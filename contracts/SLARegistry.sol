@@ -1,0 +1,32 @@
+pragma solidity ^0.5.0;
+
+import "./SLA/SLA.sol";
+
+contract SLARegistry {
+
+    mapping(address => SLA[]) private userToSLAs;
+
+    function createSLA(
+        address _owner,
+        Whitelist _whitelist,
+        IERC20 _dsla,
+        bytes32[] memory _SLONames,
+        SLO[] memory _SLOs,
+        uint _compensationAmount
+    ) public {
+        SLA sla = new SLA(
+            _owner,
+            _whitelist,
+            _dsla,
+            _SLONames,
+            _SLOs,
+            _compensationAmount
+        );
+
+        userToSLAs[msg.sender].push(sla);
+    }
+
+    function userSLAs(address _user) public view returns(SLA[] memory) {
+        return(userToSLAs[_user]);
+    }
+}
