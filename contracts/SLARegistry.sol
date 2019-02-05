@@ -12,7 +12,8 @@ contract SLARegistry {
         IERC20 _dsla,
         bytes32[] memory _SLONames,
         SLO[] memory _SLOs,
-        uint _compensationAmount
+        uint _compensationAmount,
+        uint _stake
     ) public {
         SLA sla = new SLA(
             _owner,
@@ -20,7 +21,8 @@ contract SLARegistry {
             _dsla,
             _SLONames,
             _SLOs,
-            _compensationAmount
+            _compensationAmount,
+            _stake
         );
 
         userToSLAs[msg.sender].push(sla);
