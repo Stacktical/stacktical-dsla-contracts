@@ -64,10 +64,16 @@ contract SLA is Ownable, Compensatable, Subscribable {
     function signAgreement() external {
         _subscribe();
         _setInitialuserCompensation();
-        dsla.transfer(address(this), stake);
+        dsla.approve(address(this), stake);
+        dsla.transferFrom(msg.sender, address(this), stake);
     }
 
     function withdrawCompensation() external onlySubscribed {
         _withdrawCompensation();
+    }
+
+    function unSubscribe() external onlySubscribed {
+        _unSubscribe();
+        dsla.transfer(msg.sender, stake);
     }
 }
