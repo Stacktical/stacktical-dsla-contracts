@@ -6,6 +6,8 @@ contract SLARegistry {
 
     mapping(address => SLA[]) private userToSLAs;
 
+    event SLARegistered(address indexed sla);
+
     function createSLA(
         address _owner,
         Whitelist _whitelist,
@@ -22,6 +24,8 @@ contract SLARegistry {
             _SLOs,
             _compensationAmount
         );
+
+        emit SLARegistered(sla);
 
         userToSLAs[msg.sender].push(sla);
     }

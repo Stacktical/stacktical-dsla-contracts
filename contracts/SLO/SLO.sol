@@ -9,10 +9,14 @@ contract SLO {
     uint public value;
     bytes32 public name;
 
+    event SLORegistered(uint _value, SLOTypes _SLOType, bytes32 _name);
+
     constructor(uint _value, SLOTypes _SLOType, bytes32 _name) public {
         value = _value;
         SLOType = _SLOType;
         name = _name;
+
+        emit SLORegistered(_value, _SLOType, _name);
     }
 
     function isSLOHonored(uint _value) external view returns(bool) {

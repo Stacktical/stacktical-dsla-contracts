@@ -6,9 +6,13 @@ contract WhitelistRegistry {
 
     mapping(address => Whitelist[]) private userToWhitelists;
 
+    event WhitelistCreated(Whitelist indexed whitelist);
+
     function createWhitelist() public {
         Whitelist whitelist = new Whitelist(msg.sender);
         userToWhitelists[msg.sender].push(whitelist);
+
+        emit WhitelistCreated(whitelist);
     }
 
     function userWhitelists(address _user) public view returns(Whitelist[] memory) {

@@ -15,8 +15,15 @@ contract Compensatable {
     uint public compensationPerUser;
     uint public compensationAmount;
 
+    event InitialUserCompensation(address indexed user, uint value);
+    event CompensationWithdrawed(address indexed user, uint value);
+    event CompensationAdded(uint compensationPerUser);
+
+
     function _setInitialuserCompensation() internal {
         userToCompensated[msg.sender] = compensationPerUser;
+
+        emit InitialUserCompensation(msg.sender, compensationPerUser);
     }
 
     function _withdrawCompensation() internal {
@@ -27,10 +34,13 @@ contract Compensatable {
         userToWithdrawn[msg.sender] = userToWithdrawn[msg.sender].add(withdrawalAmount);
 
         dsla.transfer(msg.sender, withdrawalAmount);
+
+        emit CompensationWithdrawed(msg.sender, withdrawalAmount);
     }
 
     function _compensate() internal {
         compensationPerUser = compensationPerUser.add(compensationAmount);
+        
+        emit CompensationAdded(compensationPerUser);
     }
 }
-

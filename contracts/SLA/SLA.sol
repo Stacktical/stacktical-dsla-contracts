@@ -22,6 +22,8 @@ contract SLA is Ownable, Compensatable, Subscribable {
     mapping(bytes32 => SLO) public SLOs;
     mapping(bytes32 => SLI[]) public SLIs;
 
+    event SLICreated(uint _timestamp, uint _value, string _hash);
+
     constructor(
         address _owner,
         Whitelist _whitelist,
@@ -51,6 +53,8 @@ contract SLA is Ownable, Compensatable, Subscribable {
         onlyOwner
     {
         SLIs[_SLOName].push(SLI(now, _value, _hash));
+
+        emit SLICreated(now, _value, _hash);
 
         if(!SLOs[_SLOName].isSLOHonored(_value)) {
             _compensate();

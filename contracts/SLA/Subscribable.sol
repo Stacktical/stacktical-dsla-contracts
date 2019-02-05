@@ -13,6 +13,10 @@ contract Subscribable {
 
     uint public subscribersCount;
 
+    event Subscribed(address indexed user);
+    event Unsubscribed(address indexed user);
+
+
     modifier onlyWhitelisted() {
         require(whitelist.isWhitelisted(msg.sender));
         _;
@@ -26,11 +30,15 @@ contract Subscribable {
     function _subscribe() internal onlyWhitelisted {
         userToSubscribed[msg.sender] = true;
         subscribersCount = subscribersCount.add(1);
+
+        emit Subscribed(msg.sender);
     }
 
     function _unSubscribe() internal onlySubscribed {
         userToSubscribed[msg.sender] = false;
         subscribersCount = subscribersCount.sub(1);
+
+        emit Unsubscribed(msg.sender);
     }
 
     function isSubscribed(address _userAddress) public view returns(bool) {
