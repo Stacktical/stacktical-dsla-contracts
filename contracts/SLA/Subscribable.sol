@@ -14,7 +14,9 @@ contract Subscribable {
     uint public subscribersCount;
 
     modifier onlyWhitelisted() {
-        require(whitelist.isWhitelisted(msg.sender));
+        if (whitelist != Whitelist(0)) {
+          require(whitelist.isWhitelisted(msg.sender));
+        }
         _;
     }
 
