@@ -187,3 +187,48 @@ The SLO contracts will hold the logic and values to check SLI values against and
 `isSLOHonored(uint _value)`
 *Checks if the SLO is honored for the given value, returns false on SLO breach*
 
+### WhitelistRegistry
+
+The whitelistRegistry handles whitelist contract creation. Whitelists are used in the SLA contracts to check if a user is eligible to subscribe to the SLA, whitelists are not mandatory in a SLA.
+
+#### Storage
+
+`mapping(address => Whitelist[]) private userToWhitelists;`
+*Mapping to get the whitelists that are deployed by the given user address*
+
+#### Public functions
+
+`createWhitelist()`
+*Creates a new Whitelist contract*
+
+`userWhitelists(address _user)`
+*Returns Whitelists created by the given user address*
+
+### Whitelist
+
+Whitelists are used in SLA contracts to check if a user is eligible to subscribe. One whitelist can be used by multiple SLA contracts.
+
+#### Storage
+
+`address private _owner;`
+*Stores the address of the SLA owner*
+
+`mapping(address => bool) private userToWhitelisted;`
+*Mapping to store the whitelist status of user addresses*
+
+#### Public functions
+
+`addUsersToWhitelist(address[] memory _userAddresses) onlyOwner`
+*Whitelists an array of user addresses*
+
+`addUserToWhitelist(address _userAddress) onlyOwner`
+*Whitelists a single user address*
+
+`removeUsersFromWhitelist(address[] memory _userAddresses) onlyOwner`
+*Removes an array of user addresses from the whitelist*
+
+`removeUserFromWhitelist(address _userAddress) onlyOwner`
+*Removes a single user address from the whitelist*
+
+`isWhitelisted(address _userAddress)`
+*Returns true if the given user address is whitelisted*
