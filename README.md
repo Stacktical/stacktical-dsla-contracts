@@ -19,7 +19,7 @@ The SLA registry handles creation of SLA contracts. The registry stores the SLA 
 *Mapping to get the SLA's that are deployed by the given address*
 
 
-`address[] public SLAs;`
+`SLA[] public SLAs;`
 *[TODO] Array with all SLA addresses*
 
 
@@ -136,3 +136,54 @@ withdrawCompensations(address[] _users)
 isSubscribed(address _userAddress)
 ```
 *Returns true if the given address is subscribed to the SLA*
+
+### SLORegistry
+
+The SLO registry handles creation of SLO contracts and stores them.
+
+#### Storage
+
+`mapping(address => SLO[]) private userToSLOs;`
+*Mapping to get the SLO's that are deployed by the given user address*
+
+
+`SLO[] public SLOs;`
+*[TODO] Array with all deployed SLOs*
+
+
+#### Public functions
+
+```
+createSLO(uint _value, SLO.SLOTypes _SLOType, bytes32 _name)
+```
+*Creates a new SLO contract*
+
+```
+userSLOs(address _user)
+```
+*Returns SLOs created by the given user address*
+
+### SLO
+
+The SLO contracts will hold the logic and values to check SLI values against and returns a boolean. Multiple SLO’s can be created and a single SLO can be used in multiple SLA’s.
+
+#### Storage
+
+`enum SLOTypes { EqualTo, NotEqualTo, SmallerThan, SmallerOrEqualTo, GreaterThan, GreaterOrEqualTo }`
+*Enum with the available SLO types for checking for breaches*
+
+
+`SLOTypes public SLOType;`
+*The SLO type this contract is deployed with*
+
+`uint public value;`
+*The SLO value*
+
+`bytes32 public name;`
+*The name of the SLO in bytes*
+
+#### Functions
+
+`isSLOHonored(uint _value)`
+*Checks if the SLO is honored for the given value, returns false on SLO breach*
+
