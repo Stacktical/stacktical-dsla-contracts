@@ -11,6 +11,8 @@ contract SLA is Ownable, Compensatable, Subscribable {
 
     IERC20 public dsla;
 
+    uint public stake;
+
     struct SLI {
         uint timestamp;
         uint value;
@@ -20,13 +22,16 @@ contract SLA is Ownable, Compensatable, Subscribable {
     mapping(bytes32 => SLO) public SLOs;
     mapping(bytes32 => SLI[]) public SLIs;
 
+    event SLICreated(uint _timestamp, uint _value, string _hash);
+
     constructor(
         address _owner,
         Whitelist _whitelist,
         IERC20 _dsla,
         bytes32[] memory _SLONames,
         SLO[] memory _SLOs,
-        uint _compensationAmount
+        uint _compensationAmount,
+        uint _stake
     )
     public {
         require(_SLOs.length < 5);
@@ -40,6 +45,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
         whitelist = _whitelist;
         dsla = _dsla;
         compensationAmount = _compensationAmount;
+        stake = _stake;
     }
 
     function registerSLI(bytes32 _SLOName, uint _value, string calldata _hash)
@@ -47,6 +53,8 @@ contract SLA is Ownable, Compensatable, Subscribable {
         onlyOwner
     {
         SLIs[_SLOName].push(SLI(now, _value, _hash));
+
+        emit SLICreated(now, _value, _hash);
 
         if(!SLOs[_SLOName].isSLOHonored(_value)) {
             _compensate();
