@@ -15,7 +15,8 @@ contract SLARegistry {
         bytes32[] memory _SLONames,
         SLO[] memory _SLOs,
         uint _compensationAmount,
-        uint _stake
+        uint _stake,
+        string memory _ipfsHash
     ) public {
         SLA sla = new SLA(
             _owner,
@@ -24,7 +25,8 @@ contract SLARegistry {
             _SLONames,
             _SLOs,
             _compensationAmount,
-            _stake
+            _stake,
+            _ipfsHash
         );
 
         emit SLARegistered(sla);

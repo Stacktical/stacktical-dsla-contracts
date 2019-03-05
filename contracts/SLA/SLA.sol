@@ -12,6 +12,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
     IERC20 public dsla;
 
     uint public stake;
+    string ipfsHash;
 
     struct SLI {
         uint timestamp;
@@ -31,7 +32,8 @@ contract SLA is Ownable, Compensatable, Subscribable {
         bytes32[] memory _SLONames,
         SLO[] memory _SLOs,
         uint _compensationAmount,
-        uint _stake
+        uint _stake,
+        string memory _ipfsHash
     )
     public {
         require(_SLOs.length < 5);
@@ -46,6 +48,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
         dsla = _dsla;
         compensationAmount = _compensationAmount;
         stake = _stake;
+        ipfsHash = _ipfsHash;
     }
 
     function registerSLI(bytes32 _SLOName, uint _value, string calldata _hash)
