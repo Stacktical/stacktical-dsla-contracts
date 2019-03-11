@@ -19,7 +19,6 @@ contract Compensatable {
     event CompensationWithdrawn(address indexed user, uint value);
     event CompensationAdded(uint compensationPerUser);
 
-
     function _setInitialuserCompensation() internal {
         userToCompensated[msg.sender] = compensationPerUser;
 

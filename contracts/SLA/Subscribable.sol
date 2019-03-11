@@ -16,7 +16,6 @@ contract Subscribable {
     event Subscribed(address indexed user);
     event Unsubscribed(address indexed user);
 
-
     modifier onlyWhitelisted() {
         if (whitelist != Whitelist(0)) {
           require(whitelist.isWhitelisted(msg.sender));

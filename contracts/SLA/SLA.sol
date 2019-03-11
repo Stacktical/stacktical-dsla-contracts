@@ -76,7 +76,6 @@ contract SLA is Ownable, Compensatable, Subscribable {
           dsla.approve(address(this), stake);
           dsla.transferFrom(msg.sender, address(this), stake);
         }
-
     }
 
     function withdrawCompensation() external onlySubscribed {
@@ -89,5 +88,23 @@ contract SLA is Ownable, Compensatable, Subscribable {
         if (stake > 0) {
           dsla.transfer(msg.sender, stake);
         }
+    }
+
+    function getInformation() external view returns(
+        IERC20,
+        Whitelist,
+        address,
+        uint,
+        uint,
+        uint
+    ){
+        return(
+            dsla,
+            whitelist,
+            owner(),
+            compensationAmount,
+            stake,
+            subscribersCount
+        );
     }
 }
