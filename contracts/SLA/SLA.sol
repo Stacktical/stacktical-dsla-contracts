@@ -23,6 +23,8 @@ contract SLA is Ownable, Compensatable, Subscribable {
     mapping(bytes32 => SLO) public SLOs;
     mapping(bytes32 => SLI[]) public SLIs;
 
+    bytes32[] SLONames;
+
     event SLICreated(uint _timestamp, uint _value, string _hash);
 
     constructor(
@@ -44,6 +46,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
         }
 
         transferOwnership(_owner);
+        SLONames = _SLONames;
         whitelist = _whitelist;
         dsla = _dsla;
         compensationAmount = _compensationAmount;
@@ -90,21 +93,31 @@ contract SLA is Ownable, Compensatable, Subscribable {
         }
     }
 
-    function getInformation() external view returns(
+    function getDetails() external view returns(
         IERC20,
         Whitelist,
         address,
         uint,
         uint,
-        uint
+        uint,
+        bytes32[],
+        SLO[]
     ){
+        SLO[] memory _SLOAddressess = new SLO[](SLONames.length);
+
+        for(uint i = 0; i < SLONames.length; i++) {
+            _SLOAddressess[i] = SLOs[SLONames[i]];
+        }
+
         return(
             dsla,
             whitelist,
             owner(),
             compensationAmount,
             stake,
-            subscribersCount
+            subscribersCount,
+            SLONames,
+            _SLOAddressess
         );
     }
 }
