@@ -94,6 +94,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
     }
 
     function getDetails() external view returns(
+        string,
         IERC20,
         Whitelist,
         address,
@@ -110,6 +111,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
         }
 
         return(
+            ipfsHash,
             dsla,
             whitelist,
             owner(),
