@@ -94,15 +94,15 @@ contract SLA is Ownable, Compensatable, Subscribable {
     }
 
     function getDetails() external view returns(
-        string,
+        string memory,
         IERC20,
         Whitelist,
         address,
         uint,
         uint,
         uint,
-        bytes32[],
-        SLO[]
+        bytes32[] memory,
+        SLO[] memory
     ){
         SLO[] memory _SLOAddressess = new SLO[](SLONames.length);
 
