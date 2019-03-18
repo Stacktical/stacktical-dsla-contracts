@@ -6,7 +6,7 @@ contract SLARegistry {
 
     mapping(address => SLA[]) private userToSLAs;
 
-    event SLARegistered(address indexed sla);
+    event SLARegistered(SLA indexed sla);
 
     function createSLA(
         address _owner,
