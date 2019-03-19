@@ -28,6 +28,11 @@ contract Subscribable {
         _;
     }
 
+    modifier onlyNotSubscribed() {
+        require(!isSubscribed(msg.sender));
+        _;
+    }
+
     function _subscribe() internal onlyWhitelisted {
         userToSubscribed[msg.sender] = true;
         subscribersCount = subscribersCount.add(1);
