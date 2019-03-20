@@ -71,7 +71,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
         whitelist = _newWhitelist;
     }
 
-    function signAgreement() external {
+    function signAgreement() external onlyWhitelisted onlyNotSubscribed{
         _subscribe();
         _setInitialuserCompensation();
 
