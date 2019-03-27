@@ -16,8 +16,11 @@ contract SLARegistry {
         SLO[] memory _SLOs,
         uint _compensationAmount,
         uint _stake,
-        string memory _ipfsHash
+        string memory _ipfsHash,
+        uint _poolSize
     ) public {
+        require(_dsla.allowance(msg.sender, address(this)) >= _poolSize);
+
         SLA sla = new SLA(
             _owner,
             _whitelist,
@@ -32,6 +35,8 @@ contract SLARegistry {
         emit SLARegistered(sla);
 
         userToSLAs[msg.sender].push(sla);
+
+        _dsla.transferFrom(msg.sender, address(sla), _poolSize);
     }
 
     function userSLAs(address _user) public view returns(SLA[] memory) {
