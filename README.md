@@ -1,5 +1,22 @@
 # stacktical-mvp-contracts
 
+## Dev
+
+### Code styling
+
+**Linter**
+
+`solium -d contracts`
+
+**Other styling**
+
+[Style guide](https://solidity.readthedocs.io/en/latest/style-guide.html)
+
+**Commenting**
+
+[Natspec](https://github.com/ethereum/wiki/wiki/Ethereum-Natural-Specification-Format)
+
+
 ## Contracts
 
 * SLARegistry (Service level agreements registry, single contract)
@@ -35,7 +52,9 @@ createSLA(
     IERC20 _dsla,
     bytes32[] memory _SLONames,
     SLO[] memory _SLOs,
-    uint _compensationAmount
+    uint _compensationAmount,
+    uint _stake,
+    string memory _ipfsHash
 )
 ```
 *Creates a new SLA contract*
@@ -44,6 +63,30 @@ createSLA(
 userSLAs(address _user)
 ```
 *Returns SLAs created by the given user address*
+
+```
+userSLACount(address _user)
+```
+*Returns the amount of SLAs created by the given user address*
+
+```
+allSLAs()
+```
+*Returns all SLAs*
+
+```
+SLACount()
+```
+*Returns total amount of SLAs*
+
+```
+paginatedSLAs(
+    uint _start,
+    uint _end
+)
+```
+*Returns SLAs for the given index range*
+
 
 ### SLA
 
