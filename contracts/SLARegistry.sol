@@ -1,10 +1,15 @@
 pragma solidity ^0.5.0;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./SLA/SLA.sol";
 
 contract SLARegistry {
 
-    mapping(address => SLA[]) private userToSLAs;
+    using SafeMath for uint256;
+
+    mapping(address => uint[]) private userToSLAIndexes;
+
+    SLA[] public SLAs;
 
     event SLARegistered(SLA indexed sla);
 
@@ -34,12 +39,45 @@ contract SLARegistry {
 
         emit SLARegistered(sla);
 
-        userToSLAs[msg.sender].push(sla);
-
         _dsla.transferFrom(msg.sender, address(sla), _poolSize);
+        uint index = SLAs.push(sla);
+
+        userToSLAIndexes[msg.sender].push(index);
     }
 
     function userSLAs(address _user) public view returns(SLA[] memory) {
-        return(userToSLAs[_user]);
+        uint count = userSLACount(_user);
+        SLA[] memory SLAList = new SLA[](count);
+        uint[] memory userSLAIndexes = userToSLAIndexes[_user];
+
+        for(uint i = 0; i < count; i++) {
+            SLAList[i] = (SLAs[userSLAIndexes[i]]);
+        }
+
+        return(SLAList);
+    }
+
+    function userSLACount(address _user) public view returns(uint) {
+        return userToSLAIndexes[_user].length;
+    }
+
+    function allSLAs() public view returns(SLA[] memory) {
+        return(SLAs);
+    }
+
+    function SLACount() public view returns(uint) {
+        return SLAs.length;
+    }
+
+    function paginatedSLAs(uint _start, uint _end) public view returns(SLA[] memory) {
+        require(_start >= _end);
+
+        SLA[] memory SLAList = new SLA[](_end.sub(_start).add(1));
+
+        for(uint i = 0; i < _end.sub(_start).add(1); i++) {
+            SLAList[i] = (SLAs[i.add(_start)]);
+        }
+
+        return(SLAList);
     }
 }
