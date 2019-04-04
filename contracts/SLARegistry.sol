@@ -66,7 +66,7 @@ contract SLARegistry {
 
         _dsla.transferFrom(msg.sender, address(sla), _poolSize);
 
-        uint index = SLAs.push(sla);
+        uint index = SLAs.push(sla).sub(1);
 
         userToSLAIndexes[msg.sender].push(index);
 
