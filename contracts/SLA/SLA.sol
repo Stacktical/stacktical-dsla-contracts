@@ -76,8 +76,8 @@ contract SLA is Ownable, Compensatable, Subscribable {
         _setInitialuserCompensation();
 
         if (stake > 0) {
-          dsla.approve(address(this), stake);
-          dsla.transferFrom(msg.sender, address(this), stake);
+            dsla.approve(address(this), stake);
+            dsla.transferFrom(msg.sender, address(this), stake);
         }
     }
 
@@ -89,7 +89,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
         _unSubscribe();
 
         if (stake > 0) {
-          dsla.transfer(msg.sender, stake);
+            dsla.transfer(msg.sender, stake);
         }
     }
 

@@ -18,7 +18,7 @@ contract Subscribable {
 
     modifier onlyWhitelisted() {
         if (whitelist != Whitelist(0)) {
-          require(whitelist.isWhitelisted(msg.sender));
+            require(whitelist.isWhitelisted(msg.sender));
         }
         _;
     }
