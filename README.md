@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Versions
+
+Truffle `5.0.10`
+
 ### Code styling
 
 **Linter**
