@@ -26,7 +26,7 @@ contract Compensatable {
     }
 
     function _withdrawCompensation() internal {
-        require(userToCompensated[msg.sender] < compensationPerUser);
+        require(_compensationWithdrawable(msg.sender));
 
         uint withdrawalAmount = compensationPerUser.sub(userToCompensated[msg.sender]);
         userToCompensated[msg.sender] = userToCompensated[msg.sender].add(withdrawalAmount);
@@ -41,5 +41,9 @@ contract Compensatable {
         compensationPerUser = compensationPerUser.add(compensationAmount);
 
         emit CompensationAdded(compensationPerUser);
+    }
+
+    function _compensationWithdrawable(address _user) internal view returns(bool) {
+        return userToCompensated[_user] < compensationPerUser;
     }
 }

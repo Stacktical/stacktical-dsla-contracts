@@ -11,7 +11,10 @@ contract Subscribable {
 
     mapping(address => bool) private userToSubscribed;
 
+    address[] internal allUsers;
+
     uint public subscribersCount;
+    uint internal usersCount;
 
     event Subscribed(address indexed user);
     event Unsubscribed(address indexed user);
@@ -36,6 +39,8 @@ contract Subscribable {
     function _subscribe() internal onlyWhitelisted {
         userToSubscribed[msg.sender] = true;
         subscribersCount = subscribersCount.add(1);
+        allUsers.push(msg.sender);
+        usersCount = usersCount.add(1);
 
         emit Subscribed(msg.sender);
     }

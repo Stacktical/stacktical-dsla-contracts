@@ -2,12 +2,15 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Compensatable.sol";
 import "./Subscribable.sol";
 import "../Whitelist/Whitelist.sol";
 import "../SLO/SLO.sol";
 
 contract SLA is Ownable, Compensatable, Subscribable {
+
+    using SafeMath for uint256;
 
     IERC20 public dsla;
 
@@ -86,6 +89,10 @@ contract SLA is Ownable, Compensatable, Subscribable {
     }
 
     function revokeAgreement() external onlySubscribed {
+        if (_compensationWithdrawable(msg.sender)) {
+            _withdrawCompensation();
+        }
+
         _unSubscribe();
 
         if (stake > 0) {
@@ -121,5 +128,21 @@ contract SLA is Ownable, Compensatable, Subscribable {
             SLONames,
             _SLOAddressess
         );
+    }
+
+    function getWithdrawableSubscribers() external view returns(address[] memory) {
+        address[] memory userList = new address[](usersCount);
+
+        for(uint i = 0; i < usersCount; i++) {
+            address userAddress = allUsers[i];
+
+            if (isSubscribed(userAddress) && _compensationWithdrawable(userAddress)) {
+                userList[i] = userAddress;
+            } else {
+                userList[i] = address(0);
+            }
+        }
+
+        return userList;
     }
 }
