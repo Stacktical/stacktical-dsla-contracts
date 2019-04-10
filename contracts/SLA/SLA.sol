@@ -85,12 +85,28 @@ contract SLA is Ownable, Compensatable, Subscribable {
     }
 
     function withdrawCompensation() external onlySubscribed {
-        _withdrawCompensation();
+        _withdrawCompensation(msg.sender);
+    }
+
+    function withdrawCompensations(address[] calldata _users) external {
+        uint reward = 0;
+
+        for(uint i = 0; i < _users.length; i++) {
+            address userAddress = _users[i];
+
+            if (isSubscribed(userAddress) && _compensationWithdrawable(userAddress)) {
+                _withdrawCompensation(userAddress);
+                reward = reward.add(1e18);
+            }
+        }
+
+        // TODO: Replace temporary reward calculation with actual calculation
+        dsla.transfer(msg.sender, reward);
     }
 
     function revokeAgreement() external onlySubscribed {
         if (_compensationWithdrawable(msg.sender)) {
-            _withdrawCompensation();
+            _withdrawCompensation(msg.sender);
         }
 
         _unSubscribe();
