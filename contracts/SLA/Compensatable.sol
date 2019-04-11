@@ -25,16 +25,16 @@ contract Compensatable {
         emit InitialUserCompensation(msg.sender, compensationPerUser);
     }
 
-    function _withdrawCompensation(address _user) internal {
+    function _withdrawCompensation(address _user) internal returns(uint) {
         require(_compensationWithdrawable(_user));
 
         uint withdrawalAmount = compensationPerUser.sub(userToCompensated[_user]);
         userToCompensated[_user] = userToCompensated[_user].add(withdrawalAmount);
         userToWithdrawn[_user] = userToWithdrawn[_user].add(withdrawalAmount);
 
-        dsla.transfer(_user, withdrawalAmount);
-
         emit CompensationWithdrawn(_user, withdrawalAmount);
+
+        return withdrawalAmount;
     }
 
     function _compensate() internal {

@@ -85,7 +85,8 @@ contract SLA is Ownable, Compensatable, Subscribable {
     }
 
     function withdrawCompensation() external onlySubscribed {
-        _withdrawCompensation(msg.sender);
+        uint withdrawalAmount = _withdrawCompensation(msg.sender);
+        dsla.transfer(msg.sender, withdrawalAmount);
     }
 
     function withdrawCompensations(address[] calldata _users) external {
@@ -95,7 +96,9 @@ contract SLA is Ownable, Compensatable, Subscribable {
             address userAddress = _users[i];
 
             if (isSubscribed(userAddress) && _compensationWithdrawable(userAddress)) {
-                _withdrawCompensation(userAddress);
+                uint withdrawalAmount = _withdrawCompensation(userAddress);
+                dsla.transfer(userAddress, withdrawalAmount);
+
                 reward = reward.add(1e18);
             }
         }
