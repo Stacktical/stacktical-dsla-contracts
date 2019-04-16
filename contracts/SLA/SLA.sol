@@ -1,13 +1,16 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.7;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Compensatable.sol";
 import "./Subscribable.sol";
 import "../Whitelist/Whitelist.sol";
 import "../SLO/SLO.sol";
 
 contract SLA is Ownable, Compensatable, Subscribable {
+
+    using SafeMath for uint256;
 
     IERC20 public dsla;
 
@@ -82,10 +85,33 @@ contract SLA is Ownable, Compensatable, Subscribable {
     }
 
     function withdrawCompensation() external onlySubscribed {
-        _withdrawCompensation();
+        uint withdrawalAmount = _withdrawCompensation(msg.sender);
+        dsla.transfer(msg.sender, withdrawalAmount);
+    }
+
+    function withdrawCompensations(address[] calldata _users) external {
+        uint reward = 0;
+
+        for(uint i = 0; i < _users.length; i++) {
+            address userAddress = _users[i];
+
+            if (isSubscribed(userAddress) && _compensationWithdrawable(userAddress)) {
+                uint withdrawalAmount = _withdrawCompensation(userAddress);
+                dsla.transfer(userAddress, withdrawalAmount);
+
+                reward = reward.add(1e18);
+            }
+        }
+
+        // TODO: Replace temporary reward calculation with actual calculation
+        dsla.transfer(msg.sender, reward);
     }
 
     function revokeAgreement() external onlySubscribed {
+        if (_compensationWithdrawable(msg.sender)) {
+            _withdrawCompensation(msg.sender);
+        }
+
         _unSubscribe();
 
         if (stake > 0) {
@@ -121,5 +147,21 @@ contract SLA is Ownable, Compensatable, Subscribable {
             SLONames,
             _SLOAddressess
         );
+    }
+
+    function getWithdrawableSubscribers() external view returns(address[] memory) {
+        address[] memory userList = new address[](usersCount);
+
+        for(uint i = 0; i < usersCount; i++) {
+            address userAddress = allUsers[i];
+
+            if (isSubscribed(userAddress) && _compensationWithdrawable(userAddress)) {
+                userList[i] = userAddress;
+            } else {
+                userList[i] = address(0);
+            }
+        }
+
+        return userList;
     }
 }

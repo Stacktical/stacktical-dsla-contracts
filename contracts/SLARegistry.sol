@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.7;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./SLA/SLA.sol";
@@ -117,12 +117,12 @@ contract SLARegistry {
     }
 
     /**
-     * @dev public view function that returns the service level agreements for
+     * @dev external view function that returns the service level agreements for
      * a certain range in the array
      * @param _start the index of the start position in the array
      * @param _end the index of the end position in the array
      */
-    function paginatedSLAs(uint _start, uint _end) public view returns(SLA[] memory) {
+    function paginatedSLAs(uint _start, uint _end) external view returns(SLA[] memory) {
         require(_start >= _end);
 
         SLA[] memory SLAList = new SLA[](_end.sub(_start).add(1));
