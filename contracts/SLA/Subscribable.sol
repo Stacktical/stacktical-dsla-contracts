@@ -87,7 +87,7 @@ contract Subscribable {
     }
 
     /**
-     * @dev public view funtion to check if a given user is subscribed to the
+     * @dev public view function to check if a given user is subscribed to the
      * contract
      * @param _userAddress the address of the user to check
      * @return true if _userAddress is subscribed to the contract
