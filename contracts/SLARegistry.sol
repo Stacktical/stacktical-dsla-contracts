@@ -123,7 +123,7 @@ contract SLARegistry {
      * @param _end the index of the end position in the array
      */
     function paginatedSLAs(uint _start, uint _end) external view returns(SLA[] memory) {
-        require(_start >= _end);
+        require(_start <= _end);
 
         SLA[] memory SLAList = new SLA[](_end.sub(_start).add(1));
 
