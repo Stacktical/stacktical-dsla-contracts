@@ -26,6 +26,9 @@ contract SLA is Ownable, Compensatable, Subscribable {
     // The ipfs hash that stores extra information about the agreement
     string ipfsHash;
 
+    // The address of the registry contract
+    address registry;
+
     // Struct used for storing registered SLI's
     struct SLI {
         uint timestamp;
@@ -92,6 +95,15 @@ contract SLA is Ownable, Compensatable, Subscribable {
         compensationAmount = _compensationAmount;
         stake = _stake;
         ipfsHash = _ipfsHash;
+        registry = msg.sender;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the registry contract.
+     */
+    modifier onlyRegistry() {
+        require(msg.sender == registry);
+        _;
     }
 
     /**
@@ -102,7 +114,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
      */
     function registerSLI(bytes32 _SLOName, uint _value, string calldata _hash)
         external
-        onlyOwner
+        onlyRegistry
     {
         SLIs[_SLOName].push(SLI(now, _value, _hash));
 
