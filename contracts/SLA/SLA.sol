@@ -3,10 +3,12 @@ pragma solidity 0.5.7;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./Compensatable.sol";
-import "./Subscribable.sol";
+import "../interfaces/IMessenger.sol";
 import "../Whitelist/Whitelist.sol";
 import "../SLO/SLO.sol";
+import "../SLARegistry.sol";
+import "./Subscribable.sol";
+import "./Compensatable.sol";
 
 /**
  * @title SLA
@@ -23,11 +25,14 @@ contract SLA is Ownable, Compensatable, Subscribable {
     // The required amount to stake when subscribing to the agreement
     uint public stake;
 
+    // The time between SLI registration
+    uint private sliInterval;
+
     // The ipfs hash that stores extra information about the agreement
-    string ipfsHash;
+    string public ipfsHash;
 
     // The address of the registry contract
-    address registry;
+    SLARegistry public registry;
 
     // Struct used for storing registered SLI's
     struct SLI {
@@ -78,7 +83,8 @@ contract SLA is Ownable, Compensatable, Subscribable {
         SLO[] memory _SLOs,
         uint _compensationAmount,
         uint _stake,
-        string memory _ipfsHash
+        string memory _ipfsHash,
+        uint _sliInterval
     )
     public {
         require(_SLOs.length < 5);
@@ -95,14 +101,16 @@ contract SLA is Ownable, Compensatable, Subscribable {
         compensationAmount = _compensationAmount;
         stake = _stake;
         ipfsHash = _ipfsHash;
-        registry = msg.sender;
+        registry = SLARegistry(msg.sender);
+        sliInterval = _sliInterval;
     }
 
     /**
-     * @dev Throws if called by any account other than the registry contract.
+     * @dev Throws if called by any address other than the Oraclize or
+     * messenger contract.
      */
-    modifier onlyRegistry() {
-        require(msg.sender == registry);
+    modifier onlyMessenger() {
+        require(msg.sender == address(registry.messenger()));
         _;
     }
 
@@ -114,7 +122,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
      */
     function registerSLI(bytes32 _SLOName, uint _value, string calldata _hash)
         external
-        onlyRegistry
+        onlyMessenger
     {
         SLIs[_SLOName].push(SLI(now, _value, _hash));
 
@@ -191,6 +199,13 @@ contract SLA is Ownable, Compensatable, Subscribable {
         if (stake > 0) {
             dsla.transfer(msg.sender, stake);
         }
+    }
+
+    /**
+     * @dev external view function that returns the sliInterval value
+     */
+    function getSliInterval() external view returns(uint) {
+      return sliInterval;
     }
 
     /**
