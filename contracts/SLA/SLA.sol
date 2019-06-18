@@ -205,7 +205,7 @@ contract SLA is Ownable, Compensatable, Subscribable {
      * @dev external view function that returns the sliInterval value
      */
     function getSliInterval() external view returns(uint) {
-      return sliInterval;
+        return sliInterval;
     }
 
     /**

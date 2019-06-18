@@ -12,10 +12,10 @@ interface IMessenger {
      * @param _interval the interval in seconds between requesting a new SLI
      */
     function initializeSLIRegistering(
-      SLA _sla,
-      bytes32 _sloName,
-      uint _interval
-    ) external;
+        SLA _sla,
+        bytes32 _sloName,
+        uint _interval
+    )  external;
 
     /**
      * @dev Creates an Oraclize request to get a new SLI value for the
