@@ -20,6 +20,13 @@ Truffle `5.0.10`
 
 [Natspec](https://github.com/ethereum/wiki/wiki/Ethereum-Natural-Specification-Format)
 
+## Deploying
+
+1. Make sure a new `Messenger` contract has been deployed to connect with the oracle ([stacktical-dsla-oraclize](https://github.com/Stacktical/stacktical-dsla-oraclize)).
+
+2. Update the `messengerAddress` contract address in `migrations/2_deploy_contracts.js` with the newly deployed `Messenger` contract address.
+
+3. Run `truffle migrate` with the required options (network, etc.)
 
 ## Contracts
 
