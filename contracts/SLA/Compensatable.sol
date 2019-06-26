@@ -43,7 +43,7 @@ contract Compensatable {
 
     /**
      * @dev event for logging when a new compensation is added
-     * @param compenssationPerUser The new amount of compensation every user
+     * @param compensationPerUser The new amount of compensation every user
      * is entitled to
      */
     event CompensationAdded(uint compensationPerUser);

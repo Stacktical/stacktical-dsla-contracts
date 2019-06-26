@@ -1,7 +1,11 @@
 pragma solidity 0.5.7;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "./interfaces/IMessenger.sol";
 import "./SLA/SLA.sol";
+import "./SLO/SLO.sol";
+import "./Whitelist/Whitelist.sol";
 
 /**
  * @title SLARegistry
@@ -11,6 +15,8 @@ import "./SLA/SLA.sol";
 contract SLARegistry {
 
     using SafeMath for uint256;
+
+    IMessenger public messenger;
 
     // Array that stores the addresses of created service level agreements
     SLA[] public SLAs;
@@ -26,6 +32,36 @@ contract SLARegistry {
     event SLACreated(SLA indexed sla, address indexed owner);
 
     /**
+     * @dev constructor
+     * @param _messengerAddress the address of the chainlink messenger contract
+     */
+    constructor(IMessenger _messengerAddress) public {
+        messenger = _messengerAddress;
+
+        messenger.setSLARegistry();
+    }
+
+    /**
+     * @dev external view function that returns the service level agreements for
+     * a certain range in the array
+     * @param _start the index of the start position in the array
+     * @param _end the index of the end position in the array
+     */
+    function paginatedSLAs(uint _start, uint _end) external view returns(
+        SLA[] memory
+    ) {
+        require(_start <= _end);
+
+        SLA[] memory SLAList = new SLA[](_end.sub(_start).add(1));
+
+        for(uint i = 0; i < _end.sub(_start).add(1); i++) {
+            SLAList[i] = (SLAs[i.add(_start)]);
+        }
+
+        return(SLAList);
+    }
+
+    /**
      * @dev public function for creating service level agreements
      * @param _owner Address of the owner of the service level agreement
      * @param _whitelist Address of the whitelist contract
@@ -39,6 +75,8 @@ contract SLARegistry {
      * service level agreement
      * @param _ipfsHash String with the ipfs hash that contains extra
      * information about the service level agreement
+     * @param _poolSize uint the size of the compensation pool the creator will
+     * initialize the contract with
      */
     function createSLA(
         address _owner,
@@ -49,7 +87,8 @@ contract SLARegistry {
         uint _compensationAmount,
         uint _stake,
         string memory _ipfsHash,
-        uint _poolSize
+        uint _poolSize,
+        uint _sliInterval
     ) public {
         require(_dsla.allowance(msg.sender, address(this)) >= _poolSize);
 
@@ -61,7 +100,8 @@ contract SLARegistry {
             _SLOs,
             _compensationAmount,
             _stake,
-            _ipfsHash
+            _ipfsHash,
+            _sliInterval
         );
 
         _dsla.transferFrom(msg.sender, address(sla), _poolSize);
@@ -69,6 +109,10 @@ contract SLARegistry {
         uint index = SLAs.push(sla).sub(1);
 
         userToSLAIndexes[msg.sender].push(index);
+
+        for(uint i = 0; i < _SLONames.length; i++) {
+            messenger.initializeSLIRegistering(sla, _SLONames[i], _sliInterval);
+        }
 
         emit SLACreated(sla, _owner);
     }
@@ -114,23 +158,5 @@ contract SLARegistry {
      */
     function SLACount() public view returns(uint) {
         return SLAs.length;
-    }
-
-    /**
-     * @dev external view function that returns the service level agreements for
-     * a certain range in the array
-     * @param _start the index of the start position in the array
-     * @param _end the index of the end position in the array
-     */
-    function paginatedSLAs(uint _start, uint _end) external view returns(SLA[] memory) {
-        require(_start <= _end);
-
-        SLA[] memory SLAList = new SLA[](_end.sub(_start).add(1));
-
-        for(uint i = 0; i < _end.sub(_start).add(1); i++) {
-            SLAList[i] = (SLAs[i.add(_start)]);
-        }
-
-        return(SLAList);
     }
 }
