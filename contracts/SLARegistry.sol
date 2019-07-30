@@ -153,6 +153,40 @@ contract SLARegistry {
     }
 
     /**
+     * @dev public view function that returns the service level agreements the
+     * user is subscribed to
+     */
+    function subscribedSLAs(address _user) public view returns(SLA[] memory) {
+        SLA[] memory SLAList = new SLA[](subscriptionCount(_user));
+        uint SLAListIndex = 0;
+
+        for(uint i = 0; i < SLAs.length; i++) {
+            if (SLAs[i].isSubscribed(_user)) {
+                SLAList[SLAListIndex] = (SLAs[i]);
+                SLAListIndex = SLAListIndex.add(1);
+            }
+        }
+
+        return(SLAList);
+    }
+
+    /**
+     * @dev public view function that returns the amount of SLA's the user is
+     * subscribed to
+     */
+    function subscriptionCount(address _user) public view returns(uint) {
+        uint count = 0;
+
+        for(uint i = 0; i < SLAs.length; i++) {
+            if (SLAs[i].isSubscribed(_user)) {
+                count = count.add(1);
+            }
+        }
+
+        return(count);
+    }
+
+    /**
      * @dev public view function that returns the total amount of service
      * level agreements
      */
