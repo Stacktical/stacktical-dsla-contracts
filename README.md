@@ -86,6 +86,16 @@ allSLAs()
 *Returns all SLAs*
 
 ```
+subscriptionCount(address _user)
+```
+* Returns the amount of SLAs the user is subscribed to
+
+```
+subscribedSLAs(address _user)
+```
+* Returns all SLAs the user is subscribed to
+
+```
 SLACount()
 ```
 *Returns total amount of SLAs*
