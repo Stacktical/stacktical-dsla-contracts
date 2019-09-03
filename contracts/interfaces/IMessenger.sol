@@ -26,7 +26,7 @@ interface IMessenger {
     function requestSLI(uint _sloDetailsId, uint _previousTimestamp) external;
 
     /**
-     * @dev The callback function for the Oraclize SLI request which stores
+     * @dev The callback function for the Provable SLI request which stores
      * the SLI in the SLA contract
      * @param _requestId the ID of the ChainLink request
      * @param _result the SLI value returned by ChainLink

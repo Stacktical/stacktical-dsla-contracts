@@ -1,0 +1,809 @@
+{
+  "contractName": "IMessenger",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_sla",
+          "type": "address"
+        },
+        {
+          "name": "_sloName",
+          "type": "bytes32"
+        },
+        {
+          "name": "_interval",
+          "type": "uint256"
+        }
+      ],
+      "name": "initializeSLIRegistering",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_sloDetailsId",
+          "type": "uint256"
+        },
+        {
+          "name": "_previousTimestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "requestSLI",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_requestId",
+          "type": "bytes32"
+        },
+        {
+          "name": "_result",
+          "type": "string"
+        }
+      ],
+      "name": "__callback",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "setSLARegistry",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity 0.5.7;\n\nimport \"../SLA/SLA.sol\";\n\ninterface IMessenger {\n\n    /**\n     * @dev Creates an Oraclize request to get a new SLI value for the\n     * given params\n     * @param _sla the SLA to get the SLI values for\n     * @param _sloName the SLO name to get the SLI values for\n     * @param _interval the interval in seconds between requesting a new SLI\n     */\n    function initializeSLIRegistering(\n        SLA _sla,\n        bytes32 _sloName,\n        uint _interval\n    )  external;\n\n    /**\n     * @dev Creates an Oraclize request to get a new SLI value for the\n     * given slo\n     * @param _sloDetailsId the id for the SLO details\n     * @param _previousTimestamp the timestamp of the previous request\n     */\n    function requestSLI(uint _sloDetailsId, uint _previousTimestamp) external;\n\n    /**\n     * @dev The callback function for the Oraclize SLI request which stores\n     * the SLI in the SLA contract\n     * @param _requestId the ID of the ChainLink request\n     * @param _result the SLI value returned by ChainLink\n     */\n    function __callback(bytes32 _requestId, string calldata _result) external;\n\n    /**\n     * @dev This sets the SLARegistry contract address and can only be called\n     * once\n     */\n    function setSLARegistry() external;\n}\n",
+  "sourcePath": "/home/silversurfer/Development/stacktical-dsla-contracts/contracts/interfaces/IMessenger.sol",
+  "ast": {
+    "absolutePath": "/home/silversurfer/Development/stacktical-dsla-contracts/contracts/interfaces/IMessenger.sol",
+    "exportedSymbols": {
+      "IMessenger": [
+        1677
+      ]
+    },
+    "id": 1678,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1649,
+        "literals": [
+          "solidity",
+          "0.5",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:22:9"
+      },
+      {
+        "absolutePath": "/home/silversurfer/Development/stacktical-dsla-contracts/contracts/SLA/SLA.sol",
+        "file": "../SLA/SLA.sol",
+        "id": 1650,
+        "nodeType": "ImportDirective",
+        "scope": 1678,
+        "sourceUnit": 719,
+        "src": "24:24:9",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 1677,
+        "linearizedBaseContracts": [
+          1677
+        ],
+        "name": "IMessenger",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": "@dev Creates an Oraclize request to get a new SLI value for the\ngiven params\n@param _sla the SLA to get the SLI values for\n@param _sloName the SLO name to get the SLI values for\n@param _interval the interval in seconds between requesting a new SLI",
+            "id": 1659,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initializeSLIRegistering",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1657,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1652,
+                  "name": "_sla",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1659,
+                  "src": "420:8:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_SLA_$718",
+                    "typeString": "contract SLA"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 1651,
+                    "name": "SLA",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 718,
+                    "src": "420:3:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_SLA_$718",
+                      "typeString": "contract SLA"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1654,
+                  "name": "_sloName",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1659,
+                  "src": "438:16:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 1653,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "438:7:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1656,
+                  "name": "_interval",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1659,
+                  "src": "464:14:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1655,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "464:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "410:74:9"
+            },
+            "returnParameters": {
+              "id": 1658,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "494:0:9"
+            },
+            "scope": 1677,
+            "src": "377:118:9",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@dev Creates an Oraclize request to get a new SLI value for the\ngiven slo\n@param _sloDetailsId the id for the SLO details\n@param _previousTimestamp the timestamp of the previous request",
+            "id": 1666,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "requestSLI",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1664,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1661,
+                  "name": "_sloDetailsId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1666,
+                  "src": "751:18:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1660,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "751:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1663,
+                  "name": "_previousTimestamp",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1666,
+                  "src": "771:23:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1662,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "771:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "750:45:9"
+            },
+            "returnParameters": {
+              "id": 1665,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "804:0:9"
+            },
+            "scope": 1677,
+            "src": "731:74:9",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@dev The callback function for the Oraclize SLI request which stores\nthe SLI in the SLA contract\n@param _requestId the ID of the ChainLink request\n@param _result the SLI value returned by ChainLink",
+            "id": 1673,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "__callback",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1671,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1668,
+                  "name": "_requestId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1673,
+                  "src": "1073:18:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 1667,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1073:7:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1670,
+                  "name": "_result",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1673,
+                  "src": "1093:23:9",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_calldata_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1669,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1093:6:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1072:45:9"
+            },
+            "returnParameters": {
+              "id": 1672,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1126:0:9"
+            },
+            "scope": 1677,
+            "src": "1053:74:9",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@dev This sets the SLARegistry contract address and can only be called\nonce",
+            "id": 1676,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setSLARegistry",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1674,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1262:2:9"
+            },
+            "returnParameters": {
+              "id": 1675,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1273:0:9"
+            },
+            "scope": 1677,
+            "src": "1239:35:9",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1678,
+        "src": "50:1226:9"
+      }
+    ],
+    "src": "0:1277:9"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/silversurfer/Development/stacktical-dsla-contracts/contracts/interfaces/IMessenger.sol",
+    "exportedSymbols": {
+      "IMessenger": [
+        1677
+      ]
+    },
+    "id": 1678,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1649,
+        "literals": [
+          "solidity",
+          "0.5",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:22:9"
+      },
+      {
+        "absolutePath": "/home/silversurfer/Development/stacktical-dsla-contracts/contracts/SLA/SLA.sol",
+        "file": "../SLA/SLA.sol",
+        "id": 1650,
+        "nodeType": "ImportDirective",
+        "scope": 1678,
+        "sourceUnit": 719,
+        "src": "24:24:9",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 1677,
+        "linearizedBaseContracts": [
+          1677
+        ],
+        "name": "IMessenger",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": "@dev Creates an Oraclize request to get a new SLI value for the\ngiven params\n@param _sla the SLA to get the SLI values for\n@param _sloName the SLO name to get the SLI values for\n@param _interval the interval in seconds between requesting a new SLI",
+            "id": 1659,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initializeSLIRegistering",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1657,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1652,
+                  "name": "_sla",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1659,
+                  "src": "420:8:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_SLA_$718",
+                    "typeString": "contract SLA"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 1651,
+                    "name": "SLA",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 718,
+                    "src": "420:3:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_SLA_$718",
+                      "typeString": "contract SLA"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1654,
+                  "name": "_sloName",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1659,
+                  "src": "438:16:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 1653,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "438:7:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1656,
+                  "name": "_interval",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1659,
+                  "src": "464:14:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1655,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "464:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "410:74:9"
+            },
+            "returnParameters": {
+              "id": 1658,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "494:0:9"
+            },
+            "scope": 1677,
+            "src": "377:118:9",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@dev Creates an Oraclize request to get a new SLI value for the\ngiven slo\n@param _sloDetailsId the id for the SLO details\n@param _previousTimestamp the timestamp of the previous request",
+            "id": 1666,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "requestSLI",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1664,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1661,
+                  "name": "_sloDetailsId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1666,
+                  "src": "751:18:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1660,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "751:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1663,
+                  "name": "_previousTimestamp",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1666,
+                  "src": "771:23:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1662,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "771:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "750:45:9"
+            },
+            "returnParameters": {
+              "id": 1665,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "804:0:9"
+            },
+            "scope": 1677,
+            "src": "731:74:9",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@dev The callback function for the Oraclize SLI request which stores\nthe SLI in the SLA contract\n@param _requestId the ID of the ChainLink request\n@param _result the SLI value returned by ChainLink",
+            "id": 1673,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "__callback",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1671,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1668,
+                  "name": "_requestId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1673,
+                  "src": "1073:18:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 1667,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1073:7:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1670,
+                  "name": "_result",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1673,
+                  "src": "1093:23:9",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_calldata_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1669,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1093:6:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1072:45:9"
+            },
+            "returnParameters": {
+              "id": 1672,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1126:0:9"
+            },
+            "scope": 1677,
+            "src": "1053:74:9",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@dev This sets the SLARegistry contract address and can only be called\nonce",
+            "id": 1676,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setSLARegistry",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1674,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1262:2:9"
+            },
+            "returnParameters": {
+              "id": 1675,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1273:0:9"
+            },
+            "scope": 1677,
+            "src": "1239:35:9",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1678,
+        "src": "50:1226:9"
+      }
+    ],
+    "src": "0:1277:9"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.7+commit.6da8b019.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.2",
+  "updatedAt": "2019-09-02T13:10:07.086Z",
+  "devdoc": {
+    "methods": {
+      "__callback(bytes32,string)": {
+        "details": "The callback function for the Oraclize SLI request which stores the SLI in the SLA contract",
+        "params": {
+          "_requestId": "the ID of the ChainLink request",
+          "_result": "the SLI value returned by ChainLink"
+        }
+      },
+      "initializeSLIRegistering(address,bytes32,uint256)": {
+        "details": "Creates an Oraclize request to get a new SLI value for the given params",
+        "params": {
+          "_interval": "the interval in seconds between requesting a new SLI",
+          "_sla": "the SLA to get the SLI values for",
+          "_sloName": "the SLO name to get the SLI values for"
+        }
+      },
+      "requestSLI(uint256,uint256)": {
+        "details": "Creates an Oraclize request to get a new SLI value for the given slo",
+        "params": {
+          "_previousTimestamp": "the timestamp of the previous request",
+          "_sloDetailsId": "the id for the SLO details"
+        }
+      },
+      "setSLARegistry()": {
+        "details": "This sets the SLARegistry contract address and can only be called once"
+      }
+    }
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

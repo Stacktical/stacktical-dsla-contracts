@@ -1,7 +1,8 @@
+// Will automatically load `.env` file parameters
 require('dotenv').config()
 const HDWalletProvider = require("truffle-hdwallet-provider");
 
-const infura_project_id = process.env.INFURA_PROJECT_ID;
+const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 const mnemonic_dev = process.env.DSLA_MNEMONIC_DEV;
 
 /**
@@ -64,7 +65,7 @@ module.exports = {
           return new HDWalletProvider(mnemonic_dev, "https://ropsten.infura.io/v3/" + infura_project_id);
       },
       network_id: "3",
-      gas: 4612388
+      gas: 5000000
     },
 
     // Another network with more advanced options...
