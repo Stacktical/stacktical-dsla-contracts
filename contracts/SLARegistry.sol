@@ -77,6 +77,7 @@ contract SLARegistry {
      * information about the service level agreement
      * @param _poolSize uint the size of the compensation pool the creator will
      * initialize the contract with
+     * @param _sliInterval uint the interval in seconds between requesting a new SLI
      */
     function createSLA(
         address _owner,
