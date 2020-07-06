@@ -111,10 +111,6 @@ contract SLARegistry {
 
         userToSLAIndexes[msg.sender].push(index);
 
-        for(uint i = 0; i < _SLONames.length; i++) {
-            messenger.initializeSLIRegistering(sla, _SLONames[i], _sliInterval);
-        }
-
         emit SLACreated(sla, _owner);
     }
 
