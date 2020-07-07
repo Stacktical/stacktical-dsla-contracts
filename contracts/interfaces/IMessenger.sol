@@ -11,7 +11,7 @@ interface IMessenger {
      * @param _sloName the name of the SLO for which SLI must be computed
      */
     function requestSLI(
-        bytes _data,
+        bytes calldata _data,
         SLA _sla,
         bytes32 _sloName
     ) external;
