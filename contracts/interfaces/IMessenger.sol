@@ -4,6 +4,12 @@ import "../SLA/SLA.sol";
 
 interface IMessenger {
     /**
+     * @dev This sets the SLARegistry contract address and can only be called
+     * once
+     */
+    function setSLARegistry() external;
+
+    /**
      * @dev Creates a request to get a new SLI value for the
      * given slo
      * @param _data the decentralized oracle payload
@@ -15,10 +21,4 @@ interface IMessenger {
         SLA _sla,
         bytes32 _sloName
     ) external;
-
-    /**
-     * @dev This sets the SLARegistry contract address and can only be called
-     * once
-     */
-    function setSLARegistry() external;
 }

@@ -115,6 +115,20 @@ contract SLARegistry {
     }
 
     /**
+     * @dev Gets SLI information for the specified SLA and SLO
+     * @param _data Oracle Proof
+     * @param _sla SLA Address
+     * @param _sloName SLO Name
+     */
+    function requestSLI(
+        bytes calldata _data,
+        SLA _sla,
+        bytes32 _sloName
+    ) public {
+        messenger.requestSLI(_data, _sla, _sloName);
+    }
+
+    /**
      * @dev public view function that returns the service level agreements that
      * the given user is the owner of
      * @param _user Address of the user for which to return the service level
