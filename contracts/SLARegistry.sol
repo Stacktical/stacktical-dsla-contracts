@@ -121,7 +121,7 @@ contract SLARegistry {
      * @param _sloName SLO Name
      */
     function requestSLI(
-        bytes calldata _data,
+        bytes memory _data,
         SLA _sla,
         bytes32 _sloName
     ) public {
