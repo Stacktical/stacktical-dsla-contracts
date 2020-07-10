@@ -111,11 +111,21 @@ contract SLARegistry {
 
         userToSLAIndexes[msg.sender].push(index);
 
-        for(uint i = 0; i < _SLONames.length; i++) {
-            messenger.initializeSLIRegistering(sla, _SLONames[i], _sliInterval);
-        }
-
         emit SLACreated(sla, _owner);
+    }
+
+    /**
+     * @dev Gets SLI information for the specified SLA and SLO
+     * @param _data Oracle Proof
+     * @param _sla SLA Address
+     * @param _sloName SLO Name
+     */
+    function requestSLI(
+        bytes memory _data,
+        SLA _sla,
+        bytes32 _sloName
+    ) public {
+        messenger.requestSLI(_data, _sla, _sloName);
     }
 
     /**

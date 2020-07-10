@@ -1,4 +1,5 @@
 pragma solidity 0.5.7;
+pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -199,6 +200,14 @@ contract SLA is Ownable, Compensatable, Subscribable {
         if (stake > 0) {
             dsla.transfer(msg.sender, stake);
         }
+    }
+
+    /**
+     * @dev external function to get SLI
+     * @param _SLOName the name of the SLO in bytes32
+     */
+    function getSLI(bytes32 _SLOName) public view returns(SLI[] memory) {
+        return SLIs[_SLOName];
     }
 
     /**

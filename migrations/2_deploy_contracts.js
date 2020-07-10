@@ -3,9 +3,8 @@ const SLORegistry = artifacts.require('./SLORegistry.sol');
 const SLARegistry = artifacts.require('./SLARegistry.sol');
 
 module.exports =  function(deployer, network) {
-  // Make sure to first deploy a new chainlink Messenger contract and update
-  // the address here
-  let messengerAddress = "0x0Ce6eEE973295d655bb336C8a8C0Dbc5716b453D";
+  // Make sure to first deploy a new Oracle Messenger contract, then update the address below
+  let messengerAddress = "0x1aA8dB048FcbC21e2774b383D06E41c3343aaa4f";
 
   deployer.deploy(WhitelistRegistry)
   deployer.deploy(SLORegistry)
