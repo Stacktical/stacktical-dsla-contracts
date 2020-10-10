@@ -1,12 +1,12 @@
-pragma solidity 0.5.7;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin-contracts/contracts/math/SafeMath.sol";
+import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IMessenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
-import "./Whitelist/Whitelist.sol";
-
+import "./bDSLA/bDSLAToken.sol";
 /**
  * @title SLARegistry
  * @dev SLARegistry is a contract for handling creation of service level
@@ -64,12 +64,9 @@ contract SLARegistry {
     /**
      * @dev public function for creating service level agreements
      * @param _owner Address of the owner of the service level agreement
-     * @param _whitelist Address of the whitelist contract
-     * @param _dsla Address of the DSLA token contract
      * @param _SLONames Array of the names of the service level objectives
      * in bytes32
      * @param _SLOs Array of service level objective contract addressess
-     * @param _compensationAmount Uint of the amount of DSLA to compensate on
      * service level objective breach
      * @param _stake Uint of the amount required to stake when signing the
      * service level agreement
@@ -81,33 +78,30 @@ contract SLARegistry {
      */
     function createSLA(
         address _owner,
-        Whitelist _whitelist,
-        IERC20 _dsla,
         bytes32[] memory _SLONames,
         SLO[] memory _SLOs,
-        uint _compensationAmount,
         uint _stake,
         string memory _ipfsHash,
         uint _poolSize,
-        uint _sliInterval
+        uint _sliInterval,
+        bDSLAToken _tokenAddress
     ) public {
-        require(_dsla.allowance(msg.sender, address(this)) >= _poolSize);
+        require(_tokenAddress.allowance(msg.sender, address(this)) >= _poolSize);
 
         SLA sla = new SLA(
             _owner,
-            _whitelist,
-            _dsla,
             _SLONames,
             _SLOs,
-            _compensationAmount,
             _stake,
             _ipfsHash,
-            _sliInterval
+            _sliInterval, 
+            _tokenAddress
         );
 
-        _dsla.transferFrom(msg.sender, address(sla), _poolSize);
-
-        uint index = SLAs.push(sla).sub(1);
+        _tokenAddress.transferFrom(msg.sender, address(sla), _poolSize);
+        SLAs.push(sla);
+        
+        uint index = SLAs.length.sub(1);
 
         userToSLAIndexes[msg.sender].push(index);
 
@@ -161,40 +155,6 @@ contract SLARegistry {
      */
     function allSLAs() public view returns(SLA[] memory) {
         return(SLAs);
-    }
-
-    /**
-     * @dev public view function that returns the service level agreements the
-     * user is subscribed to
-     */
-    function subscribedSLAs(address _user) public view returns(SLA[] memory) {
-        SLA[] memory SLAList = new SLA[](subscriptionCount(_user));
-        uint SLAListIndex = 0;
-
-        for(uint i = 0; i < SLAs.length; i++) {
-            if (SLAs[i].isSubscribed(_user)) {
-                SLAList[SLAListIndex] = (SLAs[i]);
-                SLAListIndex = SLAListIndex.add(1);
-            }
-        }
-
-        return(SLAList);
-    }
-
-    /**
-     * @dev public view function that returns the amount of SLA's the user is
-     * subscribed to
-     */
-    function subscriptionCount(address _user) public view returns(uint) {
-        uint count = 0;
-
-        for(uint i = 0; i < SLAs.length; i++) {
-            if (SLAs[i].isSubscribed(_user)) {
-                count = count.add(1);
-            }
-        }
-
-        return(count);
     }
 
     /**
