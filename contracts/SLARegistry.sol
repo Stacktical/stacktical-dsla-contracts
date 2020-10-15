@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-import "@openzeppelin-contracts/contracts/math/SafeMath.sol";
-import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IMessenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
@@ -42,26 +42,6 @@ contract SLARegistry {
     }
 
     /**
-     * @dev external view function that returns the service level agreements for
-     * a certain range in the array
-     * @param _start the index of the start position in the array
-     * @param _end the index of the end position in the array
-     */
-    function paginatedSLAs(uint _start, uint _end) external view returns(
-        SLA[] memory
-    ) {
-        require(_start <= _end);
-
-        SLA[] memory SLAList = new SLA[](_end.sub(_start).add(1));
-
-        for(uint i = 0; i < _end.sub(_start).add(1); i++) {
-            SLAList[i] = (SLAs[i.add(_start)]);
-        }
-
-        return(SLAList);
-    }
-
-    /**
      * @dev public function for creating service level agreements
      * @param _owner Address of the owner of the service level agreement
      * @param _SLONames Array of the names of the service level objectives
@@ -72,8 +52,6 @@ contract SLARegistry {
      * service level agreement
      * @param _ipfsHash String with the ipfs hash that contains extra
      * information about the service level agreement
-     * @param _poolSize uint the size of the compensation pool the creator will
-     * initialize the contract with
      * @param _sliInterval uint the interval in seconds between requesting a new SLI
      */
     function createSLA(
@@ -82,12 +60,9 @@ contract SLARegistry {
         SLO[] memory _SLOs,
         uint _stake,
         string memory _ipfsHash,
-        uint _poolSize,
         uint _sliInterval,
         bDSLAToken _tokenAddress
     ) public {
-        require(_tokenAddress.allowance(msg.sender, address(this)) >= _poolSize);
-
         SLA sla = new SLA(
             _owner,
             _SLONames,
@@ -98,7 +73,6 @@ contract SLARegistry {
             _tokenAddress
         );
 
-        _tokenAddress.transferFrom(msg.sender, address(sla), _poolSize);
         SLAs.push(sla);
         
         uint index = SLAs.length.sub(1);
