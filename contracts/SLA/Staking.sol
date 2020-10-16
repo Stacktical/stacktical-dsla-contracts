@@ -29,6 +29,8 @@ contract Staking is Ownable {
     mapping(address => uint) public uniqueTokensStaked; // mapping to trace how many token is staked by an user
     uint public totalStaked; 
 
+    event NewPeriodAdded(uint indexed period_index);
+    
     modifier notValidator {
         require(msg.sender != validator, "You are a validator !");
         _;
@@ -45,23 +47,20 @@ contract Staking is Ownable {
         _;
     }
     
-    constructor(bDSLAToken _tokenAddress) public {
+    constructor(bDSLAToken _tokenAddress, uint[] memory _sla_period_starts, uint[] memory _sla_period_ends) public {
+        require(_sla_period_starts.length == _sla_period_ends.length, "Please check the params of your periods !");
         bDSLA = bDSLAToken(_tokenAddress);
         allowedTokens.push(address(bDSLA));
         validator = msg.sender;
+        
+        for(uint i = 0; i < _sla_period_starts.length; i++) {
+            _addPeriod(_sla_period_starts[i], _sla_period_ends[i]);
+        }
     }
     
     // add new period 
-    function addNewPeriod(uint _sla_period_start, uint _sla_period_end) public onlyOwner returns(uint _index){
-        Period memory _period;
-        
-        _period.sla_period_start = _sla_period_start;
-        _period.sla_period_end = _sla_period_end;
-        _period.status = Status.NotVerified; 
-        
-        periods.push(_period);
-        
-        return periods.length;
+    function addNewPeriod(uint _sla_period_start, uint _sla_period_end) public onlyOwner {
+        _addPeriod(_sla_period_start, _sla_period_end);
     }
     
     // autorise a new token to be staked
@@ -70,7 +69,7 @@ contract Staking is Ownable {
     }
 
     // stake an amount of token
-    function stakeTokens(uint256 _amount, address _token, uint _period) public {
+    function stakeTokens(uint _amount, address _token, uint _period) public {
         require(_amount > 0, "amount cannot be 0");
         require(_tokenIsAllowed(_token), "token should be autorised to be staked");
 
@@ -205,5 +204,17 @@ contract Staking is Ownable {
             }
         }
         return (uint(-1));
+    }
+    
+    function _addPeriod(uint _sla_period_start, uint _sla_period_end) internal {
+        Period memory _period;
+        
+        _period.sla_period_start = _sla_period_start;
+        _period.sla_period_end = _sla_period_end;
+        _period.status = Status.NotVerified; 
+        
+        periods.push(_period);
+        
+        emit NewPeriodAdded(periods.length.sub(1));
     }
 }
