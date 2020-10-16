@@ -58,14 +58,9 @@ contract Staking is Ownable {
 
     // stake an amount of token
     function stakeTokens(uint256 _amount, address _token, uint _period) public {
-        require(_amount > 0, "amount cannot be 0");
-        require(_tokenIsAllowed(_token), "token should be autorised to be staked");
-
-        // check if the staker had already staked another token or not
-        _updateUniqueTokensStaked(msg.sender, _token, _period);
         // stake tokens
-        IERC20(_token).approve(address(this), _amount);
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+
         // update balance of staked tokens per staker
         periods[_period].stakingBalance[_token][msg.sender] = periods[_period].stakingBalance[_token][msg.sender].add(_amount);
         totalStaked = totalStaked.add(_amount);
@@ -81,7 +76,6 @@ contract Staking is Ownable {
     function withdraw(address _token, uint _period) public notValidator {
         // check if staker has staked tokens
         require(periods[_period].stakingBalance[_token][msg.sender] > 0, "staking balance cannot be 0");
-        require(_tokenIsAllowed(_token), "token should be autorised to be staked");
 
         // unstake bDSLA tokens
         uint staked = periods[_period].stakingBalance[_token][msg.sender];
@@ -104,10 +98,8 @@ contract Staking is Ownable {
     function withdrawAndStake(address _token, uint _amount, uint _period) public notValidator {
       // check if staker has staked tokens
       require(periods[_period].stakingBalance[_token][msg.sender] > 0, "staking balance cannot be 0");
-      require(_tokenIsAllowed(_token), "token should be autorised to be staked");
 
       // stake d tokens
-      IERC20(_token).approve(address(this), _amount);
       IERC20(_token).transferFrom(msg.sender, address(this), _amount);
       // update balance of staked tokens per staker
       periods[_period].stakingBalance[_token][msg.sender] = periods[_period].stakingBalance[_token][msg.sender].add(_amount);
@@ -120,7 +112,6 @@ contract Staking is Ownable {
       periods[_period].stakingBalance[_token][msg.sender] = 0;
       totalStaked = totalStaked.sub(staked);
       bDSLA.transfer(msg.sender, staked.sub(claimed_reward));
-      
     }
     
     // claim from validators
