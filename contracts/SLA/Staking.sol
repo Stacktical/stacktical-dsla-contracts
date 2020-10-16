@@ -50,7 +50,20 @@ contract Staking is Ownable {
         allowedTokens.push(address(bDSLA));
         validator = msg.sender;
     }
-
+    
+    // add new period 
+    function addNewPeriod(uint _sla_period_start, uint _sla_period_end) public onlyOwner returns(uint _index){
+        Period memory _period;
+        
+        _period.sla_period_start = _sla_period_start;
+        _period.sla_period_end = _sla_period_end;
+        _period.status = Status.NotVerified; 
+        
+        periods.push(_period);
+        
+        return periods.length;
+    }
+    
     // autorise a new token to be staked
     function addAllowedTokens(address _token) public onlyOwner {
         allowedTokens.push(_token);
