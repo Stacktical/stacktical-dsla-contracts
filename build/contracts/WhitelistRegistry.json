@@ -38,8 +38,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract Whitelist\",\"name\":\"whitelist\",\"type\":\"address\"}],\"name\":\"WhitelistCreated\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"createWhitelist\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"userWhitelists\",\"outputs\":[{\"internalType\":\"contract Whitelist[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"WhitelistRegistry is a contract for handling creation of whitelists and querying those whitelists\",\"events\":{\"WhitelistCreated(address)\":{\"details\":\"event for whitelist creation logging\",\"params\":{\"whitelist\":\"the address of the created whitelist contract\"}}},\"kind\":\"dev\",\"methods\":{\"createWhitelist()\":{\"details\":\"public function for creating whitelists\"},\"userWhitelists(address)\":{\"details\":\"public view function that returns the whitelists that are owned by the given user\",\"params\":{\"_user\":\"Address of the user for which to return the whitelists\"}}},\"title\":\"WhitelistRegistry\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/WhitelistRegistry.sol\":\"WhitelistRegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/Whitelist/Whitelist.sol\":{\"keccak256\":\"0xe6b2aa77e4c9f0338aefaa0ab4577c75a2fb7f4f51e1da64201b8205fde14838\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://67c90b78ba61519b617f18ef468662b18aa676b00f4285d118bc2dca9f521368\",\"dweb:/ipfs/QmUpEvf1SPo65YEDAoJMFTY9jbWfB4XhSvVixa5LservPj\"]},\"/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/WhitelistRegistry.sol\":{\"keccak256\":\"0xe04c99ecf4ded16f55fe36cc03464daa9f141b484c501098d457bbf9c9138e1d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ddea53272dffd2cfa5b498c1b9ddef4488643050890be4c1524443112ae38185\",\"dweb:/ipfs/QmRQpAAxK3zLRZfzx8qJjQoZN7XptxZ9UYJ4C5XkrhR5UF\"]},\"@openzeppelin/contracts/GSN/Context.sol\":{\"keccak256\":\"0xdb26cbf4d028490f49831a7865c2fe1b28db44b535ca8d343785a3b768aae183\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://840b14ce0315c47d49ba328f1f9fa7654ded1c9e1559e6c5e777a7b2dc28bf0a\",\"dweb:/ipfs/QmTLLabn4wcfGro9LEmUXUN2nwKqZSotXMvjDCLXEnLtZP\"]},\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0x4bd6402ca6b3419008c2b482aff54e66836e8cb4eba2680e42ac5884ae6424fc\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8f9f711fb8d0d92aeea1c327e3845d13ca1fa8f142e47f8723cd5b3106fb29a3\",\"dweb:/ipfs/QmVQUReDW9f4zGqhizwHnyU8EntMs95tbASdqkGncnikba\"]}},\"version\":1}",
@@ -54,15 +53,15 @@
     "absolutePath": "/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/WhitelistRegistry.sol",
     "exportedSymbols": {
       "WhitelistRegistry": [
-        1825
+        1883
       ]
     },
-    "id": 1826,
+    "id": 1884,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1772,
+        "id": 1830,
         "literals": [
           "solidity",
           "^",
@@ -75,10 +74,10 @@
       {
         "absolutePath": "/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/Whitelist/Whitelist.sol",
         "file": "./Whitelist/Whitelist.sol",
-        "id": 1773,
+        "id": 1831,
         "nodeType": "ImportDirective",
-        "scope": 1826,
-        "sourceUnit": 1771,
+        "scope": 1884,
+        "sourceUnit": 1829,
         "src": "57:35:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -87,42 +86,42 @@
         "abstract": false,
         "baseContracts": [],
         "contractDependencies": [
-          1770
+          1828
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 1774,
+          "id": 1832,
           "nodeType": "StructuredDocumentation",
           "src": "94:144:7",
           "text": " @title WhitelistRegistry\n @dev WhitelistRegistry is a contract for handling creation of whitelists\n and querying those whitelists"
         },
         "fullyImplemented": true,
-        "id": 1825,
+        "id": 1883,
         "linearizedBaseContracts": [
-          1825
+          1883
         ],
         "name": "WhitelistRegistry",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": false,
-            "id": 1779,
+            "id": 1837,
             "mutability": "mutable",
             "name": "userToWhitelists",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 1825,
+            "scope": 1883,
             "src": "331:56:7",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1770_$dyn_storage_$",
+              "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1828_$dyn_storage_$",
               "typeString": "mapping(address => contract Whitelist[])"
             },
             "typeName": {
-              "id": 1778,
+              "id": 1836,
               "keyType": {
-                "id": 1775,
+                "id": 1833,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
                 "src": "339:7:7",
@@ -134,28 +133,28 @@
               "nodeType": "Mapping",
               "src": "331:31:7",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1770_$dyn_storage_$",
+                "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1828_$dyn_storage_$",
                 "typeString": "mapping(address => contract Whitelist[])"
               },
               "valueType": {
                 "baseType": {
                   "contractScope": null,
-                  "id": 1776,
+                  "id": 1834,
                   "name": "Whitelist",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 1770,
+                  "referencedDeclaration": 1828,
                   "src": "350:9:7",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_Whitelist_$1770",
+                    "typeIdentifier": "t_contract$_Whitelist_$1828",
                     "typeString": "contract Whitelist"
                   }
                 },
-                "id": 1777,
+                "id": 1835,
                 "length": null,
                 "nodeType": "ArrayTypeName",
                 "src": "350:11:7",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage_ptr",
+                  "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage_ptr",
                   "typeString": "contract Whitelist[]"
                 }
               }
@@ -166,43 +165,43 @@
           {
             "anonymous": false,
             "documentation": {
-              "id": 1780,
+              "id": 1838,
               "nodeType": "StructuredDocumentation",
               "src": "394:130:7",
               "text": " @dev event for whitelist creation logging\n @param whitelist the address of the created whitelist contract"
             },
-            "id": 1784,
+            "id": 1842,
             "name": "WhitelistCreated",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1783,
+              "id": 1841,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1782,
+                  "id": 1840,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "whitelist",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1784,
+                  "scope": 1842,
                   "src": "552:27:7",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_Whitelist_$1770",
+                    "typeIdentifier": "t_contract$_Whitelist_$1828",
                     "typeString": "contract Whitelist"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1781,
+                    "id": 1839,
                     "name": "Whitelist",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1770,
+                    "referencedDeclaration": 1828,
                     "src": "552:9:7",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_Whitelist_$1770",
+                      "typeIdentifier": "t_contract$_Whitelist_$1828",
                       "typeString": "contract Whitelist"
                     }
                   },
@@ -216,39 +215,39 @@
           },
           {
             "body": {
-              "id": 1808,
+              "id": 1866,
               "nodeType": "Block",
               "src": "689:161:7",
               "statements": [
                 {
                   "assignments": [
-                    1789
+                    1847
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1789,
+                      "id": 1847,
                       "mutability": "mutable",
                       "name": "whitelist",
                       "nodeType": "VariableDeclaration",
                       "overrides": null,
-                      "scope": 1808,
+                      "scope": 1866,
                       "src": "699:19:7",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Whitelist_$1770",
+                        "typeIdentifier": "t_contract$_Whitelist_$1828",
                         "typeString": "contract Whitelist"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1788,
+                        "id": 1846,
                         "name": "Whitelist",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1770,
+                        "referencedDeclaration": 1828,
                         "src": "699:9:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       },
@@ -256,7 +255,7 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1795,
+                  "id": 1853,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [
@@ -264,7 +263,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 1792,
+                          "id": 1850,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -275,7 +274,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 1793,
+                        "id": 1851,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -297,7 +296,7 @@
                           "typeString": "address payable"
                         }
                       ],
-                      "id": 1791,
+                      "id": 1849,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -305,23 +304,23 @@
                       "nodeType": "NewExpression",
                       "src": "721:13:7",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_Whitelist_$1770_$",
+                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_Whitelist_$1828_$",
                         "typeString": "function (address) returns (contract Whitelist)"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1790,
+                        "id": 1848,
                         "name": "Whitelist",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1770,
+                        "referencedDeclaration": 1828,
                         "src": "725:9:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       }
                     },
-                    "id": 1794,
+                    "id": 1852,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -332,7 +331,7 @@
                     "src": "721:25:7",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_Whitelist_$1770",
+                      "typeIdentifier": "t_contract$_Whitelist_$1828",
                       "typeString": "contract Whitelist"
                     }
                   },
@@ -345,14 +344,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1801,
+                        "id": 1859,
                         "name": "whitelist",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1789,
+                        "referencedDeclaration": 1847,
                         "src": "790:9:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       }
@@ -360,7 +359,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       ],
@@ -368,23 +367,23 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 1796,
+                          "id": 1854,
                           "name": "userToWhitelists",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1779,
+                          "referencedDeclaration": 1837,
                           "src": "756:16:7",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1770_$dyn_storage_$",
+                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1828_$dyn_storage_$",
                             "typeString": "mapping(address => contract Whitelist[] storage ref)"
                           }
                         },
-                        "id": 1799,
+                        "id": 1857,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 1797,
+                            "id": 1855,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -395,7 +394,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 1798,
+                          "id": 1856,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -416,11 +415,11 @@
                         "nodeType": "IndexAccess",
                         "src": "756:28:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage",
+                          "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage",
                           "typeString": "contract Whitelist[] storage ref"
                         }
                       },
-                      "id": 1800,
+                      "id": 1858,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -430,11 +429,11 @@
                       "referencedDeclaration": null,
                       "src": "756:33:7",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_contract$_Whitelist_$1770_$returns$__$",
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_contract$_Whitelist_$1828_$returns$__$",
                         "typeString": "function (contract Whitelist)"
                       }
                     },
-                    "id": 1802,
+                    "id": 1860,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -449,7 +448,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1803,
+                  "id": 1861,
                   "nodeType": "ExpressionStatement",
                   "src": "756:44:7"
                 },
@@ -459,14 +458,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1805,
+                        "id": 1863,
                         "name": "whitelist",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1789,
+                        "referencedDeclaration": 1847,
                         "src": "833:9:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       }
@@ -474,22 +473,22 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       ],
-                      "id": 1804,
+                      "id": 1862,
                       "name": "WhitelistCreated",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1784,
+                      "referencedDeclaration": 1842,
                       "src": "816:16:7",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_Whitelist_$1770_$returns$__$",
+                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_Whitelist_$1828_$returns$__$",
                         "typeString": "function (contract Whitelist)"
                       }
                     },
-                    "id": 1806,
+                    "id": 1864,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -504,20 +503,20 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1807,
+                  "id": 1865,
                   "nodeType": "EmitStatement",
                   "src": "811:32:7"
                 }
               ]
             },
             "documentation": {
-              "id": 1785,
+              "id": 1843,
               "nodeType": "StructuredDocumentation",
               "src": "587:63:7",
               "text": " @dev public function for creating whitelists"
             },
             "functionSelector": "27e11b52",
-            "id": 1809,
+            "id": 1867,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -525,18 +524,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 1786,
+              "id": 1844,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "679:2:7"
             },
             "returnParameters": {
-              "id": 1787,
+              "id": 1845,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "689:0:7"
             },
-            "scope": 1825,
+            "scope": 1883,
             "src": "655:195:7",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -544,7 +543,7 @@
           },
           {
             "body": {
-              "id": 1823,
+              "id": 1881,
               "nodeType": "Block",
               "src": "1127:48:7",
               "statements": [
@@ -556,25 +555,25 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 1818,
+                          "id": 1876,
                           "name": "userToWhitelists",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1779,
+                          "referencedDeclaration": 1837,
                           "src": "1144:16:7",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1770_$dyn_storage_$",
+                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1828_$dyn_storage_$",
                             "typeString": "mapping(address => contract Whitelist[] storage ref)"
                           }
                         },
-                        "id": 1820,
+                        "id": 1878,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 1819,
+                          "id": 1877,
                           "name": "_user",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1812,
+                          "referencedDeclaration": 1870,
                           "src": "1161:5:7",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -588,12 +587,12 @@
                         "nodeType": "IndexAccess",
                         "src": "1144:23:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage",
+                          "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage",
                           "typeString": "contract Whitelist[] storage ref"
                         }
                       }
                     ],
-                    "id": 1821,
+                    "id": 1879,
                     "isConstant": false,
                     "isInlineArray": false,
                     "isLValue": false,
@@ -602,25 +601,25 @@
                     "nodeType": "TupleExpression",
                     "src": "1143:25:7",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage",
+                      "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage",
                       "typeString": "contract Whitelist[] storage ref"
                     }
                   },
-                  "functionReturnParameters": 1817,
-                  "id": 1822,
+                  "functionReturnParameters": 1875,
+                  "id": 1880,
                   "nodeType": "Return",
                   "src": "1137:31:7"
                 }
               ]
             },
             "documentation": {
-              "id": 1810,
+              "id": 1868,
               "nodeType": "StructuredDocumentation",
               "src": "856:187:7",
               "text": " @dev public view function that returns the whitelists that are owned by\n the given user\n @param _user Address of the user for which to return the whitelists"
             },
             "functionSelector": "9baf53dc",
-            "id": 1824,
+            "id": 1882,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -628,17 +627,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 1813,
+              "id": 1871,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1812,
+                  "id": 1870,
                   "mutability": "mutable",
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1824,
+                  "scope": 1882,
                   "src": "1072:13:7",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -647,7 +646,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1811,
+                    "id": 1869,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "1072:7:7",
@@ -664,43 +663,43 @@
               "src": "1071:15:7"
             },
             "returnParameters": {
-              "id": 1817,
+              "id": 1875,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1816,
+                  "id": 1874,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1824,
+                  "scope": 1882,
                   "src": "1107:18:7",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_memory_ptr",
+                    "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_memory_ptr",
                     "typeString": "contract Whitelist[]"
                   },
                   "typeName": {
                     "baseType": {
                       "contractScope": null,
-                      "id": 1814,
+                      "id": 1872,
                       "name": "Whitelist",
                       "nodeType": "UserDefinedTypeName",
-                      "referencedDeclaration": 1770,
+                      "referencedDeclaration": 1828,
                       "src": "1107:9:7",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Whitelist_$1770",
+                        "typeIdentifier": "t_contract$_Whitelist_$1828",
                         "typeString": "contract Whitelist"
                       }
                     },
-                    "id": 1815,
+                    "id": 1873,
                     "length": null,
                     "nodeType": "ArrayTypeName",
                     "src": "1107:11:7",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage_ptr",
+                      "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage_ptr",
                       "typeString": "contract Whitelist[]"
                     }
                   },
@@ -710,14 +709,14 @@
               ],
               "src": "1106:20:7"
             },
-            "scope": 1825,
+            "scope": 1883,
             "src": "1048:127:7",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 1826,
+        "scope": 1884,
         "src": "239:939:7"
       }
     ],
@@ -727,15 +726,15 @@
     "absolutePath": "/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/WhitelistRegistry.sol",
     "exportedSymbols": {
       "WhitelistRegistry": [
-        1825
+        1883
       ]
     },
-    "id": 1826,
+    "id": 1884,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1772,
+        "id": 1830,
         "literals": [
           "solidity",
           "^",
@@ -748,10 +747,10 @@
       {
         "absolutePath": "/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/Whitelist/Whitelist.sol",
         "file": "./Whitelist/Whitelist.sol",
-        "id": 1773,
+        "id": 1831,
         "nodeType": "ImportDirective",
-        "scope": 1826,
-        "sourceUnit": 1771,
+        "scope": 1884,
+        "sourceUnit": 1829,
         "src": "57:35:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -760,42 +759,42 @@
         "abstract": false,
         "baseContracts": [],
         "contractDependencies": [
-          1770
+          1828
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 1774,
+          "id": 1832,
           "nodeType": "StructuredDocumentation",
           "src": "94:144:7",
           "text": " @title WhitelistRegistry\n @dev WhitelistRegistry is a contract for handling creation of whitelists\n and querying those whitelists"
         },
         "fullyImplemented": true,
-        "id": 1825,
+        "id": 1883,
         "linearizedBaseContracts": [
-          1825
+          1883
         ],
         "name": "WhitelistRegistry",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": false,
-            "id": 1779,
+            "id": 1837,
             "mutability": "mutable",
             "name": "userToWhitelists",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 1825,
+            "scope": 1883,
             "src": "331:56:7",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1770_$dyn_storage_$",
+              "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1828_$dyn_storage_$",
               "typeString": "mapping(address => contract Whitelist[])"
             },
             "typeName": {
-              "id": 1778,
+              "id": 1836,
               "keyType": {
-                "id": 1775,
+                "id": 1833,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
                 "src": "339:7:7",
@@ -807,28 +806,28 @@
               "nodeType": "Mapping",
               "src": "331:31:7",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1770_$dyn_storage_$",
+                "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1828_$dyn_storage_$",
                 "typeString": "mapping(address => contract Whitelist[])"
               },
               "valueType": {
                 "baseType": {
                   "contractScope": null,
-                  "id": 1776,
+                  "id": 1834,
                   "name": "Whitelist",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 1770,
+                  "referencedDeclaration": 1828,
                   "src": "350:9:7",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_Whitelist_$1770",
+                    "typeIdentifier": "t_contract$_Whitelist_$1828",
                     "typeString": "contract Whitelist"
                   }
                 },
-                "id": 1777,
+                "id": 1835,
                 "length": null,
                 "nodeType": "ArrayTypeName",
                 "src": "350:11:7",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage_ptr",
+                  "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage_ptr",
                   "typeString": "contract Whitelist[]"
                 }
               }
@@ -839,43 +838,43 @@
           {
             "anonymous": false,
             "documentation": {
-              "id": 1780,
+              "id": 1838,
               "nodeType": "StructuredDocumentation",
               "src": "394:130:7",
               "text": " @dev event for whitelist creation logging\n @param whitelist the address of the created whitelist contract"
             },
-            "id": 1784,
+            "id": 1842,
             "name": "WhitelistCreated",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1783,
+              "id": 1841,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1782,
+                  "id": 1840,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "whitelist",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1784,
+                  "scope": 1842,
                   "src": "552:27:7",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_Whitelist_$1770",
+                    "typeIdentifier": "t_contract$_Whitelist_$1828",
                     "typeString": "contract Whitelist"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1781,
+                    "id": 1839,
                     "name": "Whitelist",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1770,
+                    "referencedDeclaration": 1828,
                     "src": "552:9:7",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_Whitelist_$1770",
+                      "typeIdentifier": "t_contract$_Whitelist_$1828",
                       "typeString": "contract Whitelist"
                     }
                   },
@@ -889,39 +888,39 @@
           },
           {
             "body": {
-              "id": 1808,
+              "id": 1866,
               "nodeType": "Block",
               "src": "689:161:7",
               "statements": [
                 {
                   "assignments": [
-                    1789
+                    1847
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1789,
+                      "id": 1847,
                       "mutability": "mutable",
                       "name": "whitelist",
                       "nodeType": "VariableDeclaration",
                       "overrides": null,
-                      "scope": 1808,
+                      "scope": 1866,
                       "src": "699:19:7",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Whitelist_$1770",
+                        "typeIdentifier": "t_contract$_Whitelist_$1828",
                         "typeString": "contract Whitelist"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1788,
+                        "id": 1846,
                         "name": "Whitelist",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1770,
+                        "referencedDeclaration": 1828,
                         "src": "699:9:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       },
@@ -929,7 +928,7 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1795,
+                  "id": 1853,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [
@@ -937,7 +936,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 1792,
+                          "id": 1850,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -948,7 +947,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 1793,
+                        "id": 1851,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -970,7 +969,7 @@
                           "typeString": "address payable"
                         }
                       ],
-                      "id": 1791,
+                      "id": 1849,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -978,23 +977,23 @@
                       "nodeType": "NewExpression",
                       "src": "721:13:7",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_Whitelist_$1770_$",
+                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_Whitelist_$1828_$",
                         "typeString": "function (address) returns (contract Whitelist)"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1790,
+                        "id": 1848,
                         "name": "Whitelist",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1770,
+                        "referencedDeclaration": 1828,
                         "src": "725:9:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       }
                     },
-                    "id": 1794,
+                    "id": 1852,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1005,7 +1004,7 @@
                     "src": "721:25:7",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_Whitelist_$1770",
+                      "typeIdentifier": "t_contract$_Whitelist_$1828",
                       "typeString": "contract Whitelist"
                     }
                   },
@@ -1018,14 +1017,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1801,
+                        "id": 1859,
                         "name": "whitelist",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1789,
+                        "referencedDeclaration": 1847,
                         "src": "790:9:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       }
@@ -1033,7 +1032,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       ],
@@ -1041,23 +1040,23 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 1796,
+                          "id": 1854,
                           "name": "userToWhitelists",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1779,
+                          "referencedDeclaration": 1837,
                           "src": "756:16:7",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1770_$dyn_storage_$",
+                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1828_$dyn_storage_$",
                             "typeString": "mapping(address => contract Whitelist[] storage ref)"
                           }
                         },
-                        "id": 1799,
+                        "id": 1857,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 1797,
+                            "id": 1855,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -1068,7 +1067,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 1798,
+                          "id": 1856,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1089,11 +1088,11 @@
                         "nodeType": "IndexAccess",
                         "src": "756:28:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage",
+                          "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage",
                           "typeString": "contract Whitelist[] storage ref"
                         }
                       },
-                      "id": 1800,
+                      "id": 1858,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -1103,11 +1102,11 @@
                       "referencedDeclaration": null,
                       "src": "756:33:7",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_contract$_Whitelist_$1770_$returns$__$",
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_contract$_Whitelist_$1828_$returns$__$",
                         "typeString": "function (contract Whitelist)"
                       }
                     },
-                    "id": 1802,
+                    "id": 1860,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1122,7 +1121,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1803,
+                  "id": 1861,
                   "nodeType": "ExpressionStatement",
                   "src": "756:44:7"
                 },
@@ -1132,14 +1131,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1805,
+                        "id": 1863,
                         "name": "whitelist",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1789,
+                        "referencedDeclaration": 1847,
                         "src": "833:9:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       }
@@ -1147,22 +1146,22 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_Whitelist_$1770",
+                          "typeIdentifier": "t_contract$_Whitelist_$1828",
                           "typeString": "contract Whitelist"
                         }
                       ],
-                      "id": 1804,
+                      "id": 1862,
                       "name": "WhitelistCreated",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1784,
+                      "referencedDeclaration": 1842,
                       "src": "816:16:7",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_Whitelist_$1770_$returns$__$",
+                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_Whitelist_$1828_$returns$__$",
                         "typeString": "function (contract Whitelist)"
                       }
                     },
-                    "id": 1806,
+                    "id": 1864,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1177,20 +1176,20 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1807,
+                  "id": 1865,
                   "nodeType": "EmitStatement",
                   "src": "811:32:7"
                 }
               ]
             },
             "documentation": {
-              "id": 1785,
+              "id": 1843,
               "nodeType": "StructuredDocumentation",
               "src": "587:63:7",
               "text": " @dev public function for creating whitelists"
             },
             "functionSelector": "27e11b52",
-            "id": 1809,
+            "id": 1867,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -1198,18 +1197,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 1786,
+              "id": 1844,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "679:2:7"
             },
             "returnParameters": {
-              "id": 1787,
+              "id": 1845,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "689:0:7"
             },
-            "scope": 1825,
+            "scope": 1883,
             "src": "655:195:7",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -1217,7 +1216,7 @@
           },
           {
             "body": {
-              "id": 1823,
+              "id": 1881,
               "nodeType": "Block",
               "src": "1127:48:7",
               "statements": [
@@ -1229,25 +1228,25 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 1818,
+                          "id": 1876,
                           "name": "userToWhitelists",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1779,
+                          "referencedDeclaration": 1837,
                           "src": "1144:16:7",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1770_$dyn_storage_$",
+                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_Whitelist_$1828_$dyn_storage_$",
                             "typeString": "mapping(address => contract Whitelist[] storage ref)"
                           }
                         },
-                        "id": 1820,
+                        "id": 1878,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 1819,
+                          "id": 1877,
                           "name": "_user",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1812,
+                          "referencedDeclaration": 1870,
                           "src": "1161:5:7",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -1261,12 +1260,12 @@
                         "nodeType": "IndexAccess",
                         "src": "1144:23:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage",
+                          "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage",
                           "typeString": "contract Whitelist[] storage ref"
                         }
                       }
                     ],
-                    "id": 1821,
+                    "id": 1879,
                     "isConstant": false,
                     "isInlineArray": false,
                     "isLValue": false,
@@ -1275,25 +1274,25 @@
                     "nodeType": "TupleExpression",
                     "src": "1143:25:7",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage",
+                      "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage",
                       "typeString": "contract Whitelist[] storage ref"
                     }
                   },
-                  "functionReturnParameters": 1817,
-                  "id": 1822,
+                  "functionReturnParameters": 1875,
+                  "id": 1880,
                   "nodeType": "Return",
                   "src": "1137:31:7"
                 }
               ]
             },
             "documentation": {
-              "id": 1810,
+              "id": 1868,
               "nodeType": "StructuredDocumentation",
               "src": "856:187:7",
               "text": " @dev public view function that returns the whitelists that are owned by\n the given user\n @param _user Address of the user for which to return the whitelists"
             },
             "functionSelector": "9baf53dc",
-            "id": 1824,
+            "id": 1882,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -1301,17 +1300,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 1813,
+              "id": 1871,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1812,
+                  "id": 1870,
                   "mutability": "mutable",
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1824,
+                  "scope": 1882,
                   "src": "1072:13:7",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1320,7 +1319,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1811,
+                    "id": 1869,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "1072:7:7",
@@ -1337,43 +1336,43 @@
               "src": "1071:15:7"
             },
             "returnParameters": {
-              "id": 1817,
+              "id": 1875,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1816,
+                  "id": 1874,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1824,
+                  "scope": 1882,
                   "src": "1107:18:7",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_memory_ptr",
+                    "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_memory_ptr",
                     "typeString": "contract Whitelist[]"
                   },
                   "typeName": {
                     "baseType": {
                       "contractScope": null,
-                      "id": 1814,
+                      "id": 1872,
                       "name": "Whitelist",
                       "nodeType": "UserDefinedTypeName",
-                      "referencedDeclaration": 1770,
+                      "referencedDeclaration": 1828,
                       "src": "1107:9:7",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Whitelist_$1770",
+                        "typeIdentifier": "t_contract$_Whitelist_$1828",
                         "typeString": "contract Whitelist"
                       }
                     },
-                    "id": 1815,
+                    "id": 1873,
                     "length": null,
                     "nodeType": "ArrayTypeName",
                     "src": "1107:11:7",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_contract$_Whitelist_$1770_$dyn_storage_ptr",
+                      "typeIdentifier": "t_array$_t_contract$_Whitelist_$1828_$dyn_storage_ptr",
                       "typeString": "contract Whitelist[]"
                     }
                   },
@@ -1383,14 +1382,14 @@
               ],
               "src": "1106:20:7"
             },
-            "scope": 1825,
+            "scope": 1883,
             "src": "1048:127:7",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 1826,
+        "scope": 1884,
         "src": "239:939:7"
       }
     ],
@@ -1400,31 +1399,9 @@
     "name": "solc",
     "version": "0.6.12+commit.27d51765.Emscripten.clang"
   },
-  "networks": {
-    "3": {
-      "events": {
-        "0x3aaa159995532a09d71082a9df6247e5c5846856e24e293fd65e164ed48233f4": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "name": "whitelist",
-              "type": "address",
-              "internalType": "contract Whitelist"
-            }
-          ],
-          "name": "WhitelistCreated",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0xa114d36eDd8fd4331D8A43e16A8845504Fddaa5A",
-      "transactionHash": "0x38d3c19270920b7ae050be918e7d443d4de1de36f842d4e6eb37b42c3bdac372"
-    }
-  },
+  "networks": {},
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-10-15T22:30:37.463Z",
-  "networkType": "ethereum",
+  "updatedAt": "2020-10-16T11:30:57.842Z",
   "devdoc": {
     "details": "WhitelistRegistry is a contract for handling creation of whitelists and querying those whitelists",
     "events": {

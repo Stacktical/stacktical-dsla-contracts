@@ -4,7 +4,7 @@ const SLARegistry = artifacts.require('./SLARegistry.sol');
 
 module.exports =  function(deployer, network) {
   // Make sure to first deploy a new Oracle Messenger contract, then update the address below
-  let messengerAddress = "0x7F7FF3e3FBC4a940F29A5EA90c8099fAFE54f259";
+  let messengerAddress = "0xAb3119aeE87D6659c2944ce564FA56B13f6c0f91";
 
   deployer.deploy(WhitelistRegistry)
   deployer.deploy(SLORegistry)
