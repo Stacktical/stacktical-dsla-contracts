@@ -61,7 +61,9 @@ contract SLARegistry {
         uint _stake,
         string memory _ipfsHash,
         uint _sliInterval,
-        bDSLAToken _tokenAddress
+        bDSLAToken _tokenAddress, 
+        uint[] memory _sla_period_starts, 
+        uint[] memory _sla_period_ends
     ) public {
         SLA sla = new SLA(
             _owner,
@@ -70,7 +72,9 @@ contract SLARegistry {
             _stake,
             _ipfsHash,
             _sliInterval, 
-            _tokenAddress
+            _tokenAddress, 
+            _sla_period_starts, 
+            _sla_period_ends
         );
 
         SLAs.push(sla);
