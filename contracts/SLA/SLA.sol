@@ -84,7 +84,7 @@ contract SLA is Ownable, Staking {
         bDSLAToken _tokenAddress,
         uint[] memory _sla_period_starts, 
         uint[] memory _sla_period_ends
-    ) public Staking(_tokenAddress, _sla_period_starts, _sla_period_ends) {
+    ) public Staking(_tokenAddress, _sla_period_starts, _sla_period_ends, _owner) {
         require(_SLOs.length < 5);
         require(_SLONames.length == _SLOs.length);
 
