@@ -115,11 +115,11 @@ contract SLARegistry {
      * @param _sloName SLO Name
      */
     function requestSLI(
-        bytes memory _data,
+        uint256 _periodId,
         SLA _sla,
         bytes32 _sloName
     ) public {
-        messenger.requestSLI(_data, _sla, _sloName);
+        messenger.requestSLI(_data, _sla, _periodId);
     }
 
     /**
