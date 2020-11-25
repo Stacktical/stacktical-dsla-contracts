@@ -1,6 +1,6 @@
-pragma solidity ^0.6.0;
+pragma solidity 0.6.6;
 
-import "@openzeppelin-contracts/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title Whitelist

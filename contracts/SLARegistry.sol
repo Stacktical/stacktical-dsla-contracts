@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity 0.6.6;
 
-import "@openzeppelin-contracts/contracts/math/SafeMath.sol";
-import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IMessenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
@@ -110,7 +110,7 @@ contract SLARegistry {
 
     /**
      * @dev Gets SLI information for the specified SLA and SLO
-     * @param _data Oracle Proof
+     * @param _periodId Oracle Proof
      * @param _sla SLA Address
      * @param _sloName SLO Name
      */
@@ -119,7 +119,7 @@ contract SLARegistry {
         SLA _sla,
         bytes32 _sloName
     ) public {
-        messenger.requestSLI(_data, _sla, _periodId);
+        messenger.requestSLI(_periodId, _sla, _sloName);
     }
 
     /**

@@ -2,63 +2,23 @@
   "contractName": "SLO",
   "abi": [
     {
-      "constant": true,
-      "inputs": [],
-      "name": "name",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "value",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "SLOType",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint8"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
+          "internalType": "uint256",
           "name": "_value",
           "type": "uint256"
         },
         {
+          "internalType": "enum SLO.SLOTypes",
           "name": "_SLOType",
           "type": "uint8"
         },
         {
+          "internalType": "bytes32",
           "name": "_name",
           "type": "bytes32"
         }
       ],
-      "payable": false,
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
@@ -67,16 +27,19 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "uint256",
           "name": "_value",
           "type": "uint256"
         },
         {
           "indexed": false,
+          "internalType": "enum SLO.SLOTypes",
           "name": "_SLOType",
           "type": "uint8"
         },
         {
           "indexed": false,
+          "internalType": "bytes32",
           "name": "_name",
           "type": "bytes32"
         }
@@ -85,9 +48,48 @@
       "type": "event"
     },
     {
-      "constant": true,
+      "inputs": [],
+      "name": "SLOType",
+      "outputs": [
+        {
+          "internalType": "enum SLO.SLOTypes",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "name",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "value",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
+          "internalType": "uint256",
           "name": "_value",
           "type": "uint256"
         }
@@ -95,122 +97,132 @@
       "name": "isSLOHonored",
       "outputs": [
         {
+          "internalType": "bool",
           "name": "",
           "type": "bool"
         }
       ],
-      "payable": false,
       "stateMutability": "view",
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.7+commit.6da8b019\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"value\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"isSLOHonored\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"SLOType\",\"outputs\":[{\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"_SLOType\",\"type\":\"uint8\"},{\"name\":\"_name\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_SLOType\",\"type\":\"uint8\"},{\"indexed\":false,\"name\":\"_name\",\"type\":\"bytes32\"}],\"name\":\"SLORegistered\",\"type\":\"event\"}],\"devdoc\":{\"details\":\"SLO is a service level objective contract used to check SLI's against\",\"methods\":{\"constructor\":{\"details\":\"constructor\",\"params\":{\"_SLOType\":\"The checking type for this SLO\",\"_name\":\"The name of the SLO in bytes32\",\"_value\":\"The value to check the SLI against\"}},\"isSLOHonored(uint256)\":{\"details\":\"external view function to check a value against the SLO\",\"params\":{\"_value\":\"The SLI value to check against the SL\"},\"return\":\"true if the SLO is honored\"}},\"title\":\"SLO\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLO/SLO.sol\":\"SLO\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLO/SLO.sol\":{\"keccak256\":\"0x1e5ab37d22d095d3d0195553e43a9039c9407f1c0035f702bd92fd78d80c661f\",\"urls\":[\"bzzr://406eabfab60ceec1f4bf022e4a6588bcc5b2ec084a724c2dedf53d8d502a9776\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b506040516060806103948339810180604052606081101561003057600080fd5b8101908080519060200190929190805190602001909291908051906020019092919050505082600181905550816000806101000a81548160ff0219169083600581111561007957fe5b0217905550806002819055507fbc0575dbcc2a44104cea600e4aacedc0030c223951fc23106ec03e9c135b6bd2838383604051808481526020018360058111156100bf57fe5b60ff168152602001828152602001935050505060405180910390a15050506102a8806100ec6000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c806306fdde03146100515780633fa4f2451461006f578063868d08f71461008d578063cf1ddcce146100d3575b600080fd5b6100596100ff565b6040518082815260200191505060405180910390f35b610077610105565b6040518082815260200191505060405180910390f35b6100b9600480360360208110156100a357600080fd5b810190808035906020019092919050505061010b565b604051808215151515815260200191505060405180910390f35b6100db61026a565b604051808260058111156100eb57fe5b60ff16815260200191505060405180910390f35b60025481565b60015481565b600080600581111561011957fe5b6000809054906101000a900460ff16600581111561013357fe5b14156101455760015482149050610265565b6001600581111561015257fe5b6000809054906101000a900460ff16600581111561016c57fe5b141561017f576001548214159050610265565b6002600581111561018c57fe5b6000809054906101000a900460ff1660058111156101a657fe5b14156101b85760015482109050610265565b600360058111156101c557fe5b6000809054906101000a900460ff1660058111156101df57fe5b14156101f2576001548211159050610265565b600460058111156101ff57fe5b6000809054906101000a900460ff16600581111561021957fe5b141561022b5760015482119050610265565b60058081111561023757fe5b6000809054906101000a900460ff16600581111561025157fe5b1415610264576001548210159050610265565b5b919050565b6000809054906101000a900460ff168156fea165627a7a7230582042633201c6c8a12ecf50286387846c2a915ad0909c0cd2fc4f7bcef7df9dea620029",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c806306fdde03146100515780633fa4f2451461006f578063868d08f71461008d578063cf1ddcce146100d3575b600080fd5b6100596100ff565b6040518082815260200191505060405180910390f35b610077610105565b6040518082815260200191505060405180910390f35b6100b9600480360360208110156100a357600080fd5b810190808035906020019092919050505061010b565b604051808215151515815260200191505060405180910390f35b6100db61026a565b604051808260058111156100eb57fe5b60ff16815260200191505060405180910390f35b60025481565b60015481565b600080600581111561011957fe5b6000809054906101000a900460ff16600581111561013357fe5b14156101455760015482149050610265565b6001600581111561015257fe5b6000809054906101000a900460ff16600581111561016c57fe5b141561017f576001548214159050610265565b6002600581111561018c57fe5b6000809054906101000a900460ff1660058111156101a657fe5b14156101b85760015482109050610265565b600360058111156101c557fe5b6000809054906101000a900460ff1660058111156101df57fe5b14156101f2576001548211159050610265565b600460058111156101ff57fe5b6000809054906101000a900460ff16600581111561021957fe5b141561022b5760015482119050610265565b60058081111561023757fe5b6000809054906101000a900460ff16600581111561025157fe5b1415610264576001548210159050610265565b5b919050565b6000809054906101000a900460ff168156fea165627a7a7230582042633201c6c8a12ecf50286387846c2a915ad0909c0cd2fc4f7bcef7df9dea620029",
-  "sourceMap": "124:1884:5:-;;;977:201;8:9:-1;5:2;;;30:1;27;20:12;5:2;977:201:5;;;;;;;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;977:201:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1061:6;1053:5;:14;;;;1087:8;1077:7;;:18;;;;;;;;;;;;;;;;;;;;;;;;1112:5;1105:4;:12;;;;1133:38;1147:6;1155:8;1165:5;1133:38;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;977:201;;;124:1884;;;;;;",
-  "deployedSourceMap": "124:1884:5:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;124:1884:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;457:19;;;:::i;:::-;;;;;;;;;;;;;;;;;;;395:17;;;:::i;:::-;;;;;;;;;;;;;;;;;;;1369:636;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1369:636:5;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;323:23;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;457:19;;;;:::o;395:17::-;;;;:::o;1369:636::-;1426:4;1457:16;1446:27;;;;;;;;:7;;;;;;;;;;;:27;;;;;;;;;1442:80;;;1506:5;;1496:6;:15;1489:22;;;;1442:80;1547:19;1536:30;;;;;;;;:7;;;;;;;;;;;:30;;;;;;;;;1532:83;;;1599:5;;1589:6;:15;;1582:22;;;;1532:83;1640:20;1629:31;;;;;;;;:7;;;;;;;;;;;:31;;;;;;;;;1625:83;;;1692:5;;1683:6;:14;1676:21;;;;1625:83;1733:25;1722:36;;;;;;;;:7;;;;;;;;;;;:36;;;;;;;;;1718:89;;;1791:5;;1781:6;:15;;1774:22;;;;1718:89;1832:20;1821:31;;;;;;;;:7;;;;;;;;;;;:31;;;;;;;;;1817:83;;;1884:5;;1875:6;:14;1868:21;;;;1817:83;1925:25;1914:36;;;;;;;;:7;;;;;;;;;;;:36;;;;;;;;;1910:89;;;1983:5;;1973:6;:15;;1966:22;;;;1910:89;1369:636;;;;:::o;323:23::-;;;;;;;;;;;;;:::o",
-  "source": "pragma solidity 0.5.7;\n\n/**\n * @title SLO\n * @dev SLO is a service level objective contract used to check SLI's against\n */\ncontract SLO {\n\n    // The available checking types\n    enum SLOTypes { EqualTo, NotEqualTo, SmallerThan, SmallerOrEqualTo, GreaterThan, GreaterOrEqualTo }\n\n    // The checking type for this SLO\n    SLOTypes public SLOType;\n\n    // The value to check the SLI against\n    uint public value;\n\n    // The name of the SLO in bytes32\n    bytes32 public name;\n\n    /**\n     * @dev event for logging SLO creation\n     * @param _value The value to check the SLI against\n     * @param _SLOType The checking type for this SLO\n     * @param _name The name of the SLO in bytes32\n     */\n    event SLORegistered(uint _value, SLOTypes _SLOType, bytes32 _name);\n\n    /**\n     * @dev constructor\n     * @param _value The value to check the SLI against\n     * @param _SLOType The checking type for this SLO\n     * @param _name The name of the SLO in bytes32\n     */\n    constructor(uint _value, SLOTypes _SLOType, bytes32 _name) public {\n        value = _value;\n        SLOType = _SLOType;\n        name = _name;\n\n        emit SLORegistered(_value, _SLOType, _name);\n    }\n\n    /**\n     * @dev external view function to check a value against the SLO\n     * @param _value The SLI value to check against the SL\n     * @return true if the SLO is honored\n     */\n    function isSLOHonored(uint _value) external view returns(bool) {\n        if (SLOType == SLOTypes.EqualTo) {\n            return _value == value;\n        }\n\n        if (SLOType == SLOTypes.NotEqualTo) {\n            return _value != value;\n        }\n\n        if (SLOType == SLOTypes.SmallerThan) {\n            return _value < value;\n        }\n\n        if (SLOType == SLOTypes.SmallerOrEqualTo) {\n            return _value <= value;\n        }\n\n        if (SLOType == SLOTypes.GreaterThan) {\n            return _value > value;\n        }\n\n        if (SLOType == SLOTypes.GreaterOrEqualTo) {\n            return _value >= value;\n        }\n    }\n\n}\n",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"},{\"internalType\":\"enum SLO.SLOTypes\",\"name\":\"_SLOType\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"_name\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"enum SLO.SLOTypes\",\"name\":\"_SLOType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"_name\",\"type\":\"bytes32\"}],\"name\":\"SLORegistered\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"SLOType\",\"outputs\":[{\"internalType\":\"enum SLO.SLOTypes\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"isSLOHonored\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"value\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"SLO is a service level objective contract used to check SLI's against\",\"methods\":{\"constructor\":{\"details\":\"constructor\",\"params\":{\"_SLOType\":\"The checking type for this SLO\",\"_name\":\"The name of the SLO in bytes32\",\"_value\":\"The value to check the SLI against\"}},\"isSLOHonored(uint256)\":{\"details\":\"external view function to check a value against the SLO\",\"params\":{\"_value\":\"The SLI value to check against the SL\"},\"returns\":{\"_0\":\"true if the SLO is honored\"}}},\"title\":\"SLO\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLO/SLO.sol\":\"SLO\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLO/SLO.sol\":{\"keccak256\":\"0xb3780c0f1623e546723ca72e2352be5fc14550d44076819efa41312bb6ff73ab\",\"urls\":[\"bzz-raw://6592bf18875f1ab7c54b47ee1e8fa9ea193d42310e4d8e97fc304f142096265d\",\"dweb:/ipfs/QmSPZF5s2yq7CTKPPRN5nsUqNMnSreU9MxojrcVsSud6Xe\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506040516103a13803806103a18339818101604052606081101561003357600080fd5b8101908080519060200190929190805190602001909291908051906020019092919050505082600181905550816000806101000a81548160ff0219169083600581111561007c57fe5b0217905550806002819055507fbc0575dbcc2a44104cea600e4aacedc0030c223951fc23106ec03e9c135b6bd2838383604051808481526020018360058111156100c257fe5b60ff168152602001828152602001935050505060405180910390a15050506102b2806100ef6000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c806306fdde03146100515780633fa4f2451461006f578063868d08f71461008d578063cf1ddcce146100d3575b600080fd5b6100596100ff565b6040518082815260200191505060405180910390f35b610077610105565b6040518082815260200191505060405180910390f35b6100b9600480360360208110156100a357600080fd5b810190808035906020019092919050505061010b565b604051808215151515815260200191505060405180910390f35b6100db61026a565b604051808260058111156100eb57fe5b60ff16815260200191505060405180910390f35b60025481565b60015481565b600080600581111561011957fe5b6000809054906101000a900460ff16600581111561013357fe5b14156101455760015482149050610265565b6001600581111561015257fe5b6000809054906101000a900460ff16600581111561016c57fe5b141561017f576001548214159050610265565b6002600581111561018c57fe5b6000809054906101000a900460ff1660058111156101a657fe5b14156101b85760015482109050610265565b600360058111156101c557fe5b6000809054906101000a900460ff1660058111156101df57fe5b14156101f2576001548211159050610265565b600460058111156101ff57fe5b6000809054906101000a900460ff16600581111561021957fe5b141561022b5760015482119050610265565b60058081111561023757fe5b6000809054906101000a900460ff16600581111561025157fe5b1415610264576001548210159050610265565b5b919050565b6000809054906101000a900460ff168156fea264697066735822122088d85e87679d20354d736ede5c704a2835cd927b601651acc584055f796930ae64736f6c63430006060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c806306fdde03146100515780633fa4f2451461006f578063868d08f71461008d578063cf1ddcce146100d3575b600080fd5b6100596100ff565b6040518082815260200191505060405180910390f35b610077610105565b6040518082815260200191505060405180910390f35b6100b9600480360360208110156100a357600080fd5b810190808035906020019092919050505061010b565b604051808215151515815260200191505060405180910390f35b6100db61026a565b604051808260058111156100eb57fe5b60ff16815260200191505060405180910390f35b60025481565b60015481565b600080600581111561011957fe5b6000809054906101000a900460ff16600581111561013357fe5b14156101455760015482149050610265565b6001600581111561015257fe5b6000809054906101000a900460ff16600581111561016c57fe5b141561017f576001548214159050610265565b6002600581111561018c57fe5b6000809054906101000a900460ff1660058111156101a657fe5b14156101b85760015482109050610265565b600360058111156101c557fe5b6000809054906101000a900460ff1660058111156101df57fe5b14156101f2576001548211159050610265565b600460058111156101ff57fe5b6000809054906101000a900460ff16600581111561021957fe5b141561022b5760015482119050610265565b60058081111561023757fe5b6000809054906101000a900460ff16600581111561025157fe5b1415610264576001548210159050610265565b5b919050565b6000809054906101000a900460ff168156fea264697066735822122088d85e87679d20354d736ede5c704a2835cd927b601651acc584055f796930ae64736f6c63430006060033",
+  "immutableReferences": {},
+  "sourceMap": "124:1884:4:-:0;;;977:201;5:9:-1;2:2;;;27:1;24;17:12;2:2;977:201:4;;;;;;;;;;;;;;;15:2:-1;10:3;7:11;4:2;;;31:1;28;21:12;4:2;977:201:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1061:6;1053:5;:14;;;;1087:8;1077:7;;:18;;;;;;;;;;;;;;;;;;;;;;;;1112:5;1105:4;:12;;;;1133:38;1147:6;1155:8;1165:5;1133:38;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;977:201;;;124:1884;;;;;;",
+  "deployedSourceMap": "124:1884:4:-:0;;;;5:9:-1;2:2;;;27:1;24;17:12;2:2;124:1884:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;12:1:-1;9;2:12;457:19:4;;;:::i;:::-;;;;;;;;;;;;;;;;;;;395:17;;;:::i;:::-;;;;;;;;;;;;;;;;;;;1369:636;;;;;;15:2:-1;10:3;7:11;4:2;;;31:1;28;21:12;4:2;1369:636:4;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;323:23;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;457:19;;;;:::o;395:17::-;;;;:::o;1369:636::-;1426:4;1457:16;1446:27;;;;;;;;:7;;;;;;;;;;;:27;;;;;;;;;1442:80;;;1506:5;;1496:6;:15;1489:22;;;;1442:80;1547:19;1536:30;;;;;;;;:7;;;;;;;;;;;:30;;;;;;;;;1532:83;;;1599:5;;1589:6;:15;;1582:22;;;;1532:83;1640:20;1629:31;;;;;;;;:7;;;;;;;;;;;:31;;;;;;;;;1625:83;;;1692:5;;1683:6;:14;1676:21;;;;1625:83;1733:25;1722:36;;;;;;;;:7;;;;;;;;;;;:36;;;;;;;;;1718:89;;;1791:5;;1781:6;:15;;1774:22;;;;1718:89;1832:20;1821:31;;;;;;;;:7;;;;;;;;;;;:31;;;;;;;;;1817:83;;;1884:5;;1875:6;:14;1868:21;;;;1817:83;1925:25;1914:36;;;;;;;;:7;;;;;;;;;;;:36;;;;;;;;;1910:89;;;1983:5;;1973:6;:15;;1966:22;;;;1910:89;1369:636;;;;:::o;323:23::-;;;;;;;;;;;;;:::o",
+  "source": "pragma solidity 0.6.6;\n\n/**\n * @title SLO\n * @dev SLO is a service level objective contract used to check SLI's against\n */\ncontract SLO {\n\n    // The available checking types\n    enum SLOTypes { EqualTo, NotEqualTo, SmallerThan, SmallerOrEqualTo, GreaterThan, GreaterOrEqualTo }\n\n    // The checking type for this SLO\n    SLOTypes public SLOType;\n\n    // The value to check the SLI against\n    uint public value;\n\n    // The name of the SLO in bytes32\n    bytes32 public name;\n\n    /**\n     * @dev event for logging SLO creation\n     * @param _value The value to check the SLI against\n     * @param _SLOType The checking type for this SLO\n     * @param _name The name of the SLO in bytes32\n     */\n    event SLORegistered(uint _value, SLOTypes _SLOType, bytes32 _name);\n\n    /**\n     * @dev constructor\n     * @param _value The value to check the SLI against\n     * @param _SLOType The checking type for this SLO\n     * @param _name The name of the SLO in bytes32\n     */\n    constructor(uint _value, SLOTypes _SLOType, bytes32 _name) public {\n        value = _value;\n        SLOType = _SLOType;\n        name = _name;\n\n        emit SLORegistered(_value, _SLOType, _name);\n    }\n\n    /**\n     * @dev external view function to check a value against the SLO\n     * @param _value The SLI value to check against the SL\n     * @return true if the SLO is honored\n     */\n    function isSLOHonored(uint _value) external view returns(bool) {\n        if (SLOType == SLOTypes.EqualTo) {\n            return _value == value;\n        }\n\n        if (SLOType == SLOTypes.NotEqualTo) {\n            return _value != value;\n        }\n\n        if (SLOType == SLOTypes.SmallerThan) {\n            return _value < value;\n        }\n\n        if (SLOType == SLOTypes.SmallerOrEqualTo) {\n            return _value <= value;\n        }\n\n        if (SLOType == SLOTypes.GreaterThan) {\n            return _value > value;\n        }\n\n        if (SLOType == SLOTypes.GreaterOrEqualTo) {\n            return _value >= value;\n        }\n    }\n\n}\n",
   "sourcePath": "/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLO/SLO.sol",
   "ast": {
     "absolutePath": "/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLO/SLO.sol",
     "exportedSymbols": {
       "SLO": [
-        1414
+        1586
       ]
     },
-    "id": 1415,
+    "id": 1587,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1296,
+        "id": 1464,
         "literals": [
           "solidity",
-          "0.5",
-          ".7"
+          "0.6",
+          ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:5"
+        "src": "0:22:4"
       },
       {
+        "abstract": false,
         "baseContracts": [],
         "contractDependencies": [],
         "contractKind": "contract",
-        "documentation": "@title SLO\n@dev SLO is a service level objective contract used to check SLI's against",
+        "documentation": {
+          "id": 1465,
+          "nodeType": "StructuredDocumentation",
+          "src": "24:99:4",
+          "text": "@title SLO\n@dev SLO is a service level objective contract used to check SLI's against"
+        },
         "fullyImplemented": true,
-        "id": 1414,
+        "id": 1586,
         "linearizedBaseContracts": [
-          1414
+          1586
         ],
         "name": "SLO",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "canonicalName": "SLO.SLOTypes",
-            "id": 1303,
+            "id": 1472,
             "members": [
               {
-                "id": 1297,
+                "id": 1466,
                 "name": "EqualTo",
                 "nodeType": "EnumValue",
-                "src": "196:7:5"
+                "src": "196:7:4"
               },
               {
-                "id": 1298,
+                "id": 1467,
                 "name": "NotEqualTo",
                 "nodeType": "EnumValue",
-                "src": "205:10:5"
+                "src": "205:10:4"
               },
               {
-                "id": 1299,
+                "id": 1468,
                 "name": "SmallerThan",
                 "nodeType": "EnumValue",
-                "src": "217:11:5"
+                "src": "217:11:4"
               },
               {
-                "id": 1300,
+                "id": 1469,
                 "name": "SmallerOrEqualTo",
                 "nodeType": "EnumValue",
-                "src": "230:16:5"
+                "src": "230:16:4"
               },
               {
-                "id": 1301,
+                "id": 1470,
                 "name": "GreaterThan",
                 "nodeType": "EnumValue",
-                "src": "248:11:5"
+                "src": "248:11:4"
               },
               {
-                "id": 1302,
+                "id": 1471,
                 "name": "GreaterOrEqualTo",
                 "nodeType": "EnumValue",
-                "src": "261:16:5"
+                "src": "261:16:4"
               }
             ],
             "name": "SLOTypes",
             "nodeType": "EnumDefinition",
-            "src": "180:99:5"
+            "src": "180:99:4"
           },
           {
             "constant": false,
-            "id": 1305,
+            "functionSelector": "cf1ddcce",
+            "id": 1474,
+            "mutability": "mutable",
             "name": "SLOType",
             "nodeType": "VariableDeclaration",
-            "scope": 1414,
-            "src": "323:23:5",
+            "overrides": null,
+            "scope": 1586,
+            "src": "323:23:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_SLOTypes_$1303",
+              "typeIdentifier": "t_enum$_SLOTypes_$1472",
               "typeString": "enum SLO.SLOTypes"
             },
             "typeName": {
               "contractScope": null,
-              "id": 1304,
+              "id": 1473,
               "name": "SLOTypes",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1303,
-              "src": "323:8:5",
+              "referencedDeclaration": 1472,
+              "src": "323:8:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                "typeIdentifier": "t_enum$_SLOTypes_$1472",
                 "typeString": "enum SLO.SLOTypes"
               }
             },
@@ -219,11 +231,14 @@
           },
           {
             "constant": false,
-            "id": 1307,
+            "functionSelector": "3fa4f245",
+            "id": 1476,
+            "mutability": "mutable",
             "name": "value",
             "nodeType": "VariableDeclaration",
-            "scope": 1414,
-            "src": "395:17:5",
+            "overrides": null,
+            "scope": 1586,
+            "src": "395:17:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -231,10 +246,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 1306,
+              "id": 1475,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "395:4:5",
+              "src": "395:4:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -245,11 +260,14 @@
           },
           {
             "constant": false,
-            "id": 1309,
+            "functionSelector": "06fdde03",
+            "id": 1478,
+            "mutability": "mutable",
             "name": "name",
             "nodeType": "VariableDeclaration",
-            "scope": 1414,
-            "src": "457:19:5",
+            "overrides": null,
+            "scope": 1586,
+            "src": "457:19:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -257,10 +275,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 1308,
+              "id": 1477,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "457:7:5",
+              "src": "457:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -271,22 +289,29 @@
           },
           {
             "anonymous": false,
-            "documentation": "@dev event for logging SLO creation\n@param _value The value to check the SLI against\n@param _SLOType The checking type for this SLO\n@param _name The name of the SLO in bytes32",
-            "id": 1317,
+            "documentation": {
+              "id": 1479,
+              "nodeType": "StructuredDocumentation",
+              "src": "483:215:4",
+              "text": "@dev event for logging SLO creation\n@param _value The value to check the SLI against\n@param _SLOType The checking type for this SLO\n@param _name The name of the SLO in bytes32"
+            },
+            "id": 1487,
             "name": "SLORegistered",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1316,
+              "id": 1486,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1311,
+                  "id": 1481,
                   "indexed": false,
+                  "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1317,
-                  "src": "723:11:5",
+                  "overrides": null,
+                  "scope": 1487,
+                  "src": "723:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -294,10 +319,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1310,
+                    "id": 1480,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "723:4:5",
+                    "src": "723:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -308,27 +333,29 @@
                 },
                 {
                   "constant": false,
-                  "id": 1313,
+                  "id": 1483,
                   "indexed": false,
+                  "mutability": "mutable",
                   "name": "_SLOType",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1317,
-                  "src": "736:17:5",
+                  "overrides": null,
+                  "scope": 1487,
+                  "src": "736:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                    "typeIdentifier": "t_enum$_SLOTypes_$1472",
                     "typeString": "enum SLO.SLOTypes"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1312,
+                    "id": 1482,
                     "name": "SLOTypes",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1303,
-                    "src": "736:8:5",
+                    "referencedDeclaration": 1472,
+                    "src": "736:8:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     }
                   },
@@ -337,12 +364,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 1315,
+                  "id": 1485,
                   "indexed": false,
+                  "mutability": "mutable",
                   "name": "_name",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1317,
-                  "src": "755:13:5",
+                  "overrides": null,
+                  "scope": 1487,
+                  "src": "755:13:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -350,10 +379,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 1314,
+                    "id": 1484,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "755:7:5",
+                    "src": "755:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -363,32 +392,32 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "722:47:5"
+              "src": "722:47:4"
             },
-            "src": "703:67:5"
+            "src": "703:67:4"
           },
           {
             "body": {
-              "id": 1344,
+              "id": 1515,
               "nodeType": "Block",
-              "src": "1043:135:5",
+              "src": "1043:135:4",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1328,
+                    "id": 1499,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 1326,
+                      "id": 1497,
                       "name": "value",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1307,
-                      "src": "1053:5:5",
+                      "referencedDeclaration": 1476,
+                      "src": "1053:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -398,45 +427,45 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 1327,
+                      "id": 1498,
                       "name": "_value",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1319,
-                      "src": "1061:6:5",
+                      "referencedDeclaration": 1490,
+                      "src": "1061:6:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "src": "1053:14:5",
+                    "src": "1053:14:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 1329,
+                  "id": 1500,
                   "nodeType": "ExpressionStatement",
-                  "src": "1053:14:5"
+                  "src": "1053:14:4"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1332,
+                    "id": 1503,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 1330,
+                      "id": 1501,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1077:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1077:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -444,43 +473,43 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 1331,
+                      "id": 1502,
                       "name": "_SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1321,
-                      "src": "1087:8:5",
+                      "referencedDeclaration": 1492,
+                      "src": "1087:8:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1077:18:5",
+                    "src": "1077:18:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     }
                   },
-                  "id": 1333,
+                  "id": 1504,
                   "nodeType": "ExpressionStatement",
-                  "src": "1077:18:5"
+                  "src": "1077:18:4"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1336,
+                    "id": 1507,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 1334,
+                      "id": 1505,
                       "name": "name",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1309,
-                      "src": "1105:4:5",
+                      "referencedDeclaration": 1478,
+                      "src": "1105:4:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bytes32",
                         "typeString": "bytes32"
@@ -490,26 +519,26 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 1335,
+                      "id": 1506,
                       "name": "_name",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1323,
-                      "src": "1112:5:5",
+                      "referencedDeclaration": 1494,
+                      "src": "1112:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bytes32",
                         "typeString": "bytes32"
                       }
                     },
-                    "src": "1105:12:5",
+                    "src": "1105:12:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
                     }
                   },
-                  "id": 1337,
+                  "id": 1508,
                   "nodeType": "ExpressionStatement",
-                  "src": "1105:12:5"
+                  "src": "1105:12:4"
                 },
                 {
                   "eventCall": {
@@ -517,12 +546,12 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1339,
+                        "id": 1510,
                         "name": "_value",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1319,
-                        "src": "1147:6:5",
+                        "referencedDeclaration": 1490,
+                        "src": "1147:6:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -530,25 +559,25 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 1340,
+                        "id": 1511,
                         "name": "_SLOType",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1321,
-                        "src": "1155:8:5",
+                        "referencedDeclaration": 1492,
+                        "src": "1155:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                          "typeIdentifier": "t_enum$_SLOTypes_$1472",
                           "typeString": "enum SLO.SLOTypes"
                         }
                       },
                       {
                         "argumentTypes": null,
-                        "id": 1341,
+                        "id": 1512,
                         "name": "_name",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1323,
-                        "src": "1165:5:5",
+                        "referencedDeclaration": 1494,
+                        "src": "1165:5:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
@@ -562,7 +591,7 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                          "typeIdentifier": "t_enum$_SLOTypes_$1472",
                           "typeString": "enum SLO.SLOTypes"
                         },
                         {
@@ -570,18 +599,18 @@
                           "typeString": "bytes32"
                         }
                       ],
-                      "id": 1338,
+                      "id": 1509,
                       "name": "SLORegistered",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1317,
-                      "src": "1133:13:5",
+                      "referencedDeclaration": 1487,
+                      "src": "1133:13:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_enum$_SLOTypes_$1303_$_t_bytes32_$returns$__$",
+                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_enum$_SLOTypes_$1472_$_t_bytes32_$returns$__$",
                         "typeString": "function (uint256,enum SLO.SLOTypes,bytes32)"
                       }
                     },
-                    "id": 1342,
+                    "id": 1513,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -589,36 +618,45 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1133:38:5",
+                    "src": "1133:38:4",
+                    "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1343,
+                  "id": 1514,
                   "nodeType": "EmitStatement",
-                  "src": "1128:43:5"
+                  "src": "1128:43:4"
                 }
               ]
             },
-            "documentation": "@dev constructor\n@param _value The value to check the SLI against\n@param _SLOType The checking type for this SLO\n@param _name The name of the SLO in bytes32",
-            "id": 1345,
+            "documentation": {
+              "id": 1488,
+              "nodeType": "StructuredDocumentation",
+              "src": "776:196:4",
+              "text": "@dev constructor\n@param _value The value to check the SLI against\n@param _SLOType The checking type for this SLO\n@param _name The name of the SLO in bytes32"
+            },
+            "id": 1516,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
-              "id": 1324,
+              "id": 1495,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1319,
+                  "id": 1490,
+                  "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1345,
-                  "src": "989:11:5",
+                  "overrides": null,
+                  "scope": 1516,
+                  "src": "989:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -626,10 +664,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1318,
+                    "id": 1489,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "989:4:5",
+                    "src": "989:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -640,26 +678,28 @@
                 },
                 {
                   "constant": false,
-                  "id": 1321,
+                  "id": 1492,
+                  "mutability": "mutable",
                   "name": "_SLOType",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1345,
-                  "src": "1002:17:5",
+                  "overrides": null,
+                  "scope": 1516,
+                  "src": "1002:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                    "typeIdentifier": "t_enum$_SLOTypes_$1472",
                     "typeString": "enum SLO.SLOTypes"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1320,
+                    "id": 1491,
                     "name": "SLOTypes",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1303,
-                    "src": "1002:8:5",
+                    "referencedDeclaration": 1472,
+                    "src": "1002:8:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     }
                   },
@@ -668,11 +708,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 1323,
+                  "id": 1494,
+                  "mutability": "mutable",
                   "name": "_name",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1345,
-                  "src": "1021:13:5",
+                  "overrides": null,
+                  "scope": 1516,
+                  "src": "1021:13:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -680,10 +722,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 1322,
+                    "id": 1493,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1021:7:5",
+                    "src": "1021:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -693,48 +735,48 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "988:47:5"
+              "src": "988:47:4"
             },
             "returnParameters": {
-              "id": 1325,
+              "id": 1496,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1043:0:5"
+              "src": "1043:0:4"
             },
-            "scope": 1414,
-            "src": "977:201:5",
+            "scope": 1586,
+            "src": "977:201:4",
             "stateMutability": "nonpayable",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 1412,
+              "id": 1584,
               "nodeType": "Block",
-              "src": "1432:573:5",
+              "src": "1432:573:4",
               "statements": [
                 {
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1355,
+                    "id": 1527,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1352,
+                      "id": 1524,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1446:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1446:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -744,18 +786,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1353,
+                        "id": 1525,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1457:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1457:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1354,
+                      "id": 1526,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -763,26 +805,26 @@
                       "memberName": "EqualTo",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1457:16:5",
+                      "src": "1457:16:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1446:27:5",
+                    "src": "1446:27:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1361,
+                  "id": 1533,
                   "nodeType": "IfStatement",
-                  "src": "1442:80:5",
+                  "src": "1442:80:4",
                   "trueBody": {
-                    "id": 1360,
+                    "id": 1532,
                     "nodeType": "Block",
-                    "src": "1475:47:5",
+                    "src": "1475:47:4",
                     "statements": [
                       {
                         "expression": {
@@ -791,19 +833,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1358,
+                          "id": 1530,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1356,
+                            "id": 1528,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1496:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1496:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -813,27 +855,27 @@
                           "operator": "==",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1357,
+                            "id": 1529,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1506:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1506:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1496:15:5",
+                          "src": "1496:15:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1359,
+                        "functionReturnParameters": 1523,
+                        "id": 1531,
                         "nodeType": "Return",
-                        "src": "1489:22:5"
+                        "src": "1489:22:4"
                       }
                     ]
                   }
@@ -842,24 +884,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1365,
+                    "id": 1537,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1362,
+                      "id": 1534,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1536:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1536:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -869,18 +911,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1363,
+                        "id": 1535,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1547:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1547:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1364,
+                      "id": 1536,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -888,26 +930,26 @@
                       "memberName": "NotEqualTo",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1547:19:5",
+                      "src": "1547:19:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1536:30:5",
+                    "src": "1536:30:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1371,
+                  "id": 1543,
                   "nodeType": "IfStatement",
-                  "src": "1532:83:5",
+                  "src": "1532:83:4",
                   "trueBody": {
-                    "id": 1370,
+                    "id": 1542,
                     "nodeType": "Block",
-                    "src": "1568:47:5",
+                    "src": "1568:47:4",
                     "statements": [
                       {
                         "expression": {
@@ -916,19 +958,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1368,
+                          "id": 1540,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1366,
+                            "id": 1538,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1589:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1589:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -938,27 +980,27 @@
                           "operator": "!=",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1367,
+                            "id": 1539,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1599:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1599:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1589:15:5",
+                          "src": "1589:15:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1369,
+                        "functionReturnParameters": 1523,
+                        "id": 1541,
                         "nodeType": "Return",
-                        "src": "1582:22:5"
+                        "src": "1582:22:4"
                       }
                     ]
                   }
@@ -967,24 +1009,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1375,
+                    "id": 1547,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1372,
+                      "id": 1544,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1629:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1629:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -994,18 +1036,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1373,
+                        "id": 1545,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1640:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1640:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1374,
+                      "id": 1546,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -1013,26 +1055,26 @@
                       "memberName": "SmallerThan",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1640:20:5",
+                      "src": "1640:20:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1629:31:5",
+                    "src": "1629:31:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1381,
+                  "id": 1553,
                   "nodeType": "IfStatement",
-                  "src": "1625:83:5",
+                  "src": "1625:83:4",
                   "trueBody": {
-                    "id": 1380,
+                    "id": 1552,
                     "nodeType": "Block",
-                    "src": "1662:46:5",
+                    "src": "1662:46:4",
                     "statements": [
                       {
                         "expression": {
@@ -1041,19 +1083,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1378,
+                          "id": 1550,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1376,
+                            "id": 1548,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1683:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1683:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -1063,27 +1105,27 @@
                           "operator": "<",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1377,
+                            "id": 1549,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1692:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1692:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1683:14:5",
+                          "src": "1683:14:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1379,
+                        "functionReturnParameters": 1523,
+                        "id": 1551,
                         "nodeType": "Return",
-                        "src": "1676:21:5"
+                        "src": "1676:21:4"
                       }
                     ]
                   }
@@ -1092,24 +1134,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1385,
+                    "id": 1557,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1382,
+                      "id": 1554,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1722:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1722:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -1119,18 +1161,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1383,
+                        "id": 1555,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1733:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1733:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1384,
+                      "id": 1556,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -1138,26 +1180,26 @@
                       "memberName": "SmallerOrEqualTo",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1733:25:5",
+                      "src": "1733:25:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1722:36:5",
+                    "src": "1722:36:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1391,
+                  "id": 1563,
                   "nodeType": "IfStatement",
-                  "src": "1718:89:5",
+                  "src": "1718:89:4",
                   "trueBody": {
-                    "id": 1390,
+                    "id": 1562,
                     "nodeType": "Block",
-                    "src": "1760:47:5",
+                    "src": "1760:47:4",
                     "statements": [
                       {
                         "expression": {
@@ -1166,19 +1208,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1388,
+                          "id": 1560,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1386,
+                            "id": 1558,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1781:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1781:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -1188,27 +1230,27 @@
                           "operator": "<=",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1387,
+                            "id": 1559,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1791:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1791:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1781:15:5",
+                          "src": "1781:15:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1389,
+                        "functionReturnParameters": 1523,
+                        "id": 1561,
                         "nodeType": "Return",
-                        "src": "1774:22:5"
+                        "src": "1774:22:4"
                       }
                     ]
                   }
@@ -1217,24 +1259,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1395,
+                    "id": 1567,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1392,
+                      "id": 1564,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1821:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1821:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -1244,18 +1286,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1393,
+                        "id": 1565,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1832:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1832:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1394,
+                      "id": 1566,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -1263,26 +1305,26 @@
                       "memberName": "GreaterThan",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1832:20:5",
+                      "src": "1832:20:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1821:31:5",
+                    "src": "1821:31:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1401,
+                  "id": 1573,
                   "nodeType": "IfStatement",
-                  "src": "1817:83:5",
+                  "src": "1817:83:4",
                   "trueBody": {
-                    "id": 1400,
+                    "id": 1572,
                     "nodeType": "Block",
-                    "src": "1854:46:5",
+                    "src": "1854:46:4",
                     "statements": [
                       {
                         "expression": {
@@ -1291,19 +1333,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1398,
+                          "id": 1570,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1396,
+                            "id": 1568,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1875:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1875:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -1313,27 +1355,27 @@
                           "operator": ">",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1397,
+                            "id": 1569,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1884:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1884:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1875:14:5",
+                          "src": "1875:14:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1399,
+                        "functionReturnParameters": 1523,
+                        "id": 1571,
                         "nodeType": "Return",
-                        "src": "1868:21:5"
+                        "src": "1868:21:4"
                       }
                     ]
                   }
@@ -1342,24 +1384,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1405,
+                    "id": 1577,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1402,
+                      "id": 1574,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1914:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1914:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -1369,18 +1411,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1403,
+                        "id": 1575,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1925:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1925:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1404,
+                      "id": 1576,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -1388,26 +1430,26 @@
                       "memberName": "GreaterOrEqualTo",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1925:25:5",
+                      "src": "1925:25:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1914:36:5",
+                    "src": "1914:36:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1411,
+                  "id": 1583,
                   "nodeType": "IfStatement",
-                  "src": "1910:89:5",
+                  "src": "1910:89:4",
                   "trueBody": {
-                    "id": 1410,
+                    "id": 1582,
                     "nodeType": "Block",
-                    "src": "1952:47:5",
+                    "src": "1952:47:4",
                     "statements": [
                       {
                         "expression": {
@@ -1416,19 +1458,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1408,
+                          "id": 1580,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1406,
+                            "id": 1578,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1973:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1973:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -1438,51 +1480,60 @@
                           "operator": ">=",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1407,
+                            "id": 1579,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1983:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1983:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1973:15:5",
+                          "src": "1973:15:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1409,
+                        "functionReturnParameters": 1523,
+                        "id": 1581,
                         "nodeType": "Return",
-                        "src": "1966:22:5"
+                        "src": "1966:22:4"
                       }
                     ]
                   }
                 }
               ]
             },
-            "documentation": "@dev external view function to check a value against the SLO\n@param _value The SLI value to check against the SL\n@return true if the SLO is honored",
-            "id": 1413,
+            "documentation": {
+              "id": 1517,
+              "nodeType": "StructuredDocumentation",
+              "src": "1184:180:4",
+              "text": "@dev external view function to check a value against the SLO\n@param _value The SLI value to check against the SL\n@return true if the SLO is honored"
+            },
+            "functionSelector": "868d08f7",
+            "id": 1585,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "isSLOHonored",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
-              "id": 1348,
+              "id": 1520,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1347,
+                  "id": 1519,
+                  "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1413,
-                  "src": "1391:11:5",
+                  "overrides": null,
+                  "scope": 1585,
+                  "src": "1391:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1490,10 +1541,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1346,
+                    "id": 1518,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1391:4:5",
+                    "src": "1391:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1503,19 +1554,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1390:13:5"
+              "src": "1390:13:4"
             },
             "returnParameters": {
-              "id": 1351,
+              "id": 1523,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1350,
+                  "id": 1522,
+                  "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1413,
-                  "src": "1426:4:5",
+                  "overrides": null,
+                  "scope": 1585,
+                  "src": "1426:4:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1523,10 +1576,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 1349,
+                    "id": 1521,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1426:4:5",
+                    "src": "1426:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -1536,121 +1589,130 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1425:6:5"
+              "src": "1425:6:4"
             },
-            "scope": 1414,
-            "src": "1369:636:5",
+            "scope": 1586,
+            "src": "1369:636:4",
             "stateMutability": "view",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 1415,
-        "src": "124:1884:5"
+        "scope": 1587,
+        "src": "124:1884:4"
       }
     ],
-    "src": "0:2009:5"
+    "src": "0:2009:4"
   },
   "legacyAST": {
     "absolutePath": "/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLO/SLO.sol",
     "exportedSymbols": {
       "SLO": [
-        1414
+        1586
       ]
     },
-    "id": 1415,
+    "id": 1587,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1296,
+        "id": 1464,
         "literals": [
           "solidity",
-          "0.5",
-          ".7"
+          "0.6",
+          ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:5"
+        "src": "0:22:4"
       },
       {
+        "abstract": false,
         "baseContracts": [],
         "contractDependencies": [],
         "contractKind": "contract",
-        "documentation": "@title SLO\n@dev SLO is a service level objective contract used to check SLI's against",
+        "documentation": {
+          "id": 1465,
+          "nodeType": "StructuredDocumentation",
+          "src": "24:99:4",
+          "text": "@title SLO\n@dev SLO is a service level objective contract used to check SLI's against"
+        },
         "fullyImplemented": true,
-        "id": 1414,
+        "id": 1586,
         "linearizedBaseContracts": [
-          1414
+          1586
         ],
         "name": "SLO",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "canonicalName": "SLO.SLOTypes",
-            "id": 1303,
+            "id": 1472,
             "members": [
               {
-                "id": 1297,
+                "id": 1466,
                 "name": "EqualTo",
                 "nodeType": "EnumValue",
-                "src": "196:7:5"
+                "src": "196:7:4"
               },
               {
-                "id": 1298,
+                "id": 1467,
                 "name": "NotEqualTo",
                 "nodeType": "EnumValue",
-                "src": "205:10:5"
+                "src": "205:10:4"
               },
               {
-                "id": 1299,
+                "id": 1468,
                 "name": "SmallerThan",
                 "nodeType": "EnumValue",
-                "src": "217:11:5"
+                "src": "217:11:4"
               },
               {
-                "id": 1300,
+                "id": 1469,
                 "name": "SmallerOrEqualTo",
                 "nodeType": "EnumValue",
-                "src": "230:16:5"
+                "src": "230:16:4"
               },
               {
-                "id": 1301,
+                "id": 1470,
                 "name": "GreaterThan",
                 "nodeType": "EnumValue",
-                "src": "248:11:5"
+                "src": "248:11:4"
               },
               {
-                "id": 1302,
+                "id": 1471,
                 "name": "GreaterOrEqualTo",
                 "nodeType": "EnumValue",
-                "src": "261:16:5"
+                "src": "261:16:4"
               }
             ],
             "name": "SLOTypes",
             "nodeType": "EnumDefinition",
-            "src": "180:99:5"
+            "src": "180:99:4"
           },
           {
             "constant": false,
-            "id": 1305,
+            "functionSelector": "cf1ddcce",
+            "id": 1474,
+            "mutability": "mutable",
             "name": "SLOType",
             "nodeType": "VariableDeclaration",
-            "scope": 1414,
-            "src": "323:23:5",
+            "overrides": null,
+            "scope": 1586,
+            "src": "323:23:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_SLOTypes_$1303",
+              "typeIdentifier": "t_enum$_SLOTypes_$1472",
               "typeString": "enum SLO.SLOTypes"
             },
             "typeName": {
               "contractScope": null,
-              "id": 1304,
+              "id": 1473,
               "name": "SLOTypes",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1303,
-              "src": "323:8:5",
+              "referencedDeclaration": 1472,
+              "src": "323:8:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                "typeIdentifier": "t_enum$_SLOTypes_$1472",
                 "typeString": "enum SLO.SLOTypes"
               }
             },
@@ -1659,11 +1721,14 @@
           },
           {
             "constant": false,
-            "id": 1307,
+            "functionSelector": "3fa4f245",
+            "id": 1476,
+            "mutability": "mutable",
             "name": "value",
             "nodeType": "VariableDeclaration",
-            "scope": 1414,
-            "src": "395:17:5",
+            "overrides": null,
+            "scope": 1586,
+            "src": "395:17:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1671,10 +1736,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 1306,
+              "id": 1475,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "395:4:5",
+              "src": "395:4:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -1685,11 +1750,14 @@
           },
           {
             "constant": false,
-            "id": 1309,
+            "functionSelector": "06fdde03",
+            "id": 1478,
+            "mutability": "mutable",
             "name": "name",
             "nodeType": "VariableDeclaration",
-            "scope": 1414,
-            "src": "457:19:5",
+            "overrides": null,
+            "scope": 1586,
+            "src": "457:19:4",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1697,10 +1765,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 1308,
+              "id": 1477,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "457:7:5",
+              "src": "457:7:4",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -1711,22 +1779,29 @@
           },
           {
             "anonymous": false,
-            "documentation": "@dev event for logging SLO creation\n@param _value The value to check the SLI against\n@param _SLOType The checking type for this SLO\n@param _name The name of the SLO in bytes32",
-            "id": 1317,
+            "documentation": {
+              "id": 1479,
+              "nodeType": "StructuredDocumentation",
+              "src": "483:215:4",
+              "text": "@dev event for logging SLO creation\n@param _value The value to check the SLI against\n@param _SLOType The checking type for this SLO\n@param _name The name of the SLO in bytes32"
+            },
+            "id": 1487,
             "name": "SLORegistered",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1316,
+              "id": 1486,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1311,
+                  "id": 1481,
                   "indexed": false,
+                  "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1317,
-                  "src": "723:11:5",
+                  "overrides": null,
+                  "scope": 1487,
+                  "src": "723:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1734,10 +1809,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1310,
+                    "id": 1480,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "723:4:5",
+                    "src": "723:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1748,27 +1823,29 @@
                 },
                 {
                   "constant": false,
-                  "id": 1313,
+                  "id": 1483,
                   "indexed": false,
+                  "mutability": "mutable",
                   "name": "_SLOType",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1317,
-                  "src": "736:17:5",
+                  "overrides": null,
+                  "scope": 1487,
+                  "src": "736:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                    "typeIdentifier": "t_enum$_SLOTypes_$1472",
                     "typeString": "enum SLO.SLOTypes"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1312,
+                    "id": 1482,
                     "name": "SLOTypes",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1303,
-                    "src": "736:8:5",
+                    "referencedDeclaration": 1472,
+                    "src": "736:8:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     }
                   },
@@ -1777,12 +1854,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 1315,
+                  "id": 1485,
                   "indexed": false,
+                  "mutability": "mutable",
                   "name": "_name",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1317,
-                  "src": "755:13:5",
+                  "overrides": null,
+                  "scope": 1487,
+                  "src": "755:13:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1790,10 +1869,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 1314,
+                    "id": 1484,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "755:7:5",
+                    "src": "755:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1803,32 +1882,32 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "722:47:5"
+              "src": "722:47:4"
             },
-            "src": "703:67:5"
+            "src": "703:67:4"
           },
           {
             "body": {
-              "id": 1344,
+              "id": 1515,
               "nodeType": "Block",
-              "src": "1043:135:5",
+              "src": "1043:135:4",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1328,
+                    "id": 1499,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 1326,
+                      "id": 1497,
                       "name": "value",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1307,
-                      "src": "1053:5:5",
+                      "referencedDeclaration": 1476,
+                      "src": "1053:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -1838,45 +1917,45 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 1327,
+                      "id": 1498,
                       "name": "_value",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1319,
-                      "src": "1061:6:5",
+                      "referencedDeclaration": 1490,
+                      "src": "1061:6:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "src": "1053:14:5",
+                    "src": "1053:14:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 1329,
+                  "id": 1500,
                   "nodeType": "ExpressionStatement",
-                  "src": "1053:14:5"
+                  "src": "1053:14:4"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1332,
+                    "id": 1503,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 1330,
+                      "id": 1501,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1077:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1077:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -1884,43 +1963,43 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 1331,
+                      "id": 1502,
                       "name": "_SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1321,
-                      "src": "1087:8:5",
+                      "referencedDeclaration": 1492,
+                      "src": "1087:8:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1077:18:5",
+                    "src": "1077:18:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     }
                   },
-                  "id": 1333,
+                  "id": 1504,
                   "nodeType": "ExpressionStatement",
-                  "src": "1077:18:5"
+                  "src": "1077:18:4"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 1336,
+                    "id": 1507,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 1334,
+                      "id": 1505,
                       "name": "name",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1309,
-                      "src": "1105:4:5",
+                      "referencedDeclaration": 1478,
+                      "src": "1105:4:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bytes32",
                         "typeString": "bytes32"
@@ -1930,26 +2009,26 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 1335,
+                      "id": 1506,
                       "name": "_name",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1323,
-                      "src": "1112:5:5",
+                      "referencedDeclaration": 1494,
+                      "src": "1112:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bytes32",
                         "typeString": "bytes32"
                       }
                     },
-                    "src": "1105:12:5",
+                    "src": "1105:12:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
                     }
                   },
-                  "id": 1337,
+                  "id": 1508,
                   "nodeType": "ExpressionStatement",
-                  "src": "1105:12:5"
+                  "src": "1105:12:4"
                 },
                 {
                   "eventCall": {
@@ -1957,12 +2036,12 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1339,
+                        "id": 1510,
                         "name": "_value",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1319,
-                        "src": "1147:6:5",
+                        "referencedDeclaration": 1490,
+                        "src": "1147:6:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1970,25 +2049,25 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 1340,
+                        "id": 1511,
                         "name": "_SLOType",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1321,
-                        "src": "1155:8:5",
+                        "referencedDeclaration": 1492,
+                        "src": "1155:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                          "typeIdentifier": "t_enum$_SLOTypes_$1472",
                           "typeString": "enum SLO.SLOTypes"
                         }
                       },
                       {
                         "argumentTypes": null,
-                        "id": 1341,
+                        "id": 1512,
                         "name": "_name",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1323,
-                        "src": "1165:5:5",
+                        "referencedDeclaration": 1494,
+                        "src": "1165:5:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
@@ -2002,7 +2081,7 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                          "typeIdentifier": "t_enum$_SLOTypes_$1472",
                           "typeString": "enum SLO.SLOTypes"
                         },
                         {
@@ -2010,18 +2089,18 @@
                           "typeString": "bytes32"
                         }
                       ],
-                      "id": 1338,
+                      "id": 1509,
                       "name": "SLORegistered",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1317,
-                      "src": "1133:13:5",
+                      "referencedDeclaration": 1487,
+                      "src": "1133:13:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_enum$_SLOTypes_$1303_$_t_bytes32_$returns$__$",
+                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_enum$_SLOTypes_$1472_$_t_bytes32_$returns$__$",
                         "typeString": "function (uint256,enum SLO.SLOTypes,bytes32)"
                       }
                     },
-                    "id": 1342,
+                    "id": 1513,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2029,36 +2108,45 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1133:38:5",
+                    "src": "1133:38:4",
+                    "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1343,
+                  "id": 1514,
                   "nodeType": "EmitStatement",
-                  "src": "1128:43:5"
+                  "src": "1128:43:4"
                 }
               ]
             },
-            "documentation": "@dev constructor\n@param _value The value to check the SLI against\n@param _SLOType The checking type for this SLO\n@param _name The name of the SLO in bytes32",
-            "id": 1345,
+            "documentation": {
+              "id": 1488,
+              "nodeType": "StructuredDocumentation",
+              "src": "776:196:4",
+              "text": "@dev constructor\n@param _value The value to check the SLI against\n@param _SLOType The checking type for this SLO\n@param _name The name of the SLO in bytes32"
+            },
+            "id": 1516,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
-              "id": 1324,
+              "id": 1495,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1319,
+                  "id": 1490,
+                  "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1345,
-                  "src": "989:11:5",
+                  "overrides": null,
+                  "scope": 1516,
+                  "src": "989:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2066,10 +2154,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1318,
+                    "id": 1489,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "989:4:5",
+                    "src": "989:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2080,26 +2168,28 @@
                 },
                 {
                   "constant": false,
-                  "id": 1321,
+                  "id": 1492,
+                  "mutability": "mutable",
                   "name": "_SLOType",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1345,
-                  "src": "1002:17:5",
+                  "overrides": null,
+                  "scope": 1516,
+                  "src": "1002:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                    "typeIdentifier": "t_enum$_SLOTypes_$1472",
                     "typeString": "enum SLO.SLOTypes"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1320,
+                    "id": 1491,
                     "name": "SLOTypes",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1303,
-                    "src": "1002:8:5",
+                    "referencedDeclaration": 1472,
+                    "src": "1002:8:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     }
                   },
@@ -2108,11 +2198,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 1323,
+                  "id": 1494,
+                  "mutability": "mutable",
                   "name": "_name",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1345,
-                  "src": "1021:13:5",
+                  "overrides": null,
+                  "scope": 1516,
+                  "src": "1021:13:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2120,10 +2212,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 1322,
+                    "id": 1493,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1021:7:5",
+                    "src": "1021:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -2133,48 +2225,48 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "988:47:5"
+              "src": "988:47:4"
             },
             "returnParameters": {
-              "id": 1325,
+              "id": 1496,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1043:0:5"
+              "src": "1043:0:4"
             },
-            "scope": 1414,
-            "src": "977:201:5",
+            "scope": 1586,
+            "src": "977:201:4",
             "stateMutability": "nonpayable",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 1412,
+              "id": 1584,
               "nodeType": "Block",
-              "src": "1432:573:5",
+              "src": "1432:573:4",
               "statements": [
                 {
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1355,
+                    "id": 1527,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1352,
+                      "id": 1524,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1446:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1446:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -2184,18 +2276,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1353,
+                        "id": 1525,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1457:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1457:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1354,
+                      "id": 1526,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -2203,26 +2295,26 @@
                       "memberName": "EqualTo",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1457:16:5",
+                      "src": "1457:16:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1446:27:5",
+                    "src": "1446:27:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1361,
+                  "id": 1533,
                   "nodeType": "IfStatement",
-                  "src": "1442:80:5",
+                  "src": "1442:80:4",
                   "trueBody": {
-                    "id": 1360,
+                    "id": 1532,
                     "nodeType": "Block",
-                    "src": "1475:47:5",
+                    "src": "1475:47:4",
                     "statements": [
                       {
                         "expression": {
@@ -2231,19 +2323,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1358,
+                          "id": 1530,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1356,
+                            "id": 1528,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1496:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1496:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -2253,27 +2345,27 @@
                           "operator": "==",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1357,
+                            "id": 1529,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1506:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1506:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1496:15:5",
+                          "src": "1496:15:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1359,
+                        "functionReturnParameters": 1523,
+                        "id": 1531,
                         "nodeType": "Return",
-                        "src": "1489:22:5"
+                        "src": "1489:22:4"
                       }
                     ]
                   }
@@ -2282,24 +2374,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1365,
+                    "id": 1537,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1362,
+                      "id": 1534,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1536:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1536:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -2309,18 +2401,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1363,
+                        "id": 1535,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1547:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1547:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1364,
+                      "id": 1536,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -2328,26 +2420,26 @@
                       "memberName": "NotEqualTo",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1547:19:5",
+                      "src": "1547:19:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1536:30:5",
+                    "src": "1536:30:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1371,
+                  "id": 1543,
                   "nodeType": "IfStatement",
-                  "src": "1532:83:5",
+                  "src": "1532:83:4",
                   "trueBody": {
-                    "id": 1370,
+                    "id": 1542,
                     "nodeType": "Block",
-                    "src": "1568:47:5",
+                    "src": "1568:47:4",
                     "statements": [
                       {
                         "expression": {
@@ -2356,19 +2448,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1368,
+                          "id": 1540,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1366,
+                            "id": 1538,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1589:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1589:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -2378,27 +2470,27 @@
                           "operator": "!=",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1367,
+                            "id": 1539,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1599:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1599:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1589:15:5",
+                          "src": "1589:15:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1369,
+                        "functionReturnParameters": 1523,
+                        "id": 1541,
                         "nodeType": "Return",
-                        "src": "1582:22:5"
+                        "src": "1582:22:4"
                       }
                     ]
                   }
@@ -2407,24 +2499,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1375,
+                    "id": 1547,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1372,
+                      "id": 1544,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1629:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1629:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -2434,18 +2526,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1373,
+                        "id": 1545,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1640:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1640:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1374,
+                      "id": 1546,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -2453,26 +2545,26 @@
                       "memberName": "SmallerThan",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1640:20:5",
+                      "src": "1640:20:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1629:31:5",
+                    "src": "1629:31:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1381,
+                  "id": 1553,
                   "nodeType": "IfStatement",
-                  "src": "1625:83:5",
+                  "src": "1625:83:4",
                   "trueBody": {
-                    "id": 1380,
+                    "id": 1552,
                     "nodeType": "Block",
-                    "src": "1662:46:5",
+                    "src": "1662:46:4",
                     "statements": [
                       {
                         "expression": {
@@ -2481,19 +2573,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1378,
+                          "id": 1550,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1376,
+                            "id": 1548,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1683:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1683:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -2503,27 +2595,27 @@
                           "operator": "<",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1377,
+                            "id": 1549,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1692:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1692:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1683:14:5",
+                          "src": "1683:14:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1379,
+                        "functionReturnParameters": 1523,
+                        "id": 1551,
                         "nodeType": "Return",
-                        "src": "1676:21:5"
+                        "src": "1676:21:4"
                       }
                     ]
                   }
@@ -2532,24 +2624,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1385,
+                    "id": 1557,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1382,
+                      "id": 1554,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1722:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1722:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -2559,18 +2651,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1383,
+                        "id": 1555,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1733:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1733:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1384,
+                      "id": 1556,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -2578,26 +2670,26 @@
                       "memberName": "SmallerOrEqualTo",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1733:25:5",
+                      "src": "1733:25:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1722:36:5",
+                    "src": "1722:36:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1391,
+                  "id": 1563,
                   "nodeType": "IfStatement",
-                  "src": "1718:89:5",
+                  "src": "1718:89:4",
                   "trueBody": {
-                    "id": 1390,
+                    "id": 1562,
                     "nodeType": "Block",
-                    "src": "1760:47:5",
+                    "src": "1760:47:4",
                     "statements": [
                       {
                         "expression": {
@@ -2606,19 +2698,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1388,
+                          "id": 1560,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1386,
+                            "id": 1558,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1781:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1781:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -2628,27 +2720,27 @@
                           "operator": "<=",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1387,
+                            "id": 1559,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1791:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1791:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1781:15:5",
+                          "src": "1781:15:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1389,
+                        "functionReturnParameters": 1523,
+                        "id": 1561,
                         "nodeType": "Return",
-                        "src": "1774:22:5"
+                        "src": "1774:22:4"
                       }
                     ]
                   }
@@ -2657,24 +2749,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1395,
+                    "id": 1567,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1392,
+                      "id": 1564,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1821:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1821:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -2684,18 +2776,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1393,
+                        "id": 1565,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1832:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1832:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1394,
+                      "id": 1566,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -2703,26 +2795,26 @@
                       "memberName": "GreaterThan",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1832:20:5",
+                      "src": "1832:20:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1821:31:5",
+                    "src": "1821:31:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1401,
+                  "id": 1573,
                   "nodeType": "IfStatement",
-                  "src": "1817:83:5",
+                  "src": "1817:83:4",
                   "trueBody": {
-                    "id": 1400,
+                    "id": 1572,
                     "nodeType": "Block",
-                    "src": "1854:46:5",
+                    "src": "1854:46:4",
                     "statements": [
                       {
                         "expression": {
@@ -2731,19 +2823,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1398,
+                          "id": 1570,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1396,
+                            "id": 1568,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1875:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1875:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -2753,27 +2845,27 @@
                           "operator": ">",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1397,
+                            "id": 1569,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1884:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1884:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1875:14:5",
+                          "src": "1875:14:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1399,
+                        "functionReturnParameters": 1523,
+                        "id": 1571,
                         "nodeType": "Return",
-                        "src": "1868:21:5"
+                        "src": "1868:21:4"
                       }
                     ]
                   }
@@ -2782,24 +2874,24 @@
                   "condition": {
                     "argumentTypes": null,
                     "commonType": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1472",
                       "typeString": "enum SLO.SLOTypes"
                     },
-                    "id": 1405,
+                    "id": 1577,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 1402,
+                      "id": 1574,
                       "name": "SLOType",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1305,
-                      "src": "1914:7:5",
+                      "referencedDeclaration": 1474,
+                      "src": "1914:7:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
@@ -2809,18 +2901,18 @@
                       "argumentTypes": null,
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1403,
+                        "id": 1575,
                         "name": "SLOTypes",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1303,
-                        "src": "1925:8:5",
+                        "referencedDeclaration": 1472,
+                        "src": "1925:8:4",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1303_$",
+                          "typeIdentifier": "t_type$_t_enum$_SLOTypes_$1472_$",
                           "typeString": "type(enum SLO.SLOTypes)"
                         }
                       },
-                      "id": 1404,
+                      "id": 1576,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -2828,26 +2920,26 @@
                       "memberName": "GreaterOrEqualTo",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1925:25:5",
+                      "src": "1925:25:4",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_SLOTypes_$1303",
+                        "typeIdentifier": "t_enum$_SLOTypes_$1472",
                         "typeString": "enum SLO.SLOTypes"
                       }
                     },
-                    "src": "1914:36:5",
+                    "src": "1914:36:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "falseBody": null,
-                  "id": 1411,
+                  "id": 1583,
                   "nodeType": "IfStatement",
-                  "src": "1910:89:5",
+                  "src": "1910:89:4",
                   "trueBody": {
-                    "id": 1410,
+                    "id": 1582,
                     "nodeType": "Block",
-                    "src": "1952:47:5",
+                    "src": "1952:47:4",
                     "statements": [
                       {
                         "expression": {
@@ -2856,19 +2948,19 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1408,
+                          "id": 1580,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "argumentTypes": null,
-                            "id": 1406,
+                            "id": 1578,
                             "name": "_value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1347,
-                            "src": "1973:6:5",
+                            "referencedDeclaration": 1519,
+                            "src": "1973:6:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -2878,51 +2970,60 @@
                           "operator": ">=",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 1407,
+                            "id": 1579,
                             "name": "value",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1307,
-                            "src": "1983:5:5",
+                            "referencedDeclaration": 1476,
+                            "src": "1983:5:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             }
                           },
-                          "src": "1973:15:5",
+                          "src": "1973:15:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "functionReturnParameters": 1351,
-                        "id": 1409,
+                        "functionReturnParameters": 1523,
+                        "id": 1581,
                         "nodeType": "Return",
-                        "src": "1966:22:5"
+                        "src": "1966:22:4"
                       }
                     ]
                   }
                 }
               ]
             },
-            "documentation": "@dev external view function to check a value against the SLO\n@param _value The SLI value to check against the SL\n@return true if the SLO is honored",
-            "id": 1413,
+            "documentation": {
+              "id": 1517,
+              "nodeType": "StructuredDocumentation",
+              "src": "1184:180:4",
+              "text": "@dev external view function to check a value against the SLO\n@param _value The SLI value to check against the SL\n@return true if the SLO is honored"
+            },
+            "functionSelector": "868d08f7",
+            "id": 1585,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "isSLOHonored",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
-              "id": 1348,
+              "id": 1520,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1347,
+                  "id": 1519,
+                  "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1413,
-                  "src": "1391:11:5",
+                  "overrides": null,
+                  "scope": 1585,
+                  "src": "1391:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2930,10 +3031,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1346,
+                    "id": 1518,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1391:4:5",
+                    "src": "1391:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2943,19 +3044,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1390:13:5"
+              "src": "1390:13:4"
             },
             "returnParameters": {
-              "id": 1351,
+              "id": 1523,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1350,
+                  "id": 1522,
+                  "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1413,
-                  "src": "1426:4:5",
+                  "overrides": null,
+                  "scope": 1585,
+                  "src": "1426:4:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2963,10 +3066,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 1349,
+                    "id": 1521,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1426:4:5",
+                    "src": "1426:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -2976,28 +3079,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1425:6:5"
+              "src": "1425:6:4"
             },
-            "scope": 1414,
-            "src": "1369:636:5",
+            "scope": 1586,
+            "src": "1369:636:4",
             "stateMutability": "view",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 1415,
-        "src": "124:1884:5"
+        "scope": 1587,
+        "src": "124:1884:4"
       }
     ],
-    "src": "0:2009:5"
+    "src": "0:2009:4"
   },
   "compiler": {
     "name": "solc",
-    "version": "0.5.7+commit.6da8b019.Emscripten.clang"
+    "version": "0.6.6+commit.6c089d02.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-11-22T18:15:09.031Z",
+  "updatedAt": "2020-11-25T22:56:04.986Z",
   "devdoc": {
     "details": "SLO is a service level objective contract used to check SLI's against",
     "methods": {
@@ -3014,7 +3117,9 @@
         "params": {
           "_value": "The SLI value to check against the SL"
         },
-        "return": "true if the SLO is honored"
+        "returns": {
+          "_0": "true if the SLO is honored"
+        }
       }
     },
     "title": "SLO"
