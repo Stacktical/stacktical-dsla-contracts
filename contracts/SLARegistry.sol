@@ -94,7 +94,7 @@ contract SLARegistry {
             _SLOs,
             _stake,
             _ipfsHash,
-            _sliInterval, 
+            _sliInterval,
             _tokenAddress
         );
 

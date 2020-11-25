@@ -21,10 +21,10 @@ contract SLA is Ownable, Staking {
     using SafeMath for uint256;
 
     // The required amount to stake when subscribing to the agreement
-    uint public stake;
+    uint256 public stake;
 
     // The time between SLI registration
-    uint private sliInterval;
+    uint256 private sliInterval;
 
     // The ipfs hash that stores extra information about the agreement
     string public ipfsHash;
@@ -34,9 +34,9 @@ contract SLA is Ownable, Staking {
 
     // Struct used for storing registered SLI's
     struct SLI {
-        uint timestamp;
-        uint value;
-        string ipfsHash;
+        uint256 timestamp;
+        uint256 value;
+        uint256 periodId;
     }
 
     // Mapping to get SLO addresses from SLO names in bytes32
@@ -52,9 +52,9 @@ contract SLA is Ownable, Staking {
      * @dev event for SLI creation logging
      * @param _timestamp the time the SLI has been registered
      * @param _value the value of the SLI
-     * @param _hash the ipfs hash that stores additional info
+     * @param _periodId the id of the given period
      */
-    event SLICreated(uint _timestamp, uint _value, string _hash);
+    event SLICreated(uint256 _timestamp, uint256 _value, string _periodId);
 
 
     /**
@@ -81,16 +81,16 @@ contract SLA is Ownable, Staking {
         address _owner,
         bytes32[] memory _SLONames,
         SLO[] memory _SLOs,
-        uint _stake,
+        uint256 _stake,
         string memory _ipfsHash,
-        uint _sliInterval,
+        uint256 _sliInterval,
         bDSLAToken _tokenAddress
     )
     public Staking(_tokenAddress){
         require(_SLOs.length < 5);
         require(_SLONames.length == _SLOs.length);
 
-        for(uint i = 0; i < _SLOs.length; i++) {
+        for(uint256 i = 0; i < _SLOs.length; i++) {
             SLOs[_SLONames[i]] = _SLOs[i];
         }
 
@@ -106,15 +106,15 @@ contract SLA is Ownable, Staking {
      * @dev external function to register SLI's and check them against the SLO's
      * @param _SLOName the name of the SLO in bytes32
      * @param _value the value of the SLI to check
-     * @param _hash the ipfs hash with additional information
+     * @param _periodId the id of the given period
      */
-    function registerSLI(bytes32 _SLOName, uint _value, string calldata _hash, uint _period)
+    function registerSLI(bytes32 _SLOName, uint256 _value, uint256 _periodId)
         external
         onlyMessenger
     {
-        SLIs[_SLOName].push(SLI(now, _value, _hash));
+        SLIs[_SLOName].push(SLI(block.timestamp, _value, _periodId));
 
-        emit SLICreated(now, _value, _hash);
+        emit SLICreated(block.timestamp, _value, _periodId);
 
         
         if(!SLOs[_SLOName].isSLOHonored(_value)) {
@@ -135,7 +135,7 @@ contract SLA is Ownable, Staking {
     /**
      * @dev external view function that returns the sliInterval value
      */
-    function getSliInterval() external view returns(uint) {
+    function getSliInterval() external view returns(uint256) {
         return sliInterval;
     }
 
