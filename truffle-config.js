@@ -75,7 +75,7 @@ module.exports = {
         );
       },
       network_id: "42",
-      gas: 4612388,
+      gas: 12000000,
     },
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
