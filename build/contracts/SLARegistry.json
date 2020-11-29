@@ -48,8 +48,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -62,8 +61,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -87,8 +85,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -178,8 +175,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -198,8 +194,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -212,8 +207,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -226,8 +220,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IMessenger\",\"name\":\"_messengerAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract SLA\",\"name\":\"sla\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"SLACreated\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"SLACount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"SLAs\",\"outputs\":[{\"internalType\":\"contract SLA\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"allSLAs\",\"outputs\":[{\"internalType\":\"contract SLA[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_SLONames\",\"type\":\"bytes32[]\"},{\"internalType\":\"contract SLO[]\",\"name\":\"_SLOs\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"_stake\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"_ipfsHash\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"_poolSize\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_sliInterval\",\"type\":\"uint256\"},{\"internalType\":\"contract bDSLAToken\",\"name\":\"_tokenAddress\",\"type\":\"address\"}],\"name\":\"createSLA\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"messenger\",\"outputs\":[{\"internalType\":\"contract IMessenger\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_end\",\"type\":\"uint256\"}],\"name\":\"paginatedSLAs\",\"outputs\":[{\"internalType\":\"contract SLA[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"},{\"internalType\":\"contract SLA\",\"name\":\"_sla\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_sloName\",\"type\":\"bytes32\"}],\"name\":\"requestSLI\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"userSLACount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"userSLAs\",\"outputs\":[{\"internalType\":\"contract SLA[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements\",\"methods\":{\"SLACount()\":{\"details\":\"public view function that returns the total amount of service level agreements\"},\"allSLAs()\":{\"details\":\"public view function that returns all the service level agreements\"},\"constructor\":{\"details\":\"constructor\",\"params\":{\"_messengerAddress\":\"the address of the chainlink messenger contract\"}},\"createSLA(address,bytes32[],address[],uint256,string,uint256,uint256,address)\":{\"details\":\"public function for creating service level agreements\",\"params\":{\"_SLONames\":\"Array of the names of the service level objectives in bytes32\",\"_SLOs\":\"Array of service level objective contract addressess service level objective breach\",\"_ipfsHash\":\"String with the ipfs hash that contains extra information about the service level agreement\",\"_owner\":\"Address of the owner of the service level agreement\",\"_poolSize\":\"uint the size of the compensation pool the creator will initialize the contract with\",\"_sliInterval\":\"uint the interval in seconds between requesting a new SLI\",\"_stake\":\"Uint of the amount required to stake when signing the service level agreement\"}},\"paginatedSLAs(uint256,uint256)\":{\"details\":\"external view function that returns the service level agreements for a certain range in the array\",\"params\":{\"_end\":\"the index of the end position in the array\",\"_start\":\"the index of the start position in the array\"}},\"requestSLI(uint256,address,bytes32)\":{\"details\":\"Gets SLI information for the specified SLA and SLO\",\"params\":{\"_periodId\":\"Oracle Proof\",\"_sla\":\"SLA Address\",\"_sloName\":\"SLO Name\"}},\"userSLACount(address)\":{\"details\":\"public view function that returns the amount of service level agreements the given user is the owner of\",\"params\":{\"_user\":\"Address of the user for which to return the amount of service level agreements\"}},\"userSLAs(address)\":{\"details\":\"public view function that returns the service level agreements that the given user is the owner of\",\"params\":{\"_user\":\"Address of the user for which to return the service level agreements\"}}},\"title\":\"SLARegistry\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLARegistry.sol\":\"SLARegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLA/SLA.sol\":{\"keccak256\":\"0xdca7021e1ad7a0836934dda5566944dbfa9d76212c4510c1700dba68c77cd160\",\"urls\":[\"bzz-raw://9e10974de31e3a66e4a2482c4043eb3c594272e8d1dc2bef9ab70a959f840841\",\"dweb:/ipfs/Qmf482Ph2KSsZmeSNTmL6nXd8gUUjkkYbARMsEvKbD2zJs\"]},\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLA/Staking.sol\":{\"keccak256\":\"0x2e89bb25b969e379791c3c358f7eaea91d6ef43dbe53d870c410b22470fc88a6\",\"urls\":[\"bzz-raw://d953a60b62bcbd6eadac4074ad3f88d22b26f3a72f6bd9c46b592ef6f560aea9\",\"dweb:/ipfs/QmUyXy85zhjFL9xzjiHJYbTP7SVtzRsW4zsXuosobMqxVZ\"]},\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLARegistry.sol\":{\"keccak256\":\"0x7cbe7d327dc83ad6c54fcc5b46709ccbc3a6a66856c6d5d0e41a311c31fb1175\",\"urls\":[\"bzz-raw://051a7baa007e891b0afc52237a1356b3ff3f1088e1eadfe233c33b613333ed30\",\"dweb:/ipfs/QmU8tC2EkgtQcMxnscrf7QjQ8JNMwBEd3zWJYdJEz4ZYP5\"]},\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/SLO/SLO.sol\":{\"keccak256\":\"0xb3780c0f1623e546723ca72e2352be5fc14550d44076819efa41312bb6ff73ab\",\"urls\":[\"bzz-raw://6592bf18875f1ab7c54b47ee1e8fa9ea193d42310e4d8e97fc304f142096265d\",\"dweb:/ipfs/QmSPZF5s2yq7CTKPPRN5nsUqNMnSreU9MxojrcVsSud6Xe\"]},\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/Whitelist/Whitelist.sol\":{\"keccak256\":\"0xd9ed433912c1f444391652546b7045830c41af96162891be238e3090b101da0d\",\"urls\":[\"bzz-raw://5da97f11b2b30b667b5f42d9a1b140fd328f66c5ef3d22c192ef04b8071a8cf3\",\"dweb:/ipfs/Qme2uXvEqCspyNGTZ1iBQvkjDRH325ibWpgr9v1yZqsp5w\"]},\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/bDSLA/bDSLAToken.sol\":{\"keccak256\":\"0xf44b2d42600badd69cfc0cc8d22dcdc20de34dcef1a6299c04070517a0d91a2e\",\"urls\":[\"bzz-raw://065a5c777fc018fcaf8a4d178cde9d6e4462e97d70a96d6c68bc4fb4c31a2da1\",\"dweb:/ipfs/QmQ21x8iwbS8HKjzpxYL1VsSUXcrrw8sXhdsRFBeQmM3H7\"]},\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/interfaces/IMessenger.sol\":{\"keccak256\":\"0x1666c7ff4895f193105211409df2a309e979131ba11633ef20c0ebce4c8a48d6\",\"urls\":[\"bzz-raw://69c0b8de6b7e862510cbd0b7db100172b069e6ccdc0e96ce71e8874587a4a1bf\",\"dweb:/ipfs/QmdUrUXWMJHjB5BnUWdSp1GN9sC7MPgNJBULxssJFcGDo1\"]},\"@openzeppelin/contracts/GSN/Context.sol\":{\"keccak256\":\"0xdb26cbf4d028490f49831a7865c2fe1b28db44b535ca8d343785a3b768aae183\",\"urls\":[\"bzz-raw://840b14ce0315c47d49ba328f1f9fa7654ded1c9e1559e6c5e777a7b2dc28bf0a\",\"dweb:/ipfs/QmTLLabn4wcfGro9LEmUXUN2nwKqZSotXMvjDCLXEnLtZP\"]},\"@openzeppelin/contracts/access/AccessControl.sol\":{\"keccak256\":\"0x92f7900d382761c7faefeaced81c6b4f1aae909ed0551803bfe8f27101956360\",\"urls\":[\"bzz-raw://407c0864143968542e5cf5aa7556916d2cf292b201e3dadb65662e9a3aa24187\",\"dweb:/ipfs/QmSnXzYAUaGLGr7uofRbgQraTJvatbjQLBPhyYiMd18oUJ\"]},\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0x4bd6402ca6b3419008c2b482aff54e66836e8cb4eba2680e42ac5884ae6424fc\",\"urls\":[\"bzz-raw://8f9f711fb8d0d92aeea1c327e3845d13ca1fa8f142e47f8723cd5b3106fb29a3\",\"dweb:/ipfs/QmVQUReDW9f4zGqhizwHnyU8EntMs95tbASdqkGncnikba\"]},\"@openzeppelin/contracts/math/SafeMath.sol\":{\"keccak256\":\"0x9a9cf02622cd7a64261b10534fc3260449da25c98c9e96d1b4ae8110a20e5806\",\"urls\":[\"bzz-raw://2df142592d1dc267d9549049ee3317fa190d2f87eaa565f86ab05ec83f7ab8f5\",\"dweb:/ipfs/QmSkJtcfWo7c42KnL5hho6GFxK6HRNV91XABx1P7xDtfLV\"]},\"@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol\":{\"keccak256\":\"0xe30213b0851987b0455057cdfb65660c05805cbb05b12c0d61b0ff7a99cc36cc\",\"urls\":[\"bzz-raw://1c61711ecc3ad53890dded63c27909a315ba3053c553be29acaa239bc6a7a0cf\",\"dweb:/ipfs/QmQjriBzSyAYQTm4NfWpnnoH8RhZrayyXm2zvpeHkxQnAk\"]},\"@openzeppelin/contracts/token/ERC20/ERC20.sol\":{\"keccak256\":\"0x91e0bd6a6762d2a1700dab0849de8422611355100576c4beef1e80d82a4104a0\",\"urls\":[\"bzz-raw://73bbd77af0a8b07255d2ffa20728bcf13b116007c9ddac5d37046cfabb0e1e02\",\"dweb:/ipfs/QmRgZgWCWCSMTTaok6o4QvWA6MgB4goS8qpb3sN7bAvaZ9\"]},\"@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol\":{\"keccak256\":\"0x657b0d90be17331364211d74359df2a734fac864f6e88c80de7626fa33090ffb\",\"urls\":[\"bzz-raw://09cca25fefa2354a424d55a97930c76b11dc50697ba62c85d7affc27a37e830c\",\"dweb:/ipfs/QmPTQBYXxQDSNmMKqwe4WnM8E7NwnpLnkFLSRH8hZRvrVK\"]},\"@openzeppelin/contracts/token/ERC20/ERC20Pausable.sol\":{\"keccak256\":\"0xbab4a97af2a6810a8ffc187205dfb331284949ea5b30caa5b9052828853bb149\",\"urls\":[\"bzz-raw://f53c98e31ed415c2a6f03d99809cd4f2f5fff92a13ee85022922a09df82ee459\",\"dweb:/ipfs/QmXiv4ysuQSRfoXqPpwA1QCreEnqfkrHDGyJTmifoni7dK\"]},\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0x5c26b39d26f7ed489e555d955dcd3e01872972e71fdd1528e93ec164e4f23385\",\"urls\":[\"bzz-raw://efdc632af6960cf865dbc113665ea1f5b90eab75cc40ec062b2f6ae6da582017\",\"dweb:/ipfs/QmfAZFDuG62vxmAN9DnXApv7e7PMzPqi4RkqqZHLMSQiY5\"]},\"@openzeppelin/contracts/utils/Address.sol\":{\"keccak256\":\"0xf5fa8cbdffa5ef8be49b246b5628facc30b71707e78a45d80d93b64eff3fe390\",\"urls\":[\"bzz-raw://774e78a9ff32792cc95db4d2ceaf3a7965bb7f0bea5e6cb7cff182b450d44b37\",\"dweb:/ipfs/QmRRMC4uj7eAcLW7chynA3sNEYULMFazdLwQHKHQPyzAbA\"]},\"@openzeppelin/contracts/utils/EnumerableSet.sol\":{\"keccak256\":\"0xb2a11b236f073662f5a196995863f51c11d006bf7c3de158b316dfa1506c4b79\",\"urls\":[\"bzz-raw://8651649cf0b9efa18c3b01c030276fa320d41adbdc286833417e7f36e357b2f3\",\"dweb:/ipfs/QmafhM2Nd1aP43QVB1eRRZaqRXQKswNfQcWi8U8xjrxCfN\"]},\"@openzeppelin/contracts/utils/Pausable.sol\":{\"keccak256\":\"0x5d1b1dcbc0396f44c1c8d554857f71e3187503bf1e54062bf9ec6782e21f3a08\",\"urls\":[\"bzz-raw://9aa7fa580393aab7ca3d9f606f5ab7434d51e1c0f3632a593fca82c80ef8cc4c\",\"dweb:/ipfs/QmRy84N7QfkwBM2AeR7UB5G1PPHdRLi6s1iyzAwCzevcHe\"]}},\"version\":1}",
@@ -8427,8 +8420,7 @@
     }
   },
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-11-25T23:15:41.763Z",
-  "networkType": "ethereum",
+  "updatedAt": "2020-11-29T13:40:21.613Z",
   "devdoc": {
     "details": "SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements",
     "methods": {
