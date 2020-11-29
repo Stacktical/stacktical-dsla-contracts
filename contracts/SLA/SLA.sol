@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/IMessenger.sol";
-import "../Whitelist/Whitelist.sol";
 import "../SLO/SLO.sol";
 import "../SLARegistry.sol";
 import "./Staking.sol";
@@ -17,7 +16,6 @@ import "./Staking.sol";
  * compensation
  */
 contract SLA is Ownable, Staking {
-
     using SafeMath for uint256;
 
     // The required amount to stake when subscribing to the agreement
@@ -56,7 +54,6 @@ contract SLA is Ownable, Staking {
      */
     event SLICreated(uint256 _timestamp, uint256 _value, uint256 _periodId);
 
-
     /**
      * @dev Throws if called by any address other than the Oraclize or
      * messenger contract.
@@ -65,7 +62,7 @@ contract SLA is Ownable, Staking {
         require(msg.sender == address(registry.messenger()));
         _;
     }
-    
+
     /**
      * @dev constructor
      * @param _owner the owner of the service level agreement
@@ -84,13 +81,14 @@ contract SLA is Ownable, Staking {
         uint256 _stake,
         string memory _ipfsHash,
         uint256 _sliInterval,
-        bDSLAToken _tokenAddress
-    )
-    public Staking(_tokenAddress){
+        bDSLAToken _tokenAddress,
+        uint[] memory _sla_period_starts, 
+        uint[] memory _sla_period_ends
+    ) public Staking(_tokenAddress, _sla_period_starts, _sla_period_ends, _owner) {
         require(_SLOs.length < 5);
         require(_SLONames.length == _SLOs.length);
 
-        for(uint256 i = 0; i < _SLOs.length; i++) {
+        for (uint256 i = 0; i < _SLOs.length; i++) {
             SLOs[_SLONames[i]] = _SLOs[i];
         }
 
@@ -128,15 +126,38 @@ contract SLA is Ownable, Staking {
      * @dev external function to get SLI
      * @param _SLOName the name of the SLO in bytes32
      */
-    function getSLI(bytes32 _SLOName) public view returns(SLI[] memory) {
+    function getSLI(bytes32 _SLOName) public view returns (SLI[] memory) {
         return SLIs[_SLOName];
     }
 
     /**
      * @dev external view function that returns the sliInterval value
      */
-    function getSliInterval() external view returns(uint256) {
+    function getSliInterval() external view returns (uint256) {
         return sliInterval;
     }
 
+    /**
+     * @dev external view function that returns all agreement information
+     */
+
+    function getDetails()
+        external
+        view
+        returns (
+            address,
+            string memory,
+            uint256,
+            bytes32[] memory,
+            SLO[] memory
+        )
+    {
+        SLO[] memory _SLOAddresses = new SLO[](SLONames.length);
+
+        for (uint256 i = 0; i < SLONames.length; i++) {
+            _SLOAddresses[i] = SLOs[SLONames[i]];
+        }
+
+        return (owner(), ipfsHash, stake, SLONames, _SLOAddresses);
+    }
 }
