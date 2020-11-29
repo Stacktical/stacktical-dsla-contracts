@@ -50,7 +50,7 @@ module.exports = {
     mainnet: {
       provider: function () {
         return new HDWalletProvider(
-          mnemonic_dev,
+          mnemonic,
           "https://mainnet.infura.io/v3/" + infura_project_id
         );
       },
@@ -60,7 +60,7 @@ module.exports = {
     rinkeby: {
       provider: function () {
         return new HDWalletProvider(
-          mnemonic_dev,
+          mnemonic,
           "https://rinkeby.infura.io/v3/" + infura_project_id
         );
       },
@@ -70,7 +70,7 @@ module.exports = {
     kovan: {
       provider: function () {
         return new HDWalletProvider(
-          mnemonic_dev,
+          mnemonic,
           "https://kovan.infura.io/v3/" + infura_project_id
         );
       },
