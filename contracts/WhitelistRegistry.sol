@@ -8,7 +8,6 @@ import "./Whitelist/Whitelist.sol";
  * and querying those whitelists
  */
 contract WhitelistRegistry {
-
     // Mapping that stores the whitelists owned by a user
     mapping(address => Whitelist[]) private userToWhitelists;
 
@@ -33,8 +32,11 @@ contract WhitelistRegistry {
      * the given user
      * @param _user Address of the user for which to return the whitelists
      */
-    function userWhitelists(address _user) public view returns(Whitelist[] memory) {
-        return(userToWhitelists[_user]);
+    function userWhitelists(address _user)
+        public
+        view
+        returns (Whitelist[] memory)
+    {
+        return (userToWhitelists[_user]);
     }
-
 }

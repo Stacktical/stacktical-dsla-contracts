@@ -8,7 +8,6 @@ import "@openzeppelin-contracts/contracts/access/Ownable.sol";
  * to perform specific actions
  */
 contract Whitelist is Ownable {
-
     // mapping to store which user addresses are whitelisted
     mapping(address => bool) private userToWhitelisted;
 
@@ -40,8 +39,11 @@ contract Whitelist is Ownable {
      * @dev public function for adding multiple users to the whitelist
      * @param _userAddresses array of user addresses to add to the whitelist
      */
-    function addUsersToWhitelist(address[] memory _userAddresses) public onlyOwner {
-        for (uint i = 0; i < _userAddresses.length; i++) {
+    function addUsersToWhitelist(address[] memory _userAddresses)
+        public
+        onlyOwner
+    {
+        for (uint256 i = 0; i < _userAddresses.length; i++) {
             addUserToWhitelist(_userAddresses[i]);
         }
     }
@@ -59,8 +61,11 @@ contract Whitelist is Ownable {
      * @dev public function for removing multiple users from the whitelist
      * @param _userAddresses array of user addresses to remove from the whitelist
      */
-    function removeUsersFromWhitelist(address[] memory _userAddresses) public onlyOwner {
-        for (uint i = 0; i < _userAddresses.length; i++) {
+    function removeUsersFromWhitelist(address[] memory _userAddresses)
+        public
+        onlyOwner
+    {
+        for (uint256 i = 0; i < _userAddresses.length; i++) {
             removeUserFromWhitelist(_userAddresses[i]);
         }
     }
@@ -79,8 +84,7 @@ contract Whitelist is Ownable {
      * @param _userAddress the address of the user to check
      * @return true if the user is whitelisted
      */
-    function isWhitelisted(address _userAddress) public view returns(bool) {
-        return(userToWhitelisted[_userAddress]);
+    function isWhitelisted(address _userAddress) public view returns (bool) {
+        return (userToWhitelisted[_userAddress]);
     }
-
 }

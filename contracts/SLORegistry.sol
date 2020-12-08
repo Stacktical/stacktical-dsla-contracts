@@ -8,7 +8,6 @@ import "./SLO/SLO.sol";
  * objectives and querying those service level objectives
  */
 contract SLORegistry {
-
     // Mapping that stores the service level objectives created by a user
     mapping(address => SLO[]) private userToSLOs;
 
@@ -24,7 +23,11 @@ contract SLORegistry {
      * @param _SLOType type of check
      * @param _name name of the service level objective in bytes32
      */
-    function createSLO(uint _value, SLO.SLOTypes _SLOType, bytes32 _name) public {
+    function createSLO(
+        uint256 _value,
+        SLO.SLOTypes _SLOType,
+        bytes32 _name
+    ) public {
         SLO slo = new SLO(_value, _SLOType, _name);
         userToSLOs[msg.sender].push(slo);
 
@@ -37,7 +40,7 @@ contract SLORegistry {
      * @param _user Address of the user for which to return the service level
      * objectives
      */
-    function userSLOs(address _user) public view returns(SLO[] memory) {
-        return(userToSLOs[_user]);
+    function userSLOs(address _user) public view returns (SLO[] memory) {
+        return (userToSLOs[_user]);
     }
 }
