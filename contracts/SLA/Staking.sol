@@ -1,11 +1,10 @@
-// Staking.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
 import "../bDSLA/bDSLAToken.sol";
-import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin-contracts/contracts/access/Ownable.sol";
-import "@openzeppelin-contracts/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 contract Staking is Ownable {
     using SafeMath for uint256;
@@ -25,10 +24,12 @@ contract Staking is Ownable {
     bDSLAToken public bDSLA;
     address public validator;
     address[] public stakers; // list of all stakers (validators, vouchers, delegators ...)
-    address[] allowedTokens; // mapping for all allowed tokens to be staked
+    address[] public allowedTokens; // mapping for all allowed tokens to be staked
     Period[] public periods; // all periods for an SLA
     mapping(address => uint256) public uniqueTokensStaked; // mapping to trace how many token is staked by an user
     uint256 public totalStaked;
+
+    event NewPeriodAdded(uint256 indexed period_index);
 
     modifier notValidator {
         require(msg.sender != validator, "You are a validator !");
@@ -48,10 +49,31 @@ contract Staking is Ownable {
         _;
     }
 
-    constructor(bDSLAToken _tokenAddress) public {
+    constructor(
+        bDSLAToken _tokenAddress,
+        uint256[] memory _sla_period_starts,
+        uint256[] memory _sla_period_ends,
+        address _owner
+    ) public {
+        require(
+            _sla_period_starts.length == _sla_period_ends.length,
+            "Please check the params of your periods !"
+        );
         bDSLA = bDSLAToken(_tokenAddress);
         allowedTokens.push(address(bDSLA));
-        validator = msg.sender;
+        validator = _owner;
+
+        for (uint256 i = 0; i < _sla_period_starts.length; i++) {
+            _addPeriod(_sla_period_starts[i], _sla_period_ends[i]);
+        }
+    }
+
+    // add new period
+    function addNewPeriod(uint256 _sla_period_start, uint256 _sla_period_end)
+        public
+        onlyOwner
+    {
+        _addPeriod(_sla_period_start, _sla_period_end);
     }
 
     // autorise a new token to be staked
@@ -74,7 +96,6 @@ contract Staking is Ownable {
         // check if the staker had already staked another token or not
         _updateUniqueTokensStaked(msg.sender, _token, _period);
         // stake tokens
-        IERC20(_token).approve(address(this), _amount);
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
         // update balance of staked tokens per staker
         periods[_period].stakingBalance[_token][msg.sender] = periods[_period]
@@ -103,8 +124,9 @@ contract Staking is Ownable {
 
         // unstake bDSLA tokens
         uint256 staked = periods[_period].stakingBalance[_token][msg.sender];
-        uint256 claimed_reward =
-            periods[_period].claimed_reward.div(stakers.length);
+        uint256 claimed_reward = periods[_period].claimed_reward.div(
+            stakers.length
+        );
 
         periods[_period].stakingBalance[_token][msg.sender] = 0;
         totalStaked = totalStaked.sub(staked);
@@ -136,7 +158,6 @@ contract Staking is Ownable {
         );
 
         // stake d tokens
-        IERC20(_token).approve(address(this), _amount);
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
         // update balance of staked tokens per staker
         periods[_period].stakingBalance[_token][msg.sender] = periods[_period]
@@ -146,8 +167,9 @@ contract Staking is Ownable {
 
         // unstake bDSLA tokens
         uint256 staked = periods[_period].stakingBalance[_token][msg.sender];
-        uint256 claimed_reward =
-            periods[_period].claimed_reward.div(stakers.length);
+        uint256 claimed_reward = periods[_period].claimed_reward.div(
+            stakers.length
+        );
 
         periods[_period].stakingBalance[_token][msg.sender] = 0;
         totalStaked = totalStaked.sub(staked);
@@ -218,9 +240,8 @@ contract Staking is Ownable {
                 allowedTokensIndex++
             ) {
                 totalValue = totalValue.add(
-                    periods[_period].stakingBalance[
-                        allowedTokens[allowedTokensIndex]
-                    ][_user]
+                    periods[_period]
+                        .stakingBalance[allowedTokens[allowedTokensIndex]][_user]
                 );
             }
         }
@@ -257,5 +278,31 @@ contract Staking is Ownable {
             }
         }
         return (uint256(-1));
+    }
+
+    function _addPeriod(uint256 _sla_period_start, uint256 _sla_period_end)
+        internal
+    {
+        Period memory _period;
+
+        _period.sla_period_start = _sla_period_start;
+        _period.sla_period_end = _sla_period_end;
+        _period.status = Status.NotVerified;
+
+        periods.push(_period);
+
+        emit NewPeriodAdded(periods.length.sub(1));
+    }
+
+    /**
+     * @dev public view function that returns the total amount of stakers
+     *
+     */
+    function stakersCount() public view returns (uint256) {
+        return stakers.length;
+    }
+
+    function getPeriodData(uint256 _periodId) public view returns (uint256 periodStart, uint256 periodEnd){
+        return (periods[_periodId].sla_period_start,periods[_periodId].sla_period_end);
     }
 }

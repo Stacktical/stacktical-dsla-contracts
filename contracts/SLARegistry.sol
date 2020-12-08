@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-import "@openzeppelin-contracts/contracts/math/SafeMath.sol";
-import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IMessenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
 import "./bDSLA/bDSLAToken.sol";
-
 /**
  * @title SLARegistry
  * @dev SLARegistry is a contract for handling creation of service level
  * agreements and keeping track of the created agreements
  */
 contract SLARegistry {
+
     using SafeMath for uint256;
 
     IMessenger public messenger;
@@ -22,7 +22,7 @@ contract SLARegistry {
     SLA[] public SLAs;
 
     // Mapping that stores the indexes of service level agreements owned by a user
-    mapping(address => uint256[]) private userToSLAIndexes;
+    mapping(address => uint[]) private userToSLAIndexes;
 
     /**
      * @dev event for service level agreement creation logging
@@ -42,28 +42,6 @@ contract SLARegistry {
     }
 
     /**
-     * @dev external view function that returns the service level agreements for
-     * a certain range in the array
-     * @param _start the index of the start position in the array
-     * @param _end the index of the end position in the array
-     */
-    function paginatedSLAs(uint256 _start, uint256 _end)
-        external
-        view
-        returns (SLA[] memory)
-    {
-        require(_start <= _end);
-
-        SLA[] memory SLAList = new SLA[](_end.sub(_start).add(1));
-
-        for (uint256 i = 0; i < _end.sub(_start).add(1); i++) {
-            SLAList[i] = (SLAs[i.add(_start)]);
-        }
-
-        return (SLAList);
-    }
-
-    /**
      * @dev public function for creating service level agreements
      * @param _owner Address of the owner of the service level agreement
      * @param _SLONames Array of the names of the service level objectives
@@ -74,39 +52,34 @@ contract SLARegistry {
      * service level agreement
      * @param _ipfsHash String with the ipfs hash that contains extra
      * information about the service level agreement
-     * @param _poolSize uint the size of the compensation pool the creator will
-     * initialize the contract with
      * @param _sliInterval uint the interval in seconds between requesting a new SLI
      */
     function createSLA(
         address _owner,
         bytes32[] memory _SLONames,
         SLO[] memory _SLOs,
-        uint256 _stake,
+        uint _stake,
         string memory _ipfsHash,
-        uint256 _poolSize,
-        uint256 _sliInterval,
-        bDSLAToken _tokenAddress
+        uint _sliInterval,
+        bDSLAToken _tokenAddress, 
+        uint[] memory _sla_period_starts, 
+        uint[] memory _sla_period_ends
     ) public {
-        require(
-            _tokenAddress.allowance(msg.sender, address(this)) >= _poolSize
+        SLA sla = new SLA(
+            _owner,
+            _SLONames,
+            _SLOs,
+            _stake,
+            _ipfsHash,
+            _sliInterval, 
+            _tokenAddress, 
+            _sla_period_starts, 
+            _sla_period_ends
         );
 
-        SLA sla =
-            new SLA(
-                _owner,
-                _SLONames,
-                _SLOs,
-                _stake,
-                _ipfsHash,
-                _sliInterval,
-                _tokenAddress
-            );
-
-        _tokenAddress.transferFrom(msg.sender, address(sla), _poolSize);
         SLAs.push(sla);
-
-        uint256 index = SLAs.length.sub(1);
+        
+        uint index = SLAs.length.sub(1);
 
         userToSLAIndexes[msg.sender].push(index);
 
@@ -115,16 +88,16 @@ contract SLARegistry {
 
     /**
      * @dev Gets SLI information for the specified SLA and SLO
-     * @param _data Oracle Proof
+     * @param _periodId Oracle Proof
      * @param _sla SLA Address
      * @param _sloName SLO Name
      */
     function requestSLI(
-        bytes memory _data,
+        uint256 _periodId,
         SLA _sla,
         bytes32 _sloName
     ) public {
-        messenger.requestSLI(_data, _sla, _sloName);
+        messenger.requestSLI(_periodId, _sla, _sloName);
     }
 
     /**
@@ -133,16 +106,16 @@ contract SLARegistry {
      * @param _user Address of the user for which to return the service level
      * agreements
      */
-    function userSLAs(address _user) public view returns (SLA[] memory) {
-        uint256 count = userSLACount(_user);
+    function userSLAs(address _user) public view returns(SLA[] memory) {
+        uint count = userSLACount(_user);
         SLA[] memory SLAList = new SLA[](count);
-        uint256[] memory userSLAIndexes = userToSLAIndexes[_user];
+        uint[] memory userSLAIndexes = userToSLAIndexes[_user];
 
-        for (uint256 i = 0; i < count; i++) {
+        for(uint i = 0; i < count; i++) {
             SLAList[i] = (SLAs[userSLAIndexes[i]]);
         }
 
-        return (SLAList);
+        return(SLAList);
     }
 
     /**
@@ -151,22 +124,22 @@ contract SLARegistry {
      * @param _user Address of the user for which to return the amount of
      * service level agreements
      */
-    function userSLACount(address _user) public view returns (uint256) {
+    function userSLACount(address _user) public view returns(uint) {
         return userToSLAIndexes[_user].length;
     }
 
     /**
      * @dev public view function that returns all the service level agreements
      */
-    function allSLAs() public view returns (SLA[] memory) {
-        return (SLAs);
+    function allSLAs() public view returns(SLA[] memory) {
+        return(SLAs);
     }
 
     /**
      * @dev public view function that returns the total amount of service
      * level agreements
      */
-    function SLACount() public view returns (uint256) {
+    function SLACount() public view returns(uint) {
         return SLAs.length;
     }
 }

@@ -2,11 +2,10 @@
 pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin-contracts/contracts/access/Ownable.sol";
-import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin-contracts/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/IMessenger.sol";
-import "../Whitelist/Whitelist.sol";
 import "../SLO/SLO.sol";
 import "../SLARegistry.sol";
 import "./Staking.sol";
@@ -35,7 +34,7 @@ contract SLA is Ownable, Staking {
     struct SLI {
         uint256 timestamp;
         uint256 value;
-        string ipfsHash;
+        uint256 periodId;
     }
 
     // Mapping to get SLO addresses from SLO names in bytes32
@@ -51,9 +50,9 @@ contract SLA is Ownable, Staking {
      * @dev event for SLI creation logging
      * @param _timestamp the time the SLI has been registered
      * @param _value the value of the SLI
-     * @param _hash the ipfs hash that stores additional info
+     * @param _periodId the id of the given period
      */
-    event SLICreated(uint256 _timestamp, uint256 _value, string _hash);
+    event SLICreated(uint256 _timestamp, uint256 _value, uint256 _periodId);
 
     /**
      * @dev Throws if called by any address other than the Oraclize or
@@ -82,8 +81,10 @@ contract SLA is Ownable, Staking {
         uint256 _stake,
         string memory _ipfsHash,
         uint256 _sliInterval,
-        bDSLAToken _tokenAddress
-    ) public Staking(_tokenAddress) {
+        bDSLAToken _tokenAddress,
+        uint[] memory _sla_period_starts, 
+        uint[] memory _sla_period_ends
+    ) public Staking(_tokenAddress, _sla_period_starts, _sla_period_ends, _owner) {
         require(_SLOs.length < 5);
         require(_SLONames.length == _SLOs.length);
 
@@ -103,22 +104,21 @@ contract SLA is Ownable, Staking {
      * @dev external function to register SLI's and check them against the SLO's
      * @param _SLOName the name of the SLO in bytes32
      * @param _value the value of the SLI to check
-     * @param _hash the ipfs hash with additional information
+     * @param _periodId the id of the given period
      */
-    function registerSLI(
-        bytes32 _SLOName,
-        uint256 _value,
-        string calldata _hash,
-        uint256 _period
-    ) external onlyMessenger {
-        SLIs[_SLOName].push(SLI(now, _value, _hash));
+    function registerSLI(bytes32 _SLOName, uint256 _value, uint256 _periodId)
+        external
+        onlyMessenger
+    {
+        SLIs[_SLOName].push(SLI(block.timestamp, _value, _periodId));
 
-        emit SLICreated(now, _value, _hash);
+        emit SLICreated(block.timestamp, _value, _periodId);
 
-        if (!SLOs[_SLOName].isSLOHonored(_value)) {
-            periods[_period].status = Status.NotRespected;
-        } else {
-            periods[_period].status = Status.Respected;
+        
+        if(!SLOs[_SLOName].isSLOHonored(_value)) {
+            periods[_periodId].status = Status.NotRespected;
+        }else{
+            periods[_periodId].status = Status.Respected;
         }
     }
 
@@ -135,5 +135,29 @@ contract SLA is Ownable, Staking {
      */
     function getSliInterval() external view returns (uint256) {
         return sliInterval;
+    }
+
+    /**
+     * @dev external view function that returns all agreement information
+     */
+
+    function getDetails()
+        external
+        view
+        returns (
+            address,
+            string memory,
+            uint256,
+            bytes32[] memory,
+            SLO[] memory
+        )
+    {
+        SLO[] memory _SLOAddresses = new SLO[](SLONames.length);
+
+        for (uint256 i = 0; i < SLONames.length; i++) {
+            _SLOAddresses[i] = SLOs[SLONames[i]];
+        }
+
+        return (owner(), ipfsHash, stake, SLONames, _SLOAddresses);
     }
 }
