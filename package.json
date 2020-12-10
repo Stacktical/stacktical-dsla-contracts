@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "truffle compile && NODE_ENV=test truffle test",
+    "test:kovan": "truffle compile && NODE_ENV=test truffle test --network kovan",
     "remix": "npx remixd -s . --remix-ide https://remix.ethereum.org",
     "compile": "truffle compile",
     "prettier": "prettier --write 'contracts/**/*.sol'"
@@ -12,10 +13,10 @@
   "author": "DSLA Core Developers",
   "license": "ISC",
   "dependencies": {
+    "@chainlink/contracts": "0.0.11",
     "@openzeppelin/contracts": "^3.2.0"
   },
   "devDependencies": {
-    "@openzeppelin/test-environment": "^0.1.8",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",

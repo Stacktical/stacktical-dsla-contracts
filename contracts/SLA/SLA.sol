@@ -82,9 +82,12 @@ contract SLA is Ownable, Staking {
         string memory _ipfsHash,
         uint256 _sliInterval,
         bDSLAToken _tokenAddress,
-        uint[] memory _sla_period_starts, 
-        uint[] memory _sla_period_ends
-    ) public Staking(_tokenAddress, _sla_period_starts, _sla_period_ends, _owner) {
+        uint256[] memory _sla_period_starts,
+        uint256[] memory _sla_period_ends
+    )
+        public
+        Staking(_tokenAddress, _sla_period_starts, _sla_period_ends, _owner)
+    {
         require(_SLOs.length < 5);
         require(_SLONames.length == _SLOs.length);
 
@@ -106,18 +109,18 @@ contract SLA is Ownable, Staking {
      * @param _value the value of the SLI to check
      * @param _periodId the id of the given period
      */
-    function registerSLI(bytes32 _SLOName, uint256 _value, uint256 _periodId)
-        external
-        onlyMessenger
-    {
+    function registerSLI(
+        bytes32 _SLOName,
+        uint256 _value,
+        uint256 _periodId
+    ) external onlyMessenger {
         SLIs[_SLOName].push(SLI(block.timestamp, _value, _periodId));
 
         emit SLICreated(block.timestamp, _value, _periodId);
 
-        
-        if(!SLOs[_SLOName].isSLOHonored(_value)) {
+        if (!SLOs[_SLOName].isSLOHonored(_value)) {
             periods[_periodId].status = Status.NotRespected;
-        }else{
+        } else {
             periods[_periodId].status = Status.Respected;
         }
     }
