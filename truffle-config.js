@@ -5,13 +5,20 @@ const HDWalletProvider = require("truffle-hdwallet-provider");
 
 const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 const mnemonic = process.env.DSLA_MNEMONIC;
+const test_mnemonic = process.env.TEST_MNEMONIC;
 
 module.exports = {
   networks: {
     development: {
       host: "127.0.0.1",
-      port: 8545,
+      port: 7545,
       network_id: "*",
+    },
+    testing: {
+      provider: function () {
+        return new HDWalletProvider(test_mnemonic, "http://192.168.0.5:7545");
+      },
+      network_id: "1337",
     },
     mainnet: {
       provider: function () {
@@ -30,20 +37,10 @@ module.exports = {
           "https://rinkeby.infura.io/v3/" + infura_project_id
         );
       },
-      network_id: "3",
+      network_id: "4",
       gas: 4612388,
     },
     kovan: {
-      provider: function () {
-        return new HDWalletProvider(
-          mnemonic,
-          "https://kovan.infura.io/v3/" + infura_project_id
-        );
-      },
-      network_id: "42",
-      gas: 12000000,
-    },
-    kovanTest: {
       provider: function () {
         return new HDWalletProvider(
           mnemonic,

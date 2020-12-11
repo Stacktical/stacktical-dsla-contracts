@@ -1,5 +1,6 @@
-import { eventListener, testEnv, web3ContractCreator } from "./testEnv";
-import { getSLI } from "./helpers/getSli";
+import { testEnv } from "../environments.config";
+import { eventListener, getSLI, web3ContractCreator } from "./helpers";
+
 const Messenger = artifacts.require("Messenger");
 const MinimalSLA = artifacts.require("MinimalSLA");
 const IERC20 = artifacts.require("IERC20");
@@ -18,22 +19,32 @@ contract("Messenger", (accounts) => {
   before(async () => {
     // MinimalSLA creates a period on deployment time
     minimalSLA = await MinimalSLA.new(slaMonitoringStart, slaMonitoringEnd);
-    messenger = await Messenger.new(testEnv.chainlinkOracleAddress);
+    messenger = await Messenger.new(
+      testEnv.chainlinkOracleAddress,
+      testEnv.chainlinkTokenAddress,
+      testEnv.chainlinkJobId
+    );
     chainlinkToken = await IERC20.at(testEnv.chainlinkTokenAddress);
-    // Sets the owner as the SLARegistry
+    // // Sets the owner as the SLARegistry
     await messenger.setSLARegistry({ from: owner });
     web3Contract = web3ContractCreator(Messenger.abi, messenger.address);
   });
 
   it("should ask for a SLI value to the Chainlink Oracle", async () => {
     await chainlinkToken.transfer(messenger.address, web3.utils.toWei("0.1"));
-    await messenger.requestSLI(0, minimalSLA.address, arbitrarySLOName);
+    // MinimalSLA only has 1 period
+    const minimalSLAPeriodId = 0;
+    await messenger.requestSLI(
+      minimalSLAPeriodId,
+      minimalSLA.address,
+      arbitrarySLOName
+    );
     await eventListener(web3Contract, "SLIReceived");
     const storedSLI = await minimalSLA.SLIs.call(arbitrarySLOName, 0);
     const { timestamp, value, periodId } = storedSLI;
     assert.notEmpty(timestamp);
     assert.notEmpty(value);
-    assert.equal(periodId, 0);
+    assert.equal(periodId, minimalSLAPeriodId);
     // Compare it with the sli obtained by the GraphQL API
     const stackticalSLI = await getSLI(
       minimalSLA.address,

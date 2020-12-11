@@ -24,7 +24,8 @@ contract Messenger is ChainlinkClient, StringUtils {
 
     // jobId corresponds to API call
     address private oracle;
-    bytes32 private jobId = "29fa9aa13bf1468788b7cc4a500a45b8";
+    //    bytes32 private jobId = "29fa9aa13bf1468788b7cc4a500a45b8";
+    bytes32 private jobId;
     uint256 private fee = 0.1 * 10**18; // 0.1 LINK;
 
     /**
@@ -41,8 +42,13 @@ contract Messenger is ChainlinkClient, StringUtils {
      * @dev constructor
      * @param _chainlinkOracle the address of the oracle to create requests to
      */
-    constructor(address _chainlinkOracle) public {
-        setPublicChainlinkToken();
+    constructor(
+        address _chainlinkOracle,
+        address _chainlinkToken,
+        bytes32 _jobId
+    ) public {
+        jobId = _jobId;
+        setChainlinkToken(_chainlinkToken);
         oracle = _chainlinkOracle;
         SLARegistry = address(0);
     }
@@ -97,7 +103,7 @@ contract Messenger is ChainlinkClient, StringUtils {
         // States the path to the data, i.e. {data:{getSLI:value}}
         request.add("path", "data.getSLI");
 
-        // Sends the request with 1 LINK to the oracle contract
+        // Sends the request with 0.1 LINK to the oracle contract
         bytes32 requestId = sendChainlinkRequestTo(oracle, request, fee);
 
         requests.push(requestId);

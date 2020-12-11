@@ -29,9 +29,10 @@ const getQueryString = (slaAddress, slaMonitoringStart, slaMonitorinEnd) => {
   );
 };
 // Test parameters
-const address = "0xf7cdda73b01Bd3A3D306C30f3825B5FB607d1946";
-const slaMonitoringStart = 1577836800000000000;
-const slaMonitoringEnd = 1594026520000000000;
+// const address = "0xf7cdda73b01Bd3A3D306C30f3825B5FB607d1946";
+// const slaMonitoringStart = 1577836800000000000;
+// const slaMonitoringEnd = 1594026520000000000;
+
 export const getSLI = async (
   slaAddress,
   slaMonitoringStart,

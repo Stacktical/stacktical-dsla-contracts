@@ -4,8 +4,9 @@
   "description": "DSLA Protocol",
   "main": "index.js",
   "scripts": {
-    "test": "truffle compile && NODE_ENV=test truffle test",
-    "test:kovan": "truffle compile && NODE_ENV=test truffle test --network kovan",
+    "test": "NODE_ENV=test TEST_ENV=local truffle test --network testing",
+    "test:kovan": "NODE_ENV=test TEST_ENV=kovan truffle test --network kovan",
+    "deploy:kovan": "truffle deploy --network kovan",
     "remix": "npx remixd -s . --remix-ide https://remix.ethereum.org",
     "compile": "truffle compile",
     "prettier": "prettier --write 'contracts/**/*.sol'"
