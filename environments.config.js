@@ -20,18 +20,11 @@ const environments = {
     chainlinkTokenAddress: null,
     chainlinkJobId: null,
   },
-  ropsten: {
-    web3WebsocketProviderUrl:
-      "wss://ropsten.infura.io/ws/v3/" + process.env.DSLA_INFURA_PROJECT_ID,
+  chainlink: {
+    web3WebsocketProviderUrl: null,
     chainlinkOracleAddress: null,
     chainlinkTokenAddress: null,
     chainlinkJobId: null,
-  },
-  chainlink: {
-    web3WebsocketProviderUrl: "ws://192.168.0.5:7545",
-    chainlinkOracleAddress: "0x3742b0B04C16c2CC2a2a0D7A662AA324fEcc731E",
-    chainlinkTokenAddress: "0x464d88b68dF1fC6A451f5E66832eabE9f71A4485",
-    chainlinkJobId: "0x" + "813fd1b013cf4b1785d32a3bad7d3738",
   },
   local: {
     web3WebsocketProviderUrl: "ws://192.168.0.5:7545",
