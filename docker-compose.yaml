@@ -1,0 +1,56 @@
+version: '3.5'
+services:
+  ganache:
+    image: trufflesuite/ganache-cli:v6.12.1
+    ports:
+      - 8545:8545
+    networks:
+      - dsla-test
+    command: --accounts 10 --debug --mnemonic "${TEST_MNEMONIC}"
+
+  postgres:
+    image: postgres:13.1
+    volumes:
+      - ./chainlink/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: chainlink
+    networks:
+      - dsla-test
+
+  chainlink:
+    image: smartcontract/chainlink:0.9.6
+    ports:
+      - 6688:6688
+    volumes:
+      - ./chainlink:/chainlink
+      - ${PWD}/.api:/chainlink/.api
+      - ${PWD}/.password:/chainlink/.password
+    environment:
+      - ROOT=/chainlink
+      - ETH_CHAIN_ID=1337
+      - LOG_LEVEL=debug
+      - MIN_INCOMING_CONFIRMATIONS=0
+      - MIN_OUTGOING_CONFIRMATIONS=0
+      - LINK_CONTRACT_ADDRESS=0x464d88b68dF1fC6A451f5E66832eabE9f71A4485
+      - CHAINLINK_TLS_PORT=0
+      - SECURE_COOKIES=false
+      - GAS_UPDATER_ENABLED=true
+      - ALLOW_ORIGINS=*
+      - ETH_URL=ws://ganache:8545
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/chainlink?sslmode=disable
+
+    command: local n -p /chainlink/.password -a /chainlink/.api
+    networks:
+      - dsla-test
+    depends_on:
+      - ganache
+      - postgres
+    restart: on-failure
+
+networks:
+    dsla-test:
+
+volumes:
+    postgres:
+    chainlink:
