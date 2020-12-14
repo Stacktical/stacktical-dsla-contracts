@@ -6,6 +6,8 @@ const HDWalletProvider = require("truffle-hdwallet-provider");
 const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 const mnemonic = process.env.DSLA_MNEMONIC;
 const test_mnemonic = process.env.TEST_MNEMONIC;
+const chainlink_ip = process.env.CHAINLINK_TEST_IP;
+const chainlink_port = process.env.CHAINLINK_TEST_PORT;
 
 module.exports = {
   networks: {
@@ -14,9 +16,18 @@ module.exports = {
       port: 7545,
       network_id: "*",
     },
-    testing: {
+    local: {
       provider: function () {
-        return new HDWalletProvider(test_mnemonic, "http://192.168.0.5:7545");
+        return new HDWalletProvider(test_mnemonic, "http://localhost:8545");
+      },
+      network_id: "1337",
+    },
+    chainlink: {
+      provider: function () {
+        return new HDWalletProvider(
+          test_mnemonic,
+          `http://${chainlink_ip}:${chainlink_port}`
+        );
       },
       network_id: "1337",
     },

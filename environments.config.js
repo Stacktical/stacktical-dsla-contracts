@@ -1,3 +1,6 @@
+require("dotenv").config();
+const { CHAINLINK_TEST_IP, CHAINLINK_TEST_PORT } = process.env;
+
 // Chainlink addresses here: https://docs.chain.link/docs/decentralized-oracles-ethereum-mainnet
 const environments = {
   mainnet: {
@@ -21,16 +24,16 @@ const environments = {
     chainlinkJobId: null,
   },
   chainlink: {
-    web3WebsocketProviderUrl: null,
-    chainlinkOracleAddress: null,
-    chainlinkTokenAddress: null,
-    chainlinkJobId: null,
+    web3WebsocketProviderUrl: `wss://${CHAINLINK_TEST_IP}:${CHAINLINK_TEST_PORT}`,
+    chainlinkOracleAddress: "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
+    chainlinkTokenAddress: "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
+    chainlinkJobId: "0x" + "fc51c865f7cd4fce909809a9adb6d64f",
   },
   local: {
-    web3WebsocketProviderUrl: "ws://192.168.0.5:7545",
-    chainlinkOracleAddress: "0x3742b0B04C16c2CC2a2a0D7A662AA324fEcc731E",
-    chainlinkTokenAddress: "0x464d88b68dF1fC6A451f5E66832eabE9f71A4485",
-    chainlinkJobId: "0x" + "813fd1b013cf4b1785d32a3bad7d3738",
+    web3WebsocketProviderUrl: "ws://localhost:8545",
+    chainlinkOracleAddress: "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
+    chainlinkTokenAddress: "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
+    chainlinkJobId: "0x" + "ce8326b725264873a6ffaa50ea5f2974",
   },
 };
 
