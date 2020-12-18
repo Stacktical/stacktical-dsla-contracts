@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IMessenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
@@ -17,6 +18,12 @@ contract SLARegistry {
     using SafeMath for uint256;
 
     IMessenger public messenger;
+
+    struct ActivePool {
+        address SLAaddress;
+        uint256 stake;
+        string assetName;
+    }
 
     // Array that stores the addresses of created service level agreements
     SLA[] public SLAs;
@@ -142,5 +149,35 @@ contract SLARegistry {
      */
     function SLACount() public view returns (uint256) {
         return SLAs.length;
+    }
+
+    /**
+     * @dev returns the active pools owned by a user.
+     */
+    function getActivePool(address _slaOwner)
+        public
+        view
+        returns (ActivePool[] memory)
+    {
+        ActivePool[] memory activePools =
+            new ActivePool[](userSLACount(_slaOwner));
+        for (uint256 index = 0; index < userSLACount(_slaOwner); index++) {
+            SLA currentSLA = SLAs[userToSLAIndexes[_slaOwner][index]];
+            for (
+                uint256 tokenIndex = 0;
+                tokenIndex < currentSLA.getTokenStakeLength(msg.sender);
+                tokenIndex++
+            ) {
+                (address tokenAddress, uint256 stake) =
+                    currentSLA.getTokenStake(msg.sender, tokenIndex);
+                ActivePool memory currentActivePool =
+                    ActivePool({
+                        SLAaddress: address(currentSLA),
+                        stake: stake,
+                        assetName: ERC20(tokenAddress).name()
+                    });
+            }
+        }
+        return activePools;
     }
 }

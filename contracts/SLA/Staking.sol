@@ -21,6 +21,11 @@ contract Staking is Ownable {
         mapping(address => uint256) claimed_compensation;
     }
 
+    struct TokenStake {
+        address tokenAddress;
+        uint256 stake;
+    }
+
     bDSLAToken public bDSLA;
     address public validator;
     address[] public stakers; // list of all stakers (validators, vouchers, delegators ...)
@@ -28,6 +33,10 @@ contract Staking is Ownable {
     mapping(address => bool) public allowedTokensMapping;
     Period[] public periods; // all periods for an SLA
     mapping(address => uint256) public uniqueTokensStaked; // mapping to trace how many token is staked by an user
+    mapping(address => TokenStake[]) public userStakes; // mapping from address to TokenStake to retrieve balances staked
+    mapping(address => mapping(address => uint256))
+        public userStakedTokensIndex; // mapping from address to index of the array of the above mapping
+    mapping(address => mapping(address => bool)) public userStakedTokens; // mapping from address to boolean check if token was staked
     uint256 public totalStaked;
 
     event NewPeriodAdded(uint256 indexed period_index);
@@ -85,6 +94,25 @@ contract Staking is Ownable {
         allowedTokensMapping[_token] = true;
     }
 
+    function _increaseTokenStaking(address _token, uint256 _amount) internal {
+        if (userStakedTokens[msg.sender][_token] == false) {
+            userStakes[msg.sender].push(
+                TokenStake({tokenAddress: _token, stake: _amount})
+            );
+            uint256 newTokenIndex = userStakes[msg.sender].length - 1;
+            userStakedTokensIndex[msg.sender][_token] = newTokenIndex;
+            userStakedTokens[msg.sender][_token] = true;
+        } else {
+            uint256 tokenIndex = userStakedTokensIndex[msg.sender][_token];
+            userStakes[msg.sender][tokenIndex].stake.add(_amount);
+        }
+    }
+
+    function _decreaseTokenStaking(address _token, uint256 _amount) internal {
+        uint256 tokenIndex = userStakedTokensIndex[msg.sender][_token];
+        userStakes[msg.sender][tokenIndex].stake.sub(_amount);
+    }
+
     // stake an amount of token
     function stakeTokens(
         uint256 _amount,
@@ -112,6 +140,8 @@ contract Staking is Ownable {
         if (uniqueTokensStaked[msg.sender] == 1) {
             stakers.push(msg.sender);
         }
+
+        _increaseTokenStaking(_token, _amount);
     }
 
     // Unstaking Tokens
@@ -123,7 +153,7 @@ contract Staking is Ownable {
         );
         require(
             _tokenIsAllowed(_token),
-            "token should be autorised to be staked"
+            "token should be autorized to be staked"
         );
 
         // unstake bDSLA tokens
@@ -142,6 +172,8 @@ contract Staking is Ownable {
             uint256 index = _getIndex(msg.sender);
             delete stakers[index];
         }
+
+        _decreaseTokenStaking(_token, staked);
     }
 
     // withdraw bDSLA and stake d Tokens
@@ -168,6 +200,8 @@ contract Staking is Ownable {
             .add(_amount);
         totalStaked = totalStaked.add(_amount);
 
+        _increaseTokenStaking(_token, _amount);
+
         // unstake bDSLA tokens
         uint256 staked = periods[_period].stakingBalance[_token][msg.sender];
         uint256 claimed_reward =
@@ -176,6 +210,8 @@ contract Staking is Ownable {
         periods[_period].stakingBalance[_token][msg.sender] = 0;
         totalStaked = totalStaked.sub(staked);
         bDSLA.transfer(msg.sender, staked.sub(claimed_reward));
+
+        _decreaseTokenStaking(address(bDSLA), staked);
     }
 
     // claim from validators
@@ -234,34 +270,23 @@ contract Staking is Ownable {
         view
         returns (uint256)
     {
+        require(uniqueTokensStaked[_user] > 0, "User has not any token staked");
         uint256 totalValue = 0;
-        if (uniqueTokensStaked[_user] > 0) {
-            for (
-                uint256 allowedTokensIndex = 0;
-                allowedTokensIndex < allowedTokens.length;
-                allowedTokensIndex++
-            ) {
-                totalValue = totalValue.add(
-                    periods[_period].stakingBalance[
-                        allowedTokens[allowedTokensIndex]
-                    ][_user]
-                );
-            }
+        for (
+            uint256 allowedTokensIndex = 0;
+            allowedTokensIndex < allowedTokens.length;
+            allowedTokensIndex++
+        ) {
+            totalValue = totalValue.add(
+                periods[_period].stakingBalance[
+                    allowedTokens[allowedTokensIndex]
+                ][_user]
+            );
         }
         return totalValue;
     }
 
-    function _tokenIsAllowed(address token) internal view returns (bool) {
-//        for (
-//            uint256 allowedTokensIndex = 0;
-//            allowedTokensIndex < allowedTokens.length;
-//            allowedTokensIndex++
-//        ) {
-//            if (allowedTokens[allowedTokensIndex] == token) {
-//                return true;
-//            }
-//        }
-//        return false;
+    function _tokenIsAllowed(address _token) internal view returns (bool) {
         return allowedTokensMapping[_token];
     }
 
@@ -314,6 +339,21 @@ contract Staking is Ownable {
         return (
             periods[_periodId].sla_period_start,
             periods[_periodId].sla_period_end
+        );
+    }
+
+    function getTokenStakeLength(address _owner) public view returns (uint256) {
+        return userStakes[_owner].length;
+    }
+
+    function getTokenStake(address _owner, uint256 _index)
+        public
+        view
+        returns (address tokenAddress, uint256 stake)
+    {
+        return (
+            userStakes[_owner][_index].tokenAddress,
+            userStakes[_owner][_index].stake
         );
     }
 }
