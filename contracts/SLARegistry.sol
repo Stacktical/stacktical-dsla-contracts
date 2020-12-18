@@ -7,13 +7,13 @@ import "./interfaces/IMessenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
 import "./bDSLA/bDSLAToken.sol";
+
 /**
  * @title SLARegistry
  * @dev SLARegistry is a contract for handling creation of service level
  * agreements and keeping track of the created agreements
  */
 contract SLARegistry {
-
     using SafeMath for uint256;
 
     IMessenger public messenger;
@@ -22,7 +22,7 @@ contract SLARegistry {
     SLA[] public SLAs;
 
     // Mapping that stores the indexes of service level agreements owned by a user
-    mapping(address => uint[]) private userToSLAIndexes;
+    mapping(address => uint256[]) private userToSLAIndexes;
 
     /**
      * @dev event for service level agreement creation logging
@@ -58,28 +58,29 @@ contract SLARegistry {
         address _owner,
         bytes32[] memory _SLONames,
         SLO[] memory _SLOs,
-        uint _stake,
+        uint256 _stake,
         string memory _ipfsHash,
-        uint _sliInterval,
-        bDSLAToken _tokenAddress, 
-        uint[] memory _sla_period_starts, 
-        uint[] memory _sla_period_ends
+        uint256 _sliInterval,
+        bDSLAToken _tokenAddress,
+        uint256[] memory _sla_period_starts,
+        uint256[] memory _sla_period_ends
     ) public {
-        SLA sla = new SLA(
-            _owner,
-            _SLONames,
-            _SLOs,
-            _stake,
-            _ipfsHash,
-            _sliInterval, 
-            _tokenAddress, 
-            _sla_period_starts, 
-            _sla_period_ends
-        );
+        SLA sla =
+            new SLA(
+                _owner,
+                _SLONames,
+                _SLOs,
+                _stake,
+                _ipfsHash,
+                _sliInterval,
+                _tokenAddress,
+                _sla_period_starts,
+                _sla_period_ends
+            );
 
         SLAs.push(sla);
-        
-        uint index = SLAs.length.sub(1);
+
+        uint256 index = SLAs.length.sub(1);
 
         userToSLAIndexes[msg.sender].push(index);
 
@@ -106,16 +107,16 @@ contract SLARegistry {
      * @param _user Address of the user for which to return the service level
      * agreements
      */
-    function userSLAs(address _user) public view returns(SLA[] memory) {
-        uint count = userSLACount(_user);
+    function userSLAs(address _user) public view returns (SLA[] memory) {
+        uint256 count = userSLACount(_user);
         SLA[] memory SLAList = new SLA[](count);
-        uint[] memory userSLAIndexes = userToSLAIndexes[_user];
+        uint256[] memory userSLAIndexes = userToSLAIndexes[_user];
 
-        for(uint i = 0; i < count; i++) {
+        for (uint256 i = 0; i < count; i++) {
             SLAList[i] = (SLAs[userSLAIndexes[i]]);
         }
 
-        return(SLAList);
+        return (SLAList);
     }
 
     /**
@@ -124,22 +125,22 @@ contract SLARegistry {
      * @param _user Address of the user for which to return the amount of
      * service level agreements
      */
-    function userSLACount(address _user) public view returns(uint) {
+    function userSLACount(address _user) public view returns (uint256) {
         return userToSLAIndexes[_user].length;
     }
 
     /**
      * @dev public view function that returns all the service level agreements
      */
-    function allSLAs() public view returns(SLA[] memory) {
-        return(SLAs);
+    function allSLAs() public view returns (SLA[] memory) {
+        return (SLAs);
     }
 
     /**
      * @dev public view function that returns the total amount of service
      * level agreements
      */
-    function SLACount() public view returns(uint) {
+    function SLACount() public view returns (uint256) {
         return SLAs.length;
     }
 }

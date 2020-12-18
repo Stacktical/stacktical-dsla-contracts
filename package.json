@@ -4,32 +4,33 @@
   "description": "DSLA Protocol",
   "main": "index.js",
   "scripts": {
-    "test": "truffle compile && NODE_ENV=test truffle test",
-    "compile": "truffle compile",
+    "test:local": "NODE_ENV=test TEST_ENV=local truffle test --network local",
+    "test:chainlink": "NODE_ENV=test TEST_ENV=chainlink truffle test --network chainlink",
+    "test:kovan": "NODE_ENV=test TEST_ENV=kovan truffle test --network kovan",
+    "deploy:kovan": "truffle deploy --network kovan",
     "remix": "npx remixd -s . --remix-ide https://remix.ethereum.org",
-    "prettier": "prettier --write 'contracts/**/*.sol'",
-    "watch": "truffle watch",
-    "truffle:allow-bdsla-token": "truffle exec --network kovan scripts/allow-bdsla-token.js"
+    "compile": "truffle compile",
+    "prettier": "prettier --write 'contracts/**/*.sol'"
   },
   "author": "DSLA Core Developers",
   "license": "ISC",
   "dependencies": {
-    "@openzeppelin/contracts": "^3.2.0",
-    "prettier-plugin-solidity": "^1.0.0-beta.2"
+    "@chainlink/contracts": "0.0.11",
+    "@openzeppelin/contracts": "^3.2.0"
   },
   "devDependencies": {
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "dotenv": "^8.2.0",
+    "jest": "^26.6.3",
     "prettier": "^2.2.1",
-    "truffle": "^5.1.58",
-    "truffle-hdwallet-provider": "^1.0.17",
-    "web3": "^1.3.1"
+    "prettier-plugin-solidity": "^1.0.0-beta.1",
+    "truffle-hdwallet-provider": "^1.0.17"
   },
   "repository": {
     "type": "git",
-    "url": "git+httpps://github.com/Stacktical/stacktical-dsla-contracts.git"
+    "url": "git+https://github.com/Stacktical/stacktical-dsla-contracts.git"
   },
   "bugs": {
     "url": "https://github.com/Stacktical/stacktical-dsla-contracts/issues"

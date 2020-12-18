@@ -6,15 +6,21 @@ pragma solidity ^0.6.0;
  * @dev SLO is a service level objective contract used to check SLI's against
  */
 contract SLO {
-
     // The available checking types
-    enum SLOTypes { EqualTo, NotEqualTo, SmallerThan, SmallerOrEqualTo, GreaterThan, GreaterOrEqualTo }
+    enum SLOTypes {
+        EqualTo,
+        NotEqualTo,
+        SmallerThan,
+        SmallerOrEqualTo,
+        GreaterThan,
+        GreaterOrEqualTo
+    }
 
     // The checking type for this SLO
     SLOTypes public SLOType;
 
     // The value to check the SLI against
-    uint public value;
+    uint256 public value;
 
     // The name of the SLO in bytes32
     bytes32 public name;
@@ -25,7 +31,7 @@ contract SLO {
      * @param _SLOType The checking type for this SLO
      * @param _name The name of the SLO in bytes32
      */
-    event SLORegistered(uint _value, SLOTypes _SLOType, bytes32 _name);
+    event SLORegistered(uint256 _value, SLOTypes _SLOType, bytes32 _name);
 
     /**
      * @dev constructor
@@ -33,7 +39,11 @@ contract SLO {
      * @param _SLOType The checking type for this SLO
      * @param _name The name of the SLO in bytes32
      */
-    constructor(uint _value, SLOTypes _SLOType, bytes32 _name) public {
+    constructor(
+        uint256 _value,
+        SLOTypes _SLOType,
+        bytes32 _name
+    ) public {
         value = _value;
         SLOType = _SLOType;
         name = _name;
@@ -46,7 +56,7 @@ contract SLO {
      * @param _value The SLI value to check against the SL
      * @return true if the SLO is honored
      */
-    function isSLOHonored(uint _value) external view returns(bool) {
+    function isSLOHonored(uint256 _value) external view returns (bool) {
         if (SLOType == SLOTypes.EqualTo) {
             return _value == value;
         }
@@ -71,5 +81,4 @@ contract SLO {
             return _value >= value;
         }
     }
-
 }
