@@ -78,6 +78,7 @@ contract Staking is Ownable {
 
     // autorise a new token to be staked
     function addAllowedTokens(address _token) public onlyOwner {
+        require(!_tokenIsAllowed(_token), "token already added");
         allowedTokens.push(_token);
     }
 
@@ -124,9 +125,8 @@ contract Staking is Ownable {
 
         // unstake bDSLA tokens
         uint256 staked = periods[_period].stakingBalance[_token][msg.sender];
-        uint256 claimed_reward = periods[_period].claimed_reward.div(
-            stakers.length
-        );
+        uint256 claimed_reward =
+            periods[_period].claimed_reward.div(stakers.length);
 
         periods[_period].stakingBalance[_token][msg.sender] = 0;
         totalStaked = totalStaked.sub(staked);
@@ -167,9 +167,8 @@ contract Staking is Ownable {
 
         // unstake bDSLA tokens
         uint256 staked = periods[_period].stakingBalance[_token][msg.sender];
-        uint256 claimed_reward = periods[_period].claimed_reward.div(
-            stakers.length
-        );
+        uint256 claimed_reward =
+            periods[_period].claimed_reward.div(stakers.length);
 
         periods[_period].stakingBalance[_token][msg.sender] = 0;
         totalStaked = totalStaked.sub(staked);
@@ -240,8 +239,9 @@ contract Staking is Ownable {
                 allowedTokensIndex++
             ) {
                 totalValue = totalValue.add(
-                    periods[_period]
-                        .stakingBalance[allowedTokens[allowedTokensIndex]][_user]
+                    periods[_period].stakingBalance[
+                        allowedTokens[allowedTokensIndex]
+                    ][_user]
                 );
             }
         }
@@ -302,7 +302,14 @@ contract Staking is Ownable {
         return stakers.length;
     }
 
-    function getPeriodData(uint256 _periodId) public view returns (uint256 periodStart, uint256 periodEnd){
-        return (periods[_periodId].sla_period_start,periods[_periodId].sla_period_end);
+    function getPeriodData(uint256 _periodId)
+        public
+        view
+        returns (uint256 periodStart, uint256 periodEnd)
+    {
+        return (
+            periods[_periodId].sla_period_start,
+            periods[_periodId].sla_period_end
+        );
     }
 }
