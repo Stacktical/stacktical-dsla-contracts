@@ -252,16 +252,17 @@ contract Staking is Ownable {
     }
 
     function _tokenIsAllowed(address token) internal view returns (bool) {
-        for (
-            uint256 allowedTokensIndex = 0;
-            allowedTokensIndex < allowedTokens.length;
-            allowedTokensIndex++
-        ) {
-            if (allowedTokens[allowedTokensIndex] == token) {
-                return true;
-            }
-        }
-        return false;
+//        for (
+//            uint256 allowedTokensIndex = 0;
+//            allowedTokensIndex < allowedTokens.length;
+//            allowedTokensIndex++
+//        ) {
+//            if (allowedTokens[allowedTokensIndex] == token) {
+//                return true;
+//            }
+//        }
+//        return false;
+        return allowedTokensMapping[_token];
     }
 
     function _updateUniqueTokensStaked(
