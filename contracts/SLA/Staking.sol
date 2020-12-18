@@ -25,6 +25,7 @@ contract Staking is Ownable {
     address public validator;
     address[] public stakers; // list of all stakers (validators, vouchers, delegators ...)
     address[] public allowedTokens; // mapping for all allowed tokens to be staked
+    mapping(address => bool) public allowedTokensMapping;
     Period[] public periods; // all periods for an SLA
     mapping(address => uint256) public uniqueTokensStaked; // mapping to trace how many token is staked by an user
     uint256 public totalStaked;
@@ -61,6 +62,7 @@ contract Staking is Ownable {
         );
         bDSLA = bDSLAToken(_tokenAddress);
         allowedTokens.push(address(bDSLA));
+        allowedTokensMapping[address(bDSLA)] = true;
         validator = _owner;
 
         for (uint256 i = 0; i < _sla_period_starts.length; i++) {
@@ -78,8 +80,9 @@ contract Staking is Ownable {
 
     // autorise a new token to be staked
     function addAllowedTokens(address _token) public onlyOwner {
-        require(!_tokenIsAllowed(_token), "token already added");
+        require(allowedTokensMapping[_token] == false, "token already added");
         allowedTokens.push(_token);
+        allowedTokensMapping[_token] = true;
     }
 
     // stake an amount of token
