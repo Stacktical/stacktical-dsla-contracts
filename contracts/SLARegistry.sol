@@ -3,7 +3,7 @@ pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IMessenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
@@ -18,6 +18,7 @@ contract SLARegistry {
     using SafeMath for uint256;
 
     IMessenger public messenger;
+    bytes4 private constant NAME_SELECTOR = bytes4(keccak256(bytes('name()')));
 
     struct ActivePool {
         address SLAaddress;
@@ -170,12 +171,14 @@ contract SLARegistry {
             ) {
                 (address tokenAddress, uint256 stake) =
                     currentSLA.getTokenStake(msg.sender, tokenIndex);
+                (, bytes memory tokenNameBytes) = tokenAddress.staticcall(abi.encodeWithSelector(NAME_SELECTOR));
                 ActivePool memory currentActivePool =
                     ActivePool({
                         SLAaddress: address(currentSLA),
                         stake: stake,
-                        assetName: ERC20(tokenAddress).name()
+                        assetName: string(tokenNameBytes)
                     });
+                activePools[index] = currentActivePool;
             }
         }
         return activePools;

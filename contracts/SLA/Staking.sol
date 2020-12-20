@@ -35,8 +35,8 @@ contract Staking is Ownable {
     mapping(address => uint256) public uniqueTokensStaked; // mapping to trace how many token is staked by an user
     mapping(address => TokenStake[]) public userStakes; // mapping from address to TokenStake to retrieve balances staked
     mapping(address => mapping(address => uint256))
-        public userStakedTokensIndex; // mapping from address to index of the array of the above mapping
-    mapping(address => mapping(address => bool)) public userStakedTokens; // mapping from address to boolean check if token was staked
+        public userStakedTokensIndex; // userAddress => erc20Address => index of userStakes mapping array
+    mapping(address => mapping(address => bool)) public userStakedTokens; // // userAddress => erc20Address => token is staked
     uint256 public totalStaked;
 
     event NewPeriodAdded(uint256 indexed period_index);
@@ -56,6 +56,11 @@ contract Staking is Ownable {
             block.timestamp >= periods[_period].sla_period_start &&
                 block.timestamp <= periods[_period].sla_period_end
         );
+        _;
+    }
+
+    modifier onlyAllowedToken(address _token) {
+        require(allowedTokensMapping[_token] == true, "token is not allowed");
         _;
     }
 
@@ -87,7 +92,7 @@ contract Staking is Ownable {
         _addPeriod(_sla_period_start, _sla_period_end);
     }
 
-    // autorise a new token to be staked
+    // authorize a new token to be staked
     function addAllowedTokens(address _token) public onlyOwner {
         require(allowedTokensMapping[_token] == false, "token already added");
         allowedTokens.push(_token);
@@ -118,13 +123,8 @@ contract Staking is Ownable {
         uint256 _amount,
         address _token,
         uint256 _period
-    ) public {
+    ) public onlyAllowedToken(_token) {
         require(_amount > 0, "amount cannot be 0");
-        require(
-            _tokenIsAllowed(_token),
-            "token should be autorised to be staked"
-        );
-
         // check if the staker had already staked another token or not
         _updateUniqueTokensStaked(msg.sender, _token, _period);
         // stake tokens
@@ -145,15 +145,15 @@ contract Staking is Ownable {
     }
 
     // Unstaking Tokens
-    function withdraw(address _token, uint256 _period) public notValidator {
+    function withdraw(address _token, uint256 _period)
+        public
+        notValidator
+        onlyAllowedToken(_token)
+    {
         // check if staker has staked tokens
         require(
             periods[_period].stakingBalance[_token][msg.sender] > 0,
             "staking balance cannot be 0"
-        );
-        require(
-            _tokenIsAllowed(_token),
-            "token should be autorized to be staked"
         );
 
         // unstake bDSLA tokens
@@ -181,15 +181,11 @@ contract Staking is Ownable {
         address _token,
         uint256 _amount,
         uint256 _period
-    ) public notValidator {
+    ) public notValidator onlyAllowedToken(_token) {
         // check if staker has staked tokens
         require(
             periods[_period].stakingBalance[_token][msg.sender] > 0,
             "staking balance cannot be 0"
-        );
-        require(
-            _tokenIsAllowed(_token),
-            "token should be autorised to be staked"
         );
 
         // stake d tokens
@@ -284,10 +280,6 @@ contract Staking is Ownable {
             );
         }
         return totalValue;
-    }
-
-    function _tokenIsAllowed(address _token) internal view returns (bool) {
-        return allowedTokensMapping[_token];
     }
 
     function _updateUniqueTokensStaked(
