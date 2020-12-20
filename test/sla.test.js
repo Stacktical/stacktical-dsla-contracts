@@ -119,6 +119,7 @@ describe("SLA", function () {
         "token is not allowed"
       );
     });
+
     it("should allow the user to stake bDSLA on deployment", async function () {
       const firstTokenAddress = await sla.allowedTokens.call(0);
       assert.equal(
@@ -215,13 +216,13 @@ describe("SLA", function () {
       );
 
       assert.equal(newTokenIndex, 0, "newToken index should be 0");
-      const userHasNewTokenstaked = await sla.userStakedTokens.call(
+      const userHasNewTokenStaked = await sla.userStakedTokens.call(
         owner,
         newToken.address
       );
 
       assert.equal(
-        userHasNewTokenstaked,
+        userHasNewTokenStaked,
         true,
         "newToken was not correctly registered"
       );
