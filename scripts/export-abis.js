@@ -34,7 +34,7 @@ const files = {
   },
 };
 
-const base_path = "../exported_abis";
+const base_path = "../exported_data";
 
 module.exports = async (callback) => {
   try {

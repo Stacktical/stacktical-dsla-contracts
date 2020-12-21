@@ -13,7 +13,11 @@
     "remix": "npx remixd -s . --remix-ide https://remix.ethereum.org",
     "compile": "truffle compile",
     "prettier": "prettier --write 'contracts/**/*.sol'",
-    "export-abis": "truffle compile && truffle exec --network local scripts/export-abis.js && prettier --config .prettierrc.abis.json --write 'exported_abis/**.ts'"
+    "export-data": "npm run export-data:scripts && prettier --config .prettierrc.abis.json --write 'exported_data/**.ts'",
+    "export-data:scripts": "npm run compile && npm run export-data:abis && npm run export-data:addresses",
+    "export-data:abis": "truffle exec --network local scripts/export-abis.js",
+    "export-data:addresses": "truffle exec --network local scripts/export-addresses.js"
+
   },
   "author": "DSLA Core Developers",
   "license": "ISC",
