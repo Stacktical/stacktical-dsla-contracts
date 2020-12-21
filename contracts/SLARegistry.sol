@@ -18,7 +18,7 @@ contract SLARegistry {
     using SafeMath for uint256;
 
     IMessenger public messenger;
-    bytes4 private constant NAME_SELECTOR = bytes4(keccak256(bytes('name()')));
+    bytes4 private constant NAME_SELECTOR = bytes4(keccak256(bytes("name()")));
 
     struct ActivePool {
         address SLAaddress;
@@ -171,7 +171,10 @@ contract SLARegistry {
             ) {
                 (address tokenAddress, uint256 stake) =
                     currentSLA.getTokenStake(msg.sender, tokenIndex);
-                (, bytes memory tokenNameBytes) = tokenAddress.staticcall(abi.encodeWithSelector(NAME_SELECTOR));
+                (, bytes memory tokenNameBytes) =
+                    tokenAddress.staticcall(
+                        abi.encodeWithSelector(NAME_SELECTOR)
+                    );
                 ActivePool memory currentActivePool =
                     ActivePool({
                         SLAaddress: address(currentSLA),

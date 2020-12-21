@@ -11,13 +11,15 @@
     "deploy:kovan": "truffle deploy --network kovan",
     "remix": "npx remixd -s . --remix-ide https://remix.ethereum.org",
     "compile": "truffle compile",
-    "prettier": "prettier --write 'contracts/**/*.sol'"
+    "prettier": "prettier --write 'contracts/**/*.sol'",
+    "export-abis": "truffle compile && truffle exec --network local scripts/export-abis.js && prettier --config .prettierrc.abis.json --write 'exported_abis/**.ts'"
   },
   "author": "DSLA Core Developers",
   "license": "ISC",
   "dependencies": {
     "@chainlink/contracts": "0.0.11",
     "@openzeppelin/contracts": "^3.2.0",
+    "prettier": "^2.2.1",
     "truffle-hdwallet-provider": "^1.0.17"
   },
   "devDependencies": {
@@ -28,7 +30,6 @@
     "chai": "^4.2.0",
     "dotenv": "^8.2.0",
     "mocha": "^8.2.1",
-    "prettier": "^2.2.1",
     "prettier-plugin-solidity": "^1.0.0-beta.1"
   },
   "repository": {
