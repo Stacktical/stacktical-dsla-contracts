@@ -1,4 +1,4 @@
-export const addresses = {
+const addresses = {
   '1': {
     DSLAToken: '0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe',
     SLORegistry: 'TBD',
@@ -18,3 +18,5 @@ export const addresses = {
     AdminWallet: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1',
   },
 };
+
+export default addresses;
