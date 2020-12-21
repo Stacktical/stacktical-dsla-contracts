@@ -54,7 +54,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract SLO\",\"name\":\"slo\",\"type\":\"address\"}],\"name\":\"SLOCreated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"},{\"internalType\":\"enum SLO.SLOTypes\",\"name\":\"_SLOType\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"_name\",\"type\":\"bytes32\"}],\"name\":\"createSLO\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"userSLOs\",\"outputs\":[{\"internalType\":\"contract SLO[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"SLORegistry is a contract for handling creation of service level objectives and querying those service level objectives\",\"events\":{\"SLOCreated(address)\":{\"details\":\"event for service level objective creation logging\",\"params\":{\"slo\":\"The address of the created service level objective contract\"}}},\"kind\":\"dev\",\"methods\":{\"createSLO(uint256,uint8,bytes32)\":{\"details\":\"public function for creating service level objectives\",\"params\":{\"_SLOType\":\"type of check\",\"_name\":\"name of the service level objective in bytes32\",\"_value\":\"the value to check against\"}},\"userSLOs(address)\":{\"details\":\"public view function that returns the service level objectives that the given user has created\",\"params\":{\"_user\":\"Address of the user for which to return the service level objectives\"}}},\"title\":\"SLORegistry\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol\":\"SLORegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLO/SLO.sol\":{\"keccak256\":\"0x86206fabb1341a004cd81dd39603b9e1626fa764fefe7c699caa26170ba19812\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0d7f913351599734b1cc6cb49e79a9dbf0edf9a0e7295d3de473bd969f6ce311\",\"dweb:/ipfs/QmTH3u5n9Kw5ju489o7DS652tGk8hz2ZLTWiFyTuawKjAc\"]},\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol\":{\"keccak256\":\"0x6d27977a7036bf3c9510ff817e14082f0da8ae1fd4d2a0b04efaacf9822e1657\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e4696e0b72ccd6690a08a0cda8db26ced12196b51aff1738a3ef3b455e83b339\",\"dweb:/ipfs/QmULGuNTsBB5LHhRx75UMj9EGPo8QgUSzyiqSCcGsPJFYj\"]}},\"version\":1}",
@@ -1665,10 +1666,31 @@
       "links": {},
       "address": "0x1110CCfE892CBc95f3d51A952A50Ee217561823f",
       "transactionHash": "0x9104f007aaff7af4fba1ca36eacda5a1bd367c36bd614218ddb3cf6a803e38b4"
+    },
+    "1337": {
+      "events": {
+        "0xda7fecad5247e1329bde744d342240b695d643d7f4e54f8b0ec74962c525f975": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "contract SLO",
+              "name": "slo",
+              "type": "address"
+            }
+          ],
+          "name": "SLOCreated",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x713de6105F184327e01093781507b2Ba71AbC726",
+      "transactionHash": "0xf308155d335393fe97630b472535766df12b9fbbd5557504722e3a2659231a5f"
     }
   },
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-12-18T20:22:17.102Z",
+  "updatedAt": "2020-12-21T20:22:26.535Z",
+  "networkType": "ethereum",
   "devdoc": {
     "details": "SLORegistry is a contract for handling creation of service level objectives and querying those service level objectives",
     "events": {

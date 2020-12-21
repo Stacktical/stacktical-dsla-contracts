@@ -38,6 +38,7 @@ const environments = {
 };
 
 const getNetworkName = (network) => {
+  if (/local/i.test(network)) return "local";
   if (/kovan/i.test(network)) return "kovan";
   if (/rinkeby/i.test(network)) return "rinkeby";
   if (/ropsten/i.test(network)) return "ropsten";

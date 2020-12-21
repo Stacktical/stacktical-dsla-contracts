@@ -1,7 +1,7 @@
 const { getDeploymentEnv } = require("../environments.config");
 
-const SLORegistry = artifacts.require("./SLORegistry.sol");
-const SLARegistry = artifacts.require("./SLARegistry.sol");
+const SLORegistry = artifacts.require("SLORegistry");
+const SLARegistry = artifacts.require("SLARegistry");
 const Messenger = artifacts.require("Messenger");
 
 module.exports = function (deployer, network) {
@@ -19,8 +19,9 @@ module.exports = function (deployer, network) {
       env.chainlinkTokenAddress,
       env.chainlinkJobId
     )
-    .then(() => {
-      deployer.deploy(SLARegistry, Messenger.address);
-      deployer.deploy(SLORegistry);
+    .then((messenger) => {
+      return deployer.deploy(SLARegistry, messenger.address).then(() => {
+        return deployer.deploy(SLORegistry);
+      });
     });
 };
