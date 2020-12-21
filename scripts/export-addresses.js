@@ -1,8 +1,5 @@
-const SLA = artifacts.require("SLA");
 const SLARegistry = artifacts.require("SLARegistry");
-const SLO = artifacts.require("SLO");
 const SLORegistry = artifacts.require("SLORegistry");
-const bDSLAToken = artifacts.require("bDSLAToken");
 const fs = require("fs");
 const path = require("path");
 

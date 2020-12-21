@@ -35,6 +35,7 @@ export const SLARegistryABI: Array<object> = [
     outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -44,6 +45,7 @@ export const SLARegistryABI: Array<object> = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -91,6 +93,7 @@ export const SLARegistryABI: Array<object> = [
     outputs: [{ internalType: 'contract SLA[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
@@ -98,6 +101,7 @@ export const SLARegistryABI: Array<object> = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -105,6 +109,7 @@ export const SLARegistryABI: Array<object> = [
     outputs: [{ internalType: 'contract SLA[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -112,6 +117,7 @@ export const SLARegistryABI: Array<object> = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_slaOwner', type: 'address' }],
@@ -130,5 +136,6 @@ export const SLARegistryABI: Array<object> = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];
