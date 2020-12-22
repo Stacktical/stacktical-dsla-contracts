@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test:local": "NODE_ENV=test TEST_ENV=local truffle test --network local",
-    "test:local:specific": "NODE_ENV=test TEST_ENV=local truffle test --network local test/slaRegistry.test.js",
+    "test:local:specific": "NODE_ENV=test TEST_ENV=local truffle test --network local test/bdsla.test.js",
     "test:chainlink": "NODE_ENV=test TEST_ENV=chainlink truffle test --network chainlink",
     "test:kovan": "NODE_ENV=test TEST_ENV=kovan truffle test --network kovan",
-    "deploy:kovan": "truffle deploy --network kovan",
-    "deploy:kovan:reset": "truffle deploy --reset --network kovan",
-    "deploy:local:reset": "truffle deploy --reset --network local",
+    "deploy:kovan": "truffle deploy --network kovan && npm run export-data",
+    "deploy:kovan:reset": "truffle deploy --reset --network kovan && npm run export-data",
+    "deploy:local": "truffle deploy --network local && npm run export-data",
+    "deploy:local:reset": "truffle deploy --reset --network local && npm run export-data",
     "remix": "npx remixd -s . --remix-ide https://remix.ethereum.org",
     "compile": "truffle compile",
     "prettier": "prettier --write 'contracts/**/*.sol'",
@@ -18,7 +19,6 @@
     "export-data:scripts": "npm run compile && npm run export-data:abis && npm run export-data:addresses",
     "export-data:abis": "truffle exec --network local scripts/export-abis.js",
     "export-data:addresses": "truffle exec --network local scripts/export-addresses.js"
-
   },
   "author": "DSLA Core Developers",
   "license": "ISC",

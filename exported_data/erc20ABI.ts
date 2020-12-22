@@ -282,16 +282,6 @@ export const erc20ABI: Array<object> = [
     type: 'function',
   },
   {
-    inputs: [
-      { internalType: 'address', name: 'to', type: 'address' },
-      { internalType: 'uint256', name: 'amount', type: 'uint256' },
-    ],
-    name: 'mint',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     inputs: [],
     name: 'name',
     outputs: [{ internalType: 'string', name: '', type: 'string' }],
@@ -397,6 +387,16 @@ export const erc20ABI: Array<object> = [
   {
     inputs: [{ internalType: 'address', name: '_claimer', type: 'address' }],
     name: 'claim',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'mint',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',

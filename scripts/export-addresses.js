@@ -1,5 +1,7 @@
 const SLARegistry = artifacts.require("SLARegistry");
 const SLORegistry = artifacts.require("SLORegistry");
+const bDSLAToken = artifacts.require("bDSLAToken");
+
 const fs = require("fs");
 const path = require("path");
 
@@ -7,7 +9,7 @@ const placeHolder = "TBD";
 
 const addresses = (adminWallet) => ({
   1: {
-    DSLAToken: "0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe",
+    DSLAToken: "0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe", // mainnet don't use bDSLA
     SLORegistry:
       (SLORegistry.networks[1] && SLORegistry.networks[1].address) ||
       placeHolder,
@@ -17,7 +19,9 @@ const addresses = (adminWallet) => ({
     AdminWallet: adminWallet,
   },
   42: {
-    DSLAToken: "0x653157C7B46A81F106Ae0990E9B23DBFEAA0145F",
+    DSLAToken:
+      (bDSLAToken.networks[42] && bDSLAToken.networks[42].address) ||
+      placeHolder,
     SLORegistry:
       (SLORegistry.networks[42] && SLORegistry.networks[42].address) ||
       placeHolder,
@@ -27,7 +31,9 @@ const addresses = (adminWallet) => ({
     AdminWallet: adminWallet,
   },
   1337: {
-    DSLAToken: "0x6bf8E55A7D261F4e6AB6ac315fB1fdB21c897f29",
+    DSLAToken:
+      (bDSLAToken.networks[1337] && bDSLAToken.networks[1337].address) ||
+      placeHolder,
     SLORegistry:
       (SLORegistry.networks[1337] && SLORegistry.networks[1337].address) ||
       placeHolder,
