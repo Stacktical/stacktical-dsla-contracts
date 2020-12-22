@@ -1,0 +1,3574 @@
+{
+  "contractName": "MinimalSLA",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_sla_period_start",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_sla_period_end",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_timestamp",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_value",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_periodId",
+          "type": "uint256"
+        }
+      ],
+      "name": "SLICreated",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "SLIs",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "periodId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "periods",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "sla_period_start",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "sla_period_end",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "claimed_reward",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "claimed",
+          "type": "bool"
+        },
+        {
+          "internalType": "enum MinimalSLA.Status",
+          "name": "status",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_SLOName",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_value",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_period",
+          "type": "uint256"
+        }
+      ],
+      "name": "registerSLI",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_periodId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPeriodData",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "periodStart",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "periodEnd",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_sla_period_start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_sla_period_end\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_timestamp\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"}],\"name\":\"SLICreated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"SLIs\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"periodId\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"}],\"name\":\"getPeriodData\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"periodStart\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"periodEnd\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"periods\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"sla_period_start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"sla_period_end\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"claimed_reward\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"claimed\",\"type\":\"bool\"},{\"internalType\":\"enum MinimalSLA.Status\",\"name\":\"status\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_SLOName\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_period\",\"type\":\"uint256\"}],\"name\":\"registerSLI\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Minimal implementation os SLA contract for the Messenger contract, to test inter contract interaction without dealing with the SLA deployment overhead.\",\"events\":{\"SLICreated(uint256,uint256,uint256)\":{\"details\":\"event for SLI creation logging\",\"params\":{\"_periodId\":\"the id of the given period\",\"_timestamp\":\"the time the SLI has been registered\",\"_value\":\"the value of the SLI\"}}},\"kind\":\"dev\",\"methods\":{\"constructor\":{\"details\":\"constructor add a Period at deployment time start 1577836800000000000 end 1594026520000000000\"},\"getPeriodData(uint256)\":{\"details\":\"function to get a period start and end\",\"params\":{\"_periodId\":\"the id of the period to get data\"}},\"registerSLI(bytes32,uint256,uint256)\":{\"details\":\"external function to register SLI's and check them against the SLO's\",\"params\":{\"_SLOName\":\"the name of the SLO in bytes32\",\"_period\":\"the id of the given period\",\"_value\":\"the value of the SLI to check\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/testing/MinimalSLA.sol\":\"MinimalSLA\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/testing/MinimalSLA.sol\":{\"keccak256\":\"0xc92d00a9063cb295150ab794eb54a95b64c4ddd497b0bb7d8689a019963f6211\",\"urls\":[\"bzz-raw://e42be88b848b9e9eebdfba49da5705a4e7f93bdaa82b8b8660cbf4a3cf339aa7\",\"dweb:/ipfs/QmbbR9wBykYJE3T9HVKAmYvcpsqP2Xi2ci8eMJmv53a6o4\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506040516104a23803806104a28339818101604052604081101561003357600080fd5b508051602090910151610044610170565b6040518060a00160405280848152602001838152602001600081526020016000151581526020016000600281111561007857fe5b905260008054600181018255908052815160069091027f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563810191825560208301517f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e56482015560408301517f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e56582015560608301517f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e566909101805491151560ff199092169190911780825560808401519394508493919061ff00191661010083600281111561016157fe5b021790555050505050506101ab565b6040518060a00160405280600081526020016000815260200160008152602001600015158152602001600060028111156101a657fe5b905290565b6102e8806101ba6000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c8063869c39251461005157806394199c611461007c578063ea4a1104146100bd578063fc875ece14610119575b600080fd5b61007a6004803603606081101561006757600080fd5b508035906020810135906040013561014f565b005b61009f6004803603604081101561009257600080fd5b50803590602001356101e6565b60408051938452602084019290925282820152519081900360600190f35b6100da600480360360208110156100d357600080fd5b5035610225565b60405180868152602001858152602001848152602001831515815260200182600281111561010457fe5b81526020019550505050505060405180910390f35b6101366004803603602081101561012f57600080fd5b5035610268565b6040805192835260208301919091528051918290030190f35b6000838152600160208181526040808420815160608082018452428083528286018a81528386018a81528554808a018755958a52988790209351600390950290930193845591519583019590955594516002909101558051938452908301859052828101849052517fc95987c1992805ee34bdc915e017cceae36ba1c156b9911fa7e691e6435eb46e9281900390910190a1505050565b600160205281600052604060002081815481106101ff57fe5b600091825260209091206003909102018054600182015460029092015490935090915083565b6000818154811061023257fe5b60009182526020909120600690910201805460018201546002830154600390930154919350919060ff8082169161010090041685565b6000806000838154811061027857fe5b9060005260206000209060060201600001546000848154811061029757fe5b9060005260206000209060060201600101549150915091509156fea26469706673582212202a70ff5be879de577460d1ea6e031940d3f5ca2e15b0b8105b062504afdcb7aa64736f6c634300060c0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c8063869c39251461005157806394199c611461007c578063ea4a1104146100bd578063fc875ece14610119575b600080fd5b61007a6004803603606081101561006757600080fd5b508035906020810135906040013561014f565b005b61009f6004803603604081101561009257600080fd5b50803590602001356101e6565b60408051938452602084019290925282820152519081900360600190f35b6100da600480360360208110156100d357600080fd5b5035610225565b60405180868152602001858152602001848152602001831515815260200182600281111561010457fe5b81526020019550505050505060405180910390f35b6101366004803603602081101561012f57600080fd5b5035610268565b6040805192835260208301919091528051918290030190f35b6000838152600160208181526040808420815160608082018452428083528286018a81528386018a81528554808a018755958a52988790209351600390950290930193845591519583019590955594516002909101558051938452908301859052828101849052517fc95987c1992805ee34bdc915e017cceae36ba1c156b9911fa7e691e6435eb46e9281900390910190a1505050565b600160205281600052604060002081815481106101ff57fe5b600091825260209091206003909102018054600182015460029092015490935090915083565b6000818154811061023257fe5b60009182526020909120600690910201805460018201546002830154600390930154919350919060ff8082169161010090041685565b6000806000838154811061027857fe5b9060005260206000209060060201600001546000848154811061029757fe5b9060005260206000209060060201600101549150915091509156fea26469706673582212202a70ff5be879de577460d1ea6e031940d3f5ca2e15b0b8105b062504afdcb7aa64736f6c634300060c0033",
+  "immutableReferences": {},
+  "sourceMap": "200:2479:10:-:0;;;1395:388;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1395:388:10;;;;;;;1476:20;;:::i;:::-;1511:235;;;;;;;;1554:17;1511:235;;;;1605:15;1511:235;;;;1654:1;1511:235;;;;1682:5;1511:235;;;;;;1713:18;1511:235;;;;;;;;;;1756:7;:20;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1756:20:10;;;;;;;;;;;;;;1476:270;;-1:-1:-1;1476:270:10;;1756:20;;-1:-1:-1;;1756:20:10;;;;;;;;;;;;;;;;;;1395:388;;;200:2479;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;",
+  "deployedSourceMap": "200:2479:10:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2040:246;;;;;;;;;;;;;;;;-1:-1:-1;2040:246:10;;;;;;;;;;;;:::i;:::-;;923:37;;;;;;;;;;;;;;;;-1:-1:-1;923:37:10;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;659:23;;;;;;;;;;;;;;;;-1:-1:-1;659:23:10;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2416:261;;;;;;;;;;;;;;;;-1:-1:-1;2416:261:10;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;2040:246;2161:14;;;;:4;:14;;;;;;;;2181:37;;;;;;;;2185:15;2181:37;;;;;;;;;;;;;;;2161:58;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2235:44;;;;;;;;;;;;;;;;;;;;;;;;;;;;2040:246;;;:::o;923:37::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;923:37:10;;-1:-1:-1;923:37:10;:::o;659:23::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;659:23:10;;;;;;;;;;;;:::o;2416:261::-;2503:19;2524:17;2578:7;2586:9;2578:18;;;;;;;;;;;;;;;;;;:35;;;2627:7;2635:9;2627:18;;;;;;;;;;;;;;;;;;:33;;;2557:113;;;;2416:261;;;:::o",
+  "source": "pragma solidity ^0.6.0;\n\n/**\n * @dev Minimal implementation os SLA contract for the Messenger contract,\n * to test inter contract interaction without dealing with the SLA deployment\n * overhead.\n */\n\ncontract MinimalSLA {\n    enum Status {NotVerified, Respected, NotRespected}\n\n    struct Period {\n        uint256 sla_period_start;\n        uint256 sla_period_end;\n        uint256 claimed_reward;\n        bool claimed;\n        Status status;\n        mapping(address => mapping(address => uint256)) stakingBalance; // staking balance for all tokens (address token => (address user => amount))\n        mapping(address => uint256) claimed_compensation;\n    }\n    Period[] public periods; // all periods for an SLA\n\n    // Struct used for storing registered SLI's\n    struct SLI {\n        uint256 timestamp;\n        uint256 value;\n        uint256 periodId;\n    }\n\n    // Mapping to get SLI structs from SLO names in bytes32\n    mapping(bytes32 => SLI[]) public SLIs;\n\n    /**\n     * @dev event for SLI creation logging\n     * @param _timestamp the time the SLI has been registered\n     * @param _value the value of the SLI\n     * @param _periodId the id of the given period\n     */\n    event SLICreated(uint256 _timestamp, uint256 _value, uint256 _periodId);\n\n    /**\n     * @dev constructor add a Period at deployment time\n     * start 1577836800000000000\n     * end 1594026520000000000\n     */\n    constructor(uint256 _sla_period_start, uint256 _sla_period_end) public {\n        Period memory period =\n            Period({\n                sla_period_start: _sla_period_start,\n                sla_period_end: _sla_period_end,\n                claimed_reward: 0,\n                claimed: false,\n                status: Status.NotVerified\n            });\n        periods.push(period);\n    }\n\n    /**\n     * @dev external function to register SLI's and check them against the SLO's\n     * @param _SLOName the name of the SLO in bytes32\n     * @param _value the value of the SLI to check\n     * @param _period the id of the given period\n     */\n    function registerSLI(\n        bytes32 _SLOName,\n        uint256 _value,\n        uint256 _period\n    ) external {\n        SLIs[_SLOName].push(SLI(block.timestamp, _value, _period));\n\n        emit SLICreated(block.timestamp, _value, _period);\n    }\n\n    /**\n     * @dev function to get a period start and end\n     * @param _periodId the id of the period to get data\n     */\n    function getPeriodData(uint256 _periodId)\n        public\n        view\n        returns (uint256 periodStart, uint256 periodEnd)\n    {\n        return (\n            periods[_periodId].sla_period_start,\n            periods[_periodId].sla_period_end\n        );\n    }\n}\n",
+  "sourcePath": "/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/testing/MinimalSLA.sol",
+  "ast": {
+    "absolutePath": "/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/testing/MinimalSLA.sol",
+    "exportedSymbols": {
+      "MinimalSLA": [
+        2565
+      ]
+    },
+    "id": 2566,
+    "license": null,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2437,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:10"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 2438,
+          "nodeType": "StructuredDocumentation",
+          "src": "25:173:10",
+          "text": " @dev Minimal implementation os SLA contract for the Messenger contract,\n to test inter contract interaction without dealing with the SLA deployment\n overhead."
+        },
+        "fullyImplemented": true,
+        "id": 2565,
+        "linearizedBaseContracts": [
+          2565
+        ],
+        "name": "MinimalSLA",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "MinimalSLA.Status",
+            "id": 2442,
+            "members": [
+              {
+                "id": 2439,
+                "name": "NotVerified",
+                "nodeType": "EnumValue",
+                "src": "239:11:10"
+              },
+              {
+                "id": 2440,
+                "name": "Respected",
+                "nodeType": "EnumValue",
+                "src": "252:9:10"
+              },
+              {
+                "id": 2441,
+                "name": "NotRespected",
+                "nodeType": "EnumValue",
+                "src": "263:12:10"
+              }
+            ],
+            "name": "Status",
+            "nodeType": "EnumDefinition",
+            "src": "226:50:10"
+          },
+          {
+            "canonicalName": "MinimalSLA.Period",
+            "id": 2463,
+            "members": [
+              {
+                "constant": false,
+                "id": 2444,
+                "mutability": "mutable",
+                "name": "sla_period_start",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "306:24:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2443,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "306:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2446,
+                "mutability": "mutable",
+                "name": "sla_period_end",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "340:22:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2445,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "340:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2448,
+                "mutability": "mutable",
+                "name": "claimed_reward",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "372:22:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2447,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "372:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2450,
+                "mutability": "mutable",
+                "name": "claimed",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "404:12:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2449,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "404:4:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2452,
+                "mutability": "mutable",
+                "name": "status",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "426:13:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_enum$_Status_$2442",
+                  "typeString": "enum MinimalSLA.Status"
+                },
+                "typeName": {
+                  "contractScope": null,
+                  "id": 2451,
+                  "name": "Status",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 2442,
+                  "src": "426:6:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_Status_$2442",
+                    "typeString": "enum MinimalSLA.Status"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2458,
+                "mutability": "mutable",
+                "name": "stakingBalance",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "449:62:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$",
+                  "typeString": "mapping(address => mapping(address => uint256))"
+                },
+                "typeName": {
+                  "id": 2457,
+                  "keyType": {
+                    "id": 2453,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "457:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "449:47:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$",
+                    "typeString": "mapping(address => mapping(address => uint256))"
+                  },
+                  "valueType": {
+                    "id": 2456,
+                    "keyType": {
+                      "id": 2454,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "476:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Mapping",
+                    "src": "468:27:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                      "typeString": "mapping(address => uint256)"
+                    },
+                    "valueType": {
+                      "id": 2455,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "487:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    }
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2462,
+                "mutability": "mutable",
+                "name": "claimed_compensation",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "599:48:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                  "typeString": "mapping(address => uint256)"
+                },
+                "typeName": {
+                  "id": 2461,
+                  "keyType": {
+                    "id": 2459,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "607:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "599:27:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                    "typeString": "mapping(address => uint256)"
+                  },
+                  "valueType": {
+                    "id": 2460,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "618:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Period",
+            "nodeType": "StructDefinition",
+            "scope": 2565,
+            "src": "282:372:10",
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "ea4a1104",
+            "id": 2466,
+            "mutability": "mutable",
+            "name": "periods",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 2565,
+            "src": "659:23:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage",
+              "typeString": "struct MinimalSLA.Period[]"
+            },
+            "typeName": {
+              "baseType": {
+                "contractScope": null,
+                "id": 2464,
+                "name": "Period",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 2463,
+                "src": "659:6:10",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Period_$2463_storage_ptr",
+                  "typeString": "struct MinimalSLA.Period"
+                }
+              },
+              "id": 2465,
+              "length": null,
+              "nodeType": "ArrayTypeName",
+              "src": "659:8:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage_ptr",
+                "typeString": "struct MinimalSLA.Period[]"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "MinimalSLA.SLI",
+            "id": 2473,
+            "members": [
+              {
+                "constant": false,
+                "id": 2468,
+                "mutability": "mutable",
+                "name": "timestamp",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "784:17:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2467,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "784:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2470,
+                "mutability": "mutable",
+                "name": "value",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "811:13:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2469,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "811:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2472,
+                "mutability": "mutable",
+                "name": "periodId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "834:16:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2471,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "834:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "SLI",
+            "nodeType": "StructDefinition",
+            "scope": 2565,
+            "src": "763:94:10",
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "94199c61",
+            "id": 2478,
+            "mutability": "mutable",
+            "name": "SLIs",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 2565,
+            "src": "923:37:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_struct$_SLI_$2473_storage_$dyn_storage_$",
+              "typeString": "mapping(bytes32 => struct MinimalSLA.SLI[])"
+            },
+            "typeName": {
+              "id": 2477,
+              "keyType": {
+                "id": 2474,
+                "name": "bytes32",
+                "nodeType": "ElementaryTypeName",
+                "src": "931:7:10",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "923:25:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_struct$_SLI_$2473_storage_$dyn_storage_$",
+                "typeString": "mapping(bytes32 => struct MinimalSLA.SLI[])"
+              },
+              "valueType": {
+                "baseType": {
+                  "contractScope": null,
+                  "id": 2475,
+                  "name": "SLI",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 2473,
+                  "src": "942:3:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_SLI_$2473_storage_ptr",
+                    "typeString": "struct MinimalSLA.SLI"
+                  }
+                },
+                "id": 2476,
+                "length": null,
+                "nodeType": "ArrayTypeName",
+                "src": "942:5:10",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_struct$_SLI_$2473_storage_$dyn_storage_ptr",
+                  "typeString": "struct MinimalSLA.SLI[]"
+                }
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 2479,
+              "nodeType": "StructuredDocumentation",
+              "src": "967:209:10",
+              "text": " @dev event for SLI creation logging\n @param _timestamp the time the SLI has been registered\n @param _value the value of the SLI\n @param _periodId the id of the given period"
+            },
+            "id": 2487,
+            "name": "SLICreated",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 2486,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2481,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_timestamp",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2487,
+                  "src": "1198:18:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2480,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1198:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2483,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2487,
+                  "src": "1218:14:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2482,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1218:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2485,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_periodId",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2487,
+                  "src": "1234:17:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2484,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1234:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1197:55:10"
+            },
+            "src": "1181:72:10"
+          },
+          {
+            "body": {
+              "id": 2512,
+              "nodeType": "Block",
+              "src": "1466:317:10",
+              "statements": [
+                {
+                  "assignments": [
+                    2496
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 2496,
+                      "mutability": "mutable",
+                      "name": "period",
+                      "nodeType": "VariableDeclaration",
+                      "overrides": null,
+                      "scope": 2512,
+                      "src": "1476:20:10",
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Period_$2463_memory_ptr",
+                        "typeString": "struct MinimalSLA.Period"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 2495,
+                        "name": "Period",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 2463,
+                        "src": "1476:6:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Period_$2463_storage_ptr",
+                          "typeString": "struct MinimalSLA.Period"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 2505,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2498,
+                        "name": "_sla_period_start",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2490,
+                        "src": "1554:17:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 2499,
+                        "name": "_sla_period_end",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2492,
+                        "src": "1605:15:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "30",
+                        "id": 2500,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "number",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1654:1:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_rational_0_by_1",
+                          "typeString": "int_const 0"
+                        },
+                        "value": "0"
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "66616c7365",
+                        "id": 2501,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "bool",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1682:5:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        "value": "false"
+                      },
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2502,
+                          "name": "Status",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2442,
+                          "src": "1713:6:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_enum$_Status_$2442_$",
+                            "typeString": "type(enum MinimalSLA.Status)"
+                          }
+                        },
+                        "id": 2503,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "memberName": "NotVerified",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1713:18:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_enum$_Status_$2442",
+                          "typeString": "enum MinimalSLA.Status"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_rational_0_by_1",
+                          "typeString": "int_const 0"
+                        },
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_enum$_Status_$2442",
+                          "typeString": "enum MinimalSLA.Status"
+                        }
+                      ],
+                      "id": 2497,
+                      "name": "Period",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2463,
+                      "src": "1511:6:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_struct$_Period_$2463_storage_ptr_$",
+                        "typeString": "type(struct MinimalSLA.Period storage pointer)"
+                      }
+                    },
+                    "id": 2504,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "structConstructorCall",
+                    "lValueRequested": false,
+                    "names": [
+                      "sla_period_start",
+                      "sla_period_end",
+                      "claimed_reward",
+                      "claimed",
+                      "status"
+                    ],
+                    "nodeType": "FunctionCall",
+                    "src": "1511:235:10",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Period_$2463_memory_ptr",
+                      "typeString": "struct MinimalSLA.Period memory"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1476:270:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2509,
+                        "name": "period",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2496,
+                        "src": "1769:6:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Period_$2463_memory_ptr",
+                          "typeString": "struct MinimalSLA.Period memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_struct$_Period_$2463_memory_ptr",
+                          "typeString": "struct MinimalSLA.Period memory"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2506,
+                        "name": "periods",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2466,
+                        "src": "1756:7:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage",
+                          "typeString": "struct MinimalSLA.Period storage ref[] storage ref"
+                        }
+                      },
+                      "id": 2508,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "push",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "1756:12:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_struct$_Period_$2463_storage_$returns$__$",
+                        "typeString": "function (struct MinimalSLA.Period storage ref)"
+                      }
+                    },
+                    "id": 2510,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1756:20:10",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2511,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1756:20:10"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2488,
+              "nodeType": "StructuredDocumentation",
+              "src": "1259:131:10",
+              "text": " @dev constructor add a Period at deployment time\n start 1577836800000000000\n end 1594026520000000000"
+            },
+            "id": 2513,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 2493,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2490,
+                  "mutability": "mutable",
+                  "name": "_sla_period_start",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2513,
+                  "src": "1407:25:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2489,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1407:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2492,
+                  "mutability": "mutable",
+                  "name": "_sla_period_end",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2513,
+                  "src": "1434:23:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2491,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1434:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1406:52:10"
+            },
+            "returnParameters": {
+              "id": 2494,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1466:0:10"
+            },
+            "scope": 2565,
+            "src": "1395:388:10",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2542,
+              "nodeType": "Block",
+              "src": "2151:135:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "expression": {
+                              "argumentTypes": null,
+                              "id": 2528,
+                              "name": "block",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": -4,
+                              "src": "2185:5:10",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_magic_block",
+                                "typeString": "block"
+                              }
+                            },
+                            "id": 2529,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "timestamp",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": null,
+                            "src": "2185:15:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 2530,
+                            "name": "_value",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2518,
+                            "src": "2202:6:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 2531,
+                            "name": "_period",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2520,
+                            "src": "2210:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            },
+                            {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            },
+                            {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          ],
+                          "id": 2527,
+                          "name": "SLI",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2473,
+                          "src": "2181:3:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_struct$_SLI_$2473_storage_ptr_$",
+                            "typeString": "type(struct MinimalSLA.SLI storage pointer)"
+                          }
+                        },
+                        "id": 2532,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "structConstructorCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "2181:37:10",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_SLI_$2473_memory_ptr",
+                          "typeString": "struct MinimalSLA.SLI memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_struct$_SLI_$2473_memory_ptr",
+                          "typeString": "struct MinimalSLA.SLI memory"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "baseExpression": {
+                          "argumentTypes": null,
+                          "id": 2523,
+                          "name": "SLIs",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2478,
+                          "src": "2161:4:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_struct$_SLI_$2473_storage_$dyn_storage_$",
+                            "typeString": "mapping(bytes32 => struct MinimalSLA.SLI storage ref[] storage ref)"
+                          }
+                        },
+                        "id": 2525,
+                        "indexExpression": {
+                          "argumentTypes": null,
+                          "id": 2524,
+                          "name": "_SLOName",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2516,
+                          "src": "2166:8:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          }
+                        },
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "IndexAccess",
+                        "src": "2161:14:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_SLI_$2473_storage_$dyn_storage",
+                          "typeString": "struct MinimalSLA.SLI storage ref[] storage ref"
+                        }
+                      },
+                      "id": 2526,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "push",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "2161:19:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_struct$_SLI_$2473_storage_$returns$__$",
+                        "typeString": "function (struct MinimalSLA.SLI storage ref)"
+                      }
+                    },
+                    "id": 2533,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2161:58:10",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2534,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2161:58:10"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2536,
+                          "name": "block",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": -4,
+                          "src": "2246:5:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_block",
+                            "typeString": "block"
+                          }
+                        },
+                        "id": 2537,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "timestamp",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "2246:15:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 2538,
+                        "name": "_value",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2518,
+                        "src": "2263:6:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 2539,
+                        "name": "_period",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2520,
+                        "src": "2271:7:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 2535,
+                      "name": "SLICreated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2487,
+                      "src": "2235:10:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_uint256_$_t_uint256_$returns$__$",
+                        "typeString": "function (uint256,uint256,uint256)"
+                      }
+                    },
+                    "id": 2540,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2235:44:10",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2541,
+                  "nodeType": "EmitStatement",
+                  "src": "2230:49:10"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2514,
+              "nodeType": "StructuredDocumentation",
+              "src": "1789:246:10",
+              "text": " @dev external function to register SLI's and check them against the SLO's\n @param _SLOName the name of the SLO in bytes32\n @param _value the value of the SLI to check\n @param _period the id of the given period"
+            },
+            "functionSelector": "869c3925",
+            "id": 2543,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "registerSLI",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 2521,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2516,
+                  "mutability": "mutable",
+                  "name": "_SLOName",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2543,
+                  "src": "2070:16:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2515,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2070:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2518,
+                  "mutability": "mutable",
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2543,
+                  "src": "2096:14:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2517,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2096:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2520,
+                  "mutability": "mutable",
+                  "name": "_period",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2543,
+                  "src": "2120:15:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2519,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2120:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2060:81:10"
+            },
+            "returnParameters": {
+              "id": 2522,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2151:0:10"
+            },
+            "scope": 2565,
+            "src": "2040:246:10",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 2563,
+              "nodeType": "Block",
+              "src": "2547:130:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "components": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "baseExpression": {
+                            "argumentTypes": null,
+                            "id": 2553,
+                            "name": "periods",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2466,
+                            "src": "2578:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage",
+                              "typeString": "struct MinimalSLA.Period storage ref[] storage ref"
+                            }
+                          },
+                          "id": 2555,
+                          "indexExpression": {
+                            "argumentTypes": null,
+                            "id": 2554,
+                            "name": "_periodId",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2546,
+                            "src": "2586:9:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "2578:18:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Period_$2463_storage",
+                            "typeString": "struct MinimalSLA.Period storage ref"
+                          }
+                        },
+                        "id": 2556,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sla_period_start",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 2444,
+                        "src": "2578:35:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "baseExpression": {
+                            "argumentTypes": null,
+                            "id": 2557,
+                            "name": "periods",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2466,
+                            "src": "2627:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage",
+                              "typeString": "struct MinimalSLA.Period storage ref[] storage ref"
+                            }
+                          },
+                          "id": 2559,
+                          "indexExpression": {
+                            "argumentTypes": null,
+                            "id": 2558,
+                            "name": "_periodId",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2546,
+                            "src": "2635:9:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "2627:18:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Period_$2463_storage",
+                            "typeString": "struct MinimalSLA.Period storage ref"
+                          }
+                        },
+                        "id": 2560,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sla_period_end",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 2446,
+                        "src": "2627:33:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "id": 2561,
+                    "isConstant": false,
+                    "isInlineArray": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "TupleExpression",
+                    "src": "2564:106:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$_t_uint256_$_t_uint256_$",
+                      "typeString": "tuple(uint256,uint256)"
+                    }
+                  },
+                  "functionReturnParameters": 2552,
+                  "id": 2562,
+                  "nodeType": "Return",
+                  "src": "2557:113:10"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2544,
+              "nodeType": "StructuredDocumentation",
+              "src": "2292:119:10",
+              "text": " @dev function to get a period start and end\n @param _periodId the id of the period to get data"
+            },
+            "functionSelector": "fc875ece",
+            "id": 2564,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getPeriodData",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 2547,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2546,
+                  "mutability": "mutable",
+                  "name": "_periodId",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2564,
+                  "src": "2439:17:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2545,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2439:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2438:19:10"
+            },
+            "returnParameters": {
+              "id": 2552,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2549,
+                  "mutability": "mutable",
+                  "name": "periodStart",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2564,
+                  "src": "2503:19:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2548,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2503:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2551,
+                  "mutability": "mutable",
+                  "name": "periodEnd",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2564,
+                  "src": "2524:17:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2550,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2524:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2502:40:10"
+            },
+            "scope": 2565,
+            "src": "2416:261:10",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2566,
+        "src": "200:2479:10"
+      }
+    ],
+    "src": "0:2680:10"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/matiasbn/Desktop/stacktical-dsla-contracts/contracts/testing/MinimalSLA.sol",
+    "exportedSymbols": {
+      "MinimalSLA": [
+        2565
+      ]
+    },
+    "id": 2566,
+    "license": null,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2437,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:10"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 2438,
+          "nodeType": "StructuredDocumentation",
+          "src": "25:173:10",
+          "text": " @dev Minimal implementation os SLA contract for the Messenger contract,\n to test inter contract interaction without dealing with the SLA deployment\n overhead."
+        },
+        "fullyImplemented": true,
+        "id": 2565,
+        "linearizedBaseContracts": [
+          2565
+        ],
+        "name": "MinimalSLA",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "MinimalSLA.Status",
+            "id": 2442,
+            "members": [
+              {
+                "id": 2439,
+                "name": "NotVerified",
+                "nodeType": "EnumValue",
+                "src": "239:11:10"
+              },
+              {
+                "id": 2440,
+                "name": "Respected",
+                "nodeType": "EnumValue",
+                "src": "252:9:10"
+              },
+              {
+                "id": 2441,
+                "name": "NotRespected",
+                "nodeType": "EnumValue",
+                "src": "263:12:10"
+              }
+            ],
+            "name": "Status",
+            "nodeType": "EnumDefinition",
+            "src": "226:50:10"
+          },
+          {
+            "canonicalName": "MinimalSLA.Period",
+            "id": 2463,
+            "members": [
+              {
+                "constant": false,
+                "id": 2444,
+                "mutability": "mutable",
+                "name": "sla_period_start",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "306:24:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2443,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "306:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2446,
+                "mutability": "mutable",
+                "name": "sla_period_end",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "340:22:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2445,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "340:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2448,
+                "mutability": "mutable",
+                "name": "claimed_reward",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "372:22:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2447,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "372:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2450,
+                "mutability": "mutable",
+                "name": "claimed",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "404:12:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2449,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "404:4:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2452,
+                "mutability": "mutable",
+                "name": "status",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "426:13:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_enum$_Status_$2442",
+                  "typeString": "enum MinimalSLA.Status"
+                },
+                "typeName": {
+                  "contractScope": null,
+                  "id": 2451,
+                  "name": "Status",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 2442,
+                  "src": "426:6:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_Status_$2442",
+                    "typeString": "enum MinimalSLA.Status"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2458,
+                "mutability": "mutable",
+                "name": "stakingBalance",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "449:62:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$",
+                  "typeString": "mapping(address => mapping(address => uint256))"
+                },
+                "typeName": {
+                  "id": 2457,
+                  "keyType": {
+                    "id": 2453,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "457:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "449:47:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$",
+                    "typeString": "mapping(address => mapping(address => uint256))"
+                  },
+                  "valueType": {
+                    "id": 2456,
+                    "keyType": {
+                      "id": 2454,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "476:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Mapping",
+                    "src": "468:27:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                      "typeString": "mapping(address => uint256)"
+                    },
+                    "valueType": {
+                      "id": 2455,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "487:7:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    }
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2462,
+                "mutability": "mutable",
+                "name": "claimed_compensation",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2463,
+                "src": "599:48:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                  "typeString": "mapping(address => uint256)"
+                },
+                "typeName": {
+                  "id": 2461,
+                  "keyType": {
+                    "id": 2459,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "607:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "599:27:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                    "typeString": "mapping(address => uint256)"
+                  },
+                  "valueType": {
+                    "id": 2460,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "618:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Period",
+            "nodeType": "StructDefinition",
+            "scope": 2565,
+            "src": "282:372:10",
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "ea4a1104",
+            "id": 2466,
+            "mutability": "mutable",
+            "name": "periods",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 2565,
+            "src": "659:23:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage",
+              "typeString": "struct MinimalSLA.Period[]"
+            },
+            "typeName": {
+              "baseType": {
+                "contractScope": null,
+                "id": 2464,
+                "name": "Period",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 2463,
+                "src": "659:6:10",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Period_$2463_storage_ptr",
+                  "typeString": "struct MinimalSLA.Period"
+                }
+              },
+              "id": 2465,
+              "length": null,
+              "nodeType": "ArrayTypeName",
+              "src": "659:8:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage_ptr",
+                "typeString": "struct MinimalSLA.Period[]"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "MinimalSLA.SLI",
+            "id": 2473,
+            "members": [
+              {
+                "constant": false,
+                "id": 2468,
+                "mutability": "mutable",
+                "name": "timestamp",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "784:17:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2467,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "784:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2470,
+                "mutability": "mutable",
+                "name": "value",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "811:13:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2469,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "811:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2472,
+                "mutability": "mutable",
+                "name": "periodId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "834:16:10",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2471,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "834:7:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "SLI",
+            "nodeType": "StructDefinition",
+            "scope": 2565,
+            "src": "763:94:10",
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "functionSelector": "94199c61",
+            "id": 2478,
+            "mutability": "mutable",
+            "name": "SLIs",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 2565,
+            "src": "923:37:10",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_struct$_SLI_$2473_storage_$dyn_storage_$",
+              "typeString": "mapping(bytes32 => struct MinimalSLA.SLI[])"
+            },
+            "typeName": {
+              "id": 2477,
+              "keyType": {
+                "id": 2474,
+                "name": "bytes32",
+                "nodeType": "ElementaryTypeName",
+                "src": "931:7:10",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "923:25:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_struct$_SLI_$2473_storage_$dyn_storage_$",
+                "typeString": "mapping(bytes32 => struct MinimalSLA.SLI[])"
+              },
+              "valueType": {
+                "baseType": {
+                  "contractScope": null,
+                  "id": 2475,
+                  "name": "SLI",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 2473,
+                  "src": "942:3:10",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_SLI_$2473_storage_ptr",
+                    "typeString": "struct MinimalSLA.SLI"
+                  }
+                },
+                "id": 2476,
+                "length": null,
+                "nodeType": "ArrayTypeName",
+                "src": "942:5:10",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_struct$_SLI_$2473_storage_$dyn_storage_ptr",
+                  "typeString": "struct MinimalSLA.SLI[]"
+                }
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 2479,
+              "nodeType": "StructuredDocumentation",
+              "src": "967:209:10",
+              "text": " @dev event for SLI creation logging\n @param _timestamp the time the SLI has been registered\n @param _value the value of the SLI\n @param _periodId the id of the given period"
+            },
+            "id": 2487,
+            "name": "SLICreated",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 2486,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2481,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_timestamp",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2487,
+                  "src": "1198:18:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2480,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1198:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2483,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2487,
+                  "src": "1218:14:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2482,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1218:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2485,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_periodId",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2487,
+                  "src": "1234:17:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2484,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1234:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1197:55:10"
+            },
+            "src": "1181:72:10"
+          },
+          {
+            "body": {
+              "id": 2512,
+              "nodeType": "Block",
+              "src": "1466:317:10",
+              "statements": [
+                {
+                  "assignments": [
+                    2496
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 2496,
+                      "mutability": "mutable",
+                      "name": "period",
+                      "nodeType": "VariableDeclaration",
+                      "overrides": null,
+                      "scope": 2512,
+                      "src": "1476:20:10",
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Period_$2463_memory_ptr",
+                        "typeString": "struct MinimalSLA.Period"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 2495,
+                        "name": "Period",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 2463,
+                        "src": "1476:6:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Period_$2463_storage_ptr",
+                          "typeString": "struct MinimalSLA.Period"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 2505,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2498,
+                        "name": "_sla_period_start",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2490,
+                        "src": "1554:17:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 2499,
+                        "name": "_sla_period_end",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2492,
+                        "src": "1605:15:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "30",
+                        "id": 2500,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "number",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1654:1:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_rational_0_by_1",
+                          "typeString": "int_const 0"
+                        },
+                        "value": "0"
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "66616c7365",
+                        "id": 2501,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "bool",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1682:5:10",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        "value": "false"
+                      },
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2502,
+                          "name": "Status",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2442,
+                          "src": "1713:6:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_enum$_Status_$2442_$",
+                            "typeString": "type(enum MinimalSLA.Status)"
+                          }
+                        },
+                        "id": 2503,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "memberName": "NotVerified",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1713:18:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_enum$_Status_$2442",
+                          "typeString": "enum MinimalSLA.Status"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_rational_0_by_1",
+                          "typeString": "int_const 0"
+                        },
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_enum$_Status_$2442",
+                          "typeString": "enum MinimalSLA.Status"
+                        }
+                      ],
+                      "id": 2497,
+                      "name": "Period",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2463,
+                      "src": "1511:6:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_struct$_Period_$2463_storage_ptr_$",
+                        "typeString": "type(struct MinimalSLA.Period storage pointer)"
+                      }
+                    },
+                    "id": 2504,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "structConstructorCall",
+                    "lValueRequested": false,
+                    "names": [
+                      "sla_period_start",
+                      "sla_period_end",
+                      "claimed_reward",
+                      "claimed",
+                      "status"
+                    ],
+                    "nodeType": "FunctionCall",
+                    "src": "1511:235:10",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Period_$2463_memory_ptr",
+                      "typeString": "struct MinimalSLA.Period memory"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1476:270:10"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2509,
+                        "name": "period",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2496,
+                        "src": "1769:6:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Period_$2463_memory_ptr",
+                          "typeString": "struct MinimalSLA.Period memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_struct$_Period_$2463_memory_ptr",
+                          "typeString": "struct MinimalSLA.Period memory"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 2506,
+                        "name": "periods",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2466,
+                        "src": "1756:7:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage",
+                          "typeString": "struct MinimalSLA.Period storage ref[] storage ref"
+                        }
+                      },
+                      "id": 2508,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "push",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "1756:12:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_struct$_Period_$2463_storage_$returns$__$",
+                        "typeString": "function (struct MinimalSLA.Period storage ref)"
+                      }
+                    },
+                    "id": 2510,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1756:20:10",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2511,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1756:20:10"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2488,
+              "nodeType": "StructuredDocumentation",
+              "src": "1259:131:10",
+              "text": " @dev constructor add a Period at deployment time\n start 1577836800000000000\n end 1594026520000000000"
+            },
+            "id": 2513,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 2493,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2490,
+                  "mutability": "mutable",
+                  "name": "_sla_period_start",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2513,
+                  "src": "1407:25:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2489,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1407:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2492,
+                  "mutability": "mutable",
+                  "name": "_sla_period_end",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2513,
+                  "src": "1434:23:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2491,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1434:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1406:52:10"
+            },
+            "returnParameters": {
+              "id": 2494,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1466:0:10"
+            },
+            "scope": 2565,
+            "src": "1395:388:10",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2542,
+              "nodeType": "Block",
+              "src": "2151:135:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "expression": {
+                              "argumentTypes": null,
+                              "id": 2528,
+                              "name": "block",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": -4,
+                              "src": "2185:5:10",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_magic_block",
+                                "typeString": "block"
+                              }
+                            },
+                            "id": 2529,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "timestamp",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": null,
+                            "src": "2185:15:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 2530,
+                            "name": "_value",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2518,
+                            "src": "2202:6:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 2531,
+                            "name": "_period",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2520,
+                            "src": "2210:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            },
+                            {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            },
+                            {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          ],
+                          "id": 2527,
+                          "name": "SLI",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2473,
+                          "src": "2181:3:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_struct$_SLI_$2473_storage_ptr_$",
+                            "typeString": "type(struct MinimalSLA.SLI storage pointer)"
+                          }
+                        },
+                        "id": 2532,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "structConstructorCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "2181:37:10",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_SLI_$2473_memory_ptr",
+                          "typeString": "struct MinimalSLA.SLI memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_struct$_SLI_$2473_memory_ptr",
+                          "typeString": "struct MinimalSLA.SLI memory"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "baseExpression": {
+                          "argumentTypes": null,
+                          "id": 2523,
+                          "name": "SLIs",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2478,
+                          "src": "2161:4:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_struct$_SLI_$2473_storage_$dyn_storage_$",
+                            "typeString": "mapping(bytes32 => struct MinimalSLA.SLI storage ref[] storage ref)"
+                          }
+                        },
+                        "id": 2525,
+                        "indexExpression": {
+                          "argumentTypes": null,
+                          "id": 2524,
+                          "name": "_SLOName",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2516,
+                          "src": "2166:8:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          }
+                        },
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "IndexAccess",
+                        "src": "2161:14:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_SLI_$2473_storage_$dyn_storage",
+                          "typeString": "struct MinimalSLA.SLI storage ref[] storage ref"
+                        }
+                      },
+                      "id": 2526,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "push",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "2161:19:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_struct$_SLI_$2473_storage_$returns$__$",
+                        "typeString": "function (struct MinimalSLA.SLI storage ref)"
+                      }
+                    },
+                    "id": 2533,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2161:58:10",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2534,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2161:58:10"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 2536,
+                          "name": "block",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": -4,
+                          "src": "2246:5:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_block",
+                            "typeString": "block"
+                          }
+                        },
+                        "id": 2537,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "timestamp",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "2246:15:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 2538,
+                        "name": "_value",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2518,
+                        "src": "2263:6:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 2539,
+                        "name": "_period",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2520,
+                        "src": "2271:7:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 2535,
+                      "name": "SLICreated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2487,
+                      "src": "2235:10:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_uint256_$_t_uint256_$returns$__$",
+                        "typeString": "function (uint256,uint256,uint256)"
+                      }
+                    },
+                    "id": 2540,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2235:44:10",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2541,
+                  "nodeType": "EmitStatement",
+                  "src": "2230:49:10"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2514,
+              "nodeType": "StructuredDocumentation",
+              "src": "1789:246:10",
+              "text": " @dev external function to register SLI's and check them against the SLO's\n @param _SLOName the name of the SLO in bytes32\n @param _value the value of the SLI to check\n @param _period the id of the given period"
+            },
+            "functionSelector": "869c3925",
+            "id": 2543,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "registerSLI",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 2521,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2516,
+                  "mutability": "mutable",
+                  "name": "_SLOName",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2543,
+                  "src": "2070:16:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2515,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2070:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2518,
+                  "mutability": "mutable",
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2543,
+                  "src": "2096:14:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2517,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2096:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2520,
+                  "mutability": "mutable",
+                  "name": "_period",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2543,
+                  "src": "2120:15:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2519,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2120:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2060:81:10"
+            },
+            "returnParameters": {
+              "id": 2522,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2151:0:10"
+            },
+            "scope": 2565,
+            "src": "2040:246:10",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 2563,
+              "nodeType": "Block",
+              "src": "2547:130:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "components": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "baseExpression": {
+                            "argumentTypes": null,
+                            "id": 2553,
+                            "name": "periods",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2466,
+                            "src": "2578:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage",
+                              "typeString": "struct MinimalSLA.Period storage ref[] storage ref"
+                            }
+                          },
+                          "id": 2555,
+                          "indexExpression": {
+                            "argumentTypes": null,
+                            "id": 2554,
+                            "name": "_periodId",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2546,
+                            "src": "2586:9:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "2578:18:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Period_$2463_storage",
+                            "typeString": "struct MinimalSLA.Period storage ref"
+                          }
+                        },
+                        "id": 2556,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sla_period_start",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 2444,
+                        "src": "2578:35:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "baseExpression": {
+                            "argumentTypes": null,
+                            "id": 2557,
+                            "name": "periods",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2466,
+                            "src": "2627:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_array$_t_struct$_Period_$2463_storage_$dyn_storage",
+                              "typeString": "struct MinimalSLA.Period storage ref[] storage ref"
+                            }
+                          },
+                          "id": 2559,
+                          "indexExpression": {
+                            "argumentTypes": null,
+                            "id": 2558,
+                            "name": "_periodId",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2546,
+                            "src": "2635:9:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "2627:18:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Period_$2463_storage",
+                            "typeString": "struct MinimalSLA.Period storage ref"
+                          }
+                        },
+                        "id": 2560,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sla_period_end",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 2446,
+                        "src": "2627:33:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "id": 2561,
+                    "isConstant": false,
+                    "isInlineArray": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "TupleExpression",
+                    "src": "2564:106:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$_t_uint256_$_t_uint256_$",
+                      "typeString": "tuple(uint256,uint256)"
+                    }
+                  },
+                  "functionReturnParameters": 2552,
+                  "id": 2562,
+                  "nodeType": "Return",
+                  "src": "2557:113:10"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2544,
+              "nodeType": "StructuredDocumentation",
+              "src": "2292:119:10",
+              "text": " @dev function to get a period start and end\n @param _periodId the id of the period to get data"
+            },
+            "functionSelector": "fc875ece",
+            "id": 2564,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getPeriodData",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 2547,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2546,
+                  "mutability": "mutable",
+                  "name": "_periodId",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2564,
+                  "src": "2439:17:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2545,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2439:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2438:19:10"
+            },
+            "returnParameters": {
+              "id": 2552,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2549,
+                  "mutability": "mutable",
+                  "name": "periodStart",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2564,
+                  "src": "2503:19:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2548,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2503:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2551,
+                  "mutability": "mutable",
+                  "name": "periodEnd",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 2564,
+                  "src": "2524:17:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2550,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2524:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2502:40:10"
+            },
+            "scope": 2565,
+            "src": "2416:261:10",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2566,
+        "src": "200:2479:10"
+      }
+    ],
+    "src": "0:2680:10"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.12+commit.27d51765.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.2.5",
+  "updatedAt": "2020-12-11T14:54:21.905Z",
+  "devdoc": {
+    "details": "Minimal implementation os SLA contract for the Messenger contract, to test inter contract interaction without dealing with the SLA deployment overhead.",
+    "events": {
+      "SLICreated(uint256,uint256,uint256)": {
+        "details": "event for SLI creation logging",
+        "params": {
+          "_periodId": "the id of the given period",
+          "_timestamp": "the time the SLI has been registered",
+          "_value": "the value of the SLI"
+        }
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "constructor": {
+        "details": "constructor add a Period at deployment time start 1577836800000000000 end 1594026520000000000"
+      },
+      "getPeriodData(uint256)": {
+        "details": "function to get a period start and end",
+        "params": {
+          "_periodId": "the id of the period to get data"
+        }
+      },
+      "registerSLI(bytes32,uint256,uint256)": {
+        "details": "external function to register SLI's and check them against the SLO's",
+        "params": {
+          "_SLOName": "the name of the SLO in bytes32",
+          "_period": "the id of the given period",
+          "_value": "the value of the SLI to check"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

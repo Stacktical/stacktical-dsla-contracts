@@ -4,12 +4,18 @@
   "description": "DSLA Protocol",
   "main": "index.js",
   "scripts": {
-    "test": "truffle compile && NODE_ENV=test truffle test",
-    "remix": "npx remixd -s . --remix-ide https://remix.ethereum.org"
+    "test:local": "NODE_ENV=test TEST_ENV=local truffle test --network local",
+    "test:chainlink": "NODE_ENV=test TEST_ENV=chainlink truffle test --network chainlink",
+    "test:kovan": "NODE_ENV=test TEST_ENV=kovan truffle test --network kovan",
+    "deploy:kovan": "truffle deploy --network kovan",
+    "remix": "npx remixd -s . --remix-ide https://remix.ethereum.org",
+    "compile": "truffle compile",
+    "prettier": "prettier --write 'contracts/**/*.sol'"
   },
   "author": "DSLA Core Developers",
   "license": "ISC",
   "dependencies": {
+    "@chainlink/contracts": "0.0.11",
     "@openzeppelin/contracts": "^3.2.0"
   },
   "devDependencies": {
@@ -17,6 +23,9 @@
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "dotenv": "^8.2.0",
+    "jest": "^26.6.3",
+    "prettier": "^2.2.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.1",
     "truffle-hdwallet-provider": "^1.0.17"
   },
   "repository": {
