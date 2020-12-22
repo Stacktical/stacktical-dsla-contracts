@@ -6,6 +6,7 @@
       "inputs": [
         {
           "indexed": true,
+          "internalType": "contract SLO",
           "name": "slo",
           "type": "address"
         }
@@ -14,31 +15,32 @@
       "type": "event"
     },
     {
-      "constant": false,
       "inputs": [
         {
+          "internalType": "uint256",
           "name": "_value",
           "type": "uint256"
         },
         {
+          "internalType": "enum SLO.SLOTypes",
           "name": "_SLOType",
           "type": "uint8"
         },
         {
+          "internalType": "bytes32",
           "name": "_name",
           "type": "bytes32"
         }
       ],
       "name": "createSLO",
       "outputs": [],
-      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "constant": true,
       "inputs": [
         {
+          "internalType": "address",
           "name": "_user",
           "type": "address"
         }
@@ -46,118 +48,130 @@
       "name": "userSLOs",
       "outputs": [
         {
+          "internalType": "contract SLO[]",
           "name": "",
           "type": "address[]"
         }
       ],
-      "payable": false,
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.7+commit.6da8b019\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"userSLOs\",\"outputs\":[{\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"_SLOType\",\"type\":\"uint8\"},{\"name\":\"_name\",\"type\":\"bytes32\"}],\"name\":\"createSLO\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"slo\",\"type\":\"address\"}],\"name\":\"SLOCreated\",\"type\":\"event\"}],\"devdoc\":{\"details\":\"SLORegistry is a contract for handling creation of service level objectives and querying those service level objectives\",\"methods\":{\"createSLO(uint256,uint8,bytes32)\":{\"details\":\"public function for creating service level objectives\",\"params\":{\"_SLOType\":\"type of check\",\"_name\":\"name of the service level objective in bytes32\",\"_value\":\"the value to check against\"}},\"userSLOs(address)\":{\"details\":\"public view function that returns the service level objectives that the given user has created\",\"params\":{\"_user\":\"Address of the user for which to return the service level objectives\"}}},\"title\":\"SLORegistry\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/wilhempujar/Development/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol\":\"SLORegistry\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/wilhempujar/Development/stacktical/stacktical-dsla-contracts/contracts/SLO/SLO.sol\":{\"keccak256\":\"0x1e5ab37d22d095d3d0195553e43a9039c9407f1c0035f702bd92fd78d80c661f\",\"urls\":[\"bzzr://406eabfab60ceec1f4bf022e4a6588bcc5b2ec084a724c2dedf53d8d502a9776\"]},\"/Users/wilhempujar/Development/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol\":{\"keccak256\":\"0xe1f2def7e9c75d1387c0f2878c9a39d6bd1978e979deffc64e4ec47ad8a3dbde\",\"urls\":[\"bzzr://4f6146e93ce26067266e315400a5bc1be1e6e407e20bdb6aa45bf7205ced165f\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b506106f3806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c8063376768401461003b578063b76e980f146100d4575b600080fd5b61007d6004803603602081101561005157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610119565b6040518080602001828103825283818151815260200191508051906020019060200280838360005b838110156100c05780820151818401526020810190506100a5565b505050509050019250505060405180910390f35b610117600480360360608110156100ea57600080fd5b8101908080359060200190929190803560ff169060200190929190803590602001909291905050506101e5565b005b60606000808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208054806020026020016040519081016040528092919081815260200182805480156101d957602002820191906000526020600020905b8160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001906001019080831161018f575b50505050509050919050565b60008383836040516101f690610326565b8084815260200183600581111561020957fe5b60ff1681526020018281526020019350505050604051809103906000f080158015610238573d6000803e3d6000fd5b5090506000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208190806001815401808255809150509060018203906000526020600020016000909192909190916101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550508073ffffffffffffffffffffffffffffffffffffffff167fda7fecad5247e1329bde744d342240b695d643d7f4e54f8b0ec74962c525f97560405160405180910390a250505050565b610394806103348339019056fe608060405234801561001057600080fd5b506040516060806103948339810180604052606081101561003057600080fd5b8101908080519060200190929190805190602001909291908051906020019092919050505082600181905550816000806101000a81548160ff0219169083600581111561007957fe5b0217905550806002819055507fbc0575dbcc2a44104cea600e4aacedc0030c223951fc23106ec03e9c135b6bd2838383604051808481526020018360058111156100bf57fe5b60ff168152602001828152602001935050505060405180910390a15050506102a8806100ec6000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c806306fdde03146100515780633fa4f2451461006f578063868d08f71461008d578063cf1ddcce146100d3575b600080fd5b6100596100ff565b6040518082815260200191505060405180910390f35b610077610105565b6040518082815260200191505060405180910390f35b6100b9600480360360208110156100a357600080fd5b810190808035906020019092919050505061010b565b604051808215151515815260200191505060405180910390f35b6100db61026a565b604051808260058111156100eb57fe5b60ff16815260200191505060405180910390f35b60025481565b60015481565b600080600581111561011957fe5b6000809054906101000a900460ff16600581111561013357fe5b14156101455760015482149050610265565b6001600581111561015257fe5b6000809054906101000a900460ff16600581111561016c57fe5b141561017f576001548214159050610265565b6002600581111561018c57fe5b6000809054906101000a900460ff1660058111156101a657fe5b14156101b85760015482109050610265565b600360058111156101c557fe5b6000809054906101000a900460ff1660058111156101df57fe5b14156101f2576001548211159050610265565b600460058111156101ff57fe5b6000809054906101000a900460ff16600581111561021957fe5b141561022b5760015482119050610265565b60058081111561023757fe5b6000809054906101000a900460ff16600581111561025157fe5b1415610264576001548210159050610265565b5b919050565b6000809054906101000a900460ff168156fea165627a7a7230582086265c1a803f2c71e1c46c24ec844fcf01a07e3dbbda39b9c88729d1b41a5d8b0029a165627a7a72305820e367aa9134383e360b1bbb3bb66e8a23fc7bf5f44b34377c95cb111b456f66120029",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c8063376768401461003b578063b76e980f146100d4575b600080fd5b61007d6004803603602081101561005157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610119565b6040518080602001828103825283818151815260200191508051906020019060200280838360005b838110156100c05780820151818401526020810190506100a5565b505050509050019250505060405180910390f35b610117600480360360608110156100ea57600080fd5b8101908080359060200190929190803560ff169060200190929190803590602001909291905050506101e5565b005b60606000808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208054806020026020016040519081016040528092919081815260200182805480156101d957602002820191906000526020600020905b8160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001906001019080831161018f575b50505050509050919050565b60008383836040516101f690610326565b8084815260200183600581111561020957fe5b60ff1681526020018281526020019350505050604051809103906000f080158015610238573d6000803e3d6000fd5b5090506000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208190806001815401808255809150509060018203906000526020600020016000909192909190916101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550508073ffffffffffffffffffffffffffffffffffffffff167fda7fecad5247e1329bde744d342240b695d643d7f4e54f8b0ec74962c525f97560405160405180910390a250505050565b610394806103348339019056fe608060405234801561001057600080fd5b506040516060806103948339810180604052606081101561003057600080fd5b8101908080519060200190929190805190602001909291908051906020019092919050505082600181905550816000806101000a81548160ff0219169083600581111561007957fe5b0217905550806002819055507fbc0575dbcc2a44104cea600e4aacedc0030c223951fc23106ec03e9c135b6bd2838383604051808481526020018360058111156100bf57fe5b60ff168152602001828152602001935050505060405180910390a15050506102a8806100ec6000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c806306fdde03146100515780633fa4f2451461006f578063868d08f71461008d578063cf1ddcce146100d3575b600080fd5b6100596100ff565b6040518082815260200191505060405180910390f35b610077610105565b6040518082815260200191505060405180910390f35b6100b9600480360360208110156100a357600080fd5b810190808035906020019092919050505061010b565b604051808215151515815260200191505060405180910390f35b6100db61026a565b604051808260058111156100eb57fe5b60ff16815260200191505060405180910390f35b60025481565b60015481565b600080600581111561011957fe5b6000809054906101000a900460ff16600581111561013357fe5b14156101455760015482149050610265565b6001600581111561015257fe5b6000809054906101000a900460ff16600581111561016c57fe5b141561017f576001548214159050610265565b6002600581111561018c57fe5b6000809054906101000a900460ff1660058111156101a657fe5b14156101b85760015482109050610265565b600360058111156101c557fe5b6000809054906101000a900460ff1660058111156101df57fe5b14156101f2576001548211159050610265565b600460058111156101ff57fe5b6000809054906101000a900460ff16600581111561021957fe5b141561022b5760015482119050610265565b60058081111561023757fe5b6000809054906101000a900460ff16600581111561025157fe5b1415610264576001548210159050610265565b5b919050565b6000809054906101000a900460ff168156fea165627a7a7230582086265c1a803f2c71e1c46c24ec844fcf01a07e3dbbda39b9c88729d1b41a5d8b0029a165627a7a72305820e367aa9134383e360b1bbb3bb66e8a23fc7bf5f44b34377c95cb111b456f66120029",
-  "sourceMap": "210:1136:6:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;210:1136:6;;;;;;;",
-  "deployedSourceMap": "210:1136:6:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;210:1136:6;;;;;;;;;;;;;;;;;;;;;;;;1235:109;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1235:109:6;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;1235:109:6;;;;;;;;;;;;;;;;;794:209;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;794:209:6;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;1235:109;1288:12;1319:10;:17;1330:5;1319:17;;;;;;;;;;;;;;;1312:25;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1235:109;;;:::o;794:209::-;881:7;899:6;907:8;917:5;891:32;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;891:32:6;881:42;;933:10;:22;944:10;933:22;;;;;;;;;;;;;;;961:3;933:32;;39:1:-1;33:3;27:10;23:18;57:10;52:3;45:23;79:10;72:17;;0:93;933:32:6;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;992:3;981:15;;;;;;;;;;;;794:209;;;;:::o;210:1136::-;;;;;;;;:::o",
-  "source": "pragma solidity 0.5.7;\n\nimport \"./SLO/SLO.sol\";\n\n/**\n * @title SLORegistry\n * @dev SLORegistry is a contract for handling creation of service level\n * objectives and querying those service level objectives\n */\ncontract SLORegistry {\n\n    // Mapping that stores the service level objectives created by a user\n    mapping(address => SLO[]) private userToSLOs;\n\n    /**\n     * @dev event for service level objective creation logging\n     * @param slo The address of the created service level objective contract\n     */\n    event SLOCreated(SLO indexed slo);\n\n    /**\n     * @dev public function for creating service level objectives\n     * @param _value the value to check against\n     * @param _SLOType type of check\n     * @param _name name of the service level objective in bytes32\n     */\n    function createSLO(uint _value, SLO.SLOTypes _SLOType, bytes32 _name) public {\n        SLO slo = new SLO(_value, _SLOType, _name);\n        userToSLOs[msg.sender].push(slo);\n\n        emit SLOCreated(slo);\n    }\n\n    /**\n     * @dev public view function that returns the service level objectives that\n     * the given user has created\n     * @param _user Address of the user for which to return the service level\n     * objectives\n     */\n    function userSLOs(address _user) public view returns(SLO[] memory) {\n        return(userToSLOs[_user]);\n    }\n}\n",
-  "sourcePath": "/Users/wilhempujar/Development/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract SLO\",\"name\":\"slo\",\"type\":\"address\"}],\"name\":\"SLOCreated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"},{\"internalType\":\"enum SLO.SLOTypes\",\"name\":\"_SLOType\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"_name\",\"type\":\"bytes32\"}],\"name\":\"createSLO\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"userSLOs\",\"outputs\":[{\"internalType\":\"contract SLO[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"SLORegistry is a contract for handling creation of service level objectives and querying those service level objectives\",\"events\":{\"SLOCreated(address)\":{\"details\":\"event for service level objective creation logging\",\"params\":{\"slo\":\"The address of the created service level objective contract\"}}},\"kind\":\"dev\",\"methods\":{\"createSLO(uint256,uint8,bytes32)\":{\"details\":\"public function for creating service level objectives\",\"params\":{\"_SLOType\":\"type of check\",\"_name\":\"name of the service level objective in bytes32\",\"_value\":\"the value to check against\"}},\"userSLOs(address)\":{\"details\":\"public view function that returns the service level objectives that the given user has created\",\"params\":{\"_user\":\"Address of the user for which to return the service level objectives\"}}},\"title\":\"SLORegistry\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/SLORegistry.sol\":\"SLORegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/SLO/SLO.sol\":{\"keccak256\":\"0x774c489bdeabb39817df2bfa7ee80f26e45960373daa50ee5e9308453c6b3144\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://88e8337296f4cc676ed4699ac02c8ef2ec8fc91d1a613197ee582ea338cb700c\",\"dweb:/ipfs/QmeoeyH6349GTGrZm9repEEEvZVR34cTdWQvbTYHTHCxaE\"]},\"/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/SLORegistry.sol\":{\"keccak256\":\"0x5cd46e9dd6f03452b3b4f7445534b28b8fefd98814bd34fb8f3d68d867f8428e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://be5f344547ea84ad0ba17680d5a59779c8fa5ae5685762ff08d4c8ff6a3d4380\",\"dweb:/ipfs/QmXQdzDq1acv7if3MnT3KwYYD2pAeTiwdCq1uwiURZzMpb\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5061051b806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c8063376768401461003b578063b76e980f146100b1575b600080fd5b6100616004803603602081101561005157600080fd5b50356001600160a01b03166100df565b60408051602080825283518183015283519192839290830191858101910280838360005b8381101561009d578181015183820152602001610085565b505050509050019250505060405180910390f35b6100dd600480360360608110156100c757600080fd5b5080359060ff6020820135169060400135610153565b005b6001600160a01b0381166000908152602081815260409182902080548351818402810184019094528084526060939283018282801561014757602002820191906000526020600020905b81546001600160a01b03168152600190910190602001808311610129575b50505050509050919050565b600083838360405161016490610211565b8084815260200183600581111561017757fe5b81526020018281526020019350505050604051809103906000f0801580156101a3573d6000803e3d6000fd5b5033600090815260208181526040808320805460018101825590845291832090910180546001600160a01b0319166001600160a01b0385169081179091559051929350917fda7fecad5247e1329bde744d342240b695d643d7f4e54f8b0ec74962c525f9759190a250505050565b6102c78061021f8339019056fe608060405234801561001057600080fd5b506040516102c73803806102c78339818101604052606081101561003357600080fd5b5080516020820151604090920151600182815560008054939493849260ff199091169083600581111561006257fe5b0217905550806002819055507fbc0575dbcc2a44104cea600e4aacedc0030c223951fc23106ec03e9c135b6bd2838383604051808481526020018360058111156100a857fe5b8152602001828152602001935050505060405180910390a15050506101f5806100d26000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c806306fdde03146100515780633fa4f2451461006b578063868d08f714610073578063cf1ddcce146100a4575b600080fd5b6100596100cd565b60408051918252519081900360200190f35b6100596100d3565b6100906004803603602081101561008957600080fd5b50356100d9565b604080519115158252519081900360200190f35b6100ac6101b6565b604051808260058111156100bc57fe5b815260200191505060405180910390f35b60025481565b60015481565b60008060005460ff1660058111156100ed57fe5b14156100fe575060015481146101b1565b600160005460ff16600581111561011157fe5b141561012357506001548114156101b1565b600260005460ff16600581111561013657fe5b1415610147575060015481106101b1565b600360005460ff16600581111561015a57fe5b141561016c57506001548111156101b1565b600460005460ff16600581111561017f57fe5b1415610190575060015481116101b1565b600560005460ff1660058111156101a357fe5b14156101b157506001548110155b919050565b60005460ff168156fea26469706673582212205e4c7c936b8193463c6d6ec838a54cf39a5e39c31ae2c512928bdaba58c7715c64736f6c634300060c0033a2646970667358221220d5164d4c5f0b85b2f7954229b2dccf6f4c684d7631146c20aa78a3136b3b6ee564736f6c634300060c0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c8063376768401461003b578063b76e980f146100b1575b600080fd5b6100616004803603602081101561005157600080fd5b50356001600160a01b03166100df565b60408051602080825283518183015283519192839290830191858101910280838360005b8381101561009d578181015183820152602001610085565b505050509050019250505060405180910390f35b6100dd600480360360608110156100c757600080fd5b5080359060ff6020820135169060400135610153565b005b6001600160a01b0381166000908152602081815260409182902080548351818402810184019094528084526060939283018282801561014757602002820191906000526020600020905b81546001600160a01b03168152600190910190602001808311610129575b50505050509050919050565b600083838360405161016490610211565b8084815260200183600581111561017757fe5b81526020018281526020019350505050604051809103906000f0801580156101a3573d6000803e3d6000fd5b5033600090815260208181526040808320805460018101825590845291832090910180546001600160a01b0319166001600160a01b0385169081179091559051929350917fda7fecad5247e1329bde744d342240b695d643d7f4e54f8b0ec74962c525f9759190a250505050565b6102c78061021f8339019056fe608060405234801561001057600080fd5b506040516102c73803806102c78339818101604052606081101561003357600080fd5b5080516020820151604090920151600182815560008054939493849260ff199091169083600581111561006257fe5b0217905550806002819055507fbc0575dbcc2a44104cea600e4aacedc0030c223951fc23106ec03e9c135b6bd2838383604051808481526020018360058111156100a857fe5b8152602001828152602001935050505060405180910390a15050506101f5806100d26000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c806306fdde03146100515780633fa4f2451461006b578063868d08f714610073578063cf1ddcce146100a4575b600080fd5b6100596100cd565b60408051918252519081900360200190f35b6100596100d3565b6100906004803603602081101561008957600080fd5b50356100d9565b604080519115158252519081900360200190f35b6100ac6101b6565b604051808260058111156100bc57fe5b815260200191505060405180910390f35b60025481565b60015481565b60008060005460ff1660058111156100ed57fe5b14156100fe575060015481146101b1565b600160005460ff16600581111561011157fe5b141561012357506001548114156101b1565b600260005460ff16600581111561013657fe5b1415610147575060015481106101b1565b600360005460ff16600581111561015a57fe5b141561016c57506001548111156101b1565b600460005460ff16600581111561017f57fe5b1415610190575060015481116101b1565b600560005460ff1660058111156101a357fe5b14156101b157506001548110155b919050565b60005460ff168156fea26469706673582212205e4c7c936b8193463c6d6ec838a54cf39a5e39c31ae2c512928bdaba58c7715c64736f6c634300060c0033a2646970667358221220d5164d4c5f0b85b2f7954229b2dccf6f4c684d7631146c20aa78a3136b3b6ee564736f6c634300060c0033",
+  "immutableReferences": {},
+  "sourceMap": "243:1136:5:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "243:1136:5:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1268:109;;;;;;;;;;;;;;;;-1:-1:-1;1268:109:5;-1:-1:-1;;;;;1268:109:5;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;827:209;;;;;;;;;;;;;;;;-1:-1:-1;827:209:5;;;;;;;;;;;;;;:::i;:::-;;1268:109;-1:-1:-1;;;;;1352:17:5;;:10;:17;;;;;;;;;;;;1345:25;;;;;;;;;;;;;;;;;1321:12;;1345:25;;;1352:17;1345:25;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1345:25:5;;;;;;;;;;;;;;;;;;;;;;;1268:109;;;:::o;827:209::-;914:7;932:6;940:8;950:5;924:32;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;977:10:5;966;:22;;;;;;;;;;;:32;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;;966:32:5;-1:-1:-1;;;;;966:32:5;;;;;;;;1014:15;;966:32;;-1:-1:-1;966:32:5;1014:15;;966:10;1014:15;827:209;;;;:::o;-1:-1:-1:-;;;;;;;;:::o",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.6.0;\n\nimport \"./SLO/SLO.sol\";\n\n/**\n * @title SLORegistry\n * @dev SLORegistry is a contract for handling creation of service level\n * objectives and querying those service level objectives\n */\ncontract SLORegistry {\n\n    // Mapping that stores the service level objectives created by a user\n    mapping(address => SLO[]) private userToSLOs;\n\n    /**\n     * @dev event for service level objective creation logging\n     * @param slo The address of the created service level objective contract\n     */\n    event SLOCreated(SLO indexed slo);\n\n    /**\n     * @dev public function for creating service level objectives\n     * @param _value the value to check against\n     * @param _SLOType type of check\n     * @param _name name of the service level objective in bytes32\n     */\n    function createSLO(uint _value, SLO.SLOTypes _SLOType, bytes32 _name) public {\n        SLO slo = new SLO(_value, _SLOType, _name);\n        userToSLOs[msg.sender].push(slo);\n\n        emit SLOCreated(slo);\n    }\n\n    /**\n     * @dev public view function that returns the service level objectives that\n     * the given user has created\n     * @param _user Address of the user for which to return the service level\n     * objectives\n     */\n    function userSLOs(address _user) public view returns(SLO[] memory) {\n        return(userToSLOs[_user]);\n    }\n}\n",
+  "sourcePath": "/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/SLORegistry.sol",
   "ast": {
-    "absolutePath": "/Users/wilhempujar/Development/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol",
+    "absolutePath": "/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/SLORegistry.sol",
     "exportedSymbols": {
       "SLORegistry": [
-        1508
+        1697
       ]
     },
-    "id": 1509,
+    "id": 1698,
+    "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1452,
+        "id": 1637,
         "literals": [
           "solidity",
-          "0.5",
-          ".7"
+          "^",
+          "0.6",
+          ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:6"
+        "src": "32:23:5"
       },
       {
-        "absolutePath": "/Users/wilhempujar/Development/stacktical/stacktical-dsla-contracts/contracts/SLO/SLO.sol",
+        "absolutePath": "/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/SLO/SLO.sol",
         "file": "./SLO/SLO.sol",
-        "id": 1453,
+        "id": 1638,
         "nodeType": "ImportDirective",
-        "scope": 1509,
-        "sourceUnit": 1451,
-        "src": "24:23:6",
+        "scope": 1698,
+        "sourceUnit": 1636,
+        "src": "57:23:5",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
+        "abstract": false,
         "baseContracts": [],
         "contractDependencies": [
-          1450
+          1635
         ],
         "contractKind": "contract",
-        "documentation": "@title SLORegistry\n@dev SLORegistry is a contract for handling creation of service level\nobjectives and querying those service level objectives",
+        "documentation": {
+          "id": 1639,
+          "nodeType": "StructuredDocumentation",
+          "src": "82:160:5",
+          "text": " @title SLORegistry\n @dev SLORegistry is a contract for handling creation of service level\n objectives and querying those service level objectives"
+        },
         "fullyImplemented": true,
-        "id": 1508,
+        "id": 1697,
         "linearizedBaseContracts": [
-          1508
+          1697
         ],
         "name": "SLORegistry",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": false,
-            "id": 1458,
+            "id": 1644,
+            "mutability": "mutable",
             "name": "userToSLOs",
             "nodeType": "VariableDeclaration",
-            "scope": 1508,
-            "src": "312:44:6",
+            "overrides": null,
+            "scope": 1697,
+            "src": "345:44:5",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1450_$dyn_storage_$",
+              "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1635_$dyn_storage_$",
               "typeString": "mapping(address => contract SLO[])"
             },
             "typeName": {
-              "id": 1457,
+              "id": 1643,
               "keyType": {
-                "id": 1454,
+                "id": 1640,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
-                "src": "320:7:6",
+                "src": "353:7:5",
                 "typeDescriptions": {
                   "typeIdentifier": "t_address",
                   "typeString": "address"
                 }
               },
               "nodeType": "Mapping",
-              "src": "312:25:6",
+              "src": "345:25:5",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1450_$dyn_storage_$",
+                "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1635_$dyn_storage_$",
                 "typeString": "mapping(address => contract SLO[])"
               },
               "valueType": {
                 "baseType": {
                   "contractScope": null,
-                  "id": 1455,
+                  "id": 1641,
                   "name": "SLO",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 1450,
-                  "src": "331:3:6",
+                  "referencedDeclaration": 1635,
+                  "src": "364:3:5",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_SLO_$1450",
+                    "typeIdentifier": "t_contract$_SLO_$1635",
                     "typeString": "contract SLO"
                   }
                 },
-                "id": 1456,
+                "id": 1642,
                 "length": null,
                 "nodeType": "ArrayTypeName",
-                "src": "331:5:6",
+                "src": "364:5:5",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage_ptr",
+                  "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage_ptr",
                   "typeString": "contract SLO[]"
                 }
               }
@@ -167,37 +181,44 @@
           },
           {
             "anonymous": false,
-            "documentation": "@dev event for service level objective creation logging\n@param slo The address of the created service level objective contract",
-            "id": 1462,
+            "documentation": {
+              "id": 1645,
+              "nodeType": "StructuredDocumentation",
+              "src": "396:152:5",
+              "text": " @dev event for service level objective creation logging\n @param slo The address of the created service level objective contract"
+            },
+            "id": 1649,
             "name": "SLOCreated",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1461,
+              "id": 1648,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1460,
+                  "id": 1647,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "slo",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1462,
-                  "src": "537:15:6",
+                  "overrides": null,
+                  "scope": 1649,
+                  "src": "570:15:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_SLO_$1450",
+                    "typeIdentifier": "t_contract$_SLO_$1635",
                     "typeString": "contract SLO"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1459,
+                    "id": 1646,
                     "name": "SLO",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1450,
-                    "src": "537:3:6",
+                    "referencedDeclaration": 1635,
+                    "src": "570:3:5",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_SLO_$1450",
+                      "typeIdentifier": "t_contract$_SLO_$1635",
                       "typeString": "contract SLO"
                     }
                   },
@@ -205,43 +226,45 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "536:17:6"
+              "src": "569:17:5"
             },
-            "src": "520:34:6"
+            "src": "553:34:5"
           },
           {
             "body": {
-              "id": 1492,
+              "id": 1680,
               "nodeType": "Block",
-              "src": "871:132:6",
+              "src": "904:132:5",
               "statements": [
                 {
                   "assignments": [
-                    1472
+                    1660
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1472,
+                      "id": 1660,
+                      "mutability": "mutable",
                       "name": "slo",
                       "nodeType": "VariableDeclaration",
-                      "scope": 1492,
-                      "src": "881:7:6",
+                      "overrides": null,
+                      "scope": 1680,
+                      "src": "914:7:5",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_SLO_$1450",
+                        "typeIdentifier": "t_contract$_SLO_$1635",
                         "typeString": "contract SLO"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1471,
+                        "id": 1659,
                         "name": "SLO",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1450,
-                        "src": "881:3:6",
+                        "referencedDeclaration": 1635,
+                        "src": "914:3:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       },
@@ -249,18 +272,18 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1479,
+                  "id": 1667,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1475,
+                        "id": 1663,
                         "name": "_value",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1464,
-                        "src": "899:6:6",
+                        "referencedDeclaration": 1652,
+                        "src": "932:6:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -268,25 +291,25 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 1476,
+                        "id": 1664,
                         "name": "_SLOType",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1466,
-                        "src": "907:8:6",
+                        "referencedDeclaration": 1654,
+                        "src": "940:8:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_SLOTypes_$1339",
+                          "typeIdentifier": "t_enum$_SLOTypes_$1521",
                           "typeString": "enum SLO.SLOTypes"
                         }
                       },
                       {
                         "argumentTypes": null,
-                        "id": 1477,
+                        "id": 1665,
                         "name": "_name",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1468,
-                        "src": "917:5:6",
+                        "referencedDeclaration": 1656,
+                        "src": "950:5:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
@@ -300,7 +323,7 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_enum$_SLOTypes_$1339",
+                          "typeIdentifier": "t_enum$_SLOTypes_$1521",
                           "typeString": "enum SLO.SLOTypes"
                         },
                         {
@@ -308,31 +331,31 @@
                           "typeString": "bytes32"
                         }
                       ],
-                      "id": 1474,
+                      "id": 1662,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "NewExpression",
-                      "src": "891:7:6",
+                      "src": "924:7:5",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_enum$_SLOTypes_$1339_$_t_bytes32_$returns$_t_contract$_SLO_$1450_$",
+                        "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_enum$_SLOTypes_$1521_$_t_bytes32_$returns$_t_contract$_SLO_$1635_$",
                         "typeString": "function (uint256,enum SLO.SLOTypes,bytes32) returns (contract SLO)"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1473,
+                        "id": 1661,
                         "name": "SLO",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1450,
-                        "src": "895:3:6",
+                        "referencedDeclaration": 1635,
+                        "src": "928:3:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       }
                     },
-                    "id": 1478,
+                    "id": 1666,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -340,14 +363,15 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "891:32:6",
+                    "src": "924:32:5",
+                    "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_SLO_$1450",
+                      "typeIdentifier": "t_contract$_SLO_$1635",
                       "typeString": "contract SLO"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "881:42:6"
+                  "src": "914:42:5"
                 },
                 {
                   "expression": {
@@ -355,14 +379,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1485,
+                        "id": 1673,
                         "name": "slo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1472,
-                        "src": "961:3:6",
+                        "referencedDeclaration": 1660,
+                        "src": "994:3:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       }
@@ -370,7 +394,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       ],
@@ -378,34 +402,34 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 1480,
+                          "id": 1668,
                           "name": "userToSLOs",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1458,
-                          "src": "933:10:6",
+                          "referencedDeclaration": 1644,
+                          "src": "966:10:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1450_$dyn_storage_$",
+                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1635_$dyn_storage_$",
                             "typeString": "mapping(address => contract SLO[] storage ref)"
                           }
                         },
-                        "id": 1483,
+                        "id": 1671,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 1481,
+                            "id": 1669,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 2029,
-                            "src": "944:3:6",
+                            "referencedDeclaration": -15,
+                            "src": "977:3:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
                               "typeString": "msg"
                             }
                           },
-                          "id": 1482,
+                          "id": 1670,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -413,7 +437,7 @@
                           "memberName": "sender",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": null,
-                          "src": "944:10:6",
+                          "src": "977:10:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address_payable",
                             "typeString": "address payable"
@@ -424,13 +448,13 @@
                         "isPure": false,
                         "lValueRequested": false,
                         "nodeType": "IndexAccess",
-                        "src": "933:22:6",
+                        "src": "966:22:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage",
+                          "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage",
                           "typeString": "contract SLO[] storage ref"
                         }
                       },
-                      "id": 1484,
+                      "id": 1672,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -438,13 +462,13 @@
                       "memberName": "push",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "933:27:6",
+                      "src": "966:27:5",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_contract$_SLO_$1450_$returns$_t_uint256_$",
-                        "typeString": "function (contract SLO) returns (uint256)"
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_contract$_SLO_$1635_$returns$__$",
+                        "typeString": "function (contract SLO)"
                       }
                     },
-                    "id": 1486,
+                    "id": 1674,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -452,15 +476,16 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "933:32:6",
+                    "src": "966:32:5",
+                    "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
                     }
                   },
-                  "id": 1487,
+                  "id": 1675,
                   "nodeType": "ExpressionStatement",
-                  "src": "933:32:6"
+                  "src": "966:32:5"
                 },
                 {
                   "eventCall": {
@@ -468,14 +493,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1489,
+                        "id": 1677,
                         "name": "slo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1472,
-                        "src": "992:3:6",
+                        "referencedDeclaration": 1660,
+                        "src": "1025:3:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       }
@@ -483,22 +508,22 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       ],
-                      "id": 1488,
+                      "id": 1676,
                       "name": "SLOCreated",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1462,
-                      "src": "981:10:6",
+                      "referencedDeclaration": 1649,
+                      "src": "1014:10:5",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_SLO_$1450_$returns$__$",
+                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_SLO_$1635_$returns$__$",
                         "typeString": "function (contract SLO)"
                       }
                     },
-                    "id": 1490,
+                    "id": 1678,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -506,36 +531,46 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "981:15:6",
+                    "src": "1014:15:5",
+                    "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1491,
+                  "id": 1679,
                   "nodeType": "EmitStatement",
-                  "src": "976:20:6"
+                  "src": "1009:20:5"
                 }
               ]
             },
-            "documentation": "@dev public function for creating service level objectives\n@param _value the value to check against\n@param _SLOType type of check\n@param _name name of the service level objective in bytes32",
-            "id": 1493,
+            "documentation": {
+              "id": 1650,
+              "nodeType": "StructuredDocumentation",
+              "src": "593:229:5",
+              "text": " @dev public function for creating service level objectives\n @param _value the value to check against\n @param _SLOType type of check\n @param _name name of the service level objective in bytes32"
+            },
+            "functionSelector": "b76e980f",
+            "id": 1681,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "createSLO",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
-              "id": 1469,
+              "id": 1657,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1464,
+                  "id": 1652,
+                  "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1493,
-                  "src": "813:11:6",
+                  "overrides": null,
+                  "scope": 1681,
+                  "src": "846:11:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -543,10 +578,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1463,
+                    "id": 1651,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "813:4:6",
+                    "src": "846:4:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -557,26 +592,28 @@
                 },
                 {
                   "constant": false,
-                  "id": 1466,
+                  "id": 1654,
+                  "mutability": "mutable",
                   "name": "_SLOType",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1493,
-                  "src": "826:21:6",
+                  "overrides": null,
+                  "scope": 1681,
+                  "src": "859:21:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_SLOTypes_$1339",
+                    "typeIdentifier": "t_enum$_SLOTypes_$1521",
                     "typeString": "enum SLO.SLOTypes"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1465,
+                    "id": 1653,
                     "name": "SLO.SLOTypes",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1339,
-                    "src": "826:12:6",
+                    "referencedDeclaration": 1521,
+                    "src": "859:12:5",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1339",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1521",
                       "typeString": "enum SLO.SLOTypes"
                     }
                   },
@@ -585,11 +622,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 1468,
+                  "id": 1656,
+                  "mutability": "mutable",
                   "name": "_name",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1493,
-                  "src": "849:13:6",
+                  "overrides": null,
+                  "scope": 1681,
+                  "src": "882:13:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -597,10 +636,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 1467,
+                    "id": 1655,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "849:7:6",
+                    "src": "882:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -610,25 +649,25 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "812:51:6"
+              "src": "845:51:5"
             },
             "returnParameters": {
-              "id": 1470,
+              "id": 1658,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "871:0:6"
+              "src": "904:0:5"
             },
-            "scope": 1508,
-            "src": "794:209:6",
+            "scope": 1697,
+            "src": "827:209:5",
             "stateMutability": "nonpayable",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 1506,
+              "id": 1695,
               "nodeType": "Block",
-              "src": "1302:42:6",
+              "src": "1335:42:5",
               "statements": [
                 {
                   "expression": {
@@ -638,26 +677,26 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 1501,
+                          "id": 1690,
                           "name": "userToSLOs",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1458,
-                          "src": "1319:10:6",
+                          "referencedDeclaration": 1644,
+                          "src": "1352:10:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1450_$dyn_storage_$",
+                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1635_$dyn_storage_$",
                             "typeString": "mapping(address => contract SLO[] storage ref)"
                           }
                         },
-                        "id": 1503,
+                        "id": 1692,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 1502,
+                          "id": 1691,
                           "name": "_user",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1495,
-                          "src": "1330:5:6",
+                          "referencedDeclaration": 1684,
+                          "src": "1363:5:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
@@ -668,51 +707,60 @@
                         "isPure": false,
                         "lValueRequested": false,
                         "nodeType": "IndexAccess",
-                        "src": "1319:17:6",
+                        "src": "1352:17:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage",
+                          "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage",
                           "typeString": "contract SLO[] storage ref"
                         }
                       }
                     ],
-                    "id": 1504,
+                    "id": 1693,
                     "isConstant": false,
                     "isInlineArray": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "TupleExpression",
-                    "src": "1318:19:6",
+                    "src": "1351:19:5",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage",
+                      "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage",
                       "typeString": "contract SLO[] storage ref"
                     }
                   },
-                  "functionReturnParameters": 1500,
-                  "id": 1505,
+                  "functionReturnParameters": 1689,
+                  "id": 1694,
                   "nodeType": "Return",
-                  "src": "1312:25:6"
+                  "src": "1345:25:5"
                 }
               ]
             },
-            "documentation": "@dev public view function that returns the service level objectives that\nthe given user has created\n@param _user Address of the user for which to return the service level\nobjectives",
-            "id": 1507,
+            "documentation": {
+              "id": 1682,
+              "nodeType": "StructuredDocumentation",
+              "src": "1042:221:5",
+              "text": " @dev public view function that returns the service level objectives that\n the given user has created\n @param _user Address of the user for which to return the service level\n objectives"
+            },
+            "functionSelector": "37676840",
+            "id": 1696,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "userSLOs",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
-              "id": 1496,
+              "id": 1685,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1495,
+                  "id": 1684,
+                  "mutability": "mutable",
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1507,
-                  "src": "1253:13:6",
+                  "overrides": null,
+                  "scope": 1696,
+                  "src": "1286:13:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -720,10 +768,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1494,
+                    "id": 1683,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1253:7:6",
+                    "src": "1286:7:5",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -734,44 +782,46 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1252:15:6"
+              "src": "1285:15:5"
             },
             "returnParameters": {
-              "id": 1500,
+              "id": 1689,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1499,
+                  "id": 1688,
+                  "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1507,
-                  "src": "1288:12:6",
+                  "overrides": null,
+                  "scope": 1696,
+                  "src": "1321:12:5",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_memory_ptr",
+                    "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_memory_ptr",
                     "typeString": "contract SLO[]"
                   },
                   "typeName": {
                     "baseType": {
                       "contractScope": null,
-                      "id": 1497,
+                      "id": 1686,
                       "name": "SLO",
                       "nodeType": "UserDefinedTypeName",
-                      "referencedDeclaration": 1450,
-                      "src": "1288:3:6",
+                      "referencedDeclaration": 1635,
+                      "src": "1321:3:5",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_SLO_$1450",
+                        "typeIdentifier": "t_contract$_SLO_$1635",
                         "typeString": "contract SLO"
                       }
                     },
-                    "id": 1498,
+                    "id": 1687,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "1288:5:6",
+                    "src": "1321:5:5",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage_ptr",
+                      "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage_ptr",
                       "typeString": "contract SLO[]"
                     }
                   },
@@ -779,117 +829,127 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1287:14:6"
+              "src": "1320:14:5"
             },
-            "scope": 1508,
-            "src": "1235:109:6",
+            "scope": 1697,
+            "src": "1268:109:5",
             "stateMutability": "view",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 1509,
-        "src": "210:1136:6"
+        "scope": 1698,
+        "src": "243:1136:5"
       }
     ],
-    "src": "0:1347:6"
+    "src": "32:1348:5"
   },
   "legacyAST": {
-    "absolutePath": "/Users/wilhempujar/Development/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol",
+    "absolutePath": "/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/SLORegistry.sol",
     "exportedSymbols": {
       "SLORegistry": [
-        1508
+        1697
       ]
     },
-    "id": 1509,
+    "id": 1698,
+    "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1452,
+        "id": 1637,
         "literals": [
           "solidity",
-          "0.5",
-          ".7"
+          "^",
+          "0.6",
+          ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:6"
+        "src": "32:23:5"
       },
       {
-        "absolutePath": "/Users/wilhempujar/Development/stacktical/stacktical-dsla-contracts/contracts/SLO/SLO.sol",
+        "absolutePath": "/Users/wilhempujar/Development/stacktical-dsla-contracts/contracts/SLO/SLO.sol",
         "file": "./SLO/SLO.sol",
-        "id": 1453,
+        "id": 1638,
         "nodeType": "ImportDirective",
-        "scope": 1509,
-        "sourceUnit": 1451,
-        "src": "24:23:6",
+        "scope": 1698,
+        "sourceUnit": 1636,
+        "src": "57:23:5",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
+        "abstract": false,
         "baseContracts": [],
         "contractDependencies": [
-          1450
+          1635
         ],
         "contractKind": "contract",
-        "documentation": "@title SLORegistry\n@dev SLORegistry is a contract for handling creation of service level\nobjectives and querying those service level objectives",
+        "documentation": {
+          "id": 1639,
+          "nodeType": "StructuredDocumentation",
+          "src": "82:160:5",
+          "text": " @title SLORegistry\n @dev SLORegistry is a contract for handling creation of service level\n objectives and querying those service level objectives"
+        },
         "fullyImplemented": true,
-        "id": 1508,
+        "id": 1697,
         "linearizedBaseContracts": [
-          1508
+          1697
         ],
         "name": "SLORegistry",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": false,
-            "id": 1458,
+            "id": 1644,
+            "mutability": "mutable",
             "name": "userToSLOs",
             "nodeType": "VariableDeclaration",
-            "scope": 1508,
-            "src": "312:44:6",
+            "overrides": null,
+            "scope": 1697,
+            "src": "345:44:5",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1450_$dyn_storage_$",
+              "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1635_$dyn_storage_$",
               "typeString": "mapping(address => contract SLO[])"
             },
             "typeName": {
-              "id": 1457,
+              "id": 1643,
               "keyType": {
-                "id": 1454,
+                "id": 1640,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
-                "src": "320:7:6",
+                "src": "353:7:5",
                 "typeDescriptions": {
                   "typeIdentifier": "t_address",
                   "typeString": "address"
                 }
               },
               "nodeType": "Mapping",
-              "src": "312:25:6",
+              "src": "345:25:5",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1450_$dyn_storage_$",
+                "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1635_$dyn_storage_$",
                 "typeString": "mapping(address => contract SLO[])"
               },
               "valueType": {
                 "baseType": {
                   "contractScope": null,
-                  "id": 1455,
+                  "id": 1641,
                   "name": "SLO",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 1450,
-                  "src": "331:3:6",
+                  "referencedDeclaration": 1635,
+                  "src": "364:3:5",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_SLO_$1450",
+                    "typeIdentifier": "t_contract$_SLO_$1635",
                     "typeString": "contract SLO"
                   }
                 },
-                "id": 1456,
+                "id": 1642,
                 "length": null,
                 "nodeType": "ArrayTypeName",
-                "src": "331:5:6",
+                "src": "364:5:5",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage_ptr",
+                  "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage_ptr",
                   "typeString": "contract SLO[]"
                 }
               }
@@ -899,37 +959,44 @@
           },
           {
             "anonymous": false,
-            "documentation": "@dev event for service level objective creation logging\n@param slo The address of the created service level objective contract",
-            "id": 1462,
+            "documentation": {
+              "id": 1645,
+              "nodeType": "StructuredDocumentation",
+              "src": "396:152:5",
+              "text": " @dev event for service level objective creation logging\n @param slo The address of the created service level objective contract"
+            },
+            "id": 1649,
             "name": "SLOCreated",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1461,
+              "id": 1648,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1460,
+                  "id": 1647,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "slo",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1462,
-                  "src": "537:15:6",
+                  "overrides": null,
+                  "scope": 1649,
+                  "src": "570:15:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_SLO_$1450",
+                    "typeIdentifier": "t_contract$_SLO_$1635",
                     "typeString": "contract SLO"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1459,
+                    "id": 1646,
                     "name": "SLO",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1450,
-                    "src": "537:3:6",
+                    "referencedDeclaration": 1635,
+                    "src": "570:3:5",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_SLO_$1450",
+                      "typeIdentifier": "t_contract$_SLO_$1635",
                       "typeString": "contract SLO"
                     }
                   },
@@ -937,43 +1004,45 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "536:17:6"
+              "src": "569:17:5"
             },
-            "src": "520:34:6"
+            "src": "553:34:5"
           },
           {
             "body": {
-              "id": 1492,
+              "id": 1680,
               "nodeType": "Block",
-              "src": "871:132:6",
+              "src": "904:132:5",
               "statements": [
                 {
                   "assignments": [
-                    1472
+                    1660
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1472,
+                      "id": 1660,
+                      "mutability": "mutable",
                       "name": "slo",
                       "nodeType": "VariableDeclaration",
-                      "scope": 1492,
-                      "src": "881:7:6",
+                      "overrides": null,
+                      "scope": 1680,
+                      "src": "914:7:5",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_SLO_$1450",
+                        "typeIdentifier": "t_contract$_SLO_$1635",
                         "typeString": "contract SLO"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1471,
+                        "id": 1659,
                         "name": "SLO",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1450,
-                        "src": "881:3:6",
+                        "referencedDeclaration": 1635,
+                        "src": "914:3:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       },
@@ -981,18 +1050,18 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1479,
+                  "id": 1667,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1475,
+                        "id": 1663,
                         "name": "_value",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1464,
-                        "src": "899:6:6",
+                        "referencedDeclaration": 1652,
+                        "src": "932:6:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1000,25 +1069,25 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 1476,
+                        "id": 1664,
                         "name": "_SLOType",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1466,
-                        "src": "907:8:6",
+                        "referencedDeclaration": 1654,
+                        "src": "940:8:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_SLOTypes_$1339",
+                          "typeIdentifier": "t_enum$_SLOTypes_$1521",
                           "typeString": "enum SLO.SLOTypes"
                         }
                       },
                       {
                         "argumentTypes": null,
-                        "id": 1477,
+                        "id": 1665,
                         "name": "_name",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1468,
-                        "src": "917:5:6",
+                        "referencedDeclaration": 1656,
+                        "src": "950:5:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
@@ -1032,7 +1101,7 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_enum$_SLOTypes_$1339",
+                          "typeIdentifier": "t_enum$_SLOTypes_$1521",
                           "typeString": "enum SLO.SLOTypes"
                         },
                         {
@@ -1040,31 +1109,31 @@
                           "typeString": "bytes32"
                         }
                       ],
-                      "id": 1474,
+                      "id": 1662,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "NewExpression",
-                      "src": "891:7:6",
+                      "src": "924:7:5",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_enum$_SLOTypes_$1339_$_t_bytes32_$returns$_t_contract$_SLO_$1450_$",
+                        "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_enum$_SLOTypes_$1521_$_t_bytes32_$returns$_t_contract$_SLO_$1635_$",
                         "typeString": "function (uint256,enum SLO.SLOTypes,bytes32) returns (contract SLO)"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1473,
+                        "id": 1661,
                         "name": "SLO",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1450,
-                        "src": "895:3:6",
+                        "referencedDeclaration": 1635,
+                        "src": "928:3:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       }
                     },
-                    "id": 1478,
+                    "id": 1666,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1072,14 +1141,15 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "891:32:6",
+                    "src": "924:32:5",
+                    "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_SLO_$1450",
+                      "typeIdentifier": "t_contract$_SLO_$1635",
                       "typeString": "contract SLO"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "881:42:6"
+                  "src": "914:42:5"
                 },
                 {
                   "expression": {
@@ -1087,14 +1157,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1485,
+                        "id": 1673,
                         "name": "slo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1472,
-                        "src": "961:3:6",
+                        "referencedDeclaration": 1660,
+                        "src": "994:3:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       }
@@ -1102,7 +1172,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       ],
@@ -1110,34 +1180,34 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 1480,
+                          "id": 1668,
                           "name": "userToSLOs",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1458,
-                          "src": "933:10:6",
+                          "referencedDeclaration": 1644,
+                          "src": "966:10:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1450_$dyn_storage_$",
+                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1635_$dyn_storage_$",
                             "typeString": "mapping(address => contract SLO[] storage ref)"
                           }
                         },
-                        "id": 1483,
+                        "id": 1671,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 1481,
+                            "id": 1669,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 2029,
-                            "src": "944:3:6",
+                            "referencedDeclaration": -15,
+                            "src": "977:3:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
                               "typeString": "msg"
                             }
                           },
-                          "id": 1482,
+                          "id": 1670,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1145,7 +1215,7 @@
                           "memberName": "sender",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": null,
-                          "src": "944:10:6",
+                          "src": "977:10:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address_payable",
                             "typeString": "address payable"
@@ -1156,13 +1226,13 @@
                         "isPure": false,
                         "lValueRequested": false,
                         "nodeType": "IndexAccess",
-                        "src": "933:22:6",
+                        "src": "966:22:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage",
+                          "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage",
                           "typeString": "contract SLO[] storage ref"
                         }
                       },
-                      "id": 1484,
+                      "id": 1672,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -1170,13 +1240,13 @@
                       "memberName": "push",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "933:27:6",
+                      "src": "966:27:5",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_contract$_SLO_$1450_$returns$_t_uint256_$",
-                        "typeString": "function (contract SLO) returns (uint256)"
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_contract$_SLO_$1635_$returns$__$",
+                        "typeString": "function (contract SLO)"
                       }
                     },
-                    "id": 1486,
+                    "id": 1674,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1184,15 +1254,16 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "933:32:6",
+                    "src": "966:32:5",
+                    "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
                     }
                   },
-                  "id": 1487,
+                  "id": 1675,
                   "nodeType": "ExpressionStatement",
-                  "src": "933:32:6"
+                  "src": "966:32:5"
                 },
                 {
                   "eventCall": {
@@ -1200,14 +1271,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1489,
+                        "id": 1677,
                         "name": "slo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1472,
-                        "src": "992:3:6",
+                        "referencedDeclaration": 1660,
+                        "src": "1025:3:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       }
@@ -1215,22 +1286,22 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_SLO_$1450",
+                          "typeIdentifier": "t_contract$_SLO_$1635",
                           "typeString": "contract SLO"
                         }
                       ],
-                      "id": 1488,
+                      "id": 1676,
                       "name": "SLOCreated",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1462,
-                      "src": "981:10:6",
+                      "referencedDeclaration": 1649,
+                      "src": "1014:10:5",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_SLO_$1450_$returns$__$",
+                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_SLO_$1635_$returns$__$",
                         "typeString": "function (contract SLO)"
                       }
                     },
-                    "id": 1490,
+                    "id": 1678,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1238,36 +1309,46 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "981:15:6",
+                    "src": "1014:15:5",
+                    "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1491,
+                  "id": 1679,
                   "nodeType": "EmitStatement",
-                  "src": "976:20:6"
+                  "src": "1009:20:5"
                 }
               ]
             },
-            "documentation": "@dev public function for creating service level objectives\n@param _value the value to check against\n@param _SLOType type of check\n@param _name name of the service level objective in bytes32",
-            "id": 1493,
+            "documentation": {
+              "id": 1650,
+              "nodeType": "StructuredDocumentation",
+              "src": "593:229:5",
+              "text": " @dev public function for creating service level objectives\n @param _value the value to check against\n @param _SLOType type of check\n @param _name name of the service level objective in bytes32"
+            },
+            "functionSelector": "b76e980f",
+            "id": 1681,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "createSLO",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
-              "id": 1469,
+              "id": 1657,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1464,
+                  "id": 1652,
+                  "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1493,
-                  "src": "813:11:6",
+                  "overrides": null,
+                  "scope": 1681,
+                  "src": "846:11:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1275,10 +1356,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1463,
+                    "id": 1651,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "813:4:6",
+                    "src": "846:4:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1289,26 +1370,28 @@
                 },
                 {
                   "constant": false,
-                  "id": 1466,
+                  "id": 1654,
+                  "mutability": "mutable",
                   "name": "_SLOType",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1493,
-                  "src": "826:21:6",
+                  "overrides": null,
+                  "scope": 1681,
+                  "src": "859:21:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_SLOTypes_$1339",
+                    "typeIdentifier": "t_enum$_SLOTypes_$1521",
                     "typeString": "enum SLO.SLOTypes"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 1465,
+                    "id": 1653,
                     "name": "SLO.SLOTypes",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 1339,
-                    "src": "826:12:6",
+                    "referencedDeclaration": 1521,
+                    "src": "859:12:5",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOTypes_$1339",
+                      "typeIdentifier": "t_enum$_SLOTypes_$1521",
                       "typeString": "enum SLO.SLOTypes"
                     }
                   },
@@ -1317,11 +1400,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 1468,
+                  "id": 1656,
+                  "mutability": "mutable",
                   "name": "_name",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1493,
-                  "src": "849:13:6",
+                  "overrides": null,
+                  "scope": 1681,
+                  "src": "882:13:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1329,10 +1414,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 1467,
+                    "id": 1655,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "849:7:6",
+                    "src": "882:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1342,25 +1427,25 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "812:51:6"
+              "src": "845:51:5"
             },
             "returnParameters": {
-              "id": 1470,
+              "id": 1658,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "871:0:6"
+              "src": "904:0:5"
             },
-            "scope": 1508,
-            "src": "794:209:6",
+            "scope": 1697,
+            "src": "827:209:5",
             "stateMutability": "nonpayable",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 1506,
+              "id": 1695,
               "nodeType": "Block",
-              "src": "1302:42:6",
+              "src": "1335:42:5",
               "statements": [
                 {
                   "expression": {
@@ -1370,26 +1455,26 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 1501,
+                          "id": 1690,
                           "name": "userToSLOs",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1458,
-                          "src": "1319:10:6",
+                          "referencedDeclaration": 1644,
+                          "src": "1352:10:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1450_$dyn_storage_$",
+                            "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_contract$_SLO_$1635_$dyn_storage_$",
                             "typeString": "mapping(address => contract SLO[] storage ref)"
                           }
                         },
-                        "id": 1503,
+                        "id": 1692,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 1502,
+                          "id": 1691,
                           "name": "_user",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1495,
-                          "src": "1330:5:6",
+                          "referencedDeclaration": 1684,
+                          "src": "1363:5:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
@@ -1400,51 +1485,60 @@
                         "isPure": false,
                         "lValueRequested": false,
                         "nodeType": "IndexAccess",
-                        "src": "1319:17:6",
+                        "src": "1352:17:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage",
+                          "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage",
                           "typeString": "contract SLO[] storage ref"
                         }
                       }
                     ],
-                    "id": 1504,
+                    "id": 1693,
                     "isConstant": false,
                     "isInlineArray": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "TupleExpression",
-                    "src": "1318:19:6",
+                    "src": "1351:19:5",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage",
+                      "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage",
                       "typeString": "contract SLO[] storage ref"
                     }
                   },
-                  "functionReturnParameters": 1500,
-                  "id": 1505,
+                  "functionReturnParameters": 1689,
+                  "id": 1694,
                   "nodeType": "Return",
-                  "src": "1312:25:6"
+                  "src": "1345:25:5"
                 }
               ]
             },
-            "documentation": "@dev public view function that returns the service level objectives that\nthe given user has created\n@param _user Address of the user for which to return the service level\nobjectives",
-            "id": 1507,
+            "documentation": {
+              "id": 1682,
+              "nodeType": "StructuredDocumentation",
+              "src": "1042:221:5",
+              "text": " @dev public view function that returns the service level objectives that\n the given user has created\n @param _user Address of the user for which to return the service level\n objectives"
+            },
+            "functionSelector": "37676840",
+            "id": 1696,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "userSLOs",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
-              "id": 1496,
+              "id": 1685,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1495,
+                  "id": 1684,
+                  "mutability": "mutable",
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1507,
-                  "src": "1253:13:6",
+                  "overrides": null,
+                  "scope": 1696,
+                  "src": "1286:13:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1452,10 +1546,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1494,
+                    "id": 1683,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1253:7:6",
+                    "src": "1286:7:5",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1466,44 +1560,46 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1252:15:6"
+              "src": "1285:15:5"
             },
             "returnParameters": {
-              "id": 1500,
+              "id": 1689,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1499,
+                  "id": 1688,
+                  "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1507,
-                  "src": "1288:12:6",
+                  "overrides": null,
+                  "scope": 1696,
+                  "src": "1321:12:5",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_memory_ptr",
+                    "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_memory_ptr",
                     "typeString": "contract SLO[]"
                   },
                   "typeName": {
                     "baseType": {
                       "contractScope": null,
-                      "id": 1497,
+                      "id": 1686,
                       "name": "SLO",
                       "nodeType": "UserDefinedTypeName",
-                      "referencedDeclaration": 1450,
-                      "src": "1288:3:6",
+                      "referencedDeclaration": 1635,
+                      "src": "1321:3:5",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_SLO_$1450",
+                        "typeIdentifier": "t_contract$_SLO_$1635",
                         "typeString": "contract SLO"
                       }
                     },
-                    "id": 1498,
+                    "id": 1687,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "1288:5:6",
+                    "src": "1321:5:5",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_contract$_SLO_$1450_$dyn_storage_ptr",
+                      "typeIdentifier": "t_array$_t_contract$_SLO_$1635_$dyn_storage_ptr",
                       "typeString": "contract SLO[]"
                     }
                   },
@@ -1511,24 +1607,24 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1287:14:6"
+              "src": "1320:14:5"
             },
-            "scope": 1508,
-            "src": "1235:109:6",
+            "scope": 1697,
+            "src": "1268:109:5",
             "stateMutability": "view",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 1509,
-        "src": "210:1136:6"
+        "scope": 1698,
+        "src": "243:1136:5"
       }
     ],
-    "src": "0:1347:6"
+    "src": "32:1348:5"
   },
   "compiler": {
     "name": "solc",
-    "version": "0.5.7+commit.6da8b019.Emscripten.clang"
+    "version": "0.6.12+commit.27d51765.Emscripten.clang"
   },
   "networks": {
     "3": {
@@ -1538,6 +1634,7 @@
           "inputs": [
             {
               "indexed": true,
+              "internalType": "contract SLO",
               "name": "slo",
               "type": "address"
             }
@@ -1547,15 +1644,24 @@
         }
       },
       "links": {},
-      "address": "0x482832Ae5a1f8e91326fAcFac59E384B9baee449",
-      "transactionHash": "0xdc688790cbf300593a500904a3d8584bd8d4372bd36cd638d2a4a9d6e4d132ab"
+      "address": "0xc5b8AB912F363b64aa9D1AD6D647d03b3E1CDeD0",
+      "transactionHash": "0xba7772c9d9edac68593626e99d52dbdb1dd933b2c1a3435ca2e27a4dc2cd3039"
     }
   },
-  "schemaVersion": "3.2.1",
-  "updatedAt": "2020-07-08T15:20:37.325Z",
+  "schemaVersion": "3.2.5",
+  "updatedAt": "2020-10-17T00:12:48.026Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "SLORegistry is a contract for handling creation of service level objectives and querying those service level objectives",
+    "events": {
+      "SLOCreated(address)": {
+        "details": "event for service level objective creation logging",
+        "params": {
+          "slo": "The address of the created service level objective contract"
+        }
+      }
+    },
+    "kind": "dev",
     "methods": {
       "createSLO(uint256,uint8,bytes32)": {
         "details": "public function for creating service level objectives",
@@ -1572,9 +1678,12 @@
         }
       }
     },
-    "title": "SLORegistry"
+    "title": "SLORegistry",
+    "version": 1
   },
   "userdoc": {
-    "methods": {}
+    "kind": "user",
+    "methods": {},
+    "version": 1
   }
 }
