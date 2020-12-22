@@ -6,6 +6,7 @@
   "scripts": {
     "test:local": "NODE_ENV=test TEST_ENV=local truffle test --network local",
     "test:local:specific": "NODE_ENV=test TEST_ENV=local truffle test --network local test/bdsla.test.js",
+    "test:local:messenger": "NODE_ENV=test TEST_ENV=local truffle test --network local test/messenger.test.js",
     "test:kovan": "NODE_ENV=test TEST_ENV=kovan truffle test --network kovan",
     "deploy:kovan": "truffle deploy --network kovan && npm run export-data",
     "deploy:kovan:reset": "truffle deploy --reset --network kovan && npm run export-data",
@@ -18,7 +19,7 @@
     "export-data:scripts": "npm run compile && npm run export-data:scripts:abis && npm run export-data:scripts:addresses && npm run export-data:scripts:natspec-docs",
     "export-data:scripts:abis": "truffle exec --network local scripts/export-abis.js",
     "export-data:scripts:addresses": "truffle exec --network local scripts/export-addresses.js",
-    "export-data:scripts:natspec-docs": "truffle exec --network local scripts/create-natspec-docs.js && prettier --write 'natspec-docs/**/**.json'"
+    "export-data:scripts:natspec-docs": "npm run compile && truffle exec --network local scripts/create-natspec-docs.js && prettier --write 'natspec-docs/**/**.json'"
   },
   "author": "DSLA Core Developers",
   "license": "ISC",

@@ -29,7 +29,7 @@ contract StringUtils {
         string memory _slaAddress,
         string memory _slaMonitoringStart,
         string memory _slaMonitoringStop
-    ) public pure returns (string memory query) {
+    ) internal pure returns (string memory query) {
         string memory qs1 =
             "https://dsla.network/api?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22";
         string memory qs2 = "%22%0A%20%20%20%20sla_monitoring_start%3A%20%22";
@@ -69,7 +69,7 @@ contract StringUtils {
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
         THE SOFTWARE.
     */
-    function _uintTostr(uint256 _i)
+    function _uintToStr(uint256 _i)
         internal
         pure
         returns (string memory _uintAsString)
