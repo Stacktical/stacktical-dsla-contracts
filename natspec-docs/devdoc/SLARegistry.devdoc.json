@@ -1,0 +1,63 @@
+{
+  "details": "SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements",
+  "events": {
+    "SLACreated(address,address)": {
+      "details": "event for service level agreement creation logging",
+      "params": {
+        "owner": "The address of the owner of the service level agreement",
+        "sla": "The address of the created service level agreement contract"
+      }
+    }
+  },
+  "kind": "dev",
+  "methods": {
+    "SLACount()": {
+      "details": "public view function that returns the total amount of service level agreements"
+    },
+    "allSLAs()": {
+      "details": "public view function that returns all the service level agreements"
+    },
+    "constructor": {
+      "details": "constructor",
+      "params": {
+        "_messengerAddress": "the address of the chainlink messenger contract"
+      }
+    },
+    "createSLA(address,bytes32[],address[],uint256,string,uint256,address,uint256[],uint256[])": {
+      "details": "public function for creating service level agreements",
+      "params": {
+        "_SLONames": "Array of the names of the service level objectives in bytes32",
+        "_SLOs": "Array of service level objective contract addressess service level objective breach",
+        "_ipfsHash": "String with the ipfs hash that contains extra information about the service level agreement",
+        "_owner": "Address of the owner of the service level agreement",
+        "_sliInterval": "uint the interval in seconds between requesting a new SLI",
+        "_stake": "Uint of the amount required to stake when signing the service level agreement"
+      }
+    },
+    "getActivePool(address)": {
+      "details": "returns the active pools owned by a user."
+    },
+    "requestSLI(uint256,address,bytes32)": {
+      "details": "Gets SLI information for the specified SLA and SLO",
+      "params": {
+        "_periodId": "Oracle Proof",
+        "_sla": "SLA Address",
+        "_sloName": "SLO Name"
+      }
+    },
+    "userSLACount(address)": {
+      "details": "public view function that returns the amount of service level agreements the given user is the owner of",
+      "params": {
+        "_user": "Address of the user for which to return the amount of service level agreements"
+      }
+    },
+    "userSLAs(address)": {
+      "details": "public view function that returns the service level agreements that the given user is the owner of",
+      "params": {
+        "_user": "Address of the user for which to return the service level agreements"
+      }
+    }
+  },
+  "title": "SLARegistry",
+  "version": 1
+}

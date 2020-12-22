@@ -44,7 +44,7 @@ const addresses = (adminWallet) => ({
   },
 });
 
-const base_path = "../exported_data";
+const base_path = "../exported-data";
 const fileName = "addresses.ts";
 const startingLine = "const addresses = ";
 const finalLineLine = "\n\nexport default addresses";

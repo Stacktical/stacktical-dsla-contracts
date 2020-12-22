@@ -1,0 +1,30 @@
+{
+  "details": "SLORegistry is a contract for handling creation of service level objectives and querying those service level objectives",
+  "events": {
+    "SLOCreated(address)": {
+      "details": "event for service level objective creation logging",
+      "params": {
+        "slo": "The address of the created service level objective contract"
+      }
+    }
+  },
+  "kind": "dev",
+  "methods": {
+    "createSLO(uint256,uint8,bytes32)": {
+      "details": "public function for creating service level objectives",
+      "params": {
+        "_SLOType": "type of check",
+        "_name": "name of the service level objective in bytes32",
+        "_value": "the value to check against"
+      }
+    },
+    "userSLOs(address)": {
+      "details": "public view function that returns the service level objectives that the given user has created",
+      "params": {
+        "_user": "Address of the user for which to return the service level objectives"
+      }
+    }
+  },
+  "title": "SLORegistry",
+  "version": 1
+}

@@ -34,7 +34,7 @@ const files = {
   },
 };
 
-const base_path = "../exported_data";
+const base_path = "../exported-data";
 
 module.exports = async (callback) => {
   try {

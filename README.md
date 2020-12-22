@@ -49,3 +49,6 @@ TODO
 * SLA: Service level agreement, multiple contracts can be deployed
 * SLO: Service level objective, multiple contracts can be deployed
 * MinimalSLA: used only for testing purposes. It is used by the Messenger contract to test integration
+
+### Documentation
+NATSpec userdoc and devdocs JSON files are included in natspec-docs directory

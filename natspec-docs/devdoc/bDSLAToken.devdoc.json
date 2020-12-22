@@ -1,0 +1,94 @@
+{
+  "details": "{bDSLA} token, including:  - ability for holders to burn (destroy) their tokens  - a minter role that allows for token minting (creation)  - a pauser role that allows to stop all token transfers  - a claim procces for DSLA owners This contract uses {AccessControl} to lock permissioned functions using the different roles. The account that deploys the contract will be granted the minter and pauser roles, as well as the default admin role, which will let it grant both minter and pauser roles to other accounts.",
+  "kind": "dev",
+  "methods": {
+    "allowance(address,address)": { "details": "See {IERC20-allowance}." },
+    "approve(address,uint256)": {
+      "details": "See {IERC20-approve}. Requirements: - `spender` cannot be the zero address."
+    },
+    "balanceOf(address)": { "details": "See {IERC20-balanceOf}." },
+    "burn(uint256)": {
+      "details": "Destroys `amount` tokens from the caller. See {ERC20-_burn}."
+    },
+    "burnFrom(address,uint256)": {
+      "details": "Destroys `amount` tokens from `account`, deducting from the caller's allowance. See {ERC20-_burn} and {ERC20-allowance}. Requirements: - the caller must have allowance for ``accounts``'s tokens of at least `amount`."
+    },
+    "claim(address)": {
+      "details": "creates new 'bDSLA' tokens for the `_claimer`.",
+      "params": {
+        "_claimer": "address of the claimer Requirements: - the caller must have the `(MINTER_ROLE)`. - the claimer should have an allowed balance - the claim can be done just once"
+      }
+    },
+    "constructor": {
+      "details": "Sets the values for {name} and {symbol}, {decimals} have a default value of 18. All three of these values are immutable: they can only be set once during construction."
+    },
+    "decimals()": {
+      "details": "Returns the number of decimals used to get its user representation. For example, if `decimals` equals `2`, a balance of `505` tokens should be displayed to a user as `5,05` (`505 / 10 ** 2`). Tokens usually opt for a value of 18, imitating the relationship between Ether and Wei. This is the value {ERC20} uses, unless {_setupDecimals} is called. NOTE: This information is only used for _display_ purposes: it in no way affects any of the arithmetic of the contract, including {IERC20-balanceOf} and {IERC20-transfer}."
+    },
+    "decreaseAllowance(address,uint256)": {
+      "details": "Atomically decreases the allowance granted to `spender` by the caller. This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}. Emits an {Approval} event indicating the updated allowance. Requirements: - `spender` cannot be the zero address. - `spender` must have allowance for the caller of at least `subtractedValue`."
+    },
+    "getRoleAdmin(bytes32)": {
+      "details": "Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}."
+    },
+    "getRoleMember(bytes32,uint256)": {
+      "details": "Returns one of the accounts that have `role`. `index` must be a value between 0 and {getRoleMemberCount}, non-inclusive. Role bearers are not sorted in any particular way, and their ordering may change at any point. WARNING: When using {getRoleMember} and {getRoleMemberCount}, make sure you perform all queries on the same block. See the following https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum post] for more information."
+    },
+    "getRoleMemberCount(bytes32)": {
+      "details": "Returns the number of accounts that have `role`. Can be used together with {getRoleMember} to enumerate all bearers of a role."
+    },
+    "grantRole(bytes32,address)": {
+      "details": "Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role."
+    },
+    "hasRole(bytes32,address)": {
+      "details": "Returns `true` if `account` has been granted `role`."
+    },
+    "increaseAllowance(address,uint256)": {
+      "details": "Atomically increases the allowance granted to `spender` by the caller. This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}. Emits an {Approval} event indicating the updated allowance. Requirements: - `spender` cannot be the zero address."
+    },
+    "mint(address,uint256)": {
+      "details": "Creates `amount` new tokens for `to`."
+    },
+    "name()": { "details": "Returns the name of the token." },
+    "pause()": {
+      "details": "Pauses all token transfers. See {ERC20Pausable} and {Pausable-_pause}. Requirements: - the caller must have the `PAUSER_ROLE`."
+    },
+    "paused()": {
+      "details": "Returns true if the contract is paused, and false otherwise."
+    },
+    "renounceRole(bytes32,address)": {
+      "details": "Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`."
+    },
+    "revokeRole(bytes32,address)": {
+      "details": "Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role."
+    },
+    "setAllowedAmount(uint256,address)": {
+      "details": "allows the claim of `_amount` for `_claimer`.",
+      "params": {
+        "_amount": "uint the equivalent amount of DSLA tokens on the mainnet",
+        "_claimer": "address of the claimer Requirements: - the caller must have the `(DEFAULT_ADMIN_ROLE)`."
+      }
+    },
+    "setAllowedAmounts(uint256[],address[])": {
+      "details": "allows the claim of `_amounts` for `_claimers`.",
+      "params": {
+        "_amounts": "an array of amounts to be claimed",
+        "_claimers": "an array of addresses of the claimers Requirements: - the caller must have the `(DEFAULT_ADMIN_ROLE)`."
+      }
+    },
+    "symbol()": {
+      "details": "Returns the symbol of the token, usually a shorter version of the name."
+    },
+    "totalSupply()": { "details": "See {IERC20-totalSupply}." },
+    "transfer(address,uint256)": {
+      "details": "See {IERC20-transfer}. Requirements: - `recipient` cannot be the zero address. - the caller must have a balance of at least `amount`."
+    },
+    "transferFrom(address,address,uint256)": {
+      "details": "See {IERC20-transferFrom}. Emits an {Approval} event indicating the updated allowance. This is not required by the EIP. See the note at the beginning of {ERC20}; Requirements: - `sender` and `recipient` cannot be the zero address. - `sender` must have a balance of at least `amount`. - the caller must have allowance for ``sender``'s tokens of at least `amount`."
+    },
+    "unpause()": {
+      "details": "Unpauses all token transfers. See {ERC20Pausable} and {Pausable-_unpause}. Requirements: - the caller must have the `PAUSER_ROLE`."
+    }
+  },
+  "version": 1
+}

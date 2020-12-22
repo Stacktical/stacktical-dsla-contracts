@@ -1,0 +1,56 @@
+{
+  "details": "SLA is a service level agreement contract used for service downtime compensation",
+  "events": {
+    "SLICreated(uint256,uint256,uint256)": {
+      "details": "event for SLI creation logging",
+      "params": {
+        "_periodId": "the id of the given period",
+        "_timestamp": "the time the SLI has been registered",
+        "_value": "the value of the SLI"
+      }
+    }
+  },
+  "kind": "dev",
+  "methods": {
+    "constructor": {
+      "details": "constructor",
+      "params": {
+        "_SLONames": "the names of the service level objectives in a bytes32 array",
+        "_SLOs": "an array with the service level objective addresses",
+        "_ipfsHash": "the ipfs hash that stores extra information about the agreement",
+        "_owner": "the owner of the service level agreement",
+        "_stake": "the amount required to stake when subscribing to the agreement"
+      }
+    },
+    "getDetails()": {
+      "details": "external view function that returns all agreement information"
+    },
+    "getSLI(bytes32)": {
+      "details": "external function to get SLI",
+      "params": { "_SLOName": "the name of the SLO in bytes32" }
+    },
+    "getSliInterval()": {
+      "details": "external view function that returns the sliInterval value"
+    },
+    "owner()": { "details": "Returns the address of the current owner." },
+    "registerSLI(bytes32,uint256,uint256)": {
+      "details": "external function to register SLI's and check them against the SLO's",
+      "params": {
+        "_SLOName": "the name of the SLO in bytes32",
+        "_periodId": "the id of the given period",
+        "_value": "the value of the SLI to check"
+      }
+    },
+    "renounceOwnership()": {
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+    },
+    "stakersCount()": {
+      "details": "public view function that returns the total amount of stakers"
+    },
+    "transferOwnership(address)": {
+      "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+    }
+  },
+  "title": "SLA",
+  "version": 1
+}
