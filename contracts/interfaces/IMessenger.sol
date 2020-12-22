@@ -13,12 +13,12 @@ interface IMessenger {
     /**
      * @dev Creates a request to get a new SLI value for the
      * given slo
-     * @param _data the decentralized oracle payload
+     * @param _periodId the id for the given period
      * @param _sla the service level agreement we are verifying the SLI for
      * @param _sloName the name of the SLO for which SLI must be computed
      */
     function requestSLI(
-        bytes calldata _data,
+        uint256 _periodId,
         SLA _sla,
         bytes32 _sloName
     ) external;

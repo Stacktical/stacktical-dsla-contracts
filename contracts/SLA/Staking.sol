@@ -301,4 +301,8 @@ contract Staking is Ownable {
     function stakersCount() public view returns (uint256) {
         return stakers.length;
     }
+
+    function getPeriodData(uint256 _periodId) public view returns (uint256 periodStart, uint256 periodEnd){
+        return (periods[_periodId].sla_period_start,periods[_periodId].sla_period_end);
+    }
 }

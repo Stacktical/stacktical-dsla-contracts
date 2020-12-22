@@ -88,16 +88,16 @@ contract SLARegistry {
 
     /**
      * @dev Gets SLI information for the specified SLA and SLO
-     * @param _data Oracle Proof
+     * @param _periodId Oracle Proof
      * @param _sla SLA Address
      * @param _sloName SLO Name
      */
     function requestSLI(
-        bytes memory _data,
+        uint256 _periodId,
         SLA _sla,
         bytes32 _sloName
     ) public {
-        messenger.requestSLI(_data, _sla, _sloName);
+        messenger.requestSLI(_periodId, _sla, _sloName);
     }
 
     /**
