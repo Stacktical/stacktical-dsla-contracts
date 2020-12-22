@@ -10,8 +10,8 @@
     "constructor": {
       "details": "parameterize the variables according to network",
       "params": {
-        "_chainlinkOracle": "the address of the oracle to create requests to",
         "_chainlinkToken": "the address of LINK token contract",
+        "_chainlinkOracle": "the address of the oracle to create requests to",
         "_jobId": "the job id for the HTTPGet job"
       }
     },
@@ -25,16 +25,16 @@
     "getPeriod(address,uint256)": {
       "details": "gets the start and end of a given SLA on a given period",
       "params": {
-        "_periodId": "id of the period",
-        "_slaAddress": "address of the SLA Contract"
+        "_slaAddress": "address of the SLA Contract",
+        "_periodId": "id of the period"
       }
     },
     "requestSLI(uint256,address,bytes32)": {
       "details": "creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.",
       "params": {
-        "_periodId": "value of the period id",
         "_sla": "SLA Address",
-        "_sloName": "the SLO name to get the SLI value for"
+        "_sloName": "the SLO name to get the SLI value for",
+        "_periodId": "value of the period id"
       }
     },
     "setSLARegistry()": {
