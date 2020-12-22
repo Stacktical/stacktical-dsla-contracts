@@ -25,7 +25,8 @@ Truffle `5.0.10`
 Make use of the deployment scripts. The scripts will:
 
     - Deploy to the specified network (included on the script name).
-    - Export files to exported_data, to be exported to the frontend project.
+    - Export files to exported-data, to be exported to the frontend project.
+    - Export NATSpec documentation to natspec-docs.
 
 ### Local
 
@@ -51,4 +52,21 @@ TODO
 * MinimalSLA: used only for testing purposes. It is used by the Messenger contract to test integration
 
 ### Documentation
-NATSpec userdoc and devdocs JSON files are included in natspec-docs directory
+NATSpec userdoc and devdoc JSON files are included in natspec-docs directory
+
+## Scripts
+    test:local = run automated tests on local network
+    test:local:specific = run the test specified at the end of the line on local network
+    test:kovan = run automated tests on kovan network
+    deploy:kovan = deploy updates to kovan network
+    deploy:kovan:reset = deploy everything forced to kovan network
+    deploy:local = deploy updates to local network
+    deploy:local:reset = deploy everything forced to local network
+    remix = connect remix to local repository
+    compile = compile contracts using truffle
+    prettier:contracts = prettify contracts
+    export-data = exports addresses, abis and create the natspec-docs
+    export-data:scripts = runs the below scripts
+    export-data:scripts:abis = creates the abis
+    export-data:scripts:addresses = creates the addresses.ts file
+    export-data:scripts:natspec-docs = create the natspec-docs on natspec-docs folder

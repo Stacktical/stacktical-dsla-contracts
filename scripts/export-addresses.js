@@ -47,7 +47,7 @@ const addresses = (adminWallet) => ({
 const base_path = "../exported-data";
 const fileName = "addresses.ts";
 const startingLine = "const addresses = ";
-const finalLineLine = "\n\nexport default addresses";
+const finalLine = "\n\nexport default addresses";
 
 module.exports = async (callback) => {
   try {
@@ -55,7 +55,7 @@ module.exports = async (callback) => {
     const formatedAddresses = addresses(owner);
     fs.writeFileSync(
       path.resolve(__dirname, base_path + "/" + fileName),
-      startingLine + JSON.stringify(formatedAddresses) + finalLineLine
+      startingLine + JSON.stringify(formatedAddresses) + finalLine
     );
 
     callback(null);
