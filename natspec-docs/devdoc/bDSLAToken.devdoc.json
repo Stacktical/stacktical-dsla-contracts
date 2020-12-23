@@ -16,7 +16,7 @@
     "claim(address)": {
       "details": "creates new 'bDSLA' tokens for the `_claimer`.",
       "params": {
-        "_claimer": "address of the claimer Requirements: - the caller must have the `(MINTER_ROLE)`. - the claimer should have an allowed balance - the claim can be done just once"
+        "_claimer": "1. address of the claimer Requirements: - the caller must have the `(MINTER_ROLE)`. - the claimer should have an allowed balance - the claim can be done just once"
       }
     },
     "constructor": {
@@ -47,7 +47,8 @@
       "details": "Atomically increases the allowance granted to `spender` by the caller. This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}. Emits an {Approval} event indicating the updated allowance. Requirements: - `spender` cannot be the zero address."
     },
     "mint(address,uint256)": {
-      "details": "Creates `amount` new tokens for `to`."
+      "details": "Creates `amount` new tokens for `to`.",
+      "params": { "to": "1. address of receiver", "amount": "2. minted amount" }
     },
     "name()": { "details": "Returns the name of the token." },
     "pause()": {
@@ -65,15 +66,15 @@
     "setAllowedAmount(uint256,address)": {
       "details": "allows the claim of `_amount` for `_claimer`.",
       "params": {
-        "_claimer": "address of the claimer Requirements: - the caller must have the `(DEFAULT_ADMIN_ROLE)`.",
-        "_amount": "uint the equivalent amount of DSLA tokens on the mainnet"
+        "_amount": "1. uint the equivalent amount of DSLA tokens on the mainnet",
+        "_claimer": "2. address of the claimer Requirements: - the caller must have the `(DEFAULT_ADMIN_ROLE)`."
       }
     },
     "setAllowedAmounts(uint256[],address[])": {
       "details": "allows the claim of `_amounts` for `_claimers`.",
       "params": {
-        "_claimers": "an array of addresses of the claimers Requirements: - the caller must have the `(DEFAULT_ADMIN_ROLE)`.",
-        "_amounts": "an array of amounts to be claimed"
+        "_amounts": "1. an array of amounts to be claimed",
+        "_claimers": "2. an array of addresses of the claimers Requirements: - the caller must have the `(DEFAULT_ADMIN_ROLE)`."
       }
     },
     "symbol()": {

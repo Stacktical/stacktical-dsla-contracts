@@ -29,10 +29,7 @@ contract bDSLAToken is ERC20PresetMinterPauser {
     /**
      * @dev Sets the values for {name} and {symbol}, {decimals} have
      * a default value of 18.
-     *
-     *
-     * All three of these values are immutable: they can only be set once during
-     * construction.
+     * @notice token name: bDSLA , token symbol: bDSLA
      */
     constructor() public ERC20PresetMinterPauser("bDSLA", "bDSLA") {
     }
@@ -43,8 +40,8 @@ contract bDSLAToken is ERC20PresetMinterPauser {
      * mainnet.
      * @dev allows the claim of `_amount` for `_claimer`.
      *
-     * @param _amount uint the equivalent amount of DSLA tokens on the mainnet
-     * @param _claimer address of the claimer
+     * @param _amount 1. uint the equivalent amount of DSLA tokens on the mainnet
+     * @param _claimer 2. address of the claimer
      *
      *
      * Requirements:
@@ -64,8 +61,8 @@ contract bDSLAToken is ERC20PresetMinterPauser {
      *
      * @dev allows the claim of `_amounts` for `_claimers`.
      *
-     * @param _amounts an array of amounts to be claimed
-     * @param _claimers an array of addresses of the claimers
+     * @param _amounts 1. an array of amounts to be claimed
+     * @param _claimers 2. an array of addresses of the claimers
      *
      *
      * Requirements:
@@ -89,7 +86,7 @@ contract bDSLAToken is ERC20PresetMinterPauser {
      *
      * @dev creates new 'bDSLA' tokens for the `_claimer`.
      *
-     * @param _claimer address of the claimer
+     * @param _claimer 1. address of the claimer
      *
      *
      * Requirements:
@@ -108,6 +105,8 @@ contract bDSLAToken is ERC20PresetMinterPauser {
 
     /**
     * @dev Creates `amount` new tokens for `to`.
+    * @param to 1. address of receiver
+    * @param amount 2. minted amount
     */
     function mint(address to, uint256 amount) public override {
         _mint(to, amount);
