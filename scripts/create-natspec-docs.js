@@ -13,8 +13,7 @@ const documentedContracts = [
 const basePath = "../natspec-docs";
 const devPath = "/devdoc";
 const userPath = "/userdoc";
-const fileNameDev = ".devdoc.json";
-const fileNameUser = ".userdoc.json";
+const fileExtension = ".json";
 
 // sort object fields by value ascending
 const sortObject = (object) =>
@@ -56,14 +55,14 @@ module.exports = async (callback) => {
       fs.writeFileSync(
         path.resolve(
           __dirname,
-          basePath + devPath + "/" + contract + fileNameDev
+          basePath + devPath + "/" + contract + fileExtension
         ),
         JSON.stringify(devdoc)
       );
       fs.writeFileSync(
         path.resolve(
           __dirname,
-          basePath + userPath + "/" + contract + fileNameUser
+          basePath + userPath + "/" + contract + fileExtension
         ),
         JSON.stringify(userdoc)
       );

@@ -33,7 +33,7 @@ const environments = {
     web3WebsocketProviderUrl: "ws://localhost:8545",
     chainlinkOracleAddress: "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
     chainlinkTokenAddress: "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
-    chainlinkJobId: "0x" + "aa62bb58d9304ce581ac3a2e36452383",
+    chainlinkJobId: "0x" + "85f9d7f5637b4ad98125fec3cb06347f",
   },
 };
 
