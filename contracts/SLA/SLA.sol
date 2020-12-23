@@ -126,11 +126,11 @@ contract SLA is Ownable, Staking {
 
         emit SLICreated(block.timestamp, _value, _periodId);
 
-//        if (!SLOs[_SLOName].isSLOHonored(_value)) {
-//            periods[_periodId].status = Status.NotRespected;
-//        } else {
-//            periods[_periodId].status = Status.Respected;
-//        }
+        if (!SLOs[_SLOName].isSLOHonored(_value)) {
+            periods[_periodId].status = Status.NotRespected;
+        } else {
+            periods[_periodId].status = Status.Respected;
+        }
     }
 
     /**

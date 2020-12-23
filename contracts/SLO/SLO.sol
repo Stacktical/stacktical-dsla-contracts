@@ -55,7 +55,7 @@ contract SLO {
      * @param _value The SLI value to check against the SL
      * @return boolean with the SLO honored state
      */
-    function isSLOHonored(uint256 _value) external view returns (bool) {
+    function isSLOHonored(uint256 _value) public view returns (bool) {
         if (SLOType == SLOTypes.EqualTo) {
             return _value == value;
         }
@@ -79,7 +79,6 @@ contract SLO {
         if (SLOType == SLOTypes.GreaterOrEqualTo) {
             return _value >= value;
         }
-
-        revert("isSLOHonoured couldn't be executed properly");
+        revert("isSLOHonoured wasn't executed properly");
     }
 }

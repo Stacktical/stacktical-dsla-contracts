@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+import { expect } from "chai";
 
 const IERC20 = artifacts.require("IERC20");
 const SLA = artifacts.require("SLA");
@@ -17,7 +17,8 @@ const stakeAmount1 = toWei(String(initialTokenSupply / 10));
 const stakeAmount2 = toWei(String(initialTokenSupply / 5));
 const periodId = 0;
 const sloValue = 95000;
-const sloName = "staking_efficiency";
+const sloType = 4;
+const sloName = utf8ToHex("staking_efficiency");
 
 describe("SLARegistry", function () {
   let owner,
@@ -54,9 +55,8 @@ describe("SLARegistry", function () {
     slaRegistry = await SLARegistry.new(messenger.address);
 
     sloRegistry = await SLORegistry.new();
-    const sloNameHex = utf8ToHex(sloName);
     // 4 is "GreatherThan"
-    await sloRegistry.createSLO(sloValue, 4, sloNameHex);
+    await sloRegistry.createSLO(sloValue, sloType, sloName);
     userSlos = await sloRegistry.userSLOs.call(owner);
 
     // Register the SLAs
@@ -70,7 +70,7 @@ describe("SLARegistry", function () {
 
     await slaRegistry.createSLA(
       owner,
-      [sloNameHex],
+      [sloName],
       userSlos,
       _stake,
       _ipfsHash,
@@ -83,7 +83,7 @@ describe("SLARegistry", function () {
 
     await slaRegistry.createSLA(
       owner,
-      [sloNameHex],
+      [sloName],
       userSlos,
       _stake,
       _ipfsHash,
@@ -148,12 +148,11 @@ describe("SLARegistry", function () {
     const SLICreatedEvent = "SLICreated";
     const [sla1] = SLAs;
     const { _sla_period_starts, _sla_period_ends } = slaConstructor;
-    const sloName = userSlos[0];
     const periodStart = _sla_period_starts[periodId];
     const periodEnd = _sla_period_ends[periodId];
 
     // Fund the messenger contract with LINK
-    await chainlinkToken.transfer(messenger.address, web3.utils.toWei("0.2"));
+    await chainlinkToken.transfer(messenger.address, web3.utils.toWei("0.1"));
     await slaRegistry.requestSLI(periodId, sla1.address, sloName);
     const eventDetected = await eventListener(sla1, SLICreatedEvent);
     const expectedSLI1 = await getSLI(sla1.address, periodStart, periodEnd);
@@ -166,5 +165,9 @@ describe("SLARegistry", function () {
     };
     expect(eventDetected.name).to.equal(expectedResponse.name);
     expect(eventDetected.values).to.include(expectedResponse.values);
+    const { status } = await sla1.periods.call(periodId);
+    // 1 is Respected. Is expected to be 1 because the sloType is 4 "GreaterThan"
+    // and the production API is returning 100
+    expect(status.toString()).to.equal("1");
   });
 });
