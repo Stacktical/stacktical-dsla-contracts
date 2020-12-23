@@ -32,10 +32,15 @@ contract Messenger is ChainlinkClient, StringUtils {
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
     uint256 public fee = 0.1 * 10**18;
 
-
-    ///@dev event emitted when having a response from Chainlink with the SLI
+    /**
+     * @dev event emitted when having a response from Chainlink with the SLI
+     * @param slaAddress 1. SLA address to store the SLI
+     * @param sliValue 2. SLI value
+     * @param sloName 3. SLO name
+     * @param _periodId 4. id of the period
+     */
     event SLIReceived(
-        address slaAdress,
+        address slaAddress,
         uint256 sliValue,
         bytes32 sloName,
         uint256 _periodId
@@ -127,14 +132,14 @@ contract Messenger is ChainlinkClient, StringUtils {
     {
         Request memory request = requestIdToRequest[_requestId];
 
-        request.sla.registerSLI(request.sloName, _sliValue, request.periodId);
-
         emit SLIReceived(
             address(request.sla),
             _sliValue,
             request.sloName,
             request.periodId
         );
+
+        request.sla.registerSLI(request.sloName, _sliValue, request.periodId);
     }
 
     /**

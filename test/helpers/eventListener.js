@@ -14,6 +14,8 @@ const contractCreator = (contract) => {
   }
 };
 
+// returns the second half of values, since the first half is only the position
+// of the value. e.g. {0:'hola','message':hola}
 const filterEventValues = (values) => {
   const valuesCount = Object.keys(values).length;
   const splicedEntries = Object.entries(values).slice(
@@ -39,9 +41,6 @@ export const eventListener = async (contract, event) => {
         }
         const { event: name, returnValues: values } = result;
         const response = { name, values: filterEventValues(values) };
-        if (process.env.NODE_ENV === "test") {
-          console.log(response);
-        }
         if (result.event === event) {
           return resolve(response);
         }

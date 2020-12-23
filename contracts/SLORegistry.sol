@@ -21,9 +21,9 @@ contract SLORegistry {
 
     /**
      * @dev public function for creating service level objectives
-     * @param _value the value to check against
-     * @param _SLOType type of check
-     * @param _name name of the service level objective in bytes32
+     * @param _value 1. the value to check against
+     * @param _SLOType 2. type of check
+     * @param _name 3. name of the service level objective in bytes32
      */
     function createSLO(
         uint256 _value,
@@ -41,7 +41,7 @@ contract SLORegistry {
      * the given user has created
      * @param _user Address of the user for which to return the service level
      * objectives
-     * @return SLO a service level objective that corresponds to the _user params
+     * @return SLO an array of service level objectives that corresponds to the _user params
      */
     function userSLOs(address _user) public view returns (SLO[] memory) {
         return (userToSLOs[_user]);

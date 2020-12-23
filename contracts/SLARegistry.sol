@@ -102,7 +102,7 @@ contract SLARegistry {
 
     /**
      * @dev Gets SLI information for the specified SLA and SLO
-     * @param _periodId 1. Oracle Proof
+     * @param _periodId 1. id of the period
      * @param _sla 2. SLA Address
      * @param _sloName 3. SLO Name
      */
