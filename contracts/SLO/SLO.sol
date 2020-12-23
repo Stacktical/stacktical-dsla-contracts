@@ -6,7 +6,7 @@ pragma solidity ^0.6.0;
  * @dev SLO is a service level objective contract used to check SLI's against
  */
 contract SLO {
-    /// @dev checking types to check if a SLA was honoured or not
+    /// @dev checking types to check if a SLA was honored or not
     enum SLOTypes {
         EqualTo,
         NotEqualTo,
@@ -53,7 +53,7 @@ contract SLO {
     /**
      * @dev external view function to check a value against the SLO
      * @param _value The SLI value to check against the SL
-     * @return boolean with the SLO honoured state
+     * @return boolean with the SLO honored state
      */
     function isSLOHonored(uint256 _value) external view returns (bool) {
         if (SLOType == SLOTypes.EqualTo) {

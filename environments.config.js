@@ -23,17 +23,11 @@ const environments = {
     chainlinkTokenAddress: null,
     chainlinkJobId: null,
   },
-  chainlink: {
-    web3WebsocketProviderUrl: `wss://${CHAINLINK_TEST_IP}:${CHAINLINK_TEST_PORT}`,
-    chainlinkOracleAddress: "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
-    chainlinkTokenAddress: "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
-    chainlinkJobId: "0x" + "fc51c865f7cd4fce909809a9adb6d64f",
-  },
   local: {
     web3WebsocketProviderUrl: "ws://localhost:8545",
     chainlinkOracleAddress: "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
     chainlinkTokenAddress: "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
-    chainlinkJobId: "0x" + "85f9d7f5637b4ad98125fec3cb06347f",
+    chainlinkJobId: "0x" + "40f1798b36704e9ebc5c3e985f69f648",
   },
 };
 

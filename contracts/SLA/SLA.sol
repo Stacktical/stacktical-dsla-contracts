@@ -57,7 +57,10 @@ contract SLA is Ownable, Staking {
      * @dev throws if called by any address other than the messenger contract.
      */
     modifier onlyMessenger() {
-        require(msg.sender == address(registry.messenger()));
+        require(
+            msg.sender == address(registry.messenger()),
+            "Only Messenger can call this funtcion"
+        );
         _;
     }
 
@@ -90,8 +93,11 @@ contract SLA is Ownable, Staking {
         public
         Staking(_tokenAddress, _sla_period_starts, _sla_period_ends, _owner)
     {
-        require(_SLOs.length < 5);
-        require(_SLONames.length == _SLOs.length);
+        require(_SLOs.length < 5, "max amount of SLOs is 5");
+        require(
+            _SLONames.length == _SLOs.length,
+            "_SLONames and _SLOs should have the same length"
+        );
 
         for (uint256 i = 0; i < _SLOs.length; i++) {
             SLOs[_SLONames[i]] = _SLOs[i];
@@ -120,11 +126,11 @@ contract SLA is Ownable, Staking {
 
         emit SLICreated(block.timestamp, _value, _periodId);
 
-        if (!SLOs[_SLOName].isSLOHonored(_value)) {
-            periods[_periodId].status = Status.NotRespected;
-        } else {
-            periods[_periodId].status = Status.Respected;
-        }
+//        if (!SLOs[_SLOName].isSLOHonored(_value)) {
+//            periods[_periodId].status = Status.NotRespected;
+//        } else {
+//            periods[_periodId].status = Status.Respected;
+//        }
     }
 
     /**
@@ -149,8 +155,8 @@ contract SLA is Ownable, Staking {
      * @return address owner
      * @return string ipfsHash
      * @return uint256 amount necessary to stake
-     * @return bytes32[] aasdad
-     * @return SL[] aasdad
+     * @return bytes32[] SLONames array
+     * @return SLO[] SLO addresses array
      */
 
     function getDetails()

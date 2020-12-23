@@ -1,6 +1,7 @@
 const SLO = artifacts.require("SLO");
 const SLORegistry = artifacts.require("SLORegistry");
 
+const { sloTypes } = require("./helpers/constants");
 const { utf8ToHex, hexToUtf8 } = web3.utils;
 const { expect } = require("chai");
 
@@ -15,19 +16,10 @@ describe("SLARegistry", function () {
     const [Owner, ...NotOwners] = accounts;
     owner = Owner;
     notOwners = NotOwners;
-
     sloRegistry = await SLORegistry.new();
   });
 
   it("should create a SLO correctly", async function () {
-    const sloTypes = [
-      "EqualTo",
-      "NotEqualTo",
-      "SmallerThan",
-      "SmallerOrEqualTo",
-      "GreaterThan",
-      "GreaterOrEqualTo",
-    ];
     for (let sloType in sloTypes) {
       const sloNameBytes = utf8ToHex(sloName + sloType);
       await sloRegistry.createSLO(sloValue, sloType, sloNameBytes);

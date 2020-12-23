@@ -1,52 +1,43 @@
-const { cleanSolidityString } = require("./helpers");
+const { expect } = require("chai");
+
+const IERC20 = artifacts.require("IERC20");
 const SLA = artifacts.require("SLA");
 const SLARegistry = artifacts.require("SLARegistry");
+const SLORegistry = artifacts.require("SLORegistry");
 const Messenger = artifacts.require("Messenger");
 const bDSLAToken = artifacts.require("bDSLAToken");
 
-const { toWei } = web3.utils;
+const { slaConstructor } = require("./helpers/constants");
+const { getSLI, eventListener, cleanSolidityString } = require("./helpers");
 const { testEnv } = require("../environments.config");
+const { toWei, utf8ToHex } = web3.utils;
 
 const initialTokenSupply = "100";
 const stakeAmount1 = toWei(String(initialTokenSupply / 10));
 const stakeAmount2 = toWei(String(initialTokenSupply / 5));
 const periodId = 0;
-
-const slaConstructor = {
-  _owner: "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1", //not used
-  _SLONames: [
-    "0x7374616b696e675f656666696369656e63790000000000000000000000000000",
-  ],
-  _SLOs: ["0x7f0A3d2BC5DcCE0936153eF5C592D5d5fF3c4551"],
-  _stake: toWei("0"),
-  _ipfsHash: "QmWngSpudqbLSPxd5VhN5maSKRmjZvTjapfFYig5qqkwTS",
-  _sliInterval: "604800",
-  _tokenAddress: "0x653157C7B46A81F106Ae0990E9B23DBFEAA0145F", // not used
-  _sla_period_starts: [
-    "1602633600",
-    "1603238400",
-    "1603843200",
-    "1604448000",
-    "1605052800",
-  ],
-  _sla_period_ends: [
-    "1603238400",
-    "1603843200",
-    "1604448000",
-    "1605052800",
-    "1605657600",
-  ],
-};
+const sloValue = 95000;
+const sloName = "staking_efficiency";
 
 describe("SLARegistry", function () {
-  let owner, notOwners, bDSLA, newToken, messenger, slaRegistry;
+  let owner,
+    notOwners,
+    bDSLA,
+    newToken,
+    messenger,
+    slaRegistry,
+    chainlinkToken,
+    sloRegistry,
+    userSlos;
   let SLAs = [];
 
   beforeEach(async function () {
+    SLAs.length = 0;
     const accounts = await web3.eth.getAccounts();
     const [Owner, ...NotOwners] = accounts;
     owner = Owner;
     notOwners = NotOwners;
+
     bDSLA = await bDSLAToken.new();
     await bDSLA.mint(owner, toWei(initialTokenSupply));
     newToken = await bDSLAToken.new(); // to simulate a new token
@@ -57,12 +48,19 @@ describe("SLARegistry", function () {
       testEnv.chainlinkTokenAddress,
       testEnv.chainlinkJobId
     );
+
+    chainlinkToken = await IERC20.at(testEnv.chainlinkTokenAddress);
+
     slaRegistry = await SLARegistry.new(messenger.address);
+
+    sloRegistry = await SLORegistry.new();
+    const sloNameHex = utf8ToHex(sloName);
+    // 4 is "GreatherThan"
+    await sloRegistry.createSLO(sloValue, 4, sloNameHex);
+    userSlos = await sloRegistry.userSLOs.call(owner);
 
     // Register the SLAs
     const {
-      _SLONames,
-      _SLOs,
       _stake,
       _ipfsHash,
       _sliInterval,
@@ -72,8 +70,8 @@ describe("SLARegistry", function () {
 
     await slaRegistry.createSLA(
       owner,
-      _SLONames,
-      _SLOs,
+      [sloNameHex],
+      userSlos,
       _stake,
       _ipfsHash,
       _sliInterval,
@@ -85,8 +83,8 @@ describe("SLARegistry", function () {
 
     await slaRegistry.createSLA(
       owner,
-      _SLONames,
-      _SLOs,
+      [sloNameHex],
+      userSlos,
       _stake,
       _ipfsHash,
       _sliInterval,
@@ -144,5 +142,29 @@ describe("SLARegistry", function () {
       sla2.address,
       "addresses for SLA 2 does not match"
     );
+  });
+
+  it("should ask for a SLI properly", async () => {
+    const SLICreatedEvent = "SLICreated";
+    const [sla1] = SLAs;
+    const { _sla_period_starts, _sla_period_ends } = slaConstructor;
+    const sloName = userSlos[0];
+    const periodStart = _sla_period_starts[periodId];
+    const periodEnd = _sla_period_ends[periodId];
+
+    // Fund the messenger contract with LINK
+    await chainlinkToken.transfer(messenger.address, web3.utils.toWei("0.2"));
+    await slaRegistry.requestSLI(periodId, sla1.address, sloName);
+    const eventDetected = await eventListener(sla1, SLICreatedEvent);
+    const expectedSLI1 = await getSLI(sla1.address, periodStart, periodEnd);
+    const expectedResponse = {
+      name: SLICreatedEvent,
+      values: {
+        _value: String(expectedSLI1 * 1000),
+        _periodId: String(periodId),
+      },
+    };
+    expect(eventDetected.name).to.equal(expectedResponse.name);
+    expect(eventDetected.values).to.include(expectedResponse.values);
   });
 });
