@@ -1,14 +1,15 @@
+const { expectEvent } = require("@openzeppelin/test-helpers");
+const { expect } = require("chai");
+
 const SLO = artifacts.require("SLO");
 const SLORegistry = artifacts.require("SLORegistry");
-
 const { sloTypes } = require("./helpers/constants");
 const { utf8ToHex, hexToUtf8 } = web3.utils;
-const { expect } = require("chai");
 
 const sloName = "staking_efficiency";
 const sloValue = 97000;
 
-describe("SLARegistry", function () {
+describe("SLORegistry", function () {
   let owner, notOwners, sloRegistry;
 
   beforeEach(async function () {
@@ -22,7 +23,12 @@ describe("SLARegistry", function () {
   it("should create a SLO correctly", async function () {
     for (let sloType in sloTypes) {
       const sloNameBytes = utf8ToHex(sloName + sloType);
-      await sloRegistry.createSLO(sloValue, sloType, sloNameBytes);
+      const receipt = await sloRegistry.createSLO(
+        sloValue,
+        sloType,
+        sloNameBytes
+      );
+      expectEvent(receipt, "SLOCreated");
     }
 
     const userSlos = await sloRegistry.userSLOs.call(owner);

@@ -4,9 +4,7 @@ const Messenger = artifacts.require("Messenger");
 const bDSLAToken = artifacts.require("bDSLAToken");
 
 const { slaConstructor } = require("./helpers/constants");
-const {
-  expectRevert, // Assertions for transactions that should fail
-} = require("@openzeppelin/test-helpers");
+const { expectRevert } = require("@openzeppelin/test-helpers");
 
 const { toWei } = web3.utils;
 const { testEnv } = require("../environments.config");

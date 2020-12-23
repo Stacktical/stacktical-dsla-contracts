@@ -34,3 +34,12 @@ export const sloTypes = [
   "GreaterThan",
   "GreaterOrEqualTo",
 ];
+
+export const sloTypesNames = {
+  EqualTo: sloTypes[0],
+  NotEqualTo: sloTypes[1],
+  SmallerThan: sloTypes[2],
+  SmallerOrEqualTo: sloTypes[3],
+  GreaterThan: sloTypes[4],
+  GreaterOrEqualTo: sloTypes[5],
+};
