@@ -55,9 +55,10 @@ TODO
 NATSpec userdoc and devdoc JSON files are included in natspec-docs directory
 
 ## Scripts
-    test:local = run automated tests on local network
+    test:local = run all the tests on local network
     test:local:specific = run the test specified at the end of the line on local network
     test:local:messenger = run the test messenger on local network
+    test:local:slaRegistry = run the test slaRegistry on local network
     test:kovan = run automated tests on kovan network
     deploy:kovan = deploy updates to kovan network
     deploy:kovan:reset = deploy everything forced to kovan network
@@ -65,6 +66,7 @@ NATSpec userdoc and devdoc JSON files are included in natspec-docs directory
     deploy:local:reset = deploy everything forced to local network
     remix = connect remix to local repository
     compile = compile contracts using truffle
+    turffle:console:local = open the truffle console for local network
     prettier:contracts = prettify contracts
     export-data = exports addresses, abis and create the natspec-docs
     export-data:scripts = runs the below scripts
