@@ -144,7 +144,7 @@ describe("SLARegistry", function () {
     );
   });
 
-  it("should ask for a SLI properly", async () => {
+  it("should ask for a SLI and check the SLO status properly", async () => {
     const SLICreatedEvent = "SLICreated";
     const [sla1] = SLAs;
     const { _sla_period_starts, _sla_period_ends } = slaConstructor;

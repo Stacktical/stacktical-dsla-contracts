@@ -105,12 +105,17 @@ contract SLARegistry {
      * @param _periodId 1. id of the period
      * @param _sla 2. SLA Address
      * @param _sloName 3. SLO Name
+     * @notice it will revert if the SLO is not registered in the SLA
      */
     function requestSLI(
         uint256 _periodId,
         SLA _sla,
         bytes32 _sloName
     ) public {
+        require(
+            address(SLA(_sla).SLOs(_sloName)) != address(0),
+            "_sloName does not exist in the SLA contract"
+        );
         /// TODO:change to call(signature(params)))
         messenger.requestSLI(_periodId, _sla, _sloName);
     }
