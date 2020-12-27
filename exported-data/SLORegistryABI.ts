@@ -1,4 +1,6 @@
-export const SLORegistryABI: Array<object> = [
+import { AbiItem } from 'web3-utils/types';
+
+export const SLORegistryABI: AbiItem[] = [
   {
     anonymous: false,
     inputs: [
@@ -35,5 +37,6 @@ export const SLORegistryABI: Array<object> = [
     outputs: [{ internalType: 'contract SLO[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];

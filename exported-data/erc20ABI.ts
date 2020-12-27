@@ -1,4 +1,6 @@
-export const erc20ABI: Array<object> = [
+import { AbiItem } from 'web3-utils/types';
+
+export const erc20ABI: AbiItem[] = [
   { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
   {
     anonymous: false,

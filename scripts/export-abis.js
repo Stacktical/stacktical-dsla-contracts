@@ -8,33 +8,34 @@ const path = require("path");
 
 const files = {
   SLA: {
-    constName: "export const SLAABI: Array<object> =",
+    constName: "export const SLAABI: AbiItem[] =",
     tsFileName: "SLAABI.ts",
     abi: SLA.abi,
   },
   SLARegistry: {
-    constName: "export const SLARegistryABI: Array<object> =",
+    constName: "export const SLARegistryABI: AbiItem[] =",
     tsFileName: "SLARegistryABI.ts",
     abi: SLARegistry.abi,
   },
   SLO: {
-    constName: "export const SLOABI: Array<object> =",
+    constName: "export const SLOABI: AbiItem[] =",
     tsFileName: "SLOABI.ts",
     abi: SLO.abi,
   },
   SLORegistry: {
-    constName: "export const SLORegistryABI: Array<object> =",
+    constName: "export const SLORegistryABI: AbiItem[] =",
     tsFileName: "SLORegistryABI.ts",
     abi: SLORegistry.abi,
   },
   bDSLAToken: {
-    constName: "export const erc20ABI: Array<object> =",
+    constName: "export const erc20ABI: AbiItem[] =",
     tsFileName: "erc20ABI.ts",
     abi: bDSLAToken.abi,
   },
 };
 
 const base_path = "../exported-data";
+const importAbiItem = "import { AbiItem } from 'web3-utils/types';\n\n";
 
 module.exports = async (callback) => {
   try {
@@ -42,7 +43,7 @@ module.exports = async (callback) => {
       const { constName, tsFileName, abi } = file;
       fs.writeFileSync(
         path.resolve(__dirname, base_path + "/" + tsFileName),
-        constName + JSON.stringify(abi)
+        importAbiItem + constName + JSON.stringify(abi)
       );
     }
     callback(null);

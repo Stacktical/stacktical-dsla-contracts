@@ -1,4 +1,6 @@
-export const SLAABI: Array<object> = [
+import { AbiItem } from 'web3-utils/types';
+
+export const SLAABI: AbiItem[] = [
   {
     inputs: [
       { internalType: 'address', name: '_owner', type: 'address' },

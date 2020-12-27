@@ -1,4 +1,6 @@
-export const SLOABI: Array<object> = [
+import { AbiItem } from 'web3-utils/types';
+
+export const SLOABI: AbiItem[] = [
   {
     inputs: [
       { internalType: 'uint256', name: '_value', type: 'uint256' },
