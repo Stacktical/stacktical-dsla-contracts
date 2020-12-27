@@ -1,10 +1,12 @@
+import { expectRevert } from "@openzeppelin/test-helpers";
+import { expect } from "chai";
+
+import { slaConstructor } from "./helpers/constants";
+
 const SLA = artifacts.require("SLA");
 const SLARegistry = artifacts.require("SLARegistry");
 const Messenger = artifacts.require("Messenger");
 const bDSLAToken = artifacts.require("bDSLAToken");
-
-const { slaConstructor } = require("./helpers/constants");
-const { expectRevert } = require("@openzeppelin/test-helpers");
 
 const { toWei } = web3.utils;
 const { testEnv } = require("../environments.config");
@@ -200,6 +202,19 @@ describe("SLA", function () {
         true,
         "newToken was not correctly registered"
       );
+    });
+
+    it("should add stakes per token properly", async () => {
+      const periodId = 0;
+      const stakeAmount = toWei(String(initialTokenSupply / 10));
+      // approve and stake 2 times the same amount
+      await bDSLA.approve(sla.address, stakeAmount);
+      await sla.stakeTokens(stakeAmount, bDSLA.address, periodId);
+      await bDSLA.approve(sla.address, stakeAmount);
+      await sla.stakeTokens(stakeAmount, bDSLA.address, periodId);
+      const bdslaStake = await sla.userStakes.call(owner, 0);
+      console.log(bdslaStake.stake.toString());
+      expect(bdslaStake.stake.toString()).to.equal(String(stakeAmount * 2));
     });
   });
 });

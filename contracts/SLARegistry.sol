@@ -23,6 +23,7 @@ contract SLARegistry {
         address SLAaddress;
         uint256 stake;
         string assetName;
+        address assetAddress;
     }
 
     /// @dev Messenger of the SLA Registry
@@ -196,7 +197,8 @@ contract SLARegistry {
                     ActivePool({
                         SLAaddress: address(currentSLA),
                         stake: stake,
-                        assetName: string(tokenNameBytes)
+                        assetName: string(tokenNameBytes),
+                        assetAddress: tokenAddress
                     });
                 activePools[index] = currentActivePool;
             }

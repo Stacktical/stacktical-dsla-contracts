@@ -130,6 +130,7 @@ export const SLARegistryABI: AbiItem[] = [
           { internalType: 'address', name: 'SLAaddress', type: 'address' },
           { internalType: 'uint256', name: 'stake', type: 'uint256' },
           { internalType: 'string', name: 'assetName', type: 'string' },
+          { internalType: 'address', name: 'assetAddress', type: 'address' },
         ],
         internalType: 'struct SLARegistry.ActivePool[]',
         name: '',

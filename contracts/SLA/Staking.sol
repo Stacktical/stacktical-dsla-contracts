@@ -109,7 +109,11 @@ contract Staking is Ownable {
             userStakedTokens[msg.sender][_token] = true;
         } else {
             uint256 tokenIndex = userStakedTokensIndex[msg.sender][_token];
-            userStakes[msg.sender][tokenIndex].stake.add(_amount);
+            userStakes[msg.sender][tokenIndex].stake = userStakes[msg.sender][
+                tokenIndex
+            ]
+                .stake
+                .add(_amount);
         }
     }
 
