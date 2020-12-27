@@ -11,7 +11,7 @@ const documentedContracts = [
 ];
 
 const basePath = "../natspec-docs";
-const devPath = "/devdoc";
+const devPath = "";
 const userPath = "/userdoc";
 const fileExtension = ".json";
 

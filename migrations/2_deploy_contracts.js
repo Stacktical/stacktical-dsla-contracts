@@ -3,6 +3,7 @@ const { getDeploymentEnv } = require("../environments.config");
 const SLORegistry = artifacts.require("SLORegistry");
 const SLARegistry = artifacts.require("SLARegistry");
 const Messenger = artifacts.require("Messenger");
+const bDSLAToken = artifacts.require("bDSLAToken");
 
 module.exports = function (deployer, network) {
   // Do not deploy if we are testing
@@ -11,6 +12,10 @@ module.exports = function (deployer, network) {
   }
 
   const env = getDeploymentEnv(network);
+
+  if (process.env.DEPLOY_BDSLA) {
+    return deployer.deploy(bDSLAToken);
+  }
 
   deployer
     .deploy(

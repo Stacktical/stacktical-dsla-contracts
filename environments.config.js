@@ -1,5 +1,4 @@
 require("dotenv").config();
-const { CHAINLINK_TEST_IP, CHAINLINK_TEST_PORT } = process.env;
 
 // Chainlink addresses here: https://docs.chain.link/docs/decentralized-oracles-ethereum-mainnet
 const environments = {
@@ -16,18 +15,11 @@ const environments = {
     chainlinkTokenAddress: "0xa36085F69e2889c224210F603D836748e7dC0088",
     chainlinkJobId: "0x" + "29fa9aa13bf1468788b7cc4a500a45b8",
   },
-  rinkeby: {
-    web3WebsocketProviderUrl:
-      "wss://rinkeby.infura.io/ws/v3/" + process.env.DSLA_INFURA_PROJECT_ID,
-    chainlinkOracleAddress: null,
-    chainlinkTokenAddress: null,
-    chainlinkJobId: null,
-  },
   local: {
     web3WebsocketProviderUrl: "ws://localhost:8545",
     chainlinkOracleAddress: "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
     chainlinkTokenAddress: "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
-    chainlinkJobId: "0x" + "38010d84c5124b778de646ddc3e809aa",
+    chainlinkJobId: "0x" + "f93ef01035074210a9f48d727b1a6381",
   },
 };
 

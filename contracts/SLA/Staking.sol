@@ -266,18 +266,19 @@ contract Staking is Ownable {
         view
         returns (uint256)
     {
-        require(uniqueTokensStaked[_user] > 0, "User has not any token staked");
         uint256 totalValue = 0;
-        for (
-            uint256 allowedTokensIndex = 0;
-            allowedTokensIndex < allowedTokens.length;
-            allowedTokensIndex++
-        ) {
-            totalValue = totalValue.add(
-                periods[_period].stakingBalance[
-                    allowedTokens[allowedTokensIndex]
-                ][_user]
-            );
+        if (uniqueTokensStaked[_user] > 0) {
+            for (
+                uint256 allowedTokensIndex = 0;
+                allowedTokensIndex < allowedTokens.length;
+                allowedTokensIndex++
+            ) {
+                totalValue = totalValue.add(
+                    periods[_period].stakingBalance[
+                        allowedTokens[allowedTokensIndex]
+                    ][_user]
+                );
+            }
         }
         return totalValue;
     }
