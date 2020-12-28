@@ -4,10 +4,10 @@
     "SLIReceived(address,uint256,bytes32,uint256)": {
       "details": "event emitted when having a response from Chainlink with the SLI",
       "params": {
+        "_periodId": "4. id of the period",
         "slaAddress": "1. SLA address to store the SLI",
         "sliValue": "2. SLI value",
-        "sloName": "3. SLO name",
-        "_periodId": "4. id of the period"
+        "sloName": "3. SLO name"
       }
     }
   },
@@ -16,8 +16,8 @@
     "constructor": {
       "details": "parameterize the variables according to network",
       "params": {
-        "_chainlinkToken": "the address of LINK token contract",
         "_chainlinkOracle": "the address of the oracle to create requests to",
+        "_chainlinkToken": "the address of LINK token contract",
         "_jobId": "the job id for the HTTPGet job"
       }
     },
@@ -31,16 +31,16 @@
     "getPeriod(address,uint256)": {
       "details": "gets the start and end of a given SLA on a given period",
       "params": {
-        "_slaAddress": "address of the SLA Contract",
-        "_periodId": "id of the period"
+        "_periodId": "id of the period",
+        "_slaAddress": "address of the SLA Contract"
       }
     },
     "requestSLI(uint256,address,bytes32)": {
       "details": "creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.",
       "params": {
+        "_periodId": "value of the period id",
         "_sla": "SLA Address",
-        "_sloName": "the SLO name to get the SLI value for",
-        "_periodId": "value of the period id"
+        "_sloName": "the SLO name to get the SLI value for"
       }
     },
     "setSLARegistry()": {

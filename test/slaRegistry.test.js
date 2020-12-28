@@ -6,6 +6,7 @@ const SLARegistry = artifacts.require("SLARegistry");
 const SLORegistry = artifacts.require("SLORegistry");
 const Messenger = artifacts.require("Messenger");
 const bDSLAToken = artifacts.require("bDSLAToken");
+const DAI = artifacts.require("DAI");
 
 const { slaConstructor } = require("./helpers/constants");
 const { getSLI, eventListener, cleanSolidityString } = require("./helpers");
@@ -29,7 +30,8 @@ describe("SLARegistry", function () {
     slaRegistry,
     chainlinkToken,
     sloRegistry,
-    userSlos;
+    userSlos,
+    dai;
   let SLAs = [];
 
   beforeEach(async function () {
@@ -41,6 +43,10 @@ describe("SLARegistry", function () {
 
     bDSLA = await bDSLAToken.new();
     await bDSLA.mint(owner, toWei(initialTokenSupply));
+
+    dai = await DAI.new();
+    await dai.mint(owner, toWei(initialTokenSupply));
+
     newToken = await bDSLAToken.new(); // to simulate a new token
     await newToken.mint(owner, toWei(initialTokenSupply));
 
@@ -78,6 +84,7 @@ describe("SLARegistry", function () {
       bDSLA.address,
       _sla_period_starts,
       _sla_period_ends,
+      dai.address,
       { from: owner }
     );
 
@@ -91,6 +98,7 @@ describe("SLARegistry", function () {
       bDSLA.address,
       _sla_period_starts,
       _sla_period_ends,
+      dai.address,
       { from: owner }
     );
 

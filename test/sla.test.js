@@ -7,13 +7,14 @@ const SLA = artifacts.require("SLA");
 const SLARegistry = artifacts.require("SLARegistry");
 const Messenger = artifacts.require("Messenger");
 const bDSLAToken = artifacts.require("bDSLAToken");
+const DAI = artifacts.require("DAI");
 
 const { toWei } = web3.utils;
 const { testEnv } = require("../environments.config");
 const initialTokenSupply = "100";
 
 describe("SLA", function () {
-  let owner, notOwners, sla, bDSLA, newToken, messenger, slaRegistry;
+  let owner, notOwners, sla, bDSLA, newToken, messenger, slaRegistry, dai;
 
   beforeEach(async function () {
     const accounts = await web3.eth.getAccounts();
@@ -24,6 +25,8 @@ describe("SLA", function () {
     await bDSLA.mint(owner, toWei(initialTokenSupply));
     newToken = await bDSLAToken.new(); // to simulate a new token
     await newToken.mint(owner, toWei(initialTokenSupply));
+    dai = await DAI.new();
+    await dai.mint(owner, toWei(initialTokenSupply));
 
     messenger = await Messenger.new(
       testEnv.chainlinkOracleAddress,
@@ -52,6 +55,7 @@ describe("SLA", function () {
       bDSLA.address,
       _sla_period_starts,
       _sla_period_ends,
+      dai.address,
       { from: owner }
     );
     const slaAddresses = await slaRegistry.userSLAs(owner);
@@ -213,8 +217,52 @@ describe("SLA", function () {
       await bDSLA.approve(sla.address, stakeAmount);
       await sla.stakeTokens(stakeAmount, bDSLA.address, periodId);
       const bdslaStake = await sla.userStakes.call(owner, 0);
-      console.log(bdslaStake.stake.toString());
       expect(bdslaStake.stake.toString()).to.equal(String(stakeAmount * 2));
+    });
+
+    it("should allow the user to stake DAI on deployment", async function () {
+      const secondTokenAddress = await sla.allowedTokens.call(1);
+      assert.equal(
+        secondTokenAddress,
+        dai.address,
+        "dai is not registered as allowed token"
+      );
+      const DAIisAllowed = await sla.allowedTokensMapping.call(dai.address);
+      assert.equal(
+        DAIisAllowed,
+        true,
+        "dai is not registered as allowed in the mapping"
+      );
+      const periodId = 0;
+      const stakeAmount = toWei(String(initialTokenSupply / 10));
+      await dai.approve(sla.address, stakeAmount);
+      const allowance = await dai.allowance(owner, sla.address);
+      assert.equal(
+        allowance.toString(),
+        stakeAmount,
+        "allowance does not match"
+      );
+      await sla.stakeTokens(stakeAmount, dai.address, periodId);
+      const userStakesLength = await sla.getTokenStakeLength.call(owner);
+      assert.equal(
+        userStakesLength,
+        1,
+        "userStakes has not increased in length"
+      );
+      const { tokenAddress, stake } = await sla.userStakes.call(owner, 0);
+      assert.equal(
+        tokenAddress,
+        dai.address,
+        "token address does not match with DAI"
+      );
+      assert.equal(stake, stakeAmount, "stakes amount does not match");
+      const daiIndex = await sla.userStakedTokensIndex.call(owner, dai.address);
+      assert.equal(daiIndex, 0, "dai index should be 0");
+      const userHasDAIstaked = await sla.userStakedTokens.call(
+        owner,
+        dai.address
+      );
+      assert.equal(userHasDAIstaked, true, "DAI was not correctly registered");
     });
   });
 });

@@ -1,6 +1,7 @@
 const SLARegistry = artifacts.require("SLARegistry");
 const SLORegistry = artifacts.require("SLORegistry");
 const bDSLAToken = artifacts.require("bDSLAToken");
+const DAI = artifacts.require("DAI");
 
 const fs = require("fs");
 const path = require("path");
@@ -17,6 +18,8 @@ const addresses = (adminWallet) => ({
       (SLARegistry.networks[1] && SLARegistry.networks[1].address) ||
       placeHolder,
     AdminWallet: adminWallet,
+    // https://etherscan.io/token/0x6b175474e89094c44da98b954eedeac495271d0f
+    DAIToken: "0x6b175474e89094c44da98b954eedeac495271d0f",
   },
   42: {
     DSLAToken:
@@ -29,6 +32,7 @@ const addresses = (adminWallet) => ({
       (SLARegistry.networks[42] && SLARegistry.networks[42].address) ||
       placeHolder,
     AdminWallet: adminWallet,
+    DAIToken: "0xC4375B7De8af5a38a93548eb8453a498222C4fF2",
   },
   1337: {
     DSLAToken:
@@ -41,6 +45,7 @@ const addresses = (adminWallet) => ({
       (SLARegistry.networks[1337] && SLARegistry.networks[1337].address) ||
       placeHolder,
     AdminWallet: adminWallet,
+    DAIToken: (DAI.networks[1337] && DAI.networks[1337].address) || placeHolder,
   },
 });
 
@@ -57,7 +62,6 @@ module.exports = async (callback) => {
       path.resolve(__dirname, base_path + "/" + fileName),
       startingLine + JSON.stringify(formatedAddresses) + finalLine
     );
-
     callback(null);
   } catch (error) {
     callback(error);

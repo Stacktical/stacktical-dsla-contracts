@@ -67,6 +67,7 @@ contract SLARegistry {
      * @param _tokenAddress 7. address of the DSLA token to be unlocked for staking
      * @param _sla_period_starts 8. array with the values for the "start" of every period
      * @param _sla_period_ends 9. array with the values for the "end" of every period
+     * @param _daiAddress 10. DAI Token Address to accept by default
      */
     function createSLA(
         address _owner,
@@ -77,7 +78,8 @@ contract SLARegistry {
         uint256 _sliInterval,
         bDSLAToken _tokenAddress,
         uint256[] memory _sla_period_starts,
-        uint256[] memory _sla_period_ends
+        uint256[] memory _sla_period_ends,
+        address _daiAddress
     ) public {
         SLA sla =
             new SLA(
@@ -89,7 +91,8 @@ contract SLARegistry {
                 _sliInterval,
                 _tokenAddress,
                 _sla_period_starts,
-                _sla_period_ends
+                _sla_period_ends,
+                _daiAddress
             );
 
         SLAs.push(sla);

@@ -72,6 +72,7 @@ export const SLARegistryABI: AbiItem[] = [
         name: '_sla_period_ends',
         type: 'uint256[]',
       },
+      { internalType: 'address', name: '_daiAddress', type: 'address' },
     ],
     name: 'createSLA',
     outputs: [],

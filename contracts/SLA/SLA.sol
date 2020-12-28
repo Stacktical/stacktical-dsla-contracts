@@ -78,6 +78,7 @@ contract SLA is Ownable, Staking {
      * @param _tokenAddress 7. address of the DSLA token to be unlocked for staking
      * @param _sla_period_starts 8. array with the values for the "start" of every period
      * @param _sla_period_ends 9. array with the values for the "end" of every period
+     * @param _daiAddress 10. DAI Token Address to accept by default
      */
     constructor(
         address _owner,
@@ -88,10 +89,17 @@ contract SLA is Ownable, Staking {
         uint256 _sliInterval,
         bDSLAToken _tokenAddress,
         uint256[] memory _sla_period_starts,
-        uint256[] memory _sla_period_ends
+        uint256[] memory _sla_period_ends,
+        address _daiAddress
     )
         public
-        Staking(_tokenAddress, _sla_period_starts, _sla_period_ends, _owner)
+        Staking(
+            _tokenAddress,
+            _sla_period_starts,
+            _sla_period_ends,
+            _owner,
+            _daiAddress
+        )
     {
         require(_SLOs.length < 5, "max amount of SLOs is 5");
         require(

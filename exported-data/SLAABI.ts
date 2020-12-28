@@ -24,6 +24,7 @@ export const SLAABI: AbiItem[] = [
         name: '_sla_period_ends',
         type: 'uint256[]',
       },
+      { internalType: 'address', name: '_daiAddress', type: 'address' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -84,6 +85,13 @@ export const SLAABI: AbiItem[] = [
     ],
     name: 'SLICreated',
     type: 'event',
+  },
+  {
+    inputs: [],
+    name: 'DAI',
+    outputs: [{ internalType: 'contract IERC20', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [

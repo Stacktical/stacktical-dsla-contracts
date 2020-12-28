@@ -39,6 +39,9 @@ contract Staking is Ownable {
     mapping(address => mapping(address => bool)) public userStakedTokens; // // userAddress => erc20Address => token is staked
     uint256 public totalStaked;
 
+    // @dev DAI token
+    IERC20 public DAI;
+
     event NewPeriodAdded(uint256 indexed period_index);
 
     modifier notValidator {
@@ -68,16 +71,23 @@ contract Staking is Ownable {
         bDSLAToken _tokenAddress,
         uint256[] memory _sla_period_starts,
         uint256[] memory _sla_period_ends,
-        address _owner
+        address _owner,
+        address _daiAddress
     ) public {
         require(
             _sla_period_starts.length == _sla_period_ends.length,
             "Please check the params of your periods !"
         );
+        validator = _owner;
+        // Add bDSLA as allowed token
         bDSLA = bDSLAToken(_tokenAddress);
         allowedTokens.push(address(bDSLA));
         allowedTokensMapping[address(bDSLA)] = true;
-        validator = _owner;
+
+        // Add bDSLA as allowed token
+        DAI = IERC20(_daiAddress);
+        allowedTokens.push(address(DAI));
+        allowedTokensMapping[address(DAI)] = true;
 
         for (uint256 i = 0; i < _sla_period_starts.length; i++) {
             _addPeriod(_sla_period_starts[i], _sla_period_ends[i]);
