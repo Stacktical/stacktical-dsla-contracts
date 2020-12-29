@@ -291,6 +291,13 @@ export const SLAABI: AbiItem[] = [
     type: 'function',
   },
   {
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'tokensPool',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'totalStaked',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],

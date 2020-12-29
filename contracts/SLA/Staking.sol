@@ -52,7 +52,9 @@ contract Staking is Ownable {
     mapping(address => mapping(address => uint256))
         public userStakedTokensIndex;
     /// @dev (mapping) userAddress => erc20Address => bool: user has erc20Address staked
-    mapping(address => mapping(address => bool)) public userStakedTokens; // // userAddress => erc20Address => token is staked
+    mapping(address => mapping(address => bool)) public userStakedTokens;
+    /// @dev (mapping) erc20Address => stakeAmount: stake amount by tokenAddress
+    mapping(address => uint256) public tokensPool;
 
     /**
      *@param period_index 1. index of the period added
@@ -159,6 +161,7 @@ contract Staking is Ownable {
                 .stake
                 .add(_amount);
         }
+        tokensPool[_token] = tokensPool[_token].add(_amount);
     }
 
     /**
@@ -169,6 +172,7 @@ contract Staking is Ownable {
     function _decreaseTokenStaking(address _token, uint256 _amount) internal {
         uint256 tokenIndex = userStakedTokensIndex[msg.sender][_token];
         userStakes[msg.sender][tokenIndex].stake.sub(_amount);
+        tokensPool[_token] = tokensPool[_token].sub(_amount);
     }
 
     /**
