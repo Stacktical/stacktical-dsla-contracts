@@ -104,29 +104,26 @@ describe("SLARegistry", function () {
 
     const slaAddresses = await slaRegistry.userSLAs(owner);
     const sla1 = await SLA.at(slaAddresses[0]);
-    const sla2 = await SLA.at(slaAddresses[1]);
-    SLAs.push(sla1, sla2);
+    SLAs.push(sla1);
   });
 
   it("should ask for active pool correctly", async function () {
-    const [sla1, sla2] = SLAs;
+    const [sla1] = SLAs;
     await bDSLA.approve(sla1.address, stakeAmount1);
-    await newToken.approve(sla2.address, stakeAmount2);
+    await dai.approve(sla1.address, stakeAmount2);
     await sla1.stakeTokens(stakeAmount1, bDSLA.address, periodId);
+    await sla1.stakeTokens(stakeAmount2, dai.address, periodId);
 
-    // add newToken as allowed token
-    await sla2.addAllowedTokens(newToken.address);
-    await sla2.stakeTokens(stakeAmount2, newToken.address, periodId);
-    const activePools = await slaRegistry.getActivePool(owner);
+    const activePools = await slaRegistry.getActivePool.call(owner);
     assert.equal(
       activePools.length,
-      SLAs.length,
+      2,
       "active pools should only be equal to SLAs length"
     );
 
     const [pool1, pool2] = activePools;
     const bDSLAName = await bDSLA.name.call();
-    const newTokenName = await newToken.name.call();
+    const daiName = await dai.name.call();
 
     assert.equal(pool1.stake, stakeAmount1, "stakes for SLA 1 does not match");
     assert.equal(pool2.stake, stakeAmount2, "stakes for SLA 2 does not match");
@@ -137,18 +134,18 @@ describe("SLARegistry", function () {
     );
     assert.equal(
       cleanSolidityString(pool2.assetName),
-      newTokenName,
+      daiName,
       "names for SLA 2 does not match"
     );
     assert.equal(
       pool1.SLAaddress,
       sla1.address,
-      "addresses for SLA 1 does not match"
+      "addresses for pool 1 does not match"
     );
     assert.equal(
       pool2.SLAaddress,
-      sla2.address,
-      "addresses for SLA 2 does not match"
+      sla1.address,
+      "addresses for pool 2 does not match"
     );
   });
 

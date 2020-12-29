@@ -181,8 +181,18 @@ contract SLARegistry {
         view
         returns (ActivePool[] memory)
     {
-        ActivePool[] memory activePools =
-            new ActivePool[](userSLACount(_slaOwner));
+        uint256 stakeCounter = 0;
+        // Count the stakes of the user
+        for (uint256 index = 0; index < userSLACount(_slaOwner); index++) {
+            SLA currentSLA = SLAs[userToSLAIndexes[_slaOwner][index]];
+            stakeCounter = stakeCounter.add(
+                currentSLA.getTokenStakeLength(msg.sender)
+            );
+        }
+
+        ActivePool[] memory activePools = new ActivePool[](stakeCounter);
+        // to insert on activePools array
+        uint256 stakePosition = 0;
         for (uint256 index = 0; index < userSLACount(_slaOwner); index++) {
             SLA currentSLA = SLAs[userToSLAIndexes[_slaOwner][index]];
             for (
@@ -203,7 +213,8 @@ contract SLARegistry {
                         assetName: string(tokenNameBytes),
                         assetAddress: tokenAddress
                     });
-                activePools[index] = currentActivePool;
+                activePools[stakePosition] = currentActivePool;
+                stakePosition = stakePosition.add(1);
             }
         }
         return activePools;
