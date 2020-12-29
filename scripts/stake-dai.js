@@ -1,20 +1,29 @@
 const DAI = artifacts.require("DAI");
 const SLA = artifacts.require("SLA");
-const { toWei } = web3.utils;
+const { toWei, fromWei } = web3.utils;
 
 const SLAAdress = "0x8265dd2885e3A9b5F49c2631BD24AeF7C9824D1f";
-const initialTokenSupply = "100";
 
 module.exports = async (callback) => {
   try {
+    const sla = await SLA.at(SLAAdress);
+
     const [owner] = await web3.eth.getAccounts();
     console.log("Owner address is: " + owner);
+
     const dai = await DAI.deployed();
-    const stakeAmount = toWei(String(initialTokenSupply / 10));
+    console.log("DAI address is: " + dai.address);
+    const stakeAmount = toWei(String("10"));
     await dai.approve(SLAAdress, stakeAmount);
-    const sla = await SLA.at(SLAAdress);
-    await sla.stakeTokens(stakeAmount, dai.address, 5);
-    const daiStakingIndex = await sla.callback(null);
+    await sla.stakeTokens(stakeAmount, dai.address, 4);
+    const daiStakingIndex = await sla.userStakedTokensIndex.call(
+      owner,
+      dai.address
+    );
+    console.log("DAI Staking index: " + daiStakingIndex);
+    const daiStake = await sla.userStakes.call(owner, daiStakingIndex);
+    console.log("DAI stake: " + fromWei(daiStake.stake.toString()));
+    callback(null);
   } catch (error) {
     callback(error);
   }
