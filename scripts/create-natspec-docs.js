@@ -3,11 +3,12 @@ const path = require("path");
 
 const documentedContracts = [
   "SLA",
-  "SLO",
-  "SLORegistry",
-  "SLARegistry",
-  "bDSLAToken",
-  "Messenger",
+  // "SLO",
+  // "SLORegistry",
+  // "SLARegistry",
+  // "bDSLAToken",
+  // "Messenger",
+  // "Staking",
 ];
 
 const basePath = "../natspec-docs";
@@ -15,17 +16,25 @@ const devPath = "";
 const userPath = "/userdoc";
 const fileExtension = ".json";
 
+// const sortObject = (object) =>
+//   Object.entries(object)
+//     .sort((a, b) => a[1].split(".")[0] - b[1].split(".")[0])
+//     .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+
 // sort object fields by value ascending
 const sortObject = (object) =>
-  Object.entries(object)
-    .sort((a, b) => a[1] > b[1])
-    .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+  Object.fromEntries(
+    Object.entries(object).sort(
+      ([, a], [, b]) => a.split(".")[0] - b.split(".")[0]
+    )
+  );
 
 const sortMethods = (devdoc) => {
   for (let method of Object.entries(devdoc.methods)) {
     const methodKey = method[0];
-    const methodValue = method[1];
+    let methodValue = method[1];
     if (methodValue.params && Object.keys(methodValue.params).length > 1) {
+      console.log(sortObject(methodValue.params));
       methodValue.params = sortObject(methodValue.params);
     }
     devdoc.methods[methodKey] = methodValue;
