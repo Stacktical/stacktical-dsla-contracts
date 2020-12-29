@@ -216,8 +216,30 @@ describe("SLA", function () {
       await sla.stakeTokens(stakeAmount, bDSLA.address, periodId);
       await bDSLA.approve(sla.address, stakeAmount);
       await sla.stakeTokens(stakeAmount, bDSLA.address, periodId);
-      const bdslaStake = await sla.userStakes.call(owner, 0);
-      expect(bdslaStake.stake.toString()).to.equal(String(stakeAmount * 2));
+
+      const bDSLAStakingIndex = Number(
+        await sla.userStakedTokensIndex.call(owner, bDSLA.address)
+      );
+      expect(bDSLAStakingIndex).to.equal(0);
+
+      let stake = await sla.userStakes.call(owner, bDSLAStakingIndex);
+      expect(stake.stake.toString()).to.equal(String(stakeAmount * 2));
+
+      // stake DAI and check the stakes state
+      await dai.approve(sla.address, stakeAmount);
+      await sla.stakeTokens(stakeAmount, dai.address, periodId);
+      //bDSLA stake should not change
+      stake = await sla.userStakes.call(owner, bDSLAStakingIndex);
+      expect(stake.stake.toString()).to.equal(String(stakeAmount * 2));
+
+      //DAI stake should be stakeAmount
+      const daiStakingIndex = Number(
+        await sla.userStakedTokensIndex.call(owner, dai.address)
+      );
+      expect(daiStakingIndex).to.equal(1);
+
+      stake = await sla.userStakes.call(owner, daiStakingIndex);
+      expect(stake.stake.toString()).to.equal(String(stakeAmount));
     });
 
     it("should allow the user to stake DAI on deployment", async function () {
