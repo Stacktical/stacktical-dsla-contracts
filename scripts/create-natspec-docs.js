@@ -3,12 +3,12 @@ const path = require("path");
 
 const documentedContracts = [
   "SLA",
-  // "SLO",
-  // "SLORegistry",
-  // "SLARegistry",
-  // "bDSLAToken",
-  // "Messenger",
-  // "Staking",
+  "SLO",
+  "SLORegistry",
+  "SLARegistry",
+  "bDSLAToken",
+  "Messenger",
+  "Staking",
 ];
 
 const basePath = "../natspec-docs";
@@ -34,7 +34,6 @@ const sortMethods = (devdoc) => {
     const methodKey = method[0];
     let methodValue = method[1];
     if (methodValue.params && Object.keys(methodValue.params).length > 1) {
-      console.log(sortObject(methodValue.params));
       methodValue.params = sortObject(methodValue.params);
     }
     devdoc.methods[methodKey] = methodValue;
