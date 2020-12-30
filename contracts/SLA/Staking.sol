@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-import "../bDSLA/bDSLAToken.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -25,11 +24,11 @@ contract Staking is Ownable {
         address tokenAddress;
         uint256 stake;
     }
+    bytes4 private constant BURN_SELECTOR =
+        bytes4(keccak256(bytes("burn(uint256)")));
 
-    /// @dev address of the bDSLA contract
-    bDSLAToken public bDSLA;
-    /// @dev DAI token
-    IERC20 public DAI;
+    /// @dev IERC20 of the base stake address for the SLA
+    IERC20 public BaseToken;
 
     /// @dev all periods for an SLA
     Period[] public periods;
@@ -85,33 +84,27 @@ contract Staking is Ownable {
     }
 
     /**
-     *@param _tokenAddress 1. bDSLA address
+     *@param _baseTokenAddress 1. address of the base token
      *@param _sla_period_starts 2. array of starts of period
      *@param _sla_period_ends 3. array of ends of period
      *@param _owner 4. address of the owner of the SLA
-     *@param _daiAddress 5. address of the DAI token
      */
     constructor(
-        bDSLAToken _tokenAddress,
+        address _baseTokenAddress,
         uint256[] memory _sla_period_starts,
         uint256[] memory _sla_period_ends,
-        address _owner,
-        address _daiAddress
+        address _owner
     ) public {
         require(
             _sla_period_starts.length == _sla_period_ends.length,
             "Please check the params of your periods !"
         );
         validator = _owner;
-        // Add bDSLA as allowed token
-        bDSLA = bDSLAToken(_tokenAddress);
-        allowedTokens.push(address(bDSLA));
-        allowedTokensMapping[address(bDSLA)] = true;
 
-        // Add bDSLA as allowed token
-        DAI = IERC20(_daiAddress);
-        allowedTokens.push(address(DAI));
-        allowedTokensMapping[address(DAI)] = true;
+        // Add BaseToken as allowed token
+        BaseToken = IERC20(_baseTokenAddress);
+        allowedTokens.push(_baseTokenAddress);
+        allowedTokensMapping[_baseTokenAddress] = true;
 
         for (uint256 i = 0; i < _sla_period_starts.length; i++) {
             _addPeriod(_sla_period_starts[i], _sla_period_ends[i]);
@@ -222,7 +215,6 @@ contract Staking is Ownable {
             "staking balance cannot be 0"
         );
 
-        // unstake bDSLA tokens
         uint256 staked = periods[_period].stakingBalance[_token][msg.sender];
         uint256 claimed_reward =
             periods[_period].claimed_reward.div(stakers.length);
@@ -243,7 +235,7 @@ contract Staking is Ownable {
     }
 
     /**
-     *@dev withdraw bDSLA and stake d Tokens
+     *@dev withdraw BaseToken and stake d Tokens
      *@param _token 1. address of the token
      *@param _amount 2. amount to withdraw
      *@param _period 3. period id to withdraw
@@ -269,16 +261,16 @@ contract Staking is Ownable {
 
         _increaseTokenStaking(_token, _amount);
 
-        // unstake bDSLA tokens
+        // unstake base tokens
         uint256 staked = periods[_period].stakingBalance[_token][msg.sender];
         uint256 claimed_reward =
             periods[_period].claimed_reward.div(stakers.length);
 
         periods[_period].stakingBalance[_token][msg.sender] = 0;
         totalStaked = totalStaked.sub(staked);
-        bDSLA.transfer(msg.sender, staked.sub(claimed_reward));
+        BaseToken.transfer(msg.sender, staked.sub(claimed_reward));
 
-        _decreaseTokenStaking(address(bDSLA), staked);
+        _decreaseTokenStaking(address(BaseToken), staked);
     }
 
     /**
@@ -306,8 +298,13 @@ contract Staking is Ownable {
         periods[_period].claimed_reward = reward;
         periods[_period].claimed = true;
 
-        bDSLA.transfer(msg.sender, reward);
-        bDSLA.burn(fees);
+        BaseToken.transfer(msg.sender, reward);
+        (bool _success, ) =
+            address(BaseToken).call(
+                abi.encodeWithSelector(BURN_SELECTOR, fees)
+            );
+
+        require(_success, "BaseToken burn process was not successful");
     }
 
     /**
@@ -334,8 +331,13 @@ contract Staking is Ownable {
         totalStaked = totalStaked.sub(compensation);
         periods[_period].claimed_compensation[msg.sender] = compensation;
 
-        bDSLA.transfer(msg.sender, compensation);
-        bDSLA.burn(fees);
+        BaseToken.transfer(msg.sender, compensation);
+        (bool _success, ) =
+            address(BaseToken).call(
+                abi.encodeWithSelector(BURN_SELECTOR, fees)
+            );
+
+        require(_success, "BaseToken burn process was not successful");
     }
 
     /**

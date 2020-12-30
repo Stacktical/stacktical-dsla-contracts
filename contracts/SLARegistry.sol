@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Messenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
-import "./bDSLA/bDSLAToken.sol";
 
 /**
  * @title SLARegistry
@@ -64,10 +63,9 @@ contract SLARegistry {
      * @param _ipfsHash 5. string with the ipfs hash that contains extra
      * information about the service level agreement
      * @param _sliInterval 6. uint the interval in seconds between requesting a new SLI
-     * @param _tokenAddress 7. address of the DSLA token to be unlocked for staking
+     * @param _baseTokenAddress 7. address of the base token
      * @param _sla_period_starts 8. array with the values for the "start" of every period
      * @param _sla_period_ends 9. array with the values for the "end" of every period
-     * @param _daiAddress 10. DAI Token Address to accept by default
      */
     function createSLA(
         address _owner,
@@ -76,10 +74,9 @@ contract SLARegistry {
         uint256 _stake,
         string memory _ipfsHash,
         uint256 _sliInterval,
-        bDSLAToken _tokenAddress,
+        address _baseTokenAddress,
         uint256[] memory _sla_period_starts,
-        uint256[] memory _sla_period_ends,
-        address _daiAddress
+        uint256[] memory _sla_period_ends
     ) public {
         SLA sla =
             new SLA(
@@ -89,10 +86,9 @@ contract SLARegistry {
                 _stake,
                 _ipfsHash,
                 _sliInterval,
-                _tokenAddress,
+                _baseTokenAddress,
                 _sla_period_starts,
-                _sla_period_ends,
-                _daiAddress
+                _sla_period_ends
             );
 
         SLAs.push(sla);
