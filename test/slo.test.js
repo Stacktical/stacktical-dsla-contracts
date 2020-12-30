@@ -1,24 +1,18 @@
-import { sloTypes, sloTypesNames } from "./helpers/constants";
-import { expect } from "chai";
+/* eslint no-await-in-loop: 0 */
+/* eslint no-unused-expressions: 0 */
 
-const SLO = artifacts.require("SLO");
+import { expect } from 'chai';
+import { sloTypes, sloTypesNames } from './helpers/constants';
+
+const SLO = artifacts.require('SLO');
 const { utf8ToHex } = web3.utils;
 
-const sloName = utf8ToHex("staking_efficiency");
+const sloName = utf8ToHex('staking_efficiency');
 const sloValue = 97000;
 
-describe("SLO", function () {
-  let owner, notOwners;
-
-  beforeEach(async function () {
-    const accounts = await web3.eth.getAccounts();
-    const [Owner, ...NotOwners] = accounts;
-    owner = Owner;
-    notOwners = NotOwners;
-  });
-
-  it("should check if the SLO was honored correctly", async function () {
-    for (let sloType of sloTypes) {
+describe('SLO', () => {
+  it('should check if the SLO was honored correctly', async () => {
+    for (const sloType of sloTypes) {
       let slo;
       let honored;
       switch (sloType) {
@@ -30,7 +24,6 @@ describe("SLO", function () {
           expect(honored).to.be.false;
           honored = await slo.isSLOHonored.call(sloValue);
           expect(honored).to.be.true;
-
           break;
         }
         case sloTypesNames.NotEqualTo: {

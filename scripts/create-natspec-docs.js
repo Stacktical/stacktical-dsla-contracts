@@ -1,20 +1,20 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 const documentedContracts = [
-  "SLA",
-  "SLO",
-  "SLORegistry",
-  "SLARegistry",
-  "bDSLAToken",
-  "Messenger",
-  "Staking",
+  'SLA',
+  'SLO',
+  'SLORegistry',
+  'SLARegistry',
+  'bDSLAToken',
+  'Messenger',
+  'Staking',
 ];
 
-const basePath = "../natspec-docs";
-const devPath = "";
-const userPath = "/userdoc";
-const fileExtension = ".json";
+const basePath = '../natspec-docs';
+const devPath = '';
+const userPath = '/userdoc';
+const fileExtension = '.json';
 
 // const sortObject = (object) =>
 //   Object.entries(object)
@@ -22,17 +22,16 @@ const fileExtension = ".json";
 //     .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
 
 // sort object fields by value ascending
-const sortObject = (object) =>
-  Object.fromEntries(
-    Object.entries(object).sort(
-      ([, a], [, b]) => a.split(".")[0] - b.split(".")[0]
-    )
-  );
+const sortObject = (object) => Object.fromEntries(
+  Object.entries(object).sort(
+    ([, a], [, b]) => a.split('.')[0] - b.split('.')[0],
+  ),
+);
 
 const sortMethods = (devdoc) => {
-  for (let method of Object.entries(devdoc.methods)) {
+  for (const method of Object.entries(devdoc.methods)) {
     const methodKey = method[0];
-    let methodValue = method[1];
+    const methodValue = method[1];
     if (methodValue.params && Object.keys(methodValue.params).length > 1) {
       methodValue.params = sortObject(methodValue.params);
     }
@@ -41,7 +40,7 @@ const sortMethods = (devdoc) => {
 };
 
 const sortEvents = (devdoc) => {
-  for (let event of Object.entries(devdoc.events)) {
+  for (const event of Object.entries(devdoc.events)) {
     const eventKey = event[0];
     const eventValue = event[1];
     if (eventValue.params && Object.keys(eventValue.params).length > 1) {
@@ -53,7 +52,7 @@ const sortEvents = (devdoc) => {
 
 module.exports = async (callback) => {
   try {
-    for (let contract of documentedContracts) {
+    for (const contract of documentedContracts) {
       const { devdoc, userdoc } = artifacts.require(contract);
 
       // sort params to match the order of params of the signature
@@ -63,16 +62,16 @@ module.exports = async (callback) => {
       fs.writeFileSync(
         path.resolve(
           __dirname,
-          basePath + devPath + "/" + contract + fileExtension
+          `${basePath + devPath}/${contract}${fileExtension}`,
         ),
-        JSON.stringify(devdoc)
+        JSON.stringify(devdoc),
       );
       fs.writeFileSync(
         path.resolve(
           __dirname,
-          basePath + userPath + "/" + contract + fileExtension
+          `${basePath + userPath}/${contract}${fileExtension}`,
         ),
-        JSON.stringify(userdoc)
+        JSON.stringify(userdoc),
       );
     }
     callback(null);

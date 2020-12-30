@@ -1,12 +1,12 @@
-import { testEnv } from "../../environments.config";
+import { testEnv } from '../../environments.config';
 
-const Web3 = require("web3");
+const Web3 = require('web3');
 
 const contractCreator = (contract) => {
   const { abi, address } = contract;
   try {
     const web3 = new Web3(
-      new Web3.providers.WebsocketProvider(testEnv.web3WebsocketProviderUrl)
+      new Web3.providers.WebsocketProvider(testEnv.web3WebsocketProviderUrl),
     );
     return new web3.eth.Contract(abi, address);
   } catch (error) {
@@ -21,21 +21,20 @@ const filterEventValues = (values) => {
   const valuesCount = Object.keys(values).length;
   const splicedEntries = Object.entries(values).slice(
     valuesCount / 2,
-    valuesCount
+    valuesCount,
   );
-  return splicedEntries.reduce((r, [k, v]) => {
-    return Object.assign(r, { [k]: v });
-  }, {});
+  return splicedEntries.reduce((r, [k, v]) => Object.assign(r, { [k]: v }), {});
 };
 
 // event listener
-export const eventListener = async (contract, event) => {
+const eventListener = async (contract, event) => {
   const web3Contract = contractCreator(contract);
   return new Promise((resolve, reject) => {
     web3Contract.events.allEvents(
       {
-        fromBlock: "latest",
+        fromBlock: 'latest',
       },
+      // eslint-disable-next-line consistent-return
       (error, result) => {
         if (error) {
           return reject(error);
@@ -45,7 +44,7 @@ export const eventListener = async (contract, event) => {
         if (result.event === event) {
           return resolve(response);
         }
-      }
+      },
     );
     // .on("data", () => (error, result) => {
     //   if (error) return reject(error);
@@ -53,3 +52,5 @@ export const eventListener = async (contract, event) => {
     // });
   });
 };
+
+export default eventListener;

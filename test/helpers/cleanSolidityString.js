@@ -1,4 +1,5 @@
 // using regexp to clean non ascii characters
-export const cleanSolidityString = (string) => {
-  return string.replace(/[^\x1F-\x7F]+/gm, "").trim();
-};
+// eslint-disable-next-line no-control-regex
+const cleanSolidityString = (string) => string.replace(/[^\x1F-\x7F]+/gm, '').trim();
+
+export default cleanSolidityString;
