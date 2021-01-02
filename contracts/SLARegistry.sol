@@ -98,6 +98,10 @@ contract SLARegistry {
         SLA _sla,
         bytes32 _sloName
     ) public {
+        require(
+            periodIsFinished(_sla, _periodId),
+            "Period has not finished yet"
+        );
         messenger.requestSLI(_periodId, _sla, _sloName);
     }
 
@@ -142,5 +146,19 @@ contract SLARegistry {
      */
     function SLACount() public view returns (uint256) {
         return SLAs.length;
+    }
+
+    /**
+     * @dev public view function that returns the total amount of service
+     * level agreements
+     * @param _sla 1. SLA to check if the period is finished
+     * @param _periodId 2. id of the period
+     */
+    function periodIsFinished(SLA _sla, uint256 _periodId)
+        public
+        view
+        returns (uint256)
+    {
+        return block.timestamp >= _sla.periods[_period].sla_period_end;
     }
 }
