@@ -102,6 +102,8 @@ contract SLARegistry {
             periodIsFinished(_sla, _periodId),
             "Period has not finished yet"
         );
+        require(_sla.periods[_period].status == 0);
+
         messenger.requestSLI(_periodId, _sla, _sloName);
     }
 
@@ -158,6 +160,21 @@ contract SLARegistry {
         public
         view
         returns (uint256)
+    {
+        return block.timestamp >= _sla.periods[_period].sla_period_end;
+    }
+
+    /**
+     * @dev public view function that returns the true if the period is finished
+     * level agreements
+     * @param _sla 1. SLA to check if the period is finished
+     * @param _periodId 2. id of the period
+     * @retun true if the period has finished
+     */
+    function periodIsFinished(SLA _sla, uint256 _periodId)
+        public
+        view
+        returns (bool)
     {
         return block.timestamp >= _sla.periods[_period].sla_period_end;
     }
