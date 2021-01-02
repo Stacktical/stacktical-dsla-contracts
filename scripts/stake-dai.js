@@ -2,7 +2,7 @@ const DAI = artifacts.require('DAI');
 const SLA = artifacts.require('SLA');
 const { toWei, fromWei } = web3.utils;
 
-const SLAAdress = '0xfE5bfd5C68b366AAB06382EcDB559218e77871aC';
+const SLAAdress = '0x0bEA2c54d72a002654692100E065de9d5D22d725';
 
 module.exports = async (callback) => {
   try {
@@ -15,7 +15,12 @@ module.exports = async (callback) => {
 
     const dai = await DAI.deployed();
     console.log(`DAI address is: ${dai.address}`);
+
+    await sla.addAllowedTokens(dai.address);
+
     const stakeAmount = toWei(String('100'));
+    const balance = await dai.balanceOf(owner);
+    console.log(`Owner balance is: ${balance}`);
     await dai.approve(SLAAdress, stakeAmount, { from: account });
     await sla.stakeTokens(stakeAmount, dai.address, 4, { from: account });
     const daiStakingIndex = await sla.userStakedTokensIndex.call(

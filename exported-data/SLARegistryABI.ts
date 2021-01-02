@@ -57,11 +57,7 @@ export const SLARegistryABI: AbiItem[] = [
       { internalType: 'uint256', name: '_stake', type: 'uint256' },
       { internalType: 'string', name: '_ipfsHash', type: 'string' },
       { internalType: 'uint256', name: '_sliInterval', type: 'uint256' },
-      {
-        internalType: 'contract bDSLAToken',
-        name: '_tokenAddress',
-        type: 'address',
-      },
+      { internalType: 'address', name: '_baseTokenAddress', type: 'address' },
       {
         internalType: 'uint256[]',
         name: '_sla_period_starts',
@@ -72,7 +68,6 @@ export const SLARegistryABI: AbiItem[] = [
         name: '_sla_period_ends',
         type: 'uint256[]',
       },
-      { internalType: 'address', name: '_daiAddress', type: 'address' },
     ],
     name: 'createSLA',
     outputs: [],

@@ -9,11 +9,7 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'uint256', name: '_stake', type: 'uint256' },
       { internalType: 'string', name: '_ipfsHash', type: 'string' },
       { internalType: 'uint256', name: '_sliInterval', type: 'uint256' },
-      {
-        internalType: 'contract bDSLAToken',
-        name: '_tokenAddress',
-        type: 'address',
-      },
+      { internalType: 'address', name: '_baseTokenAddress', type: 'address' },
       {
         internalType: 'uint256[]',
         name: '_sla_period_starts',
@@ -24,7 +20,6 @@ export const SLAABI: AbiItem[] = [
         name: '_sla_period_ends',
         type: 'uint256[]',
       },
-      { internalType: 'address', name: '_daiAddress', type: 'address' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -88,7 +83,7 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [],
-    name: 'DAI',
+    name: 'BaseToken',
     outputs: [{ internalType: 'contract IERC20', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
@@ -149,15 +144,6 @@ export const SLAABI: AbiItem[] = [
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
     name: 'allowedTokensMapping',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'bDSLA',
-    outputs: [
-      { internalType: 'contract bDSLAToken', name: '', type: 'address' },
-    ],
     stateMutability: 'view',
     type: 'function',
   },
