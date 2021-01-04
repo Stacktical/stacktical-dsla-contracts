@@ -6,7 +6,7 @@ pragma solidity ^0.6.0;
  * @dev SLO is a service level objective contract used to check SLI's against
  */
 contract SLO {
-    // The available checking types
+    /// @dev checking types to check if a SLA was honored or not
     enum SLOTypes {
         EqualTo,
         NotEqualTo,
@@ -16,28 +16,27 @@ contract SLO {
         GreaterOrEqualTo
     }
 
-    // The checking type for this SLO
+    /// @dev the checking type for this SLO
     SLOTypes public SLOType;
 
-    // The value to check the SLI against
+    /// @dev the value to check the SLI against
     uint256 public value;
 
-    // The name of the SLO in bytes32
+    /// @dev the name of the SLO in bytes32
     bytes32 public name;
 
     /**
      * @dev event for logging SLO creation
-     * @param _value The value to check the SLI against
-     * @param _SLOType The checking type for this SLO
-     * @param _name The name of the SLO in bytes32
+     * @param _value 1. The value to check the SLI against
+     * @param _SLOType 2. The checking type for this SLO
+     * @param _name 3. The name of the SLO in bytes32
      */
     event SLORegistered(uint256 _value, SLOTypes _SLOType, bytes32 _name);
 
     /**
-     * @dev constructor
-     * @param _value The value to check the SLI against
-     * @param _SLOType The checking type for this SLO
-     * @param _name The name of the SLO in bytes32
+     * @param _value 1. The value to check the SLI against
+     * @param _SLOType 2. The checking type for this SLO
+     * @param _name 3. The name of the SLO in bytes32
      */
     constructor(
         uint256 _value,
@@ -54,9 +53,9 @@ contract SLO {
     /**
      * @dev external view function to check a value against the SLO
      * @param _value The SLI value to check against the SL
-     * @return true if the SLO is honored
+     * @return boolean with the SLO honored state
      */
-    function isSLOHonored(uint256 _value) external view returns (bool) {
+    function isSLOHonored(uint256 _value) public view returns (bool) {
         if (SLOType == SLOTypes.EqualTo) {
             return _value == value;
         }
@@ -80,5 +79,6 @@ contract SLO {
         if (SLOType == SLOTypes.GreaterOrEqualTo) {
             return _value >= value;
         }
+        revert("isSLOHonoured wasn't executed properly");
     }
 }

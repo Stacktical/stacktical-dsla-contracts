@@ -1,0 +1,147 @@
+{
+  "details": "SLA is a service level agreement contract used for service downtime compensation",
+  "events": {
+    "SLICreated(uint256,uint256,uint256)": {
+      "details": "event for SLI creation logging",
+      "params": {
+        "_timestamp": "1. the time the SLI has been registered",
+        "_value": "2. the value of the SLI",
+        "_periodId": "3. the id of the given period"
+      }
+    }
+  },
+  "kind": "dev",
+  "methods": {
+    "addAllowedTokens(address)": {
+      "details": "add a token to ve allowed for staking",
+      "params": { "_token": "1. address of the new allowed token" }
+    },
+    "addNewPeriod(uint256,uint256)": {
+      "details": "add a new period to the array",
+      "params": {
+        "_sla_period_start": "1. uint256 of the start of the period",
+        "_sla_period_end": "2. uint256 of the end of the period"
+      }
+    },
+    "claimCompensation(uint256)": {
+      "details": "claim from delegators",
+      "params": { "_period": "1. period id to claim" }
+    },
+    "claimReward(uint256)": {
+      "details": "claim from validators",
+      "params": { "_period": "1. period id to claim" }
+    },
+    "constructor": {
+      "params": {
+        "_owner": "1. address of the owner of the service level agreement",
+        "_SLONames": "2. array of the names of the service level objectives in bytes32",
+        "_SLOs": "3. array of service level objective contract addressess service level objective breach",
+        "_stake": "4. uint of the amount required to stake when signing the service level agreement",
+        "_ipfsHash": "5. string with the ipfs hash that contains extra information about the service level agreement",
+        "_sliInterval": "6. uint the interval in seconds between requesting a new SLI",
+        "_baseTokenAddress": "7. address of the Base Token to be unlocked for staking",
+        "_sla_period_starts": "8. array with the values for the \"start\" of every period",
+        "_sla_period_ends": "9. array with the values for the \"end\" of every period"
+      }
+    },
+    "getDetails()": {
+      "details": "external view function that returns all agreement information",
+      "returns": {
+        "_0": "address owner",
+        "_1": "string ipfsHash",
+        "_2": "uint256 amount necessary to stake",
+        "_3": "bytes32[] SLONames array",
+        "_4": "SLO[] SLO addresses array"
+      }
+    },
+    "getSLI(bytes32)": {
+      "details": "external function to get SLIs of certain _SLO",
+      "params": { "_SLOName": "1. the name of the SLO in bytes32" },
+      "returns": { "_0": "SLI[] array of SLIs associated to the input SLOs" }
+    },
+    "getSliInterval()": {
+      "details": "external view function that returns the sliInterval value",
+      "returns": { "_0": "uint256 value of the sliInterval" }
+    },
+    "getTokenStake(address,uint256)": {
+      "details": "returns the token stake according to index",
+      "params": {
+        "_owner": "1. owner of the stake",
+        "_index": "2. index of the TokenStake"
+      }
+    },
+    "getTokenStakeLength(address)": {
+      "details": "returns the length of TokenStakes per user",
+      "params": { "_owner": "1. owner of the stake" }
+    },
+    "getUserTotalValue(address,uint256)": {
+      "details": "get the user total value staked",
+      "params": {
+        "_user": "1. address of the user",
+        "_period": "2. period id to claim"
+      }
+    },
+    "owner()": { "details": "Returns the address of the current owner." },
+    "registerSLI(bytes32,uint256,uint256)": {
+      "details": "external function to register SLI's and check them against the SLO's",
+      "params": {
+        "_SLOName": "1. the name of the SLO in bytes32",
+        "_value": "2. the value of the SLI to check",
+        "_periodId": "3. the id of the given period"
+      }
+    },
+    "renounceOwnership()": {
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+    },
+    "stakeTokens(uint256,address,uint256)": {
+      "details": "increase the amount staked per token",
+      "params": {
+        "_amount": "1. amount to be staked",
+        "_token": "2. address of the token",
+        "_period": "3. period id to stake"
+      }
+    },
+    "stakersCount()": {
+      "details": "public view function that returns the total amount of stakers"
+    },
+    "transferOwnership(address)": {
+      "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+    },
+    "withdraw(address,uint256)": {
+      "details": "withdraw staked tokens",
+      "params": {
+        "_token": "1. address of the token",
+        "_period": "2. period id to withdraw"
+      }
+    },
+    "withdrawAndStake(address,uint256,uint256)": {
+      "details": "withdraw BaseToken and stake d Tokens",
+      "params": {
+        "_token": "1. address of the token",
+        "_amount": "2. amount to withdraw",
+        "_period": "3. period id to withdraw"
+      }
+    }
+  },
+  "stateVariables": {
+    "SLIs": {
+      "details": "mapping to get SLI structs from SLO names in bytes32"
+    },
+    "SLONames": {
+      "details": "array storing the names of the SLO's of this agreement"
+    },
+    "SLOs": {
+      "details": "mapping to get SLO addresses from SLO names in bytes32"
+    },
+    "ipfsHash": {
+      "details": "The ipfs hash that stores extra information about the agreement"
+    },
+    "registry": { "details": "The address of the registry contract" },
+    "sliInterval": { "details": "The time between SLI registration" },
+    "stake": {
+      "details": "The required amount to stake when subscribing to the agreement"
+    }
+  },
+  "title": "SLA",
+  "version": 1
+}

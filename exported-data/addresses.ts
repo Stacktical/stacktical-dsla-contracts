@@ -1,0 +1,25 @@
+const addresses = {
+  '1': {
+    DSLAToken: '0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe',
+    SLORegistry: 'TBD',
+    SLARegistry: 'TBD',
+    AdminWallet: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1',
+    DAIToken: '0x6b175474e89094c44da98b954eedeac495271d0f',
+  },
+  '42': {
+    DSLAToken: '0x653157C7B46A81F106Ae0990E9B23DBFEAA0145F',
+    SLORegistry: '0x655648929077B9174aC4BA88900eC9629073C351',
+    SLARegistry: '0x4215502D804e5413Af5956eC09e81d56AEC53912',
+    AdminWallet: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1',
+    DAIToken: '0xC4375B7De8af5a38a93548eb8453a498222C4fF2',
+  },
+  '1337': {
+    DSLAToken: '0x642072d6Aec4AEF4498E96184073625ed87Ddf1B',
+    SLORegistry: '0x4efAe7CE1C4EfCaa02E1DBb587F66e2a7483f993',
+    SLARegistry: '0x2c309a63827c941d704c0B155E39444A2d885755',
+    AdminWallet: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1',
+    DAIToken: '0xdEe5E09e2851BF2f0847c9deb48FFC952Fef9012',
+  },
+};
+
+export default addresses;

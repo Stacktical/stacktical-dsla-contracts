@@ -1,26 +1,33 @@
-const { getDeploymentEnv } = require("../environments.config");
+require('babel-register');
+require('babel-polyfill');
 
-const SLORegistry = artifacts.require("./SLORegistry.sol");
-const SLARegistry = artifacts.require("./SLARegistry.sol");
-const Messenger = artifacts.require("Messenger");
+const { getDeploymentEnv } = require('../environments.config');
 
-module.exports = function (deployer, network) {
-  // Do not deploy if we are testing
-  if (process.env.NODE_ENV === "test") {
+const SLORegistry = artifacts.require('SLORegistry');
+const SLARegistry = artifacts.require('SLARegistry');
+const Messenger = artifacts.require('Messenger');
+const bDSLAToken = artifacts.require('bDSLAToken');
+const DAI = artifacts.require('DAI');
+
+module.exports = (deployer, network) => {
+  if (process.env.NODE_ENV === 'test') {
     return;
   }
+  deployer.then(async () => {
+    if (process.env.DEPLOY_TOKENS) {
+      await deployer.deploy(DAI);
+      return deployer.deploy(bDSLAToken);
+    }
 
-  const env = getDeploymentEnv(network);
+    const env = getDeploymentEnv(network);
 
-  deployer
-    .deploy(
+    await deployer.deploy(
       Messenger,
       env.chainlinkOracleAddress,
       env.chainlinkTokenAddress,
-      env.chainlinkJobId
-    )
-    .then(() => {
-      deployer.deploy(SLARegistry, Messenger.address);
-      deployer.deploy(SLORegistry);
-    });
+      env.chainlinkJobId,
+    );
+    await deployer.deploy(SLARegistry, Messenger.address);
+    return deployer.deploy(SLORegistry);
+  });
 };

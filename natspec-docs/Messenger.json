@@ -1,0 +1,62 @@
+{
+  "details": "This contract is attached immediately after deployment to a SLARegistry",
+  "events": {
+    "SLIReceived(address,uint256,bytes32,uint256)": {
+      "details": "event emitted when having a response from Chainlink with the SLI",
+      "params": {
+        "slaAddress": "1. SLA address to store the SLI",
+        "sliValue": "2. SLI value",
+        "sloName": "3. SLO name",
+        "_periodId": "4. id of the period"
+      }
+    }
+  },
+  "kind": "dev",
+  "methods": {
+    "constructor": {
+      "details": "parameterize the variables according to network",
+      "params": {
+        "_chainlinkOracle": "the address of the oracle to create requests to",
+        "_chainlinkToken": "the address of LINK token contract",
+        "_jobId": "the job id for the HTTPGet job"
+      }
+    },
+    "fulfillSLI(bytes32,uint256)": {
+      "details": "callback function for the Chainlink SLI request which stores the SLI in the SLA contract",
+      "params": {
+        "_requestId": "the ID of the ChainLink request",
+        "_sliValue": "the SLI value returned by ChainLink"
+      }
+    },
+    "getPeriod(address,uint256)": {
+      "details": "gets the start and end of a given SLA on a given period",
+      "params": {
+        "_periodId": "id of the period",
+        "_slaAddress": "address of the SLA Contract"
+      }
+    },
+    "requestSLI(uint256,address,bytes32)": {
+      "details": "creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.",
+      "params": {
+        "_periodId": "value of the period id",
+        "_sla": "SLA Address",
+        "_sloName": "the SLO name to get the SLI value for"
+      }
+    },
+    "setSLARegistry()": {
+      "details": "sets the SLARegistry contract address and can only be called once"
+    }
+  },
+  "stateVariables": {
+    "SLARegistry": { "details": "The address of the SLARegistry contract" },
+    "fee": { "details": "fee for Chainlink querys. Currently 0.1 LINK" },
+    "jobId": { "details": "chainlink jobId" },
+    "oracle": { "details": "Chainlink oracle address" },
+    "requestIdToRequest": {
+      "details": "Mapping that stores chainlink request information"
+    },
+    "requests": { "details": "Array with all request IDs" }
+  },
+  "title": "Messenger",
+  "version": 1
+}

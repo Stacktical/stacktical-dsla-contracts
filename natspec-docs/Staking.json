@@ -1,0 +1,121 @@
+{
+  "events": {
+    "NewPeriodAdded(uint256)": {
+      "params": { "period_index": "1. index of the period added" }
+    }
+  },
+  "kind": "dev",
+  "methods": {
+    "addAllowedTokens(address)": {
+      "details": "add a token to ve allowed for staking",
+      "params": { "_token": "1. address of the new allowed token" }
+    },
+    "addNewPeriod(uint256,uint256)": {
+      "details": "add a new period to the array",
+      "params": {
+        "_sla_period_start": "1. uint256 of the start of the period",
+        "_sla_period_end": "2. uint256 of the end of the period"
+      }
+    },
+    "claimCompensation(uint256)": {
+      "details": "claim from delegators",
+      "params": { "_period": "1. period id to claim" }
+    },
+    "claimReward(uint256)": {
+      "details": "claim from validators",
+      "params": { "_period": "1. period id to claim" }
+    },
+    "constructor": {
+      "params": {
+        "_baseTokenAddress": "1. address of the base token",
+        "_sla_period_starts": "2. array of starts of period",
+        "_sla_period_ends": "3. array of ends of period",
+        "_owner": "4. address of the owner of the SLA"
+      }
+    },
+    "getTokenStake(address,uint256)": {
+      "details": "returns the token stake according to index",
+      "params": {
+        "_owner": "1. owner of the stake",
+        "_index": "2. index of the TokenStake"
+      }
+    },
+    "getTokenStakeLength(address)": {
+      "details": "returns the length of TokenStakes per user",
+      "params": { "_owner": "1. owner of the stake" }
+    },
+    "getUserTotalValue(address,uint256)": {
+      "details": "get the user total value staked",
+      "params": {
+        "_user": "1. address of the user",
+        "_period": "2. period id to claim"
+      }
+    },
+    "owner()": { "details": "Returns the address of the current owner." },
+    "renounceOwnership()": {
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+    },
+    "stakeTokens(uint256,address,uint256)": {
+      "details": "increase the amount staked per token",
+      "params": {
+        "_amount": "1. amount to be staked",
+        "_token": "2. address of the token",
+        "_period": "3. period id to stake"
+      }
+    },
+    "stakersCount()": {
+      "details": "public view function that returns the total amount of stakers"
+    },
+    "transferOwnership(address)": {
+      "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+    },
+    "withdraw(address,uint256)": {
+      "details": "withdraw staked tokens",
+      "params": {
+        "_token": "1. address of the token",
+        "_period": "2. period id to withdraw"
+      }
+    },
+    "withdrawAndStake(address,uint256,uint256)": {
+      "details": "withdraw BaseToken and stake d Tokens",
+      "params": {
+        "_token": "1. address of the token",
+        "_amount": "2. amount to withdraw",
+        "_period": "3. period id to withdraw"
+      }
+    }
+  },
+  "stateVariables": {
+    "BaseToken": { "details": "IERC20 of the base stake address for the SLA" },
+    "allowedTokens": {
+      "details": "array with the allowed tokens addresses of the SLA"
+    },
+    "allowedTokensMapping": {
+      "details": "mapping for all allowed tokens to be staked"
+    },
+    "periods": { "details": "all periods for an SLA" },
+    "stakers": {
+      "details": "list of all stakers (validators, vouchers, delegators ...)"
+    },
+    "tokensPool": {
+      "details": "(mapping) erc20Address => stakeAmount: stake amount by tokenAddress"
+    },
+    "totalStaked": {
+      "details": "userAddress => erc20Address => index of userStakes mapping array"
+    },
+    "uniqueTokensStaked": {
+      "details": "(mapping) userAddress => amountOf tokens mapping"
+    },
+    "userStakedTokens": {
+      "details": "(mapping) userAddress => erc20Address => bool: user has erc20Address staked"
+    },
+    "userStakedTokensIndex": {
+      "details": "(mapping) userAddress => erc20Address => index: index of the TokenStake array"
+    },
+    "userStakes": {
+      "details": "(mapping) userAddress => TokenStake[] mapping"
+    },
+    "validator": { "details": "address of the validator for the SLA" }
+  },
+  "version": 1
+}

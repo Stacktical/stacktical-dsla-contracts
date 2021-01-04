@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-import "../bDSLA/bDSLAToken.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -21,14 +20,44 @@ contract Staking is Ownable {
         mapping(address => uint256) claimed_compensation;
     }
 
-    bDSLAToken public bDSLA;
-    address public validator;
-    address[] public stakers; // list of all stakers (validators, vouchers, delegators ...)
-    address[] public allowedTokens; // mapping for all allowed tokens to be staked
-    Period[] public periods; // all periods for an SLA
-    mapping(address => uint256) public uniqueTokensStaked; // mapping to trace how many token is staked by an user
-    uint256 public totalStaked;
+    struct TokenStake {
+        address tokenAddress;
+        uint256 stake;
+    }
+    bytes4 private constant BURN_SELECTOR =
+        bytes4(keccak256(bytes("burn(uint256)")));
 
+    /// @dev IERC20 of the base stake address for the SLA
+    IERC20 public BaseToken;
+
+    /// @dev all periods for an SLA
+    Period[] public periods;
+
+    /// @dev userAddress => erc20Address => index of userStakes mapping array
+    uint256 public totalStaked;
+    /// @dev address of the validator for the SLA
+    address public validator;
+    /// @dev list of all stakers (validators, vouchers, delegators ...)
+    address[] public stakers;
+    /// @dev array with the allowed tokens addresses of the SLA
+    address[] public allowedTokens;
+    /// @dev mapping for all allowed tokens to be staked
+    mapping(address => bool) public allowedTokensMapping;
+    /// @dev (mapping) userAddress => amountOf tokens mapping
+    mapping(address => uint256) public uniqueTokensStaked;
+    /// @dev (mapping) userAddress => TokenStake[] mapping
+    mapping(address => TokenStake[]) public userStakes;
+    /// @dev (mapping) userAddress => erc20Address => index: index of the TokenStake array
+    mapping(address => mapping(address => uint256))
+        public userStakedTokensIndex;
+    /// @dev (mapping) userAddress => erc20Address => bool: user has erc20Address staked
+    mapping(address => mapping(address => bool)) public userStakedTokens;
+    /// @dev (mapping) erc20Address => stakeAmount: stake amount by tokenAddress
+    mapping(address => uint256) public tokensPool;
+
+    /**
+     *@param period_index 1. index of the period added
+     */
     event NewPeriodAdded(uint256 indexed period_index);
 
     modifier notValidator {
@@ -49,8 +78,19 @@ contract Staking is Ownable {
         _;
     }
 
+    modifier onlyAllowedToken(address _token) {
+        require(allowedTokensMapping[_token] == true, "token is not allowed");
+        _;
+    }
+
+    /**
+     *@param _baseTokenAddress 1. address of the base token
+     *@param _sla_period_starts 2. array of starts of period
+     *@param _sla_period_ends 3. array of ends of period
+     *@param _owner 4. address of the owner of the SLA
+     */
     constructor(
-        bDSLAToken _tokenAddress,
+        address _baseTokenAddress,
         uint256[] memory _sla_period_starts,
         uint256[] memory _sla_period_ends,
         address _owner
@@ -59,16 +99,23 @@ contract Staking is Ownable {
             _sla_period_starts.length == _sla_period_ends.length,
             "Please check the params of your periods !"
         );
-        bDSLA = bDSLAToken(_tokenAddress);
-        allowedTokens.push(address(bDSLA));
         validator = _owner;
+
+        // Add BaseToken as allowed token
+        BaseToken = IERC20(_baseTokenAddress);
+        allowedTokens.push(_baseTokenAddress);
+        allowedTokensMapping[_baseTokenAddress] = true;
 
         for (uint256 i = 0; i < _sla_period_starts.length; i++) {
             _addPeriod(_sla_period_starts[i], _sla_period_ends[i]);
         }
     }
 
-    // add new period
+    /**
+     *@dev add a new period to the array
+     *@param _sla_period_start 1. uint256 of the start of the period
+     *@param _sla_period_end 2. uint256 of the end of the period
+     */
     function addNewPeriod(uint256 _sla_period_start, uint256 _sla_period_end)
         public
         onlyOwner
@@ -76,23 +123,63 @@ contract Staking is Ownable {
         _addPeriod(_sla_period_start, _sla_period_end);
     }
 
-    // autorise a new token to be staked
+    /**
+     *@dev add a token to ve allowed for staking
+     *@param _token 1. address of the new allowed token
+     */
     function addAllowedTokens(address _token) public onlyOwner {
+        require(allowedTokensMapping[_token] == false, "token already added");
         allowedTokens.push(_token);
+        allowedTokensMapping[_token] = true;
     }
 
-    // stake an amount of token
+    /**
+     *@dev increase the amount staked per token
+     *@param _token 1. address of the token
+     *@param _amount 2. amount to be staked
+     */
+    function _increaseTokenStaking(address _token, uint256 _amount) internal {
+        if (userStakedTokens[msg.sender][_token] == false) {
+            userStakes[msg.sender].push(
+                TokenStake({tokenAddress: _token, stake: _amount})
+            );
+            uint256 newTokenIndex = userStakes[msg.sender].length - 1;
+            userStakedTokensIndex[msg.sender][_token] = newTokenIndex;
+            userStakedTokens[msg.sender][_token] = true;
+        } else {
+            uint256 tokenIndex = userStakedTokensIndex[msg.sender][_token];
+            userStakes[msg.sender][tokenIndex].stake = userStakes[msg.sender][
+                tokenIndex
+            ]
+                .stake
+                .add(_amount);
+        }
+        tokensPool[_token] = tokensPool[_token].add(_amount);
+    }
+
+    /**
+     *@dev decrease the amount staked per token
+     *@param _token 1. address of the token
+     *@param _amount 2. amount to be decreased
+     */
+    function _decreaseTokenStaking(address _token, uint256 _amount) internal {
+        uint256 tokenIndex = userStakedTokensIndex[msg.sender][_token];
+        userStakes[msg.sender][tokenIndex].stake.sub(_amount);
+        tokensPool[_token] = tokensPool[_token].sub(_amount);
+    }
+
+    /**
+     *@dev increase the amount staked per token
+     *@param _amount 1. amount to be staked
+     *@param _token 2. address of the token
+     *@param _period 3. period id to stake
+     */
     function stakeTokens(
         uint256 _amount,
         address _token,
         uint256 _period
-    ) public {
+    ) public onlyAllowedToken(_token) {
         require(_amount > 0, "amount cannot be 0");
-        require(
-            _tokenIsAllowed(_token),
-            "token should be autorised to be staked"
-        );
-
         // check if the staker had already staked another token or not
         _updateUniqueTokensStaked(msg.sender, _token, _period);
         // stake tokens
@@ -108,21 +195,26 @@ contract Staking is Ownable {
         if (uniqueTokensStaked[msg.sender] == 1) {
             stakers.push(msg.sender);
         }
+
+        _increaseTokenStaking(_token, _amount);
     }
 
-    // Unstaking Tokens
-    function withdraw(address _token, uint256 _period) public notValidator {
+    /**
+     *@dev withdraw staked tokens
+     *@param _token 1. address of the token
+     *@param _period 2. period id to withdraw
+     */
+    function withdraw(address _token, uint256 _period)
+        public
+        notValidator
+        onlyAllowedToken(_token)
+    {
         // check if staker has staked tokens
         require(
             periods[_period].stakingBalance[_token][msg.sender] > 0,
             "staking balance cannot be 0"
         );
-        require(
-            _tokenIsAllowed(_token),
-            "token should be autorised to be staked"
-        );
 
-        // unstake bDSLA tokens
         uint256 staked = periods[_period].stakingBalance[_token][msg.sender];
         uint256 claimed_reward =
             periods[_period].claimed_reward.div(stakers.length);
@@ -138,22 +230,25 @@ contract Staking is Ownable {
             uint256 index = _getIndex(msg.sender);
             delete stakers[index];
         }
+
+        _decreaseTokenStaking(_token, staked);
     }
 
-    // withdraw bDSLA and stake d Tokens
+    /**
+     *@dev withdraw BaseToken and stake d Tokens
+     *@param _token 1. address of the token
+     *@param _amount 2. amount to withdraw
+     *@param _period 3. period id to withdraw
+     */
     function withdrawAndStake(
         address _token,
         uint256 _amount,
         uint256 _period
-    ) public notValidator {
+    ) public notValidator onlyAllowedToken(_token) {
         // check if staker has staked tokens
         require(
             periods[_period].stakingBalance[_token][msg.sender] > 0,
             "staking balance cannot be 0"
-        );
-        require(
-            _tokenIsAllowed(_token),
-            "token should be autorised to be staked"
         );
 
         // stake d tokens
@@ -164,17 +259,24 @@ contract Staking is Ownable {
             .add(_amount);
         totalStaked = totalStaked.add(_amount);
 
-        // unstake bDSLA tokens
+        _increaseTokenStaking(_token, _amount);
+
+        // unstake base tokens
         uint256 staked = periods[_period].stakingBalance[_token][msg.sender];
         uint256 claimed_reward =
             periods[_period].claimed_reward.div(stakers.length);
 
         periods[_period].stakingBalance[_token][msg.sender] = 0;
         totalStaked = totalStaked.sub(staked);
-        bDSLA.transfer(msg.sender, staked.sub(claimed_reward));
+        BaseToken.transfer(msg.sender, staked.sub(claimed_reward));
+
+        _decreaseTokenStaking(address(BaseToken), staked);
     }
 
-    // claim from validators
+    /**
+     *@dev claim from validators
+     *@param _period 1. period id to claim
+     */
     function claimReward(uint256 _period)
         public
         onlyInPeriod(_period)
@@ -196,11 +298,19 @@ contract Staking is Ownable {
         periods[_period].claimed_reward = reward;
         periods[_period].claimed = true;
 
-        bDSLA.transfer(msg.sender, reward);
-        bDSLA.burn(fees);
+        BaseToken.transfer(msg.sender, reward);
+        (bool _success, ) =
+            address(BaseToken).call(
+                abi.encodeWithSelector(BURN_SELECTOR, fees)
+            );
+
+        require(_success, "BaseToken burn process was not successful");
     }
 
-    // claim from delegators
+    /**
+     *@dev claim from delegators
+     *@param _period 1. period id to claim
+     */
     function claimCompensation(uint256 _period)
         public
         onlyInPeriod(_period)
@@ -221,10 +331,20 @@ contract Staking is Ownable {
         totalStaked = totalStaked.sub(compensation);
         periods[_period].claimed_compensation[msg.sender] = compensation;
 
-        bDSLA.transfer(msg.sender, compensation);
-        bDSLA.burn(fees);
+        BaseToken.transfer(msg.sender, compensation);
+        (bool _success, ) =
+            address(BaseToken).call(
+                abi.encodeWithSelector(BURN_SELECTOR, fees)
+            );
+
+        require(_success, "BaseToken burn process was not successful");
     }
 
+    /**
+     *@dev get the user total value staked
+     *@param _user 1. address of the user
+     *@param _period 2. period id to claim
+     */
     function getUserTotalValue(address _user, uint256 _period)
         public
         view
@@ -245,19 +365,6 @@ contract Staking is Ownable {
             }
         }
         return totalValue;
-    }
-
-    function _tokenIsAllowed(address token) internal view returns (bool) {
-        for (
-            uint256 allowedTokensIndex = 0;
-            allowedTokensIndex < allowedTokens.length;
-            allowedTokensIndex++
-        ) {
-            if (allowedTokens[allowedTokensIndex] == token) {
-                return true;
-            }
-        }
-        return false;
     }
 
     function _updateUniqueTokensStaked(
@@ -295,7 +402,6 @@ contract Staking is Ownable {
 
     /**
      * @dev public view function that returns the total amount of stakers
-     *
      */
     function stakersCount() public view returns (uint256) {
         return stakers.length;
@@ -309,6 +415,31 @@ contract Staking is Ownable {
         return (
             periods[_periodId].sla_period_start,
             periods[_periodId].sla_period_end
+        );
+    }
+
+    /**
+     * @dev returns the length of TokenStakes per user
+     * @param _owner 1. owner of the stake
+     */
+
+    function getTokenStakeLength(address _owner) public view returns (uint256) {
+        return userStakes[_owner].length;
+    }
+
+    /**
+     * @dev returns the token stake according to index
+     * @param _owner 1. owner of the stake
+     * @param _index 2. index of the TokenStake
+     */
+    function getTokenStake(address _owner, uint256 _index)
+        public
+        view
+        returns (address tokenAddress, uint256 stake)
+    {
+        return (
+            userStakes[_owner][_index].tokenAddress,
+            userStakes[_owner][_index].stake
         );
     }
 }

@@ -1,45 +1,45 @@
-import { testEnv } from "../environments.config";
-import { eventListener, getSLI, web3ContractCreator } from "./helpers";
+import { testEnv } from '../environments.config';
+import { eventListener, getSLI, getChainlinkJobId } from './helpers';
 
-const Messenger = artifacts.require("Messenger");
-const MinimalSLA = artifacts.require("MinimalSLA");
-const IERC20 = artifacts.require("IERC20");
+const Messenger = artifacts.require('Messenger');
+const MinimalSLA = artifacts.require('MinimalSLA');
+const IERC20 = artifacts.require('IERC20');
 
-contract("Messenger", (accounts) => {
+describe('Messenger', () => {
   let messenger;
   let minimalSLA;
-  let web3Contract;
   let chainlinkToken;
-  const owner = accounts[0];
-  const slaMonitoringStart = "1577836800000000000";
-  const slaMonitoringEnd = "1594026520000000000";
-  const arbitrarySLOName =
-    "0x4e69636b00000000000000000000000000000000000000000000000000000000";
+  const slaMonitoringStart = '1577836800000000000';
+  const slaMonitoringEnd = '1594026520000000000';
+  const arbitrarySLOName = '0x4e69636b00000000000000000000000000000000000000000000000000000000';
+  let owner;
 
+  // eslint-disable-next-line no-undef
   before(async () => {
+    [owner] = await web3.eth.getAccounts();
     // MinimalSLA creates a period on deployment time
     minimalSLA = await MinimalSLA.new(slaMonitoringStart, slaMonitoringEnd);
+    const jobId = process.env.TEST_ENV !== 'local' ? testEnv.chainlinkJobId : await getChainlinkJobId();
     messenger = await Messenger.new(
       testEnv.chainlinkOracleAddress,
       testEnv.chainlinkTokenAddress,
-      testEnv.chainlinkJobId
+      jobId,
     );
     chainlinkToken = await IERC20.at(testEnv.chainlinkTokenAddress);
-    // // Sets the owner as the SLARegistry
+    // Sets the owner as the SLARegistry
     await messenger.setSLARegistry({ from: owner });
-    web3Contract = web3ContractCreator(Messenger.abi, messenger.address);
   });
 
-  it("should ask for a SLI value to the Chainlink Oracle", async () => {
-    await chainlinkToken.transfer(messenger.address, web3.utils.toWei("0.1"));
+  it('should ask for a SLI value to the Chainlink Oracle', async () => {
+    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
     // MinimalSLA only has 1 period
     const minimalSLAPeriodId = 0;
     await messenger.requestSLI(
       minimalSLAPeriodId,
       minimalSLA.address,
-      arbitrarySLOName
+      arbitrarySLOName,
     );
-    await eventListener(web3Contract, "SLIReceived");
+    await eventListener(messenger, 'SLIReceived');
     const storedSLI = await minimalSLA.SLIs.call(arbitrarySLOName, 0);
     const { timestamp, value, periodId } = storedSLI;
     assert.notEmpty(timestamp);
@@ -49,9 +49,9 @@ contract("Messenger", (accounts) => {
     const stackticalSLI = await getSLI(
       minimalSLA.address,
       slaMonitoringStart,
-      slaMonitoringEnd
+      slaMonitoringEnd,
     );
     // the SLI is stored multiplied by 1000
-    assert.equal(stackticalSLI * 1000, parseInt(value));
+    assert.equal(stackticalSLI * 1000, Number(value));
   });
 });

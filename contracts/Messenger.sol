@@ -4,43 +4,54 @@ import "./SLA/SLA.sol";
 import "./StringUtils.sol";
 import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
 
+/**
+* @title Messenger
+* @notice Messenger is a contract to interact with an Oracle and request SLI information to Stacktical API
+on a decentralized fashion. Is not meant to be interacted directly.
+* @dev This contract is attached immediately after deployment to a SLARegistry
+*/
+
 contract Messenger is ChainlinkClient, StringUtils {
-    // struct that stores information regarding a chainlink request
+    /// @dev stores information regarding a chainlink request
     struct Request {
         SLA sla;
         bytes32 sloName;
         uint256 periodId;
     }
 
-    // Mapping that stores chainlink request information
+    /// @dev Mapping that stores chainlink request information
     mapping(bytes32 => Request) public requestIdToRequest;
-
-    // Array with all request IDs
+    /// @dev Array with all request IDs
     bytes32[] public requests;
-
-    // The address of the SLARegistry contract
+    /// @dev The address of the SLARegistry contract
     address public SLARegistry;
-    uint256[] public results;
-
-    // jobId corresponds to API call
-    address private oracle;
-    //    bytes32 private jobId = "29fa9aa13bf1468788b7cc4a500a45b8";
-    bytes32 private jobId;
-    uint256 private fee = 0.1 * 10**18; // 0.1 LINK;
+    /// @dev Chainlink oracle address
+    address public oracle;
+    /// @dev chainlink jobId
+    bytes32 public jobId;
+    /// @dev fee for Chainlink querys. Currently 0.1 LINK
+    uint256 public fee = 0.1 * 10**18;
 
     /**
      * @dev event emitted when having a response from Chainlink with the SLI
+     * @param slaAddress 1. SLA address to store the SLI
+     * @param sliValue 2. SLI value
+     * @param sloName 3. SLO name
+     * @param _periodId 4. id of the period
      */
     event SLIReceived(
-        address slaAdress,
+        address slaAddress,
         uint256 sliValue,
         bytes32 sloName,
         uint256 _periodId
     );
 
     /**
-     * @dev constructor
+     * @dev parameterize the variables according to network
+     * @notice sets the Chainlink parameters (oracle address, token address, jobId) and sets the SLARegistry to 0x0 address
      * @param _chainlinkOracle the address of the oracle to create requests to
+     * @param _chainlinkToken the address of LINK token contract
+     * @param _jobId the job id for the HTTPGet job
      */
     constructor(
         address _chainlinkOracle,
@@ -53,21 +64,19 @@ contract Messenger is ChainlinkClient, StringUtils {
         SLARegistry = address(0);
     }
 
-    /**
-     * @dev Throws if called by any address other than the registry contract.
-     */
-    modifier onlySLARegistry() {
+    /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
+    modifier onlyAllowedAddresses() {
         require(
             msg.sender == SLARegistry || msg.sender == chainlinkOracleAddress(),
-            "Can only be called by connected SLARegistry"
+            "Can only be called by connected SLARegistry or Chainlink Oracle"
         );
         _;
     }
 
     /**
-     * @dev Creates a ChainLink request to get a new SLI value for the
-     * given params
-     * @param _periodId bytes32 value of the period id
+     * @dev creates a ChainLink request to get a new SLI value for the
+     * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.
+     * @param _periodId value of the period id
      * @param _sla SLA Address
      * @param _sloName the SLO name to get the SLI value for
      */
@@ -76,7 +85,7 @@ contract Messenger is ChainlinkClient, StringUtils {
         uint256 _periodId,
         SLA _sla,
         bytes32 _sloName
-    ) public onlySLARegistry {
+    ) public onlyAllowedAddresses {
         Chainlink.Request memory request =
             buildChainlinkRequest(
                 jobId,
@@ -92,8 +101,8 @@ contract Messenger is ChainlinkClient, StringUtils {
         string memory query =
             _encodeQuery(
                 _addressToString(address(_sla)),
-                _uintTostr(startPeriod),
-                _uintTostr(endPeriod)
+                _uintToStr(startPeriod),
+                _uintToStr(endPeriod)
             );
         request.add("get", query);
 
@@ -112,21 +121,16 @@ contract Messenger is ChainlinkClient, StringUtils {
     }
 
     /**
-     * @dev The callback function for the Chainlink SLI request which stores
+     * @dev callback function for the Chainlink SLI request which stores
      * the SLI in the SLA contract
      * @param _requestId the ID of the ChainLink request
      * @param _sliValue the SLI value returned by ChainLink
      */
     function fulfillSLI(bytes32 _requestId, uint256 _sliValue)
         public
-        // Use recordChainlinkFulfillment to ensure only the requesting oracle can fulfill
         recordChainlinkFulfillment(_requestId)
     {
         Request memory request = requestIdToRequest[_requestId];
-
-        request.sla.registerSLI(request.sloName, _sliValue, request.periodId);
-
-        results.push(_sliValue);
 
         emit SLIReceived(
             address(request.sla),
@@ -134,10 +138,12 @@ contract Messenger is ChainlinkClient, StringUtils {
             request.sloName,
             request.periodId
         );
+
+        request.sla.registerSLI(request.sloName, _sliValue, request.periodId);
     }
 
     /**
-     * @dev This sets the SLARegistry contract address and can only be called
+     * @dev sets the SLARegistry contract address and can only be called
      * once
      */
     function setSLARegistry() public {
@@ -152,6 +158,8 @@ contract Messenger is ChainlinkClient, StringUtils {
 
     /**
      * @dev gets the start and end of a given SLA on a given period
+     * @param _slaAddress address of the SLA Contract
+     * @param _periodId id of the period
      */
     function getPeriod(address _slaAddress, uint256 _periodId)
         public
