@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { testEnv } from '../../environments.config';
 
-const baseURL = process.env.CHAINLINK_URL || 'http://localhost:6688';
+const baseURL = testEnv.chainlinkNodeUrl;
 
 const getSessionCookie = async () => {
   const resp = await axios({
@@ -16,6 +17,7 @@ const getSessionCookie = async () => {
   });
   return resp.headers['set-cookie'];
 };
+
 const getChainlinkJobId = async () => {
   const sessionCookie = await getSessionCookie();
   const { data } = await axios({

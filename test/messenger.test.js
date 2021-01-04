@@ -1,4 +1,4 @@
-import { testEnv } from '../environments.config';
+import { isTestEnv, testEnv } from '../environments.config';
 import { eventListener, getSLI, getChainlinkJobId } from './helpers';
 
 const Messenger = artifacts.require('Messenger');
@@ -19,7 +19,7 @@ describe('Messenger', () => {
     [owner] = await web3.eth.getAccounts();
     // MinimalSLA creates a period on deployment time
     minimalSLA = await MinimalSLA.new(slaMonitoringStart, slaMonitoringEnd);
-    const jobId = process.env.TEST_ENV !== 'local' ? testEnv.chainlinkJobId : await getChainlinkJobId();
+    const jobId = !isTestEnv ? testEnv.chainlinkJobId : await getChainlinkJobId();
     messenger = await Messenger.new(
       testEnv.chainlinkOracleAddress,
       testEnv.chainlinkTokenAddress,

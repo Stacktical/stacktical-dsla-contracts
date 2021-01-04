@@ -1,4 +1,6 @@
 import { expect } from 'chai';
+import { isTestEnv } from '../environments.config';
+import { getChainlinkJobId } from './helpers';
 
 const IERC20 = artifacts.require('IERC20');
 const SLA = artifacts.require('SLA');
@@ -51,7 +53,7 @@ describe('SLARegistry', () => {
     messenger = await Messenger.new(
       testEnv.chainlinkOracleAddress,
       testEnv.chainlinkTokenAddress,
-      testEnv.chainlinkJobId,
+      !isTestEnv ? testEnv.chainlinkJobId : await getChainlinkJobId(),
     );
 
     chainlinkToken = await IERC20.at(testEnv.chainlinkTokenAddress);
