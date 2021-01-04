@@ -1,4 +1,4 @@
-# stacktical-mvp-contracts
+# stacktical-dsla-contracts
 
 ## Dev
 
@@ -52,24 +52,13 @@ TODO
 * MinimalSLA: used only for testing purposes. It is used by the Messenger contract to test integration
 
 ### Documentation
-NATSpec userdoc and devdoc JSON files are included in natspec-docs directory
+NATSpec userdoc and devdoc JSON files are included in natspec-docs directory. Use it to check the inputs of the functions, or events parameters.
 
 ## Scripts
-    test:local = run all the tests on local network
-    test:local:specific = run the test specified at the end of the line on local network
-    test:local:messenger = run the test messenger on local network
-    test:local:slaRegistry = run the test slaRegistry on local network
-    test:kovan = run automated tests on kovan network
-    deploy:kovan = deploy updates to kovan network
-    deploy:kovan:reset = deploy everything forced to kovan network
-    deploy:local = deploy updates to local network
-    deploy:local:reset = deploy everything forced to local network
-    remix = connect remix to local repository
-    compile = compile contracts using truffle
-    turffle:console:local = open the truffle console for local network
-    prettier:contracts = prettify contracts
-    export-data = exports addresses, abis and create the natspec-docs
-    export-data:scripts = runs the below scripts
-    export-data:scripts:abis = creates the abis
-    export-data:scripts:addresses = creates the addresses.ts file
-    export-data:scripts:natspec-docs = compile the contracts and create the natspec-docs on natspec-docs folder
+* ```deploy:ENV:OPTION```: deploy the contracts on ENV environment, with OPTION options.
+* ```export-data```: creates the files for the front end (addresses and ABIs) and the NATSpec JSONs
+* ```mint-tokens```: mint bDSLA and DAI to account[0] on local env
+* ```test:ENV:CONTRACT```: runs the test on ENV env for CONTRACT contract.
+* ```truffle:deploy:ENV:OPTION```: runs ```truffle deploy``` on ENV with OPTION options
+* ```truffle:exec:SCRIPT:OPTION```: runs ```truffle exec```  SCRIPT script on local env (or OPTION env)
+* ```truffle:console:ENV```: runs ```truffle console```  on ENV env
