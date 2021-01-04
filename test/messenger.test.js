@@ -1,5 +1,5 @@
 import { testEnv } from '../environments.config';
-import { eventListener, getSLI } from './helpers';
+import { eventListener, getSLI, getChainlinkJobId } from './helpers';
 
 const Messenger = artifacts.require('Messenger');
 const MinimalSLA = artifacts.require('MinimalSLA');
@@ -16,17 +16,17 @@ describe('Messenger', () => {
 
   // eslint-disable-next-line no-undef
   before(async () => {
-    const accounts = await web3.eth.getAccounts();
-    [owner] = accounts;
+    [owner] = await web3.eth.getAccounts();
     // MinimalSLA creates a period on deployment time
     minimalSLA = await MinimalSLA.new(slaMonitoringStart, slaMonitoringEnd);
+    const jobId = process.env.TEST_ENV !== 'local' ? testEnv.chainlinkJobId : await getChainlinkJobId();
     messenger = await Messenger.new(
       testEnv.chainlinkOracleAddress,
       testEnv.chainlinkTokenAddress,
-      testEnv.chainlinkJobId,
+      jobId,
     );
     chainlinkToken = await IERC20.at(testEnv.chainlinkTokenAddress);
-    // // Sets the owner as the SLARegistry
+    // Sets the owner as the SLARegistry
     await messenger.setSLARegistry({ from: owner });
   });
 
