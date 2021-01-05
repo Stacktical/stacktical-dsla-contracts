@@ -2,6 +2,8 @@ import { expectRevert } from '@openzeppelin/test-helpers';
 import { expect } from 'chai';
 
 import { slaConstructor } from './helpers/constants';
+import { isTestEnv } from '../environments.config';
+import { getChainlinkJobId } from './helpers';
 
 const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
@@ -44,7 +46,7 @@ describe('SLA', () => {
     messenger = await Messenger.new(
       testEnv.chainlinkOracleAddress,
       testEnv.chainlinkTokenAddress,
-      testEnv.chainlinkJobId,
+      !isTestEnv ? testEnv.chainlinkJobId : await getChainlinkJobId(),
     );
     slaRegistry = await SLARegistry.new(messenger.address);
 
