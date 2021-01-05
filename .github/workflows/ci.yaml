@@ -35,5 +35,6 @@ jobs:
             ${{ runner.OS }}-node-
             ${{ runner.OS }}-
       - run: npm install
-      - run: npm install truffle
-      - run: ./node_modules/truffle/build/cli.bundled.js test --network staging
+      - run: npm install -g truffle
+      - run: pip3 install vyper
+      - run: npm run test:staging
