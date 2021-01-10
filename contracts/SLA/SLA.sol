@@ -59,7 +59,18 @@ contract SLA is Ownable, Staking {
     modifier onlyMessenger() {
         require(
             msg.sender == address(registry.messenger()),
-            "Only Messenger can call this funtcion"
+            "Only Messenger can call this function"
+        );
+        _;
+    }
+
+    /**
+     * @dev throws if called by any address other than the messenger contract.
+     */
+    modifier onlySLARegistry() {
+        require(
+            msg.sender == address(registry),
+            "Only SLARegistry can call this function"
         );
         _;
     }
@@ -91,12 +102,7 @@ contract SLA is Ownable, Staking {
         uint256[] memory _sla_period_ends
     )
         public
-        Staking(
-            _baseTokenAddress,
-            _sla_period_starts,
-            _sla_period_ends,
-            _owner
-        )
+        Staking(_baseTokenAddress, _sla_period_starts, _sla_period_ends, _owner)
     {
         require(_SLOs.length < 5, "max amount of SLOs is 5");
         require(
@@ -182,5 +188,22 @@ contract SLA is Ownable, Staking {
         }
 
         return (owner(), ipfsHash, stake, SLONames, _SLOAddresses);
+    }
+
+    /**
+     *@dev increase the _amount staked per _token of _sla
+     *@param _amount 1. address of the token
+     *@param _token 2. period id to stake
+     *@param _period 3. period id to stake
+     */
+
+    function stakeTokens(
+        uint256 _amount,
+        address _token,
+        uint256 _period
+    ) public {
+        bool success = registry.registerStakedSla(msg.sender);
+        require(success, "sla was not registered as staked by the msg.sender");
+        _stakeTokens(_amount, _token, _period);
     }
 }
