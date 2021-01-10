@@ -2,8 +2,8 @@ module.exports = {
   env: {
     es2021: true,
     node: true,
-    'jest/globals': true,
     'truffle/globals': true,
+    mocha: true,
   },
   extends: ['airbnb-base'],
   parserOptions: {
@@ -18,5 +18,5 @@ module.exports = {
     'no-restricted-syntax': 'off',
     'no-param-reassign': 'off',
   },
-  plugins: ['jest', 'truffle'],
+  plugins: ['truffle', 'mocha'],
 };

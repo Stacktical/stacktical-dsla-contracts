@@ -1,5 +1,8 @@
-require('babel-register');
 require('babel-polyfill');
+require('babel-register');
+
+const { getChainlinkJobId } = require('../test/helpers');
+const { isTestEnv } = require('../environments.config');
 
 const { getDeploymentEnv } = require('../environments.config');
 
@@ -13,6 +16,7 @@ module.exports = (deployer, network) => {
   if (process.env.NODE_ENV === 'test') {
     return;
   }
+
   deployer.then(async () => {
     if (process.env.DEPLOY_TOKENS) {
       await deployer.deploy(DAI);
@@ -25,7 +29,7 @@ module.exports = (deployer, network) => {
       Messenger,
       env.chainlinkOracleAddress,
       env.chainlinkTokenAddress,
-      env.chainlinkJobId,
+      !isTestEnv ? env.chainlinkJobId : await getChainlinkJobId(),
     );
     await deployer.deploy(SLARegistry, Messenger.address);
     return deployer.deploy(SLORegistry);
