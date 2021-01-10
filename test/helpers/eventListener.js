@@ -1,4 +1,4 @@
-import { testEnv } from '../../environments.config';
+import { envParameters } from '../../environments.config';
 
 const Web3 = require('web3');
 
@@ -6,7 +6,7 @@ const contractCreator = (contract) => {
   const { abi, address } = contract;
   try {
     const web3 = new Web3(
-      new Web3.providers.WebsocketProvider(testEnv.web3WebsocketProviderUrl),
+      new Web3.providers.WebsocketProvider(envParameters.web3WebsocketProviderUrl),
     );
     return new web3.eth.Contract(abi, address);
   } catch (error) {

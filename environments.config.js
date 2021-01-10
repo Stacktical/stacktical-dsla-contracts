@@ -21,7 +21,7 @@ const environments = {
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
     chainlinkNodeUrl: `http://${process.env.STAGING_IP}:6688`,
   },
-  local: {
+  develop: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
     chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
@@ -30,19 +30,15 @@ const environments = {
 };
 
 const getNetworkName = (network) => {
-  if (/local/i.test(network)) return 'local';
+  if (/develop/i.test(network)) return 'develop';
+  if (/staging/i.test(network)) return 'staging';
   if (/kovan/i.test(network)) return 'kovan';
-  if (/rinkeby/i.test(network)) return 'rinkeby';
-  if (/ropsten/i.test(network)) return 'ropsten';
   if (/live/i.test(network)) return 'mainnet';
   throw new Error(`Network not recognized: ${network}`);
 };
 
-export const getDeploymentEnv = (network) => {
-  const networkName = getNetworkName(network);
-  return environments[networkName];
-};
+export const getEnvFromNetwork = (network) => environments[getNetworkName(network)];
 
-export const testEnv = environments[process.env.TEST_ENV];
+export const envParameters = environments[process.env.NODE_ENV];
 
-export const isTestEnv = ['local', 'staging'].includes(process.env.TEST_ENV);
+export const needsGetJobId = ['develop', 'staging'].includes(process.env.NODE_ENV);

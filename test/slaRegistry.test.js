@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { isTestEnv } from '../environments.config';
+import { needsGetJobId } from '../environments.config';
 import { getChainlinkJobId } from './helpers';
 
 const IERC20 = artifacts.require('IERC20');
@@ -12,7 +12,7 @@ const DAI = artifacts.require('DAI');
 
 const { slaConstructor } = require('./helpers/constants');
 const { getSLI, eventListener, cleanSolidityString } = require('./helpers');
-const { testEnv } = require('../environments.config');
+const { envParameters } = require('../environments.config');
 
 const { toWei, utf8ToHex } = web3.utils;
 
@@ -59,12 +59,12 @@ describe('SLARegistry', () => {
     });
 
     messenger = await Messenger.new(
-      testEnv.chainlinkOracleAddress,
-      testEnv.chainlinkTokenAddress,
-      !isTestEnv ? testEnv.chainlinkJobId : await getChainlinkJobId(),
+      envParameters.chainlinkOracleAddress,
+      envParameters.chainlinkTokenAddress,
+      !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
     );
 
-    chainlinkToken = await IERC20.at(testEnv.chainlinkTokenAddress);
+    chainlinkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
 
     slaRegistry = await SLARegistry.new(messenger.address);
 
