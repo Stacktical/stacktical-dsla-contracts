@@ -231,7 +231,7 @@ contract SLARegistry {
         ) {
             SLA currentSLA = SLA(userStakedSlas[_slaOwner][index]);
             stakeCounter = stakeCounter.add(
-                currentSLA.getTokenStakeLength(msg.sender)
+                currentSLA.getTokenStakeLength(_slaOwner)
             );
         }
 
@@ -246,11 +246,11 @@ contract SLARegistry {
             SLA currentSLA = userStakedSlas[_slaOwner][index];
             for (
                 uint256 tokenIndex = 0;
-                tokenIndex < currentSLA.getTokenStakeLength(msg.sender);
+                tokenIndex < currentSLA.getTokenStakeLength(_slaOwner);
                 tokenIndex++
             ) {
                 (address tokenAddress, uint256 stake) =
-                    currentSLA.getTokenStake(msg.sender, tokenIndex);
+                    currentSLA.getTokenStake(_slaOwner, tokenIndex);
                 (, bytes memory tokenNameBytes) =
                     tokenAddress.staticcall(
                         abi.encodeWithSelector(NAME_SELECTOR)
