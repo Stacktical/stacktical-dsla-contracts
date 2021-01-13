@@ -11,7 +11,7 @@ const addresses = {
     SLORegistry: '0x26b6A83F11d66ead07EA6d7Ad513051df885F5b1',
     SLARegistry: '0x1De41cb67eD6b94E6FEcb39eDCaB91d0f681943e',
     AdminWallet: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1',
-    DAIToken: '0xC4375B7De8af5a38a93548eb8453a498222C4fF2',
+    DAIToken: '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa',
   },
   '1337': {
     DSLAToken: '0x6bf5b6F9b59DF885bD241304C902C5bF7d816fbd',

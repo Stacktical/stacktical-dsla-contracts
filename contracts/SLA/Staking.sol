@@ -164,7 +164,11 @@ contract Staking is Ownable {
      */
     function _decreaseTokenStaking(address _token, uint256 _amount) internal {
         uint256 tokenIndex = userStakedTokensIndex[msg.sender][_token];
-        userStakes[msg.sender][tokenIndex].stake.sub(_amount);
+        userStakes[msg.sender][tokenIndex].stake = userStakes[msg.sender][
+            tokenIndex
+        ]
+            .stake
+            .sub(_amount);
         tokensPool[_token] = tokensPool[_token].sub(_amount);
     }
 
