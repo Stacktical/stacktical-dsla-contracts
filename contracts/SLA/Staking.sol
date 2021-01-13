@@ -174,11 +174,11 @@ contract Staking is Ownable {
      *@param _token 2. address of the token
      *@param _period 3. period id to stake
      */
-    function stakeTokens(
+    function _stakeTokens(
         uint256 _amount,
         address _token,
         uint256 _period
-    ) public onlyAllowedToken(_token) {
+    ) internal onlyAllowedToken(_token) {
         require(_amount > 0, "amount cannot be 0");
         // check if the staker had already staked another token or not
         _updateUniqueTokensStaked(msg.sender, _token, _period);

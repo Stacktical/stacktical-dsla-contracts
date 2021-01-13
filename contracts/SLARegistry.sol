@@ -3,7 +3,6 @@ pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Messenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
@@ -31,8 +30,19 @@ contract SLARegistry {
     /// @dev stores the addresses of created SLAs
     SLA[] public SLAs;
 
+    /// @dev mapping SLA=>bool to check if SLA is registered
+    mapping(address => bool) public registeredSLAs;
+
     /// @dev stores the indexes of service level agreements owned by an user
     mapping(address => uint256[]) private userToSLAIndexes;
+
+    /// @dev mapping userAddress => SLA[]
+    mapping(address => SLA[]) public userStakedSlas;
+
+    modifier onlyRegisteredSla {
+        require(registeredSLAs[msg.sender] == true, "Only for registered SLAs");
+        _;
+    }
 
     /**
      * @dev event for service level agreement creation logging
@@ -47,7 +57,6 @@ contract SLARegistry {
      */
     constructor(Messenger _messengerAddress) public {
         messenger = _messengerAddress;
-        /// TODO:change to call(signature(params)))
         messenger.setSLARegistry();
     }
 
@@ -92,7 +101,7 @@ contract SLARegistry {
             );
 
         SLAs.push(sla);
-
+        registeredSLAs[address(sla)] = true;
         uint256 index = SLAs.length.sub(1);
 
         userToSLAIndexes[msg.sender].push(index);
@@ -116,7 +125,6 @@ contract SLARegistry {
             address(SLA(_sla).SLOs(_sloName)) != address(0),
             "_sloName does not exist in the SLA contract"
         );
-        /// TODO:change to call(signature(params)))
         messenger.requestSLI(_periodId, _sla, _sloName);
     }
 
@@ -168,6 +176,40 @@ contract SLARegistry {
     }
 
     /**
+     *@dev public view function that returns true if the _owner has staked on _sla
+     *@param _user 1. address to check
+     *@param _sla 2. sla to check
+     *@return bool, true if _sla was staked by _user
+     */
+    function slaWasStakedByUser(address _user, address _sla)
+        public
+        view
+        returns (bool)
+    {
+        for (uint256 index = 0; index < userStakedSlas[_user].length; index++) {
+            if (address(userStakedSlas[_user][index]) == _sla) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *@dev register the sending SLA contract as staked by _owner
+     *@param _owner 1. SLA contract to stake
+     */
+    function registerStakedSla(address _owner)
+        public
+        onlyRegisteredSla
+        returns (bool)
+    {
+        if (slaWasStakedByUser(_owner, msg.sender) == false) {
+            userStakedSlas[_owner].push(SLA(msg.sender));
+        }
+        return true;
+    }
+
+    /**
      * @dev returns the active pools owned by a user.
      * @param _slaOwner 1. owner of the active pool
      * @return ActivePool[], array of structs: {SLAaddress,stake,assetName}
@@ -178,26 +220,34 @@ contract SLARegistry {
         returns (ActivePool[] memory)
     {
         uint256 stakeCounter = 0;
-        // Count the stakes of the user
-        for (uint256 index = 0; index < userSLACount(_slaOwner); index++) {
-            SLA currentSLA = SLAs[userToSLAIndexes[_slaOwner][index]];
+        // Count the stakes of the user, checking every SLA staked
+        for (
+            uint256 index = 0;
+            index < userStakedSlas[_slaOwner].length;
+            index++
+        ) {
+            SLA currentSLA = SLA(userStakedSlas[_slaOwner][index]);
             stakeCounter = stakeCounter.add(
-                currentSLA.getTokenStakeLength(msg.sender)
+                currentSLA.getTokenStakeLength(_slaOwner)
             );
         }
 
         ActivePool[] memory activePools = new ActivePool[](stakeCounter);
         // to insert on activePools array
         uint256 stakePosition = 0;
-        for (uint256 index = 0; index < userSLACount(_slaOwner); index++) {
-            SLA currentSLA = SLAs[userToSLAIndexes[_slaOwner][index]];
+        for (
+            uint256 index = 0;
+            index < userStakedSlas[_slaOwner].length;
+            index++
+        ) {
+            SLA currentSLA = userStakedSlas[_slaOwner][index];
             for (
                 uint256 tokenIndex = 0;
-                tokenIndex < currentSLA.getTokenStakeLength(msg.sender);
+                tokenIndex < currentSLA.getTokenStakeLength(_slaOwner);
                 tokenIndex++
             ) {
                 (address tokenAddress, uint256 stake) =
-                    currentSLA.getTokenStake(msg.sender, tokenIndex);
+                    currentSLA.getTokenStake(_slaOwner, tokenIndex);
                 (, bytes memory tokenNameBytes) =
                     tokenAddress.staticcall(
                         abi.encodeWithSelector(NAME_SELECTOR)

@@ -8,12 +8,7 @@ const stagingIP = process.env.STAGING_IP;
 
 module.exports = {
   networks: {
-    development: {
-      host: '127.0.0.1',
-      port: 7545,
-      network_id: '*',
-    },
-    local: {
+    develop: {
       provider() {
         return new HDWalletProvider(
           test_mnemonic,
@@ -43,16 +38,6 @@ module.exports = {
         );
       },
       network_id: '1',
-      gas: 4612388,
-    },
-    rinkeby: {
-      provider() {
-        return new HDWalletProvider(
-          mnemonic,
-          `https://rinkeby.infura.io/v3/${infura_project_id}`,
-        );
-      },
-      network_id: '4',
       gas: 4612388,
     },
     kovan: {

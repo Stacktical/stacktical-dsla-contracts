@@ -32,7 +32,7 @@ const addresses = (adminWallet) => ({
       (SLARegistry.networks[42] && SLARegistry.networks[42].address)
       || placeHolder,
     AdminWallet: adminWallet,
-    DAIToken: '0xC4375B7De8af5a38a93548eb8453a498222C4fF2',
+    DAIToken: '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa',
   },
   1337: {
     DSLAToken:

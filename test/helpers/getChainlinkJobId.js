@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { testEnv } from '../../environments.config';
+import { envParameters } from '../../environments.config';
 
-const baseURL = testEnv.chainlinkNodeUrl;
+const baseURL = envParameters.chainlinkNodeUrl;
 
 const getSessionCookie = async () => {
   const resp = await axios({

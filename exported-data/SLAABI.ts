@@ -252,17 +252,6 @@ export const SLAABI: AbiItem[] = [
     type: 'function',
   },
   {
-    inputs: [
-      { internalType: 'uint256', name: '_amount', type: 'uint256' },
-      { internalType: 'address', name: '_token', type: 'address' },
-      { internalType: 'uint256', name: '_period', type: 'uint256' },
-    ],
-    name: 'stakeTokens',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     name: 'stakers',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
@@ -412,6 +401,17 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'contract SLO[]', name: '', type: 'address[]' },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'uint256', name: '_amount', type: 'uint256' },
+      { internalType: 'address', name: '_token', type: 'address' },
+      { internalType: 'uint256', name: '_period', type: 'uint256' },
+    ],
+    name: 'stakeTokens',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ];
