@@ -192,8 +192,8 @@ contract SLA is Ownable, Staking {
 
     /**
      *@dev increase the _amount staked per _token of _sla
-     *@param _amount 1. address of the token
-     *@param _token 2. period id to stake
+     *@param _amount 1. amount to be staked
+     *@param _token 2. address of the ERC to be staked
      *@param _period 3. period id to stake
      */
 
