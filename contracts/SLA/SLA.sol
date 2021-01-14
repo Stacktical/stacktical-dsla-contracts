@@ -138,6 +138,8 @@ contract SLA is Ownable, Staking {
         uint256 _periodId
     ) external onlyMessenger {
         SLIs[_SLOName].push(SLI(block.timestamp, _value, _periodId));
+        periods[_periodId].sli = _value;
+        periods[_periodId].timestamp = block.timestamp;
 
         emit SLICreated(block.timestamp, _value, _periodId);
 

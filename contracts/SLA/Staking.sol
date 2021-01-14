@@ -16,6 +16,8 @@ contract Staking is Ownable {
         uint256 claimed_reward;
         bool claimed;
         Status status;
+        uint256 sli;
+        uint256 timestamp;
         mapping(address => mapping(address => uint256)) stakingBalance; // staking balance for all tokens (address token => (address user => amount))
         mapping(address => uint256) claimed_compensation;
     }
@@ -24,6 +26,7 @@ contract Staking is Ownable {
         address tokenAddress;
         uint256 stake;
     }
+
     bytes4 private constant BURN_SELECTOR =
         bytes4(keccak256(bytes("burn(uint256)")));
 
@@ -398,7 +401,8 @@ contract Staking is Ownable {
         _period.sla_period_start = _sla_period_start;
         _period.sla_period_end = _sla_period_end;
         _period.status = Status.NotVerified;
-
+        _period.sli = 0;
+        _period.timestamp = 0;
         periods.push(_period);
 
         emit NewPeriodAdded(periods.length.sub(1));
