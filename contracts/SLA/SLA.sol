@@ -45,6 +45,9 @@ contract SLA is Ownable, Staking {
     /// @dev array storing the names of the SLO's of this agreement
     bytes32[] public SLONames;
 
+    /// @dev block timestamp of SLA deployment
+    uint256 public blockNumberCreation;
+
     /**
      * @dev event for SLI creation logging
      * @param _timestamp 1. the time the SLI has been registered
@@ -120,6 +123,7 @@ contract SLA is Ownable, Staking {
         ipfsHash = _ipfsHash;
         registry = SLARegistry(msg.sender);
         sliInterval = _sliInterval;
+        blockNumberCreation = block.number;
     }
 
     /**
