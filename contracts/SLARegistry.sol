@@ -122,6 +122,7 @@ contract SLARegistry {
         bytes32 _sloName
     ) public {
         require(
+        // verificar acá
             address(SLA(_sla).SLOs(_sloName)) != address(0),
             "_sloName does not exist in the SLA contract"
         );
