@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./Messenger.sol";
 import "./SLA/SLA.sol";
 import "./SLO/SLO.sol";
+import "./SLA/Staking.sol";
 
 /**
  * @title SLARegistry
@@ -122,9 +123,13 @@ contract SLARegistry {
         bytes32 _sloName
     ) public {
         require(
-        // verificar acá
             address(SLA(_sla).SLOs(_sloName)) != address(0),
             "_sloName does not exist in the SLA contract"
+        );
+        (, , , , Staking.Status status, , ) = _sla.periods(_periodId);
+        require(
+            status == Staking.Status.NotVerified,
+            "SLA contract was already verified for the period"
         );
         messenger.requestSLI(_periodId, _sla, _sloName);
     }

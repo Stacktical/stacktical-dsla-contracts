@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { expectRevert } from '@openzeppelin/test-helpers';
 import { needsGetJobId } from '../environments.config';
 import { getChainlinkJobId } from './helpers';
 
@@ -234,5 +235,23 @@ describe('SLARegistry', () => {
     // 1 is Respected. Is expected to be 1 because the sloType is 4 "GreaterThan"
     // and the production API is returning 100
     expect(status.toString()).to.equal('1');
+  });
+
+  it.only('requestSLI can be called only once', async () => {
+    const SLICreatedEvent = 'SLICreated';
+    const [sla] = SLAs;
+
+    // Fund the messenger contract with LINK
+    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
+    await slaRegistry.requestSLI(periodId, sla.address, sloName);
+    await eventListener(sla, SLICreatedEvent);
+
+    // call for second time
+    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
+    await expectRevert(
+      slaRegistry.requestSLI.call(periodId, sla.address, sloName),
+      'SLA contract was already verified for the period',
+    );
+    // await slaRegistry.requestSLI(periodId, sla.address, sloName);
   });
 });
