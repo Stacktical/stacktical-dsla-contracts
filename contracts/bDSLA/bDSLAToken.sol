@@ -21,18 +21,16 @@ import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
  */
 
 contract bDSLAToken is ERC20PresetMinterPauser {
-    mapping (address => uint256) private _allowedBalances;
-    mapping (address => bool) private _claimed;
-    event Allowed(uint indexed _amount, address indexed _claimer);
-
+    mapping(address => uint256) private _allowedBalances;
+    mapping(address => bool) private _claimed;
+    event Allowed(uint256 indexed _amount, address indexed _claimer);
 
     /**
      * @dev Sets the values for {name} and {symbol}, {decimals} have
      * a default value of 18.
      * @notice token name: bDSLA , token symbol: bDSLA
      */
-    constructor() public ERC20PresetMinterPauser("bDSLA", "bDSLA") {
-    }
+    constructor() public ERC20PresetMinterPauser("bDSLA", "bDSLA") {}
 
     /**
      * @notice the setAllowedAmount function allows the admin to set an amount
@@ -48,8 +46,11 @@ contract bDSLAToken is ERC20PresetMinterPauser {
      *
      * - the caller must have the `(DEFAULT_ADMIN_ROLE)`.
      */
-    function setAllowedAmount(uint _amount, address _claimer) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "ERC20PresetMinterPauser: must have admin role");
+    function setAllowedAmount(uint256 _amount, address _claimer) public {
+        require(
+            hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
+            "ERC20PresetMinterPauser: must have admin role"
+        );
         require(!_claimed[_claimer], "bDSLAToken: tokens already claimed");
         _allowedBalances[_claimer] = _amount;
         emit Allowed(_amount, _claimer);
@@ -69,11 +70,20 @@ contract bDSLAToken is ERC20PresetMinterPauser {
      *
      * - the caller must have the `(DEFAULT_ADMIN_ROLE)`.
      */
-    function setAllowedAmounts(uint[] memory _amounts, address[] memory _claimers) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "ERC20PresetMinterPauser: must have admin role");
-        require(_amounts.length == _claimers.length, "bDSLAToken: must have the same number of items");
-        for(uint i=0; i < _amounts.length; i++){
-            if(!_claimed[_claimers[i]]){
+    function setAllowedAmounts(
+        uint256[] memory _amounts,
+        address[] memory _claimers
+    ) public {
+        require(
+            hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
+            "ERC20PresetMinterPauser: must have admin role"
+        );
+        require(
+            _amounts.length == _claimers.length,
+            "bDSLAToken: must have the same number of items"
+        );
+        for (uint256 i = 0; i < _amounts.length; i++) {
+            if (!_claimed[_claimers[i]]) {
                 _allowedBalances[_claimers[i]] = _amounts[i];
                 emit Allowed(_amounts[i], _claimers[i]);
             }
@@ -96,20 +106,25 @@ contract bDSLAToken is ERC20PresetMinterPauser {
      * - the claim can be done just once
      */
     function claim(address _claimer) public {
-        require(hasRole(MINTER_ROLE, _msgSender()), "ERC20PresetMinterPauser: must have minter role");
-        require(_allowedBalances[_claimer] > 0, "bDSLAToken: must have an allowed amoun to claim");
+        require(
+            hasRole(MINTER_ROLE, _msgSender()),
+            "ERC20PresetMinterPauser: must have minter role"
+        );
+        require(
+            _allowedBalances[_claimer] > 0,
+            "bDSLAToken: must have an allowed amoun to claim"
+        );
         require(!_claimed[_claimer], "bDSLAToken: tokens already claimed");
         _claimed[_claimer] = true;
         mint(_claimer, _allowedBalances[_claimer]);
     }
 
     /**
-    * @dev Creates `amount` new tokens for `to`.
-    * @param to 1. address of receiver
-    * @param amount 2. minted amount
-    */
+     * @dev Creates `amount` new tokens for `to`.
+     * @param to 1. address of receiver
+     * @param amount 2. minted amount
+     */
     function mint(address to, uint256 amount) public override {
         _mint(to, amount);
     }
-
 }

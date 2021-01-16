@@ -3,7 +3,8 @@ import eventListener from './eventListener';
 import getSLI from './getSLI';
 import cleanSolidityString from './cleanSolidityString';
 import getChainlinkJobId from './getChainlinkJobId';
+import waitBlockTimestamp from './waitBlockTimestamp';
 
 export {
-  eventListener, getSLI, cleanSolidityString, getChainlinkJobId,
+  eventListener, getSLI, cleanSolidityString, getChainlinkJobId, waitBlockTimestamp,
 };

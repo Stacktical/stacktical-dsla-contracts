@@ -126,10 +126,22 @@ contract SLARegistry {
             address(SLA(_sla).SLOs(_sloName)) != address(0),
             "_sloName does not exist in the SLA contract"
         );
-        (, , , , Staking.Status status, , ) = _sla.periods(_periodId);
+        (
+            uint256 sla_period_start,
+            uint256 sla_period_end,
+            ,
+            ,
+            Staking.Status status,
+            ,
+
+        ) = _sla.periods(_periodId);
         require(
             status == Staking.Status.NotVerified,
             "SLA contract was already verified for the period"
+        );
+        require(
+            sla_period_end < block.timestamp,
+            "SLA contract period has not finished yet"
         );
         messenger.requestSLI(_periodId, _sla, _sloName);
     }

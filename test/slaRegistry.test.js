@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { expectRevert } from '@openzeppelin/test-helpers';
 import { needsGetJobId } from '../environments.config';
-import { getChainlinkJobId } from './helpers';
+import { getChainlinkJobId, waitBlockTimestamp } from './helpers';
 
 const IERC20 = artifacts.require('IERC20');
 const SLA = artifacts.require('SLA');
@@ -82,19 +82,6 @@ describe('SLARegistry', () => {
       _sla_period_starts,
       _sla_period_ends,
     } = slaConstructor;
-
-    await slaRegistry.createSLA(
-      owner,
-      [sloName],
-      userSlos,
-      _stake,
-      _ipfsHash,
-      _sliInterval,
-      bDSLA.address,
-      _sla_period_starts,
-      _sla_period_ends,
-      { from: owner },
-    );
 
     await slaRegistry.createSLA(
       owner,
@@ -237,7 +224,7 @@ describe('SLARegistry', () => {
     expect(status.toString()).to.equal('1');
   });
 
-  it.only('requestSLI can be called only once', async () => {
+  it('requestSLI can be called only once', async () => {
     const SLICreatedEvent = 'SLICreated';
     const [sla] = SLAs;
 
@@ -253,5 +240,43 @@ describe('SLARegistry', () => {
       'SLA contract was already verified for the period',
     );
     // await slaRegistry.requestSLI(periodId, sla.address, sloName);
+  });
+
+  it('requestSLI can only be called if the period is finished', async () => {
+    const SLICreatedEvent = 'SLICreated';
+
+    // Fund the messenger contract with LINK
+    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
+
+    const { _stake, _ipfsHash, _sliInterval } = slaConstructor;
+    const { timestamp: currentBlockTimestamp } = await web3.eth.getBlock('latest');
+    // add 15 seconds to fail first transaction
+    const slaPeriodEnd = currentBlockTimestamp + 15;
+    slaRegistry.createSLA(
+      owner,
+      [sloName],
+      userSlos,
+      _stake,
+      _ipfsHash,
+      _sliInterval,
+      bDSLA.address,
+      [currentBlockTimestamp],
+      [slaPeriodEnd],
+      { from: owner },
+    );
+    const {
+      values:
+      { sla: slaAddress },
+    } = await eventListener(slaRegistry, 'SLACreated');
+
+    await expectRevert(
+      slaRegistry.requestSLI.call(periodId, slaAddress, sloName),
+      'SLA contract period has not finished yet',
+    );
+
+    // Wait for the correct block timestamp to execute the requestSLI function
+    await waitBlockTimestamp(slaPeriodEnd);
+    await slaRegistry.requestSLI(periodId, slaAddress, sloName);
+    await eventListener(await SLA.at(slaAddress), SLICreatedEvent);
   });
 });
