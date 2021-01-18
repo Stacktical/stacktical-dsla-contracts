@@ -44,6 +44,7 @@ describe('SLA', () => {
     await dai.mint(notOwner, toWei(initialTokenSupply));
 
     messenger = await Messenger.new(
+      envParameters.indexerAPIUrl,
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),

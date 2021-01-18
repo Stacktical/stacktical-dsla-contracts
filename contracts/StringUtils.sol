@@ -26,18 +26,20 @@ contract StringUtils {
      */
 
     function _encodeQuery(
+        string memory _apiURL,
         string memory _slaAddress,
         string memory _slaMonitoringStart,
         string memory _slaMonitoringStop
     ) internal pure returns (string memory query) {
         string memory qs1 =
-            "https://dsla.network/api?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22";
+            "?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22";
         string memory qs2 = "%22%0A%20%20%20%20sla_monitoring_start%3A%20%22";
         string memory qs3 = "%22%0A%20%20%20%20sla_monitoring_end%3A%20%22";
         string memory qs4 = "%22%0A%20%20%29%0A%7D%0A";
 
         query = string(
             abi.encodePacked(
+                _apiURL,
                 qs1,
                 _slaAddress,
                 qs2,

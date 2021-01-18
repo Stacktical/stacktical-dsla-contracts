@@ -60,6 +60,7 @@ describe('SLARegistry', () => {
     });
 
     messenger = await Messenger.new(
+      envParameters.indexerAPIUrl,
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
@@ -212,7 +213,7 @@ describe('SLARegistry', () => {
     const expectedResponse = {
       name: SLICreatedEvent,
       values: {
-        _value: String(expectedSLI1 * 1000),
+        _value: String(Math.round(expectedSLI1 * 1000)),
         _periodId: String(periodId),
       },
     };
@@ -221,7 +222,9 @@ describe('SLARegistry', () => {
     const { status } = await sla.periods.call(periodId);
     // 1 is Respected. Is expected to be 1 because the sloType is 4 "GreaterThan"
     // and the production API is returning 100
-    expect(status.toString()).to.equal('1');
+    // eslint-disable-next-line no-underscore-dangle
+    const sloRespected = sloValue < eventDetected.values._value;
+    expect(status.toString()).to.equal(sloRespected ? '1' : '2');
   });
 
   it('requestSLI can be called only once', async () => {

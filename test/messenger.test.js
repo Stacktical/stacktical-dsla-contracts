@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { needsGetJobId, envParameters } from '../environments.config';
 import { eventListener, getSLI, getChainlinkJobId } from './helpers';
 
@@ -20,6 +21,7 @@ describe('Messenger', () => {
     // MinimalSLA creates a period on deployment time
     minimalSLA = await MinimalSLA.new(slaMonitoringStart, slaMonitoringEnd);
     messenger = await Messenger.new(
+      envParameters.indexerAPIUrl,
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
@@ -50,7 +52,7 @@ describe('Messenger', () => {
       slaMonitoringStart,
       slaMonitoringEnd,
     );
-    // the SLI is stored multiplied by 1000
-    assert.equal(stackticalSLI * 1000, Number(value));
+    // the SLI is stored multiplied by 1000 and rounded by the Chainlink Job
+    expect(Math.round(stackticalSLI * 1000)).to.equal(Number(value));
   });
 });

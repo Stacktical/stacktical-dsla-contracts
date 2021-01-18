@@ -31,6 +31,8 @@ contract Messenger is ChainlinkClient, StringUtils {
     bytes32 public jobId;
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
     uint256 public fee = 0.1 * 10**18;
+    /// @dev api url stated on deployment time
+    string public apiURL = "";
 
     /**
      * @dev event emitted when having a response from Chainlink with the SLI
@@ -54,6 +56,7 @@ contract Messenger is ChainlinkClient, StringUtils {
      * @param _jobId the job id for the HTTPGet job
      */
     constructor(
+        string memory _apiUrl,
         address _chainlinkOracle,
         address _chainlinkToken,
         bytes32 _jobId
@@ -62,6 +65,7 @@ contract Messenger is ChainlinkClient, StringUtils {
         setChainlinkToken(_chainlinkToken);
         oracle = _chainlinkOracle;
         SLARegistry = address(0);
+        apiURL = _apiUrl;
     }
 
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
@@ -100,6 +104,7 @@ contract Messenger is ChainlinkClient, StringUtils {
         // State the query string, transforming address and uint to strings
         string memory query =
             _encodeQuery(
+                apiURL,
                 _addressToString(address(_sla)),
                 _uintToStr(startPeriod),
                 _uintToStr(endPeriod)

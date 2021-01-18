@@ -1,3 +1,5 @@
+import { envParameters } from '../../environments.config';
+
 const https = require('https');
 
 const httpPromise = (url) => new Promise((resolve, reject) => {
@@ -17,7 +19,7 @@ const httpPromise = (url) => new Promise((resolve, reject) => {
 });
 
 const getQueryString = (slaAddress, slaMonitoringStart, slaMonitorinEnd) => (
-  `https://dsla.network/api?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22${
+  `${envParameters.indexerAPIUrl}?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22${
     slaAddress
   }%22%0A%20%20%20%20sla_monitoring_start%3A%20%22${
     slaMonitoringStart
