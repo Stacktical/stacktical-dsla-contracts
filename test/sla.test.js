@@ -2,7 +2,7 @@ import { expectRevert } from '@openzeppelin/test-helpers';
 import { expect } from 'chai';
 
 import { slaConstructor } from './helpers/constants';
-import { needsGetJobId } from '../environments.config';
+import { getIndexerAPIUrl, needsGetJobId } from '../environments.config';
 import { getChainlinkJobId } from './helpers';
 
 const SLA = artifacts.require('SLA');
@@ -44,7 +44,7 @@ describe('SLA', () => {
     await dai.mint(notOwner, toWei(initialTokenSupply));
 
     messenger = await Messenger.new(
-      envParameters.indexerAPIUrl,
+      await getIndexerAPIUrl(),
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),

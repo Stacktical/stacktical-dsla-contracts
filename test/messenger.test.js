@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { needsGetJobId, envParameters } from '../environments.config';
+import { needsGetJobId, envParameters, getIndexerAPIUrl } from '../environments.config';
 import { eventListener, getSLI, getChainlinkJobId } from './helpers';
 
 const Messenger = artifacts.require('Messenger');
@@ -21,7 +21,7 @@ describe('Messenger', () => {
     // MinimalSLA creates a period on deployment time
     minimalSLA = await MinimalSLA.new(slaMonitoringStart, slaMonitoringEnd);
     messenger = await Messenger.new(
-      envParameters.indexerAPIUrl,
+      await getIndexerAPIUrl(),
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),

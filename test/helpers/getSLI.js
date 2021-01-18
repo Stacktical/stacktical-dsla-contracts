@@ -1,8 +1,8 @@
-import { envParameters } from '../../environments.config';
+import { getIndexerAPIUrl } from '../../environments.config';
 
 const https = require('https');
 
-const httpPromise = (url) => new Promise((resolve, reject) => {
+const httpsPromise = (url) => new Promise((resolve, reject) => {
   https
     .get(url, (resp) => {
       let data = '';
@@ -18,8 +18,8 @@ const httpPromise = (url) => new Promise((resolve, reject) => {
     });
 });
 
-const getQueryString = (slaAddress, slaMonitoringStart, slaMonitorinEnd) => (
-  `${envParameters.indexerAPIUrl}?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22${
+const getQueryString = async (slaAddress, slaMonitoringStart, slaMonitorinEnd) => (
+  `${await getIndexerAPIUrl()}?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22${
     slaAddress
   }%22%0A%20%20%20%20sla_monitoring_start%3A%20%22${
     slaMonitoringStart
@@ -27,24 +27,20 @@ const getQueryString = (slaAddress, slaMonitoringStart, slaMonitorinEnd) => (
     slaMonitorinEnd
   }%22%0A%20%20%29%0A%7D%0A`
 );
-// Test parameters
-// const address = "0xf7cdda73b01Bd3A3D306C30f3825B5FB607d1946";
-// const slaMonitoringStart = 1577836800000000000;
-// const slaMonitoringEnd = 1594026520000000000;
 
 export const getSLI = async (
   slaAddress,
   slaMonitoringStart,
   slaMonitoringEnd,
 ) => {
-  const queryString = getQueryString(
+  const queryString = await getQueryString(
     slaAddress,
     slaMonitoringStart,
     slaMonitoringEnd,
   );
   const {
     data: { getSLI: response },
-  } = await httpPromise(queryString);
+  } = await httpsPromise(queryString);
   return response;
 };
 

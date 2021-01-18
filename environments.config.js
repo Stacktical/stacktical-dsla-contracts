@@ -1,4 +1,6 @@
 require('dotenv').config();
+// eslint-disable-next-line import/no-extraneous-dependencies
+const ngrok = require('ngrok');
 
 // Chainlink addresses here: https://docs.chain.link/docs/decentralized-oracles-ethereum-mainnet
 const environments = {
@@ -29,8 +31,7 @@ const environments = {
     chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
     chainlinkNodeUrl: 'http://localhost:6688',
-    // use ngrok to point to the local machine -> https://ngrok.com/
-    indexerAPIUrl: 'https://de6cdafbddb7.ngrok.io/api',
+    indexerAPIUrl: 'https://dsla-staging-indexer.herokuapp.com/api',
   },
 };
 
@@ -47,3 +48,20 @@ export const getEnvFromNetwork = (network) => environments[getNetworkName(networ
 export const envParameters = environments[process.env.NODE_ENV];
 
 export const needsGetJobId = ['develop', 'staging'].includes(process.env.NODE_ENV);
+
+// use ngrok to point to the local machine -> https://ngrok.com/
+// set USE_LOCAL_INDEXER env variable to use the local indexer running
+// on port 3333
+// just for test scripts
+let ngrokUrl = null;
+
+export async function getIndexerAPIUrl() {
+  const isDev = process.env.NODE_ENV === 'develop';
+  const isTest = process.env.TEST_ENV;
+  const useLocalIndexer = process.env.USE_LOCAL_INDEXER === false;
+  if (isDev && useLocalIndexer && ngrokUrl === null) {
+    ngrokUrl = `${await ngrok.connect(3333)}/api`;
+  }
+  return isDev && useLocalIndexer && isTest
+    ? ngrokUrl : environments[process.env.NODE_ENV].indexerAPIUrl;
+}

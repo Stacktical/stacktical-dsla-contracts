@@ -2,7 +2,7 @@ require('babel-polyfill');
 require('babel-register');
 
 const { getChainlinkJobId } = require('../test/helpers');
-const { getEnvFromNetwork, needsGetJobId } = require('../environments.config');
+const { getEnvFromNetwork, needsGetJobId, getIndexerAPIUrl } = require('../environments.config');
 
 const SLORegistry = artifacts.require('SLORegistry');
 const SLARegistry = artifacts.require('SLARegistry');
@@ -25,6 +25,7 @@ module.exports = (deployer, network) => {
 
     await deployer.deploy(
       Messenger,
+      await getIndexerAPIUrl(),
       env.chainlinkOracleAddress,
       env.chainlinkTokenAddress,
       !needsGetJobId ? env.chainlinkJobId : await getChainlinkJobId(),

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { expectRevert } from '@openzeppelin/test-helpers';
-import { needsGetJobId } from '../environments.config';
+import { getIndexerAPIUrl, needsGetJobId } from '../environments.config';
 import { getChainlinkJobId, waitBlockTimestamp } from './helpers';
 
 const IERC20 = artifacts.require('IERC20');
@@ -60,7 +60,7 @@ describe('SLARegistry', () => {
     });
 
     messenger = await Messenger.new(
-      envParameters.indexerAPIUrl,
+      await getIndexerAPIUrl(),
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
