@@ -1,25 +1,9 @@
 import { getIndexerAPIUrl } from '../../environments.config';
 
-const https = require('https');
-
-const httpsPromise = (url) => new Promise((resolve, reject) => {
-  https
-    .get(url, (resp) => {
-      let data = '';
-      resp.on('data', (chunk) => {
-        data += chunk;
-      });
-      resp.on('end', () => {
-        resolve(JSON.parse(data));
-      });
-    })
-    .on('error', (err) => {
-      reject(err.message);
-    });
-});
+const axios = require('axios');
 
 const getQueryString = async (slaAddress, slaMonitoringStart, slaMonitorinEnd) => (
-  `${await getIndexerAPIUrl()}?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22${
+  `${await getIndexerAPIUrl()}/params?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22${
     slaAddress
   }%22%0A%20%20%20%20sla_monitoring_start%3A%20%22${
     slaMonitoringStart
@@ -39,8 +23,8 @@ export const getSLI = async (
     slaMonitoringEnd,
   );
   const {
-    data: { getSLI: response },
-  } = await httpsPromise(queryString);
+    data: { data: { getSLI: response } },
+  } = await axios({ method: 'get', url: queryString });
   return response;
 };
 

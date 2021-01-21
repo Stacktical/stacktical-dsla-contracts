@@ -103,19 +103,11 @@ contract Messenger is ChainlinkClient, StringUtils {
             );
 
         // Get the period start and end
-        (uint256 startPeriod, uint256 endPeriod) =
+        (uint256 sla_monitoring_start, uint256 sla_monitoring_end) =
             SLA(_sla).getPeriodData(_periodId);
-
-        // State the query string, transforming address and uint to strings
-        string memory query =
-            _encodeQuery(
-                apiURL,
-                _addressToString(address(_sla)),
-                _uintToStr(startPeriod),
-                _uintToStr(endPeriod)
-            );
-        request.add("get", query);
-        request.add("path", "sliData");
+        request.add("sla_monitoring_start", _uintToStr(sla_monitoring_start));
+        request.add("sla_monitoring_end", _uintToStr(sla_monitoring_end));
+        request.add("sla_address", _addressToString(address(_sla)));
 
         // Sends the request with 0.1 LINK to the oracle contract
         bytes32 requestId = sendChainlinkRequestTo(oracle, request, fee);
