@@ -53,6 +53,6 @@ describe('Messenger', () => {
       slaMonitoringEnd,
     );
     // the SLI is stored multiplied by 1000 and rounded by the Chainlink Job
-    expect(Math.round(stackticalSLI * 1000)).to.equal(Number(value));
+    expect(stackticalSLI).to.equal(Number(value));
   });
 });

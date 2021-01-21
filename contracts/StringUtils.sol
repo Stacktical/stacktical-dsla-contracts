@@ -1,3 +1,4 @@
+// solhint-disable-line
 pragma solidity ^0.6.0;
 
 contract StringUtils {
@@ -49,6 +50,64 @@ contract StringUtils {
                 qs4
             )
         );
+    }
+
+    function _bytes32ToString(bytes32 _bytes32)
+        internal
+        pure
+        returns (string memory)
+    {
+        uint8 i = 0;
+        while (i < 32 && _bytes32[i] != 0) {
+            i++;
+        }
+        bytes memory bytesArray = new bytes(i);
+        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
+            bytesArray[i] = _bytes32[i];
+        }
+        return string(bytesArray);
+    }
+
+    function _parseSLIData(string memory sliData)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
+        bytes memory bytesSLIData = bytes(sliData);
+        uint256 sliDataLength = bytesSLIData.length;
+        bytes memory bytesHits = new bytes(sliDataLength);
+        bytes memory bytesMisses = new bytes(sliDataLength);
+        for (uint256 index; index < sliDataLength; index++) {
+            if (bytesSLIData[index] == bytes1(",")) {
+                for (uint256 index2 = 0; index2 < index; index2++) {
+                    bytesHits[index2] = bytesSLIData[index2];
+                }
+                for (
+                    uint256 index3 = 0;
+                    index3 < sliDataLength - index - 1;
+                    index3++
+                ) {
+                    bytesMisses[index3] = bytesSLIData[index + 1 + index3];
+                }
+            }
+        }
+        uint256 hits = _bytesToUint(bytesHits);
+        uint256 misses = _bytesToUint(bytesMisses);
+        return (hits, misses);
+    }
+
+    function _bytesToUint(bytes memory b)
+        internal
+        pure
+        returns (uint256 result)
+    {
+        result = 0;
+        for (uint256 i = 0; i < b.length; i++) {
+            if (uint8(b[i]) >= 48 && uint8(b[i]) <= 57) {
+                result = result * 10 + (uint8(b[i]) - 48);
+            }
+        }
+        return result;
     }
 
     /*

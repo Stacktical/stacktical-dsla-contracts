@@ -58,7 +58,7 @@ let ngrokUrl = null;
 export async function getIndexerAPIUrl() {
   const isDev = process.env.NODE_ENV === 'develop';
   const isTest = process.env.TEST_ENV;
-  const useLocalIndexer = process.env.USE_LOCAL_INDEXER === false;
+  const useLocalIndexer = process.env.USE_LOCAL_INDEXER === 'true';
   if (isDev && useLocalIndexer && ngrokUrl === null) {
     ngrokUrl = `${await ngrok.connect(3333)}/api`;
   }

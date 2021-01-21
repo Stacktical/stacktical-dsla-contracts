@@ -1,4 +1,5 @@
 pragma solidity ^0.6.0;
+pragma experimental ABIEncoderV2;
 
 import "./SLA/SLA.sol";
 import "./StringUtils.sol";
@@ -37,15 +38,19 @@ contract Messenger is ChainlinkClient, StringUtils {
     /**
      * @dev event emitted when having a response from Chainlink with the SLI
      * @param slaAddress 1. SLA address to store the SLI
-     * @param sliValue 2. SLI value
-     * @param sloName 3. SLO name
-     * @param _periodId 4. id of the period
+     * @param hits 2. SLI value
+     * @param misses 3. SLI value
+     * @param sliValue 4. SLI value
+     * @param sloName 5. SLO name
+     * @param periodId 6. id of the period
      */
     event SLIReceived(
         address slaAddress,
+        uint256 hits,
+        uint256 misses,
         uint256 sliValue,
         bytes32 sloName,
-        uint256 _periodId
+        uint256 periodId
     );
 
     /**
@@ -110,12 +115,7 @@ contract Messenger is ChainlinkClient, StringUtils {
                 _uintToStr(endPeriod)
             );
         request.add("get", query);
-
-        // Adds an integer with the key "times" to the request parameters
-        request.addInt("times", 1000);
-
-        // States the path to the data, i.e. {data:{getSLI:value}}
-        request.add("path", "data.getSLI");
+        request.add("path", "sliData");
 
         // Sends the request with 0.1 LINK to the oracle contract
         bytes32 requestId = sendChainlinkRequestTo(oracle, request, fee);
@@ -129,22 +129,28 @@ contract Messenger is ChainlinkClient, StringUtils {
      * @dev callback function for the Chainlink SLI request which stores
      * the SLI in the SLA contract
      * @param _requestId the ID of the ChainLink request
-     * @param _sliValue the SLI value returned by ChainLink
+     * @param _chainlinkResponse response object from Chainlink Oracles
      */
-    function fulfillSLI(bytes32 _requestId, uint256 _sliValue)
+    function fulfillSLI(bytes32 _requestId, bytes32 _chainlinkResponse)
         public
         recordChainlinkFulfillment(_requestId)
     {
         Request memory request = requestIdToRequest[_requestId];
-
+        string memory sliData = _bytes32ToString(_chainlinkResponse);
+        (uint256 hits, uint256 misses) = _parseSLIData(sliData);
+        uint256 num = hits.mul(100 * 1000);
+        uint256 total = hits.add(misses);
+        uint256 efficiency = num.div(total);
         emit SLIReceived(
             address(request.sla),
-            _sliValue,
+            hits,
+            misses,
+            efficiency,
             request.sloName,
             request.periodId
         );
 
-        request.sla.registerSLI(request.sloName, _sliValue, request.periodId);
+        request.sla.registerSLI(request.sloName, efficiency, request.periodId);
     }
 
     /**
