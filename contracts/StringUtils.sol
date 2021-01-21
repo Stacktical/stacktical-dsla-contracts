@@ -2,72 +2,6 @@
 pragma solidity ^0.6.0;
 
 contract StringUtils {
-    /**
-     * @dev transforms address to string
-     */
-    function _addressToString(address _address)
-        internal
-        pure
-        returns (string memory)
-    {
-        bytes32 _bytes = bytes32(uint256(_address));
-        bytes memory HEX = "0123456789abcdef";
-        bytes memory _string = new bytes(42);
-        _string[0] = "0";
-        _string[1] = "x";
-        for (uint256 i = 0; i < 20; i++) {
-            _string[2 + i * 2] = HEX[uint8(_bytes[i + 12] >> 4)];
-            _string[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
-        }
-        return string(_string);
-    }
-
-    /**
-     * @dev returns Graphql query for Chainlink GET request of SLI
-     */
-
-    function _encodeQuery(
-        string memory _apiURL,
-        string memory _slaAddress,
-        string memory _slaMonitoringStart,
-        string memory _slaMonitoringStop
-    ) internal pure returns (string memory query) {
-        string memory qs1 =
-            "?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22";
-        string memory qs2 = "%22%0A%20%20%20%20sla_monitoring_start%3A%20%22";
-        string memory qs3 = "%22%0A%20%20%20%20sla_monitoring_end%3A%20%22";
-        string memory qs4 = "%22%0A%20%20%29%0A%7D%0A";
-
-        query = string(
-            abi.encodePacked(
-                _apiURL,
-                qs1,
-                _slaAddress,
-                qs2,
-                _slaMonitoringStart,
-                qs3,
-                _slaMonitoringStop,
-                qs4
-            )
-        );
-    }
-
-    function _bytes32ToString(bytes32 _bytes32)
-        internal
-        pure
-        returns (string memory)
-    {
-        uint8 i = 0;
-        while (i < 32 && _bytes32[i] != 0) {
-            i++;
-        }
-        bytes memory bytesArray = new bytes(i);
-        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
-            bytesArray[i] = _bytes32[i];
-        }
-        return string(bytesArray);
-    }
-
     function _parseSLIData(string memory sliData)
         internal
         pure
@@ -94,6 +28,39 @@ contract StringUtils {
         uint256 hits = _bytesToUint(bytesHits);
         uint256 misses = _bytesToUint(bytesMisses);
         return (hits, misses);
+    }
+
+    function _addressToString(address _address)
+        internal
+        pure
+        returns (string memory)
+    {
+        bytes32 _bytes = bytes32(uint256(_address));
+        bytes memory HEX = "0123456789abcdef";
+        bytes memory _string = new bytes(42);
+        _string[0] = "0";
+        _string[1] = "x";
+        for (uint256 i = 0; i < 20; i++) {
+            _string[2 + i * 2] = HEX[uint8(_bytes[i + 12] >> 4)];
+            _string[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
+        }
+        return string(_string);
+    }
+
+    function _bytes32ToString(bytes32 _bytes32)
+        internal
+        pure
+        returns (string memory)
+    {
+        uint8 i = 0;
+        while (i < 32 && _bytes32[i] != 0) {
+            i++;
+        }
+        bytes memory bytesArray = new bytes(i);
+        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
+            bytesArray[i] = _bytes32[i];
+        }
+        return string(bytesArray);
     }
 
     function _bytesToUint(bytes memory b)
