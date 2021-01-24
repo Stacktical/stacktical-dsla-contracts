@@ -23,9 +23,11 @@ export const getSLI = async (
     slaMonitoringEnd,
   );
   const {
-    data: { data: { getSLI: response } },
+    data: { sliData },
   } = await axios({ method: 'get', url: queryString });
-  return response;
+  const [hits, misses] = sliData.split(',').map(Number);
+  const efficiency = Math.trunc((hits * 100 * 1000) / (hits + misses));
+  return efficiency;
 };
 
 export default getSLI;
