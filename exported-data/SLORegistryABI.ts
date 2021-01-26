@@ -37,6 +37,5 @@ export const SLORegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLO[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
 ];

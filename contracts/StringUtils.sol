@@ -47,7 +47,7 @@ contract StringUtils {
         return string(_string);
     }
 
-    function _bytes32ToString(bytes32 _bytes32)
+    function _bytes32ToStr(bytes32 _bytes32)
         internal
         pure
         returns (string memory)

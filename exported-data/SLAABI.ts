@@ -8,7 +8,6 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'contract SLO[]', name: '_SLOs', type: 'address[]' },
       { internalType: 'uint256', name: '_stake', type: 'uint256' },
       { internalType: 'string', name: '_ipfsHash', type: 'string' },
-      { internalType: 'uint256', name: '_sliInterval', type: 'uint256' },
       { internalType: 'address', name: '_baseTokenAddress', type: 'address' },
       {
         internalType: 'uint256[]',
@@ -396,13 +395,6 @@ export const SLAABI: AbiItem[] = [
         type: 'tuple[]',
       },
     ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getSliInterval',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },

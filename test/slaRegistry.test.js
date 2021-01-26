@@ -1,7 +1,15 @@
 import { expect } from 'chai';
 import { expectRevert } from '@openzeppelin/test-helpers';
 import { getIndexerAPIUrl, needsGetJobId } from '../environments.config';
-import { getChainlinkJobId, waitBlockTimestamp } from './helpers';
+import {
+  getChainlinkJobId,
+  waitBlockTimestamp,
+  generatePeriods,
+  getSLI,
+  eventListener,
+  cleanSolidityString,
+} from './helpers';
+import { slaConstructor, networkNamesBytes32 } from './helpers/constants';
 
 const IERC20 = artifacts.require('IERC20');
 const SLA = artifacts.require('SLA');
@@ -11,8 +19,6 @@ const Messenger = artifacts.require('Messenger');
 const bDSLAToken = artifacts.require('bDSLAToken');
 const DAI = artifacts.require('DAI');
 
-const { slaConstructor } = require('./helpers/constants');
-const { getSLI, eventListener, cleanSolidityString } = require('./helpers');
 const { envParameters } = require('../environments.config');
 
 const { toWei, utf8ToHex } = web3.utils;
@@ -24,6 +30,7 @@ const periodId = 0;
 const sloValue = 95000;
 const sloType = 4;
 const sloName = utf8ToHex('staking_efficiency');
+const [periodStarts, periodEnds] = generatePeriods(10);
 
 describe('SLARegistry', () => {
   let owner;
@@ -68,7 +75,12 @@ describe('SLARegistry', () => {
 
     chainlinkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
 
-    slaRegistry = await SLARegistry.new(messenger.address);
+    slaRegistry = await SLARegistry.new(
+      messenger.address,
+      periodStarts,
+      periodEnds,
+      networkNamesBytes32,
+    );
 
     sloRegistry = await SLORegistry.new();
     // 4 is "GreatherThan"
@@ -79,9 +91,6 @@ describe('SLARegistry', () => {
     const {
       _stake,
       _ipfsHash,
-      _sliInterval,
-      _sla_period_starts,
-      _sla_period_ends,
     } = slaConstructor;
 
     await slaRegistry.createSLA(
@@ -90,10 +99,8 @@ describe('SLARegistry', () => {
       userSlos,
       _stake,
       _ipfsHash,
-      _sliInterval,
       bDSLA.address,
-      _sla_period_starts,
-      _sla_period_ends,
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       { from: owner },
     );
 
@@ -201,9 +208,8 @@ describe('SLARegistry', () => {
   it('should ask for a SLI and check the SLO status properly', async () => {
     const SLICreatedEvent = 'SLICreated';
     const [sla] = SLAs;
-    const { _sla_period_starts, _sla_period_ends } = slaConstructor;
-    const periodStart = _sla_period_starts[periodId];
-    const periodEnd = _sla_period_ends[periodId];
+    const periodStart = periodStarts[periodId];
+    const periodEnd = periodEnds[periodId];
 
     // Fund the messenger contract with LINK
     await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
@@ -213,7 +219,7 @@ describe('SLARegistry', () => {
     const expectedResponse = {
       name: SLICreatedEvent,
       values: {
-        _value: String(Math.round(expectedSLI1 * 1000)),
+        _value: String(expectedSLI1),
         _periodId: String(periodId),
       },
     };
