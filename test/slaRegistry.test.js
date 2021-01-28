@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { expectRevert } from '@openzeppelin/test-helpers';
 import * as bs58 from 'bs58';
+import axios from 'axios';
 import { getIndexerAPIUrl, needsGetJobId } from '../environments.config';
 import {
   getChainlinkJobId,
@@ -259,7 +260,9 @@ describe('SLARegistry', () => {
     await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
 
     const { _stake, _ipfsHash, _sliInterval } = slaConstructor;
-    const { timestamp: currentBlockTimestamp } = await web3.eth.getBlock('latest');
+    const { timestamp: currentBlockTimestamp } = await web3.eth.getBlock(
+      'latest',
+    );
     // add 15 seconds to fail first transaction
     const slaPeriodEnd = currentBlockTimestamp + 15;
     slaRegistry.createSLA(
@@ -275,8 +278,7 @@ describe('SLARegistry', () => {
       { from: owner },
     );
     const {
-      values:
-      { sla: slaAddress },
+      values: { sla: slaAddress },
     } = await eventListener(slaRegistry, 'SLACreated');
 
     await expectRevert(
@@ -291,17 +293,21 @@ describe('SLARegistry', () => {
   });
 
   it.only('should ask for analytics to Chainlink correctly', async () => {
+    const networkNameBytes32 = networkNamesBytes32[0];
+    const week_id = 0;
+
     // Fund the messenger contract with LINK
     await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
 
     // Canonical period 0 is the past week, so is possible to be called
-    slaRegistry.requestAnalytics(0, networkNamesBytes32[0]);
+    slaRegistry.requestAnalytics(week_id, networkNameBytes32);
     const {
-      values: {
-        _ipfsHash,
-      },
+      values: { _ipfsHash },
     } = await eventListener(slaRegistry, 'AnalyticsReceived');
-    console.log(_ipfsHash);
-    console.log(bs58.encode(Buffer.from(`1220${_ipfsHash.replace('0x', '')}`, 'hex')));
+    const ipfsCID = bs58.encode(
+      Buffer.from(`1220${_ipfsHash.replace('0x', '')}`, 'hex'),
+    );
+    const { data: weekAnalytics } = await axios.get(`https://ipfs.dsla.network/ipfs/${ipfsCID}`);
+    expect(weekAnalytics.week_id).to.equal(0);
   });
 });
