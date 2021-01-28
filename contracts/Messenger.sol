@@ -22,7 +22,7 @@ contract Messenger is ChainlinkClient, StringUtils {
 
     struct AnalyticsRequest {
         bytes32 networkName;
-        uint256 periodId;
+        uint256 weekId;
     }
 
     /// @dev Mapping that stores chainlink sli request information
@@ -186,11 +186,11 @@ contract Messenger is ChainlinkClient, StringUtils {
     /**
      * @dev creates a ChainLink request to get a new SLI value for the
      * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.
-     * @param _periodId end of the period
+     * @param _weekId end of the period
      * @param _networkName name of the network to get analytics
      */
 
-    function requestAnalytics(uint256 _periodId, bytes32 _networkName)
+    function requestAnalytics(uint256 _weekId, bytes32 _networkName)
         public
         onlyAllowedAddresses
     {
@@ -201,10 +201,11 @@ contract Messenger is ChainlinkClient, StringUtils {
                 this.fulFillAnalytics.selector
             );
 
-        (uint256 periodStart, uint256 periodEnd) = slaRegistry.canonicalPeriods(_periodId);
+        (uint256 periodStart, uint256 periodEnd) = slaRegistry.canonicalPeriods(_weekId);
 
         request.add("job_type", "publish_analytics");
         request.add("network_name", _bytes32ToStr(_networkName));
+        request.add("week_id", _uintToStr(_weekId));
         request.add("sla_monitoring_start", _uintToStr(periodStart));
         request.add("sla_monitoring_end", _uintToStr(periodEnd));
 
@@ -213,7 +214,7 @@ contract Messenger is ChainlinkClient, StringUtils {
         requests.push(requestId);
         requestIdToAnalyticsRequest[requestId] = AnalyticsRequest(
             _networkName,
-            _periodId
+            _weekId
         );
     }
 
@@ -230,12 +231,12 @@ contract Messenger is ChainlinkClient, StringUtils {
         AnalyticsRequest memory request =
             requestIdToAnalyticsRequest[_requestId];
 
-        emit AnalyticsReceived(request.networkName, request.periodId, _chainlinkResponse);
+        emit AnalyticsReceived(request.networkName, request.weekId, _chainlinkResponse);
 
         slaRegistry.publishAnalyticsHash(
             _chainlinkResponse,
             request.networkName,
-            request.periodId
+            request.weekId
         );
     }
 

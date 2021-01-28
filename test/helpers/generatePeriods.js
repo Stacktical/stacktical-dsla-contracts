@@ -1,5 +1,11 @@
 import moment from 'moment';
 
+/*
+* @dev generates 2 arrays for starting and ending of periods.
+* The first period (start[0], finish[0]) is the past week (so is ever finished)
+* The second period is the current week, and the next periods are all future weeks.
+* */
+
 function generatePeriods(amountOfPeriods) {
   const periodStarts = [];
   const periodEnds = [];

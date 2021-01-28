@@ -1,6 +1,13 @@
 {
   "details": "SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements",
   "events": {
+    "AnalyticsReceived(bytes32,bytes32,uint256)": {
+      "details": "Event to store a new analytics ipfs hash received",
+      "params": {
+        "_ipfsHash": "1. id of the canonical period to be analyzed",
+        "_network": "2. network name to publish analytics"
+      }
+    },
     "SLACreated(address,address)": {
       "details": "event for service level agreement creation logging",
       "params": {
@@ -48,7 +55,7 @@
       }
     },
     "publishAnalyticsHash(bytes32,bytes32,uint256)": {
-      "details": "Gets SLI information for the specified SLA and SLO",
+      "details": "Receives the data from the Messenger contract",
       "params": {
         "_ipfsHash": "1. id of the canonical period to be analyzed",
         "_network": "2. network name to publish analytics"
@@ -59,7 +66,7 @@
       "params": { "_owner": "1. SLA contract to stake" }
     },
     "requestAnalytics(uint256,bytes32)": {
-      "details": "Gets SLI information for the specified SLA and SLO",
+      "details": "Request analytics object for the current period.",
       "params": {
         "_canonicalPeriodId": "1. id of the canonical period to be analyzed",
         "_network": "2. network name to publish analytics"

@@ -200,7 +200,7 @@ contract SLARegistry {
     }
 
     /**
-     * @dev Gets SLI information for the specified SLA and SLO
+     * @dev Request analytics object for the current period.
      * @param _canonicalPeriodId 1. id of the canonical period to be analyzed
      * @param _network 2. network name to publish analytics
      */
@@ -218,7 +218,18 @@ contract SLARegistry {
     }
 
     /**
-     * @dev Gets SLI information for the specified SLA and SLO
+     * @dev Event to store a new analytics ipfs hash received
+     * @param _ipfsHash 1. id of the canonical period to be analyzed
+     * @param _network 2. network name to publish analytics
+     */
+    event AnalyticsReceived(
+        bytes32 _ipfsHash,
+        bytes32 _network,
+        uint256 _periodId
+    );
+
+    /**
+     * @dev Receives the data from the Messenger contract
      * @param _ipfsHash 1. id of the canonical period to be analyzed
      * @param _network 2. network name to publish analytics
      */
@@ -231,6 +242,7 @@ contract SLARegistry {
             address(messenger) == msg.sender,
             "Can only be called by the Messenger contract"
         );
+        emit AnalyticsReceived(_ipfsHash, _network, _periodId);
         canonicalPeriodsAnalytics[_network][_periodId] = _ipfsHash;
     }
 

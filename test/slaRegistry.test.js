@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { expectRevert } from '@openzeppelin/test-helpers';
+import * as bs58 from 'bs58';
 import { getIndexerAPIUrl, needsGetJobId } from '../environments.config';
 import {
   getChainlinkJobId,
@@ -287,5 +288,20 @@ describe('SLARegistry', () => {
     await waitBlockTimestamp(slaPeriodEnd);
     await slaRegistry.requestSLI(periodId, slaAddress, sloName);
     await eventListener(await SLA.at(slaAddress), SLICreatedEvent);
+  });
+
+  it.only('should ask for analytics to Chainlink correctly', async () => {
+    // Fund the messenger contract with LINK
+    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
+
+    // Canonical period 0 is the past week, so is possible to be called
+    slaRegistry.requestAnalytics(0, networkNamesBytes32[0]);
+    const {
+      values: {
+        _ipfsHash,
+      },
+    } = await eventListener(slaRegistry, 'AnalyticsReceived');
+    console.log(_ipfsHash);
+    console.log(bs58.encode(Buffer.from(`1220${_ipfsHash.replace('0x', '')}`, 'hex')));
   });
 });

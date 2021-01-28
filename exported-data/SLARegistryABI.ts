@@ -27,6 +27,31 @@ export const SLARegistryABI: AbiItem[] = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: 'bytes32',
+        name: '_ipfsHash',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes32',
+        name: '_network',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_periodId',
+        type: 'uint256',
+      },
+    ],
+    name: 'AnalyticsReceived',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: 'contract SLA',
         name: 'sla',
