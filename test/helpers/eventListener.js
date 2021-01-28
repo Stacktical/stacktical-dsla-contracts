@@ -1,4 +1,4 @@
-import { envParameters } from '../../environments.config';
+import { envParameters } from '../../environments';
 
 const Web3 = require('web3');
 

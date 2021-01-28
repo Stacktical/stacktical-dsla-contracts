@@ -1,8 +1,9 @@
 require('babel-polyfill');
 require('babel-register');
 
+const { networkNamesBytes32 } = require('../constants');
 const { getChainlinkJobId } = require('../test/helpers');
-const { getEnvFromNetwork, needsGetJobId, getIndexerAPIUrl } = require('../environments.config');
+const { getEnvFromNetwork, needsGetJobId, getIndexerAPIUrl } = require('../environments');
 
 const SLORegistry = artifacts.require('SLORegistry');
 const SLARegistry = artifacts.require('SLARegistry');
@@ -30,7 +31,14 @@ module.exports = (deployer, network) => {
       env.chainlinkTokenAddress,
       !needsGetJobId ? env.chainlinkJobId : await getChainlinkJobId(),
     );
-    await deployer.deploy(SLARegistry, Messenger.address);
+
+    await deployer.deploy(
+      SLARegistry,
+      Messenger.address,
+      env.startsArray,
+      env.endsArray,
+      networkNamesBytes32,
+    );
     return deployer.deploy(SLORegistry);
   });
 };

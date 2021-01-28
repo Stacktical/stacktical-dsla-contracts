@@ -1,9 +1,9 @@
 import { expectRevert } from '@openzeppelin/test-helpers';
 import { expect } from 'chai';
 
-import { slaConstructor } from './helpers/constants';
-import { getIndexerAPIUrl, needsGetJobId } from '../environments.config';
+import { getIndexerAPIUrl, needsGetJobId } from '../environments';
 import { getChainlinkJobId } from './helpers';
+import slaConstructor from './helpers/slaConstructor';
 
 const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
@@ -12,7 +12,7 @@ const bDSLAToken = artifacts.require('bDSLAToken');
 const DAI = artifacts.require('DAI');
 
 const { toWei } = web3.utils;
-const { envParameters } = require('../environments.config');
+const { envParameters } = require('../environments');
 
 const initialTokenSupply = '100';
 

@@ -1,4 +1,4 @@
-import { getIndexerAPIUrl } from '../../environments.config';
+import { getIndexerAPIUrl } from '../../environments';
 
 const axios = require('axios');
 

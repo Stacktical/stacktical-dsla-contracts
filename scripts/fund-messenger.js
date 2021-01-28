@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { envParameters } = require('../environments.config');
+const { envParameters } = require('../environments');
 
 const IERC20 = artifacts.require('IERC20');
 const Messenger = artifacts.require('Messenger');

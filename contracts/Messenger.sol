@@ -118,13 +118,13 @@ contract Messenger is ChainlinkClient, StringUtils {
     /**
      * @dev creates a ChainLink request to get a new SLI value for the
      * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.
-     * @param _periodId value of the period id
+     * @param _weekId value of the period id
      * @param _sla SLA Address
      * @param _sloName the SLO name to get the SLI value for
      */
 
     function requestSLI(
-        uint256 _periodId,
+        uint256 _weekId,
         SLA _sla,
         bytes32 _sloName
     ) public onlyAllowedAddresses {
@@ -134,14 +134,10 @@ contract Messenger is ChainlinkClient, StringUtils {
                 address(this),
                 this.fulfillSLI.selector
             );
-
-        // Get the period start and end
-        (uint256 sla_monitoring_start, uint256 sla_monitoring_end) =
-            SLA(_sla).getPeriodData(_periodId);
-        request.add("sla_monitoring_start", _uintToStr(sla_monitoring_start));
-        request.add("sla_monitoring_end", _uintToStr(sla_monitoring_end));
-        request.add("sla_address", _addressToString(address(_sla)));
         request.add("job_type", "get_sli");
+        request.add("week_id", _uintToStr(_weekId));
+        request.add("sla_address", _addressToString(address(_sla)));
+        request.add("sla_registry_address", _addressToString(address(slaRegistry)));
 
         // Sends the request with 0.1 LINK to the oracle contract
         bytes32 requestId = sendChainlinkRequestTo(oracle, request, fee);
@@ -151,7 +147,7 @@ contract Messenger is ChainlinkClient, StringUtils {
         requestIdToSLIRequest[requestId] = SLIRequest(
             _sla,
             _sloName,
-            _periodId
+            _weekId
         );
     }
 

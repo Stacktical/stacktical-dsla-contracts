@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { envParameters } from '../../environments.config';
+import { envParameters } from '../../environments';
 
 const baseURL = envParameters.chainlinkNodeUrl;
 

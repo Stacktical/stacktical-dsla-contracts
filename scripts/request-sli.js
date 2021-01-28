@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { envParameters } = require('../environments.config');
+const { envParameters } = require('../environments');
 
 const { fromWei } = web3.utils;
 

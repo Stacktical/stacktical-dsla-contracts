@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { needsGetJobId, envParameters, getIndexerAPIUrl } from '../environments.config';
+import { needsGetJobId, envParameters, getIndexerAPIUrl } from '../environments';
 import { eventListener, getSLI, getChainlinkJobId } from './helpers';
 
 const Messenger = artifacts.require('Messenger');

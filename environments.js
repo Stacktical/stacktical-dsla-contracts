@@ -1,8 +1,11 @@
+import generatePeriods from './helpers';
+
 require('dotenv').config();
-// eslint-disable-next-line import/no-extraneous-dependencies
 const ngrok = require('ngrok');
 
-// Chainlink addresses here: https://docs.chain.link/docs/decentralized-oracles-ethereum-mainnet
+// eslint-disable-next-line import/no-extraneous-dependencies
+const devPeriods = generatePeriods(10);
+
 const environments = {
   mainnet: {
     web3WebsocketProviderUrl: null,
@@ -32,6 +35,8 @@ const environments = {
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
     chainlinkNodeUrl: 'http://localhost:6688',
     indexerAPIUrl: 'https://dsla-staging-indexer.herokuapp.com/api',
+    startsArray: devPeriods[0],
+    endsArray: devPeriods[1],
   },
 };
 

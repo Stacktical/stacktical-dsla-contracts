@@ -2,7 +2,7 @@
 /* eslint no-unused-expressions: 0 */
 
 import { expect } from 'chai';
-import { sloTypes, sloTypesNames } from './helpers/constants';
+import { sloTypes, sloTypesNames } from '../constants';
 
 const SLO = artifacts.require('SLO');
 const { utf8ToHex } = web3.utils;

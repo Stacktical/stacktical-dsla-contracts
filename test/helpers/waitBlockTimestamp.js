@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { envParameters } from '../../environments.config';
+import { envParameters } from '../../environments';
 
 const waitBlockTimestamp = async (timestamp) => new Promise((resolve, reject) => {
   const web3Subscription = new Web3(envParameters.web3WebsocketProviderUrl);
