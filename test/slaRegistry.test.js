@@ -11,7 +11,8 @@ import {
   eventListener,
   cleanSolidityString,
 } from './helpers';
-import { slaConstructor, networkNamesBytes32 } from './helpers/constants';
+import { networkNamesBytes32, networkNames, networks } from './helpers/constants';
+import getIPFSHash from './helpers/getIPFSHash';
 
 const IERC20 = artifacts.require('IERC20');
 const SLA = artifacts.require('SLA');
@@ -33,6 +34,7 @@ const sloValue = 95000;
 const sloType = 4;
 const sloName = utf8ToHex('staking_efficiency');
 const [periodStarts, periodEnds] = generatePeriods(10);
+const slaNetwork = networkNames[0];
 
 describe('SLARegistry', () => {
   let owner;
@@ -45,11 +47,30 @@ describe('SLARegistry', () => {
   let sloRegistry;
   let userSlos;
   let dai;
+  let ipfsHash;
   const SLAs = [];
+
+  before(async () => {
+    const serviceMetadata = {
+      serviceName: networks[slaNetwork].validators[0],
+      serviceDescription: 'Official DSLA Beta Partner.',
+      serviceImage: 'https://storage.googleapis.com/dsla-incentivized-beta/validators/chainode.svg',
+      serviceURL: 'https://dsla.network',
+      serviceAddress: 'one18hum2avunkz3u448lftwmk7wr88qswdlfvvrdm',
+      serviceTicker: slaNetwork,
+    };
+
+    ipfsHash = await getIPFSHash(serviceMetadata);
+    [owner, notOwner] = await web3.eth.getAccounts();
+
+    sloRegistry = await SLORegistry.new();
+    // 4 is "GreatherThan"
+    await sloRegistry.createSLO(sloValue, sloType, sloName);
+    userSlos = await sloRegistry.userSLOs.call(owner);
+  });
 
   beforeEach(async () => {
     SLAs.length = 0;
-    [owner, notOwner] = await web3.eth.getAccounts();
 
     // deploy tokens
     bDSLA = await bDSLAToken.new();
@@ -84,23 +105,12 @@ describe('SLARegistry', () => {
       networkNamesBytes32,
     );
 
-    sloRegistry = await SLORegistry.new();
-    // 4 is "GreatherThan"
-    await sloRegistry.createSLO(sloValue, sloType, sloName);
-    userSlos = await sloRegistry.userSLOs.call(owner);
-
-    // Register the SLAs
-    const {
-      _stake,
-      _ipfsHash,
-    } = slaConstructor;
-
     await slaRegistry.createSLA(
       owner,
       [sloName],
       userSlos,
-      _stake,
-      _ipfsHash,
+      0,
+      ipfsHash,
       bDSLA.address,
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       { from: owner },
@@ -259,7 +269,6 @@ describe('SLARegistry', () => {
     // Fund the messenger contract with LINK
     await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
 
-    const { _stake, _ipfsHash, _sliInterval } = slaConstructor;
     const { timestamp: currentBlockTimestamp } = await web3.eth.getBlock(
       'latest',
     );
@@ -269,9 +278,8 @@ describe('SLARegistry', () => {
       owner,
       [sloName],
       userSlos,
-      _stake,
-      _ipfsHash,
-      _sliInterval,
+      0,
+      ipfsHash,
       bDSLA.address,
       [currentBlockTimestamp],
       [slaPeriodEnd],

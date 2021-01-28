@@ -31,9 +31,13 @@ export const sloTypesNames = {
   GreaterOrEqualTo: sloTypes[5],
 };
 
-export const networkNamesBytes32 = [
-  'ONE',
-  'DOT',
-  'ATOM',
-  'BAND',
-].map(fromAscii);
+export const networks = {
+  ONE: { validators: ['P-OPS', 'Chainode', 'Everstake'] },
+  DOT: { validators: ['Everstake', 'Figment', 'stakefish'] },
+  ATOM: { validators: ['Everstake', 'Figment', 'stakefish'] },
+  BAND: { validators: ['Chainode'] },
+};
+
+export const networkNames = Object.keys(networks);
+
+export const networkNamesBytes32 = networkNames.map(fromAscii);

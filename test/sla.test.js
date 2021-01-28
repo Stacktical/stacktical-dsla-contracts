@@ -61,6 +61,7 @@ describe('SLA', () => {
       _sla_period_starts,
       _sla_period_ends,
     } = slaConstructor;
+
     await slaRegistry.createSLA(
       owner,
       _SLONames,
