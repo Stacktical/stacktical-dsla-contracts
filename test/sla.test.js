@@ -1,12 +1,15 @@
 import { expectRevert } from '@openzeppelin/test-helpers';
 import { expect } from 'chai';
 
-import { getIndexerAPIUrl, needsGetJobId } from '../environments';
-import { getChainlinkJobId } from './helpers';
-import slaConstructor from './helpers/slaConstructor';
+import { utf8ToHex } from 'web3-utils';
+import { needsGetJobId } from '../environments';
+import { generatePeriods, getChainlinkJobId } from './helpers';
+import { networkNames, networkNamesBytes32, networks } from '../constants';
+import getIPFSHash from './helpers/getIPFSHash';
 
 const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
+const SLORegistry = artifacts.require('SLORegistry');
 const Messenger = artifacts.require('Messenger');
 const bDSLAToken = artifacts.require('bDSLAToken');
 const DAI = artifacts.require('DAI');
@@ -15,6 +18,12 @@ const { toWei } = web3.utils;
 const { envParameters } = require('../environments');
 
 const initialTokenSupply = '100';
+const sloValue = 95000;
+const sloType = 4;
+const sloName = utf8ToHex('staking_efficiency');
+const [periodStarts, periodEnds] = generatePeriods(10);
+const slaNetwork = networkNames[0];
+const slaNetworkBytes32 = networkNamesBytes32[0];
 
 describe('SLA', () => {
   let owner;
@@ -23,14 +32,32 @@ describe('SLA', () => {
   let sla;
   let bDSLA;
   let newToken;
-  let messenger;
-  let slaRegistry;
   let dai;
+  let userSlos;
+  let ipfsHash;
 
-  beforeEach(async () => {
+  before(async () => {
     const accounts = await web3.eth.getAccounts();
     [owner, notOwner, ...notOwners] = accounts;
 
+    const serviceMetadata = {
+      serviceName: networks[slaNetwork].validators[0],
+      serviceDescription: 'Official DSLA Beta Partner.',
+      serviceImage:
+        'https://storage.googleapis.com/dsla-incentivized-beta/validators/chainode.svg',
+      serviceURL: 'https://dsla.network',
+      serviceAddress: 'one18hum2avunkz3u448lftwmk7wr88qswdlfvvrdm',
+      serviceTicker: slaNetwork,
+    };
+
+    ipfsHash = await getIPFSHash(serviceMetadata);
+    const sloRegistry = await SLORegistry.new();
+    // 4 is "GreatherThan"
+    await sloRegistry.createSLO(sloValue, sloType, sloName);
+    userSlos = await sloRegistry.userSLOs.call(owner);
+  });
+
+  beforeEach(async () => {
     bDSLA = await bDSLAToken.new();
     await bDSLA.mint(owner, toWei(initialTokenSupply));
     newToken = await bDSLAToken.new(); // to simulate a new token
@@ -43,35 +70,29 @@ describe('SLA', () => {
     await newToken.mint(notOwner, toWei(initialTokenSupply));
     await dai.mint(notOwner, toWei(initialTokenSupply));
 
-    messenger = await Messenger.new(
-      await getIndexerAPIUrl(),
+    const messenger = await Messenger.new(
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
     );
-    slaRegistry = await SLARegistry.new(messenger.address);
+
+    const slaRegistry = await SLARegistry.new(
+      messenger.address,
+      periodStarts,
+      periodEnds,
+      networkNamesBytes32,
+    );
 
     // Register the SLA
-    const {
-      _SLONames,
-      _SLOs,
-      _stake,
-      _ipfsHash,
-      _sliInterval,
-      _sla_period_starts,
-      _sla_period_ends,
-    } = slaConstructor;
 
     await slaRegistry.createSLA(
       owner,
-      _SLONames,
-      _SLOs,
-      _stake,
-      _ipfsHash,
-      _sliInterval,
+      [sloName],
+      userSlos,
+      0,
+      ipfsHash,
       bDSLA.address,
-      _sla_period_starts,
-      _sla_period_ends,
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       { from: owner },
     );
     const slaAddresses = await slaRegistry.userSLAs(owner);

@@ -53,20 +53,3 @@ export const getEnvFromNetwork = (network) => environments[getNetworkName(networ
 export const envParameters = environments[process.env.NODE_ENV];
 
 export const needsGetJobId = ['develop', 'staging'].includes(process.env.NODE_ENV);
-
-// use ngrok to point to the local machine -> https://ngrok.com/
-// set USE_LOCAL_INDEXER env variable to use the local indexer running
-// on port 3333
-// just for test scripts
-let ngrokUrl = null;
-
-export async function getIndexerAPIUrl() {
-  const isDev = process.env.NODE_ENV === 'develop';
-  const isTest = process.env.TEST_ENV;
-  const useLocalIndexer = process.env.USE_LOCAL_INDEXER === 'true';
-  if (isDev && useLocalIndexer && ngrokUrl === null) {
-    ngrokUrl = `${await ngrok.connect(3333)}/api`;
-  }
-  return isDev && useLocalIndexer && isTest
-    ? ngrokUrl : environments[process.env.NODE_ENV].indexerAPIUrl;
-}
