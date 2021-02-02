@@ -17,6 +17,7 @@ module.exports = {
     'no-console': 'off',
     'no-restricted-syntax': 'off',
     'no-param-reassign': 'off',
+    'no-unused-vars': 'warn',
   },
   plugins: ['truffle', 'mocha'],
 };

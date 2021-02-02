@@ -8,9 +8,45 @@ export const SLARegistryABI: AbiItem[] = [
         name: '_messengerAddress',
         type: 'address',
       },
+      {
+        internalType: 'uint256[]',
+        name: '_sla_week_period_starts',
+        type: 'uint256[]',
+      },
+      {
+        internalType: 'uint256[]',
+        name: '_sla_week_period_ends',
+        type: 'uint256[]',
+      },
+      { internalType: 'bytes32[]', name: '_networkNames', type: 'bytes32[]' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'bytes32',
+        name: '_ipfsHash',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes32',
+        name: '_network',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_periodId',
+        type: 'uint256',
+      },
+    ],
+    name: 'AnalyticsReceived',
+    type: 'event',
   },
   {
     anonymous: false,
@@ -37,6 +73,37 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [],
+    name: 'canonicalPeriodLastID',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'canonicalPeriods',
+    outputs: [
+      { internalType: 'uint256', name: 'start', type: 'uint256' },
+      { internalType: 'uint256', name: 'end', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [
+      { internalType: 'bytes32', name: '', type: 'bytes32' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+    ],
+    name: 'canonicalPeriodsAnalytics',
+    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -46,6 +113,15 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'networkNames',
+    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
@@ -53,6 +129,7 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -63,6 +140,15 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    name: 'validNetworks',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -71,18 +157,8 @@ export const SLARegistryABI: AbiItem[] = [
       { internalType: 'contract SLO[]', name: '_SLOs', type: 'address[]' },
       { internalType: 'uint256', name: '_stake', type: 'uint256' },
       { internalType: 'string', name: '_ipfsHash', type: 'string' },
-      { internalType: 'uint256', name: '_sliInterval', type: 'uint256' },
       { internalType: 'address', name: '_baseTokenAddress', type: 'address' },
-      {
-        internalType: 'uint256[]',
-        name: '_sla_period_starts',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'uint256[]',
-        name: '_sla_period_ends',
-        type: 'uint256[]',
-      },
+      { internalType: 'uint256[]', name: '_periodIds', type: 'uint256[]' },
     ],
     name: 'createSLA',
     outputs: [],
@@ -101,11 +177,33 @@ export const SLARegistryABI: AbiItem[] = [
     type: 'function',
   },
   {
+    inputs: [
+      { internalType: 'uint256', name: '_canonicalPeriodId', type: 'uint256' },
+      { internalType: 'bytes32', name: '_network', type: 'bytes32' },
+    ],
+    name: 'requestAnalytics',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'bytes32', name: '_ipfsHash', type: 'bytes32' },
+      { internalType: 'bytes32', name: '_network', type: 'bytes32' },
+      { internalType: 'uint256', name: '_periodId', type: 'uint256' },
+    ],
+    name: 'publishAnalyticsHash',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
     name: 'userSLAs',
     outputs: [{ internalType: 'contract SLA[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
@@ -113,6 +211,7 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -120,6 +219,7 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -127,6 +227,7 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -137,6 +238,7 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_owner', type: 'address' }],
@@ -163,5 +265,6 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];

@@ -20,9 +20,6 @@ contract SLA is Ownable, Staking {
     /// @dev The required amount to stake when subscribing to the agreement
     uint256 public stake;
 
-    /// @dev The time between SLI registration
-    uint256 private sliInterval;
-
     /// @dev The ipfs hash that stores extra information about the agreement
     string public ipfsHash;
 
@@ -44,6 +41,9 @@ contract SLA is Ownable, Staking {
 
     /// @dev array storing the names of the SLO's of this agreement
     bytes32[] public SLONames;
+
+    /// @dev block timestamp of SLA deployment
+    uint256 public blockNumberCreation;
 
     /**
      * @dev event for SLI creation logging
@@ -85,10 +85,9 @@ contract SLA is Ownable, Staking {
      * service level agreement
      * @param _ipfsHash 5. string with the ipfs hash that contains extra
      * information about the service level agreement
-     * @param _sliInterval 6. uint the interval in seconds between requesting a new SLI
-     * @param _baseTokenAddress 7. address of the Base Token to be unlocked for staking
-     * @param _sla_period_starts 8. array with the values for the "start" of every period
-     * @param _sla_period_ends 9. array with the values for the "end" of every period
+     * @param _baseTokenAddress 6. address of the Base Token to be unlocked for staking
+     * @param _sla_period_starts 7. array with the values for the "start" of every period
+     * @param _sla_period_ends 8. array with the values for the "end" of every period
      */
     constructor(
         address _owner,
@@ -96,7 +95,6 @@ contract SLA is Ownable, Staking {
         SLO[] memory _SLOs,
         uint256 _stake,
         string memory _ipfsHash,
-        uint256 _sliInterval,
         address _baseTokenAddress,
         uint256[] memory _sla_period_starts,
         uint256[] memory _sla_period_ends
@@ -119,7 +117,7 @@ contract SLA is Ownable, Staking {
         stake = _stake;
         ipfsHash = _ipfsHash;
         registry = SLARegistry(msg.sender);
-        sliInterval = _sliInterval;
+        blockNumberCreation = block.number;
     }
 
     /**
@@ -134,6 +132,8 @@ contract SLA is Ownable, Staking {
         uint256 _periodId
     ) external onlyMessenger {
         SLIs[_SLOName].push(SLI(block.timestamp, _value, _periodId));
+        periods[_periodId].sli = _value;
+        periods[_periodId].timestamp = block.timestamp;
 
         emit SLICreated(block.timestamp, _value, _periodId);
 
@@ -151,14 +151,6 @@ contract SLA is Ownable, Staking {
      */
     function getSLI(bytes32 _SLOName) public view returns (SLI[] memory) {
         return SLIs[_SLOName];
-    }
-
-    /**
-     * @dev external view function that returns the sliInterval value
-     · @return uint256 value of the sliInterval
-     */
-    function getSliInterval() external view returns (uint256) {
-        return sliInterval;
     }
 
     /**

@@ -1,9 +1,35 @@
+// solhint-disable-line
 pragma solidity ^0.6.0;
 
 contract StringUtils {
-    /**
-     * @dev transforms address to string
-     */
+    function _parseSLIData(string memory sliData)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
+        bytes memory bytesSLIData = bytes(sliData);
+        uint256 sliDataLength = bytesSLIData.length;
+        bytes memory bytesHits = new bytes(sliDataLength);
+        bytes memory bytesMisses = new bytes(sliDataLength);
+        for (uint256 index; index < sliDataLength; index++) {
+            if (bytesSLIData[index] == bytes1(",")) {
+                for (uint256 index2 = 0; index2 < index; index2++) {
+                    bytesHits[index2] = bytesSLIData[index2];
+                }
+                for (
+                    uint256 index3 = 0;
+                    index3 < sliDataLength - index - 1;
+                    index3++
+                ) {
+                    bytesMisses[index3] = bytesSLIData[index + 1 + index3];
+                }
+            }
+        }
+        uint256 hits = _bytesToUint(bytesHits);
+        uint256 misses = _bytesToUint(bytesMisses);
+        return (hits, misses);
+    }
+
     function _addressToString(address _address)
         internal
         pure
@@ -21,32 +47,34 @@ contract StringUtils {
         return string(_string);
     }
 
-    /**
-     * @dev returns Graphql query for Chainlink GET request of SLI
-     */
+    function _bytes32ToStr(bytes32 _bytes32)
+        internal
+        pure
+        returns (string memory)
+    {
+        uint8 i = 0;
+        while (i < 32 && _bytes32[i] != 0) {
+            i++;
+        }
+        bytes memory bytesArray = new bytes(i);
+        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
+            bytesArray[i] = _bytes32[i];
+        }
+        return string(bytesArray);
+    }
 
-    function _encodeQuery(
-        string memory _slaAddress,
-        string memory _slaMonitoringStart,
-        string memory _slaMonitoringStop
-    ) internal pure returns (string memory query) {
-        string memory qs1 =
-            "https://dsla.network/api?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22";
-        string memory qs2 = "%22%0A%20%20%20%20sla_monitoring_start%3A%20%22";
-        string memory qs3 = "%22%0A%20%20%20%20sla_monitoring_end%3A%20%22";
-        string memory qs4 = "%22%0A%20%20%29%0A%7D%0A";
-
-        query = string(
-            abi.encodePacked(
-                qs1,
-                _slaAddress,
-                qs2,
-                _slaMonitoringStart,
-                qs3,
-                _slaMonitoringStop,
-                qs4
-            )
-        );
+    function _bytesToUint(bytes memory b)
+        internal
+        pure
+        returns (uint256 result)
+    {
+        result = 0;
+        for (uint256 i = 0; i < b.length; i++) {
+            if (uint8(b[i]) >= 48 && uint8(b[i]) <= 57) {
+                result = result * 10 + (uint8(b[i]) - 48);
+            }
+        }
+        return result;
     }
 
     /*

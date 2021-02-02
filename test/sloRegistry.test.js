@@ -5,7 +5,7 @@ const { expect } = require('chai');
 
 const SLO = artifacts.require('SLO');
 const SLORegistry = artifacts.require('SLORegistry');
-const { sloTypes } = require('./helpers/constants');
+const { sloTypes } = require('../constants');
 
 const { utf8ToHex, hexToUtf8 } = web3.utils;
 

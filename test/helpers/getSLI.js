@@ -1,49 +1,31 @@
-const https = require('https');
+import { hexToUtf8 } from 'web3-utils';
 
-const httpPromise = (url) => new Promise((resolve, reject) => {
-  https
-    .get(url, (resp) => {
-      let data = '';
-      resp.on('data', (chunk) => {
-        data += chunk;
-      });
-      resp.on('end', () => {
-        resolve(JSON.parse(data));
-      });
-    })
-    .on('error', (err) => {
-      reject(err.message);
-    });
-});
-
-const getQueryString = (slaAddress, slaMonitoringStart, slaMonitorinEnd) => (
-  `https://dsla.network/api?query=%7B%0A%20%20getSLI%28%0A%20%20%20%20sla_address%3A%20%22${
-    slaAddress
-  }%22%0A%20%20%20%20sla_monitoring_start%3A%20%22${
-    slaMonitoringStart
-  }%22%0A%20%20%20%20sla_monitoring_end%3A%20%22${
-    slaMonitorinEnd
-  }%22%0A%20%20%29%0A%7D%0A`
-);
-// Test parameters
-// const address = "0xf7cdda73b01Bd3A3D306C30f3825B5FB607d1946";
-// const slaMonitoringStart = 1577836800000000000;
-// const slaMonitoringEnd = 1594026520000000000;
+const axios = require('axios');
 
 export const getSLI = async (
   slaAddress,
-  slaMonitoringStart,
-  slaMonitoringEnd,
+  weekId,
+  slaRegistryAddress,
 ) => {
-  const queryString = getQueryString(
-    slaAddress,
-    slaMonitoringStart,
-    slaMonitoringEnd,
-  );
   const {
-    data: { getSLI: response },
-  } = await httpPromise(queryString);
-  return response;
+    data: { data: { result } },
+  } = await axios({
+    method: 'post',
+    url: 'http://localhost:3333/adapter',
+    data: {
+      id: '1',
+      data: {
+        job_type: 'get_sli',
+        sla_address: slaAddress,
+        week_id: weekId,
+        sla_registry_address: slaRegistryAddress,
+      },
+    },
+    withCredentials: true,
+  });
+  const [hits, misses] = hexToUtf8(result).split(',').map(Number);
+  const efficiency = Math.trunc((hits * 100 * 1000) / (hits + misses));
+  return efficiency;
 };
 
 export default getSLI;
