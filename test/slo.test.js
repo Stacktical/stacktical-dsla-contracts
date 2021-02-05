@@ -86,4 +86,10 @@ describe('SLO', () => {
       }
     }
   });
+
+  // it('should return details correctly', async () => {
+  //   const slo = await SLO.new(sloValue, 4, sloName);
+  //   const details = await slo.getDetails();
+  //   console.log(details);
+  // });
 });

@@ -111,6 +111,11 @@ describe('SLA', () => {
     );
   });
 
+  it.only('should return getDetails correctly', async () => {
+    const slaDetails = await sla.getDetails();
+    console.log(slaDetails);
+  });
+
   describe('Staking', () => {
     it('should revert functions with a not allowed token as parameter', async () => {
       const stakeAmount = toWei(String(initialTokenSupply / 10));

@@ -33,6 +33,16 @@ contract SLA is Ownable, Staking {
         uint256 periodId;
     }
 
+    struct SLAPeriod {
+        uint256 sla_period_start;
+        uint256 sla_period_end;
+        uint256 claimed_reward;
+        bool claimed;
+        Status status;
+        uint256 sli;
+        uint256 timestamp;
+    }
+
     /// @dev mapping to get SLO addresses from SLO names in bytes32
     mapping(bytes32 => SLO) public SLOs;
 
@@ -155,31 +165,60 @@ contract SLA is Ownable, Staking {
 
     /**
      * @dev external view function that returns all agreement information
-     * @return address owner
-     * @return string ipfsHash
-     * @return uint256 amount necessary to stake
-     * @return bytes32[] SLONames array
-     * @return SLO[] SLO addresses array
+     * @return _slaOwner 1. address  owner
+     * @return _ipfsHash 2. string  ipfsHash
+     * @return _stake 3. uint256  amount necessary to stake
+     * @return _SLONames 4. bytes32[]  array
+     * @return _SLOAddresses 5. SLO[]  addresses array
+     * @return _SLAPeriods 6. SLAPeriod[]  addresses array
      */
 
     function getDetails()
         external
         view
         returns (
-            address,
-            string memory,
-            uint256,
-            bytes32[] memory,
-            SLO[] memory
+            address _slaOwner,
+            string memory _ipfsHash,
+            uint256 _stake,
+            bytes32[] memory _SLONames,
+            SLO[] memory _SLOAddresses,
+            SLAPeriod[] memory _SLAPeriods,
+            uint256 _stakersCount,
+            Staking.TokenStake[] memory _tokensStake
         )
     {
-        SLO[] memory _SLOAddresses = new SLO[](SLONames.length);
+        _slaOwner = owner();
+        _ipfsHash = ipfsHash;
+        _stake = stake;
+        _SLONames = SLONames;
+        _SLOAddresses = new SLO[](SLONames.length);
 
         for (uint256 i = 0; i < SLONames.length; i++) {
             _SLOAddresses[i] = SLOs[SLONames[i]];
         }
 
-        return (owner(), ipfsHash, stake, SLONames, _SLOAddresses);
+        uint256 periodsLength = getPeriodLength();
+        _SLAPeriods = new SLAPeriod[](periodsLength);
+        for (uint256 index = 0; index < periodsLength; index++) {
+            Staking.Period memory period = periods[index];
+            _SLAPeriods[index] = SLAPeriod({
+                sla_period_start: period.sla_period_start,
+                sla_period_end: period.sla_period_end,
+                claimed_reward: period.claimed_reward,
+                claimed: period.claimed,
+                status: period.status,
+                sli: period.sli,
+                timestamp: period.timestamp
+            });
+        }
+        _stakersCount = stakers.length;
+        _tokensStake = new Staking.TokenStake[](allowedTokens.length);
+        for (uint256 index = 0; index < allowedTokens.length; index++) {
+            _tokensStake[index] = Staking.TokenStake({
+                tokenAddress: allowedTokens[index],
+                stake: tokensPool[allowedTokens[index]]
+            });
+        }
     }
 
     /**

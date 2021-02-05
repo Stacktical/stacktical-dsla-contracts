@@ -452,7 +452,7 @@ contract Staking is Ownable {
     }
 
     /**
-     * @dev returns the lenght of the periods array
+     * @dev returns the length of the periods array
      */
     function getPeriodLength() public view returns (uint256 _length) {
         return periods.length;
