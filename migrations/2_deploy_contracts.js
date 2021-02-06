@@ -26,7 +26,6 @@ module.exports = (deployer, network) => {
 
     await deployer.deploy(
       Messenger,
-      await getIndexerAPIUrl(),
       env.chainlinkOracleAddress,
       env.chainlinkTokenAddress,
       !needsGetJobId ? env.chainlinkJobId : await getChainlinkJobId(),

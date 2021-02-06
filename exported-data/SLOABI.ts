@@ -63,4 +63,15 @@ export const SLOABI: AbiItem[] = [
     stateMutability: 'view',
     type: 'function',
   },
+  {
+    inputs: [],
+    name: 'getDetails',
+    outputs: [
+      { internalType: 'bytes32', name: '_name', type: 'bytes32' },
+      { internalType: 'uint256', name: '_value', type: 'uint256' },
+      { internalType: 'enum SLO.SLOTypes', name: '_SLOType', type: 'uint8' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
 ];

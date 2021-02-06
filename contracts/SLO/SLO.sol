@@ -81,4 +81,18 @@ contract SLO {
         }
         revert("isSLOHonoured wasn't executed properly");
     }
+
+    function getDetails()
+        public
+        view
+        returns (
+            bytes32 _name,
+            uint256 _value,
+            SLOTypes _SLOType
+        )
+    {
+        _name = name;
+        _value = value;
+        _SLOType = SLOType;
+    }
 }
