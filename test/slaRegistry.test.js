@@ -12,7 +12,7 @@ import {
 } from './helpers';
 import { networkNamesBytes32, networkNames, networks } from '../constants';
 import getIPFSHash from './helpers/getIPFSHash';
-import getSLI from './helpers/getSLI';
+import { getSLI } from './helpers/getSLI';
 
 const IERC20 = artifacts.require('IERC20');
 const SLA = artifacts.require('SLA');
@@ -300,5 +300,30 @@ describe('SLARegistry', () => {
     await waitBlockTimestamp(slaPeriodEnd);
     await slaRegistry.requestSLI(periodId, slaAddress, sloName);
     await eventListener(await SLA.at(slaAddress), SLICreatedEvent);
+  });
+
+  it('should ask for analytics to Chainlink correctly', async () => {
+    const networkNameBytes32 = networkNamesBytes32[0];
+    const week_id = 0;
+
+    // Fund the messenger contract with LINK
+    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
+
+    // Canonical period 0 is the past week, so is possible to be called
+    slaRegistry.requestAnalytics(week_id, networkNameBytes32);
+    const {
+      values: { _ipfsHash },
+    } = await eventListener(slaRegistry, 'AnalyticsReceived');
+    const ipfsCID = bs58.encode(
+      Buffer.from(`1220${_ipfsHash.replace('0x', '')}`, 'hex'),
+    );
+    const { data: weekAnalytics } = await axios.get(`https://ipfs.dsla.network/ipfs/${ipfsCID}`);
+    expect(weekAnalytics.week_id).to.equal('0');
+
+    const periodAnlyticsIPFSCID = await slaRegistry.canonicalPeriodsAnalytics.call(
+      networkNameBytes32,
+      week_id,
+    );
+    expect(periodAnlyticsIPFSCID).to.equal(_ipfsHash);
   });
 });
