@@ -3,10 +3,12 @@ pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Messenger.sol";
-import "./SLA/SLA.sol";
-import "./SLO/SLO.sol";
-import "./SLA/Staking.sol";
+import "./SLA.sol";
+import "./SLO.sol";
+import "./SLORegistry.sol";
+import "./Staking.sol";
 
 /**
  * @title SLARegistry
@@ -16,6 +18,12 @@ import "./SLA/Staking.sol";
 contract SLARegistry {
     using SafeMath for uint256;
     bytes4 private constant NAME_SELECTOR = bytes4(keccak256(bytes("name()")));
+
+    /// @dev address of the DSLA token
+    IERC20 public DSLAToken;
+
+    /// @dev sloRegistryAddress
+    SLORegistry public sloRegistry;
 
     /// @dev struct to return on getActivePool function.
     struct ActivePool {
@@ -35,7 +43,7 @@ contract SLARegistry {
     mapping(uint256 => CanonicalPeriod) public canonicalPeriods;
 
     /// @dev mapping periodId=>CanonicalPeriod to check if SLA is registered
-    uint256 public canonicalPeriodLastID;
+    uint256 public canonicalPeriodsLastId;
 
     /// @dev mapping networkName=>periodId=>bytes32 to store ipfsHash of the analytics corresponding to periodId
     mapping(bytes32 => mapping(uint256 => bytes32))
@@ -75,17 +83,32 @@ contract SLARegistry {
     event SLACreated(SLA indexed sla, address indexed owner);
 
     /**
+     * @dev Event to store a new analytics ipfs hash received
+     * @param _ipfsHash 1. id of the canonical period to be analyzed
+     * @param _network 2. network name to publish analytics
+     */
+    event AnalyticsReceived(
+        bytes32 _ipfsHash,
+        bytes32 _network,
+        uint256 _periodId
+    );
+
+    /**
      * @dev constructor
      * @param _messengerAddress 1. the address of the chainlink messenger contract
      * @param _sla_week_period_starts 3. array of the starts of the weeks period
      * @param _sla_week_period_ends 4. array of the ends of the weeks period
      * @param _networkNames 5. array of bytes32 with the names of the valid networks
+     * @param _dslaToken 6. DSLA Token
+     * @param _sloRegistry 7. SLORegistry
      */
     constructor(
         Messenger _messengerAddress,
         uint256[] memory _sla_week_period_starts,
         uint256[] memory _sla_week_period_ends,
-        bytes32[] memory _networkNames
+        bytes32[] memory _networkNames,
+        IERC20 _dslaToken,
+        SLORegistry _sloRegistry
     ) public {
         require(
             _sla_week_period_starts.length == _sla_week_period_ends.length,
@@ -105,94 +128,75 @@ contract SLARegistry {
                 end: _sla_week_period_ends[index]
             });
         }
+        networkNames = _networkNames;
+        canonicalPeriodsLastId = _sla_week_period_starts.length - 1;
+        DSLAToken = _dslaToken;
+        sloRegistry = _sloRegistry;
         messenger = _messengerAddress;
         messenger.setSLARegistry();
-        networkNames = _networkNames;
-        canonicalPeriodLastID = _sla_week_period_starts.length - 1;
     }
 
     /**
      * @dev public function for creating canonical service level agreements
-     * @param _owner 1. address of the owner of the service level agreement
-     * @param _SLONames 2. array of the names of the service level objectives
-     * in bytes32
-     * @param _SLOs 3. array of service level objective contract addressess
-     * service level objective breach
-     * @param _stake 4. uint of the amount required to stake when signing the
-     * service level agreement
-     * @param _ipfsHash 5. string with the ipfs hash that contains extra information about the service level agreement
-     * @param _baseTokenAddress 6. address of the base token
-     * @param _periodIds 7. array of week ids to look in the
+     * @param _SLO 2. SLO
+     * @param _ipfsHash 4. string with the ipfs hash that contains extra information about the service level agreement
+     * @param _canonicalPeriodIds 6. array of allowed canonical period ids
      */
     function createSLA(
-        address _owner,
-        bytes32[] calldata _SLONames,
-        SLO[] calldata _SLOs,
-        uint256 _stake,
+        SLO _SLO,
         string memory _ipfsHash,
-        address _baseTokenAddress,
-        uint256[] calldata _periodIds
+        uint256[] calldata _canonicalPeriodIds
     ) public {
-        require(_periodIds.length > 0, "Periods information is empty");
-
-        uint256[] memory period_starts = new uint256[](_periodIds.length);
-        uint256[] memory period_ends = new uint256[](_periodIds.length);
-        for (uint256 index = 0; index < _periodIds.length; index++) {
-            CanonicalPeriod memory period = canonicalPeriods[_periodIds[index]];
-            period_starts[index] = period.start;
-            period_ends[index] = period.end;
-        }
+        require(
+            sloRegistry.registeredSLOs(address(_SLO)) == true,
+            "SLO not registered on SLORegistry"
+        );
+        require(_canonicalPeriodIds.length > 0, "Periods information is empty");
+        require(
+            _canonicalPeriodIds[_canonicalPeriodIds.length - 1] <=
+                canonicalPeriodsLastId - 1,
+            "Should not select a period id bigger than the last canonical period id"
+        );
         SLA sla =
             new SLA(
-                _owner,
-                _SLONames,
-                _SLOs,
-                _stake,
+                msg.sender,
+                _SLO,
                 _ipfsHash,
-                _baseTokenAddress,
-                period_starts,
-                period_ends
+                address(DSLAToken),
+                _canonicalPeriodIds
             );
 
         SLAs.push(sla);
         registeredSLAs[address(sla)] = true;
         uint256 index = SLAs.length.sub(1);
-
         userToSLAIndexes[msg.sender].push(index);
-
-        emit SLACreated(sla, _owner);
+        emit SLACreated(sla, msg.sender);
     }
 
     /**
      * @dev Gets SLI information for the specified SLA and SLO
      * @param _periodId 1. id of the period
      * @param _sla 2. SLA Address
-     * @param _sloName 3. SLO Name
-     * @notice it will revert if the SLO is not registered in the SLA
      */
-    function requestSLI(
-        uint256 _periodId,
-        SLA _sla,
-        bytes32 _sloName
-    ) public {
+    function requestSLI(uint256 _periodId, SLA _sla) public {
+        CanonicalPeriod memory canonicalPeriod = canonicalPeriods[_periodId];
         require(
-            address(SLA(_sla).SLOs(_sloName)) != address(0),
-            "_sloName does not exist in the SLA contract"
-        );
-        (, uint256 sla_period_end, , , Staking.Status status, , ) =
-            _sla.periods(_periodId);
-        require(
-            status == Staking.Status.NotVerified,
-            "SLA contract was already verified for the period"
-        );
-        require(
-            sla_period_end < block.timestamp,
+            canonicalPeriod.end < block.timestamp,
             "SLA contract period has not finished yet"
         );
-        messenger.requestSLI(_periodId, _sla, _sloName);
+        (, , SLA.Status status, , , ) = _sla.slaPeriods(_periodId);
+        require(
+            status == SLA.Status.NotVerified,
+            "SLA contract was already verified for the period"
+        );
+        messenger.requestSLI(_periodId, _sla);
     }
 
-    function isValidNetwork(bytes32 _networkName) internal view returns (bool) {
+    function _isValidNetwork(bytes32 _networkName)
+        internal
+        view
+        returns (bool)
+    {
         for (uint256 index; index < networkNames.length; index++) {
             if (networkNames[index] == _networkName) return true;
         }
@@ -207,7 +211,7 @@ contract SLARegistry {
     function requestAnalytics(uint256 _canonicalPeriodId, bytes32 _network)
         public
     {
-        require(isValidNetwork(_network), "Network name not recognized");
+        require(_isValidNetwork(_network), "Network name not recognized");
         CanonicalPeriod memory period = canonicalPeriods[_canonicalPeriodId];
         require(period.end < block.timestamp, "Period has not finished yet");
         require(
@@ -218,20 +222,10 @@ contract SLARegistry {
     }
 
     /**
-     * @dev Event to store a new analytics ipfs hash received
-     * @param _ipfsHash 1. id of the canonical period to be analyzed
-     * @param _network 2. network name to publish analytics
-     */
-    event AnalyticsReceived(
-        bytes32 _ipfsHash,
-        bytes32 _network,
-        uint256 _periodId
-    );
-
-    /**
      * @dev Receives the data from the Messenger contract
      * @param _ipfsHash 1. id of the canonical period to be analyzed
      * @param _network 2. network name to publish analytics
+     * @param _periodId 3. id of the canonical period
      */
     function publishAnalyticsHash(
         bytes32 _ipfsHash,
@@ -346,7 +340,7 @@ contract SLARegistry {
         ) {
             SLA currentSLA = SLA(userStakedSlas[_slaOwner][index]);
             stakeCounter = stakeCounter.add(
-                currentSLA.getTokenStakeLength(_slaOwner)
+                currentSLA.getAllowedTokensLength()
             );
         }
 
@@ -361,7 +355,7 @@ contract SLARegistry {
             SLA currentSLA = userStakedSlas[_slaOwner][index];
             for (
                 uint256 tokenIndex = 0;
-                tokenIndex < currentSLA.getTokenStakeLength(_slaOwner);
+                tokenIndex < currentSLA.getAllowedTokensLength();
                 tokenIndex++
             ) {
                 (address tokenAddress, uint256 stake) =

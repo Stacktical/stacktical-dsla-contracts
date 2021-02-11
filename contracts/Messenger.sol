@@ -1,7 +1,7 @@
 pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
-import "./SLA/SLA.sol";
+import "./SLA.sol";
 import "./StringUtils.sol";
 import "./SLARegistry.sol";
 import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
@@ -16,7 +16,6 @@ on a decentralized fashion. Is not meant to be interacted directly.
 contract Messenger is ChainlinkClient, StringUtils {
     struct SLIRequest {
         SLA sla;
-        bytes32 sloName;
         uint256 periodId;
     }
 
@@ -46,15 +45,13 @@ contract Messenger is ChainlinkClient, StringUtils {
      * @param hits 2. SLI value
      * @param misses 3. SLI value
      * @param sliValue 4. SLI value
-     * @param sloName 5. SLO name
-     * @param periodId 6. id of the period
+     * @param periodId 5. id of the period
      */
     event SLIReceived(
         address slaAddress,
         uint256 hits,
         uint256 misses,
         uint256 sliValue,
-        bytes32 sloName,
         uint256 periodId
     );
 
@@ -114,16 +111,14 @@ contract Messenger is ChainlinkClient, StringUtils {
     /**
      * @dev creates a ChainLink request to get a new SLI value for the
      * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.
-     * @param _weekId value of the period id
+     * @param _periodId value of the period id
      * @param _sla SLA Address
-     * @param _sloName the SLO name to get the SLI value for
      */
 
-    function requestSLI(
-        uint256 _weekId,
-        SLA _sla,
-        bytes32 _sloName
-    ) public onlyAllowedAddresses {
+    function requestSLI(uint256 _periodId, SLA _sla)
+        public
+        onlyAllowedAddresses
+    {
         Chainlink.Request memory request =
             buildChainlinkRequest(
                 jobId,
@@ -131,20 +126,19 @@ contract Messenger is ChainlinkClient, StringUtils {
                 this.fulfillSLI.selector
             );
         request.add("job_type", "get_sli");
-        request.add("week_id", _uintToStr(_weekId));
+        request.add("week_id", _uintToStr(_periodId));
         request.add("sla_address", _addressToString(address(_sla)));
-        request.add("sla_registry_address", _addressToString(address(slaRegistry)));
+        request.add(
+            "sla_registry_address",
+            _addressToString(address(slaRegistry))
+        );
 
         // Sends the request with 0.1 LINK to the oracle contract
         bytes32 requestId = sendChainlinkRequestTo(oracle, request, fee);
 
         requests.push(requestId);
 
-        requestIdToSLIRequest[requestId] = SLIRequest(
-            _sla,
-            _sloName,
-            _weekId
-        );
+        requestIdToSLIRequest[requestId] = SLIRequest(_sla, _periodId);
     }
 
     /**
@@ -168,11 +162,10 @@ contract Messenger is ChainlinkClient, StringUtils {
             hits,
             misses,
             efficiency,
-            request.sloName,
             request.periodId
         );
 
-        request.sla.registerSLI(request.sloName, efficiency, request.periodId);
+        request.sla.registerSLI(efficiency, request.periodId);
     }
 
     /**
@@ -193,7 +186,8 @@ contract Messenger is ChainlinkClient, StringUtils {
                 this.fulFillAnalytics.selector
             );
 
-        (uint256 periodStart, uint256 periodEnd) = slaRegistry.canonicalPeriods(_weekId);
+        (uint256 periodStart, uint256 periodEnd) =
+            slaRegistry.canonicalPeriods(_weekId);
 
         request.add("job_type", "publish_analytics");
         request.add("network_name", _bytes32ToStr(_networkName));
@@ -223,25 +217,16 @@ contract Messenger is ChainlinkClient, StringUtils {
         AnalyticsRequest memory request =
             requestIdToAnalyticsRequest[_requestId];
 
-        emit AnalyticsReceived(request.networkName, request.weekId, _chainlinkResponse);
+        emit AnalyticsReceived(
+            request.networkName,
+            request.weekId,
+            _chainlinkResponse
+        );
 
         slaRegistry.publishAnalyticsHash(
             _chainlinkResponse,
             request.networkName,
             request.weekId
         );
-    }
-
-    /**
-     * @dev gets the start and end of a given SLA on a given period
-     * @param _slaAddress address of the SLA Contract
-     * @param _periodId id of the period
-     */
-    function getPeriod(address _slaAddress, uint256 _periodId)
-        public
-        view
-        returns (uint256 start, uint256 end)
-    {
-        (start, end) = SLA(_slaAddress).getPeriodData(_periodId);
     }
 }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-import "./SLO/SLO.sol";
+import "./SLO.sol";
 
 /**
  * @title SLORegistry
@@ -11,6 +11,9 @@ import "./SLO/SLO.sol";
 contract SLORegistry {
     /// @dev mapping that stores the service level objectives created by a user
     mapping(address => SLO[]) private userToSLOs;
+
+    /// @dev mapping to check the registered SLOs
+    mapping(address => bool) public registeredSLOs;
 
     /**
      * @dev event for service level objective creation logging
@@ -32,7 +35,7 @@ contract SLORegistry {
     ) public {
         SLO slo = new SLO(_value, _SLOType, _name);
         userToSLOs[msg.sender].push(slo);
-
+        registeredSLOs[address(slo)] = true;
         emit SLOCreated(slo, msg.sender);
     }
 

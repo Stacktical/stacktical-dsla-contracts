@@ -38,7 +38,7 @@
   "immutableReferences": {},
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.6.0;\n\nimport \"../SLA/SLA.sol\";\n\ninterface IMessenger {\n    /**\n     * @dev This sets the SLARegistry contract address and can only be called\n     * once\n     */\n    function setSLARegistry() external;\n\n    /**\n     * @dev Creates a request to get a new SLI value for the\n     * given slo\n     * @param _periodId the id for the given period\n     * @param _sla the service level agreement we are verifying the SLI for\n     * @param _sloName the name of the SLO for which SLI must be computed\n     */\n    function requestSLI(\n        uint256 _periodId,\n        SLA _sla,\n        bytes32 _sloName\n    ) external;\n}\n",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.6.0;\n\nimport \"./SLA.sol\";\n\ninterface IMessenger {\n    /**\n     * @dev This sets the SLARegistry contract address and can only be called\n     * once\n     */\n    function setSLARegistry() external;\n\n    /**\n     * @dev Creates a request to get a new SLI value for the\n     * given slo\n     * @param _periodId the id for the given period\n     * @param _sla the service level agreement we are verifying the SLI for\n     * @param _sloName the name of the SLO for which SLI must be computed\n     */\n    function requestSLI(\n        uint256 _periodId,\n        SLA _sla,\n        bytes32 _sloName\n    ) external;\n}\n",
   "sourcePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/interfaces/IMessenger.sol",
   "ast": {
     "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/interfaces/IMessenger.sol",
@@ -64,7 +64,7 @@
       },
       {
         "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLA/SLA.sol",
-        "file": "../SLA/SLA.sol",
+        "file": "./SLA.sol",
         "id": 2758,
         "nodeType": "ImportDirective",
         "scope": 2774,
@@ -273,7 +273,7 @@
       },
       {
         "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLA/SLA.sol",
-        "file": "../SLA/SLA.sol",
+        "file": "./SLA.sol",
         "id": 2758,
         "nodeType": "ImportDirective",
         "scope": 2774,
