@@ -24,9 +24,6 @@ contract SLA is Staking {
         uint256 timestamp;
         uint256 sli;
         Status status;
-        uint256 reward;
-        uint256 compensation;
-        bool claimed;
     }
 
     struct TokenStake {
@@ -52,13 +49,23 @@ contract SLA is Staking {
     /// @dev block number of SLA deployment
     uint256 public creationBlockNumber;
 
+    /// @dev states if the contract was breached or not
+    bool private _breachedContract = false;
+
     /**
      * @dev event for SLI creation logging
      * @param _timestamp 1. the time the SLI has been registered
-     * @param _value 2. the value of the SLI
+     * @param _sli 2. the value of the SLI
      * @param _periodId 3. the id of the given period
      */
-    event SLICreated(uint256 _timestamp, uint256 _value, uint256 _periodId);
+    event SLICreated(uint256 _timestamp, uint256 _sli, uint256 _periodId);
+
+    /**
+     * @dev event for SLI creation logging
+     * @param _periodId 1. the id of the given period
+     * @param _sli 2. value of the SLI
+     */
+    event SLANotRespected(uint256 _periodId, uint256 _sli);
 
     /**
      * @dev throws if called by any address other than the messenger contract.
@@ -94,8 +101,25 @@ contract SLA is Staking {
         SLO _SLO,
         string memory _ipfsHash,
         address _dslaTokenAddress,
-        uint256[] memory _canonicalPeriodIds
-    ) public Staking(_dslaTokenAddress) {
+        uint256[] memory _canonicalPeriodIds,
+        address _slaRegistryAddress,
+        uint256 _providerRewardPercentage,
+        uint256 _burnRate,
+        uint256 _minimumDSLAStakedTier1,
+        uint256 _minimumDSLAStakedTier2,
+        uint256 _minimumDSLAStakedTier3
+    )
+        public
+        Staking(
+            _dslaTokenAddress,
+            _slaRegistryAddress,
+            _providerRewardPercentage,
+            _burnRate,
+            _minimumDSLAStakedTier1,
+            _minimumDSLAStakedTier2,
+            _minimumDSLAStakedTier3
+        )
+    {
         for (
             uint256 index = 0;
             index < _canonicalPeriodIds.length - 1;
@@ -129,8 +153,12 @@ contract SLA is Staking {
         slaPeriod.timestamp = block.timestamp;
         if (slo.isSLOHonored(_sli)) {
             slaPeriod.status = Status.Respected;
+            _setRespectedPeriodReward(_periodId);
         } else {
             slaPeriod.status = Status.NotRespected;
+            _setUsersCompensationPool();
+            _breachedContract = true;
+            emit SLANotRespected(_periodId, _sli);
         }
     }
 
@@ -149,6 +177,10 @@ contract SLA is Staking {
 
     function stakeTokens(uint256 _amount, address _token) public {
         require(_amount > 0, "amount cannot be 0");
+        require(
+            _breachedContract == false,
+            "Can only stake on not breached contracts"
+        );
         _stake(_amount, _token);
         slaRegistry.registerStakedSla(msg.sender);
     }
@@ -156,22 +188,45 @@ contract SLA is Staking {
     /**
      *@dev withdraw _amount tokens from the _token contract
      *@param _amount 1. amount to be staked
-     *@param _token 2. address of the ERC to be staked
+     *@param _tokenAddress 2. address of the ERC to be staked
      */
 
-    function withdrawStake(uint256 _amount, address _token) public {
+    function withdrawStakedTokens(uint256 _amount, address _tokenAddress) public {
         require(_amount > 0, "amount cannot be 0");
         if (msg.sender != owner()) {
+            uint256 lastValidPeriodId =
+                canonicalPeriodIds[canonicalPeriodIds.length - 1];
             (, uint256 endOfLastValidPeriod) =
-                slaRegistry.canonicalPeriods(
-                    canonicalPeriodIds[canonicalPeriodIds.length - 1]
-                );
+                slaRegistry.canonicalPeriods(lastValidPeriodId);
+            // users can withdraw only if the contract is breached
+            // or if the the last period is finished and the period status was verified
             require(
-                block.timestamp >= endOfLastValidPeriod,
-                "Can only withdraw stake after the final period is finished"
+                _breachedContract == true ||
+                    (block.timestamp >= endOfLastValidPeriod &&
+                        slaPeriods[lastValidPeriodId].status !=
+                        Status.NotVerified),
+                "Can only withdraw stake after the final period is finished or if the contract is breached"
             );
         }
-        _withdraw(_amount, _token);
+        _withdraw(_amount, _tokenAddress);
+    }
+
+    /**
+     *@dev withdraw provider reward of a given token address
+     *@param _tokenAddress 1. address of the token to withdraw rewards
+     */
+
+    function claimProviderReward(address _tokenAddress) public onlyOwner {
+        _claimReward(_tokenAddress);
+    }
+
+    /**
+     *@dev withdraw provider reward of a given token address
+     *@param _tokenAddress 1. address of the token to withdraw rewards
+     */
+
+    function claimUserCompensation(address _tokenAddress) public onlyOwner {
+        _claimCompensation(_tokenAddress);
     }
 
     /**
@@ -204,9 +259,6 @@ contract SLA is Staking {
             uint256 periodId = canonicalPeriodIds[index];
             SLAPeriod memory slaPeriod = slaPeriods[periodId];
             _SLAPeriods[index] = SLAPeriod({
-                reward: slaPeriod.reward,
-                compensation: slaPeriod.compensation,
-                claimed: slaPeriod.claimed,
                 status: slaPeriod.status,
                 sli: slaPeriod.sli,
                 timestamp: slaPeriod.timestamp
@@ -217,8 +269,12 @@ contract SLA is Staking {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             _tokensStake[index] = TokenStake({
                 tokenAddress: allowedTokens[index],
-                stake: tokenStake[allowedTokens[index]]
+                stake: tokenPools[allowedTokens[index]]
             });
         }
+    }
+
+    function breachedContract() public view returns (bool) {
+        return _breachedContract;
     }
 }

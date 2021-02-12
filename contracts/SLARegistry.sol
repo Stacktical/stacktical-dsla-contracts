@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Messenger.sol";
 import "./SLA.sol";
 import "./SLO.sol";
@@ -15,15 +16,8 @@ import "./Staking.sol";
  * @dev SLARegistry is a contract for handling creation of service level
  * agreements and keeping track of the created agreements
  */
-contract SLARegistry {
+contract SLARegistry is Ownable {
     using SafeMath for uint256;
-    bytes4 private constant NAME_SELECTOR = bytes4(keccak256(bytes("name()")));
-
-    /// @dev address of the DSLA token
-    IERC20 public DSLAToken;
-
-    /// @dev sloRegistryAddress
-    SLORegistry public sloRegistry;
 
     /// @dev struct to return on getActivePool function.
     struct ActivePool {
@@ -32,48 +26,72 @@ contract SLARegistry {
         string assetName;
         address assetAddress;
     }
-
     /// @dev struct to store the start and end of the periods
     struct CanonicalPeriod {
         uint256 start;
         uint256 end;
     }
 
-    /// @dev mapping periodId=>CanonicalPeriod to check if SLA is registered
-    mapping(uint256 => CanonicalPeriod) public canonicalPeriods;
-
+    /// @dev address of the DSLA token
+    IERC20 public DSLAToken;
+    /// @dev sloRegistryAddress
+    SLORegistry public sloRegistry;
+    /// @dev Messenger of the SLA Registry
+    Messenger public messenger;
     /// @dev mapping periodId=>CanonicalPeriod to check if SLA is registered
     uint256 public canonicalPeriodsLastId;
-
+    /// @dev stores the addresses of created SLAs
+    SLA[] public SLAs;
+    /// @dev mapping periodId=>CanonicalPeriod to check if SLA is registered
+    mapping(uint256 => CanonicalPeriod) public canonicalPeriods;
     /// @dev mapping networkName=>periodId=>bytes32 to store ipfsHash of the analytics corresponding to periodId
     mapping(bytes32 => mapping(uint256 => bytes32))
         public canonicalPeriodsAnalytics;
-
-    /// @dev Messenger of the SLA Registry
-    Messenger public messenger;
-
-    /// @dev stores the addresses of created SLAs
-    SLA[] public SLAs;
-
     /// @dev mapping SLA=>bool to check if SLA is registered
     mapping(address => bool) public registeredSLAs;
-
     /// @dev bytes32 to store the available network names
     bytes32[] public networkNames;
-
     /// @dev mapping SLA=>bool to store the if the network is valid
     mapping(bytes32 => bool) public validNetworks;
-
     /// @dev stores the indexes of service level agreements owned by an user
     mapping(address => uint256[]) private userToSLAIndexes;
-
     /// @dev mapping userAddress => SLA[]
     mapping(address => SLA[]) public userStakedSlas;
+
+    //______ onlyOwner modifiable parameters ______
+    /// @dev corresponds to the reward percentage to be paid to the provider after a respected period
+    uint256 private _providerRewardPercentage = 3;
+    /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %
+    uint256 private _burnRate = 3;
+    /// @dev minimum deposit for Tier 1 staking
+    uint256 private _minimumDSLAStakedTier1 = 3000 ether;
+    /// @dev minimum deposit for Tier 2 staking
+    uint256 private _minimumDSLAStakedTier2 = 6000 ether;
+    /// @dev minimum deposit for Tier 3 staking
+    uint256 private _minimumDSLAStakedTier3 = 9000 ether;
+    /// @dev array with the allowed tokens addresses of the StakeRegistry
+    address[] public allowedTokens;
 
     modifier onlyRegisteredSla {
         require(registeredSLAs[msg.sender] == true, "Only for registered SLAs");
         _;
     }
+
+    /**
+     * @dev event to log modifications on the staking parameters
+     *@param providerRewardPercentage 2. percentage of the users pool to be rewarded to the provider
+     *@param burnRate 3. (burnRate/1000)% of DSLA to be burned after a reward/compensation is paid
+     *@param minimumDSLAStakedTier1 4. minimum stake of DSLA to enable tier 1 privileges
+     *@param minimumDSLAStakedTier2 5. minimum stake of DSLA to enable tier 2 privileges
+     *@param minimumDSLAStakedTier3 6. minimum stake of DSLA to enable tier 3 privileges
+     */
+    event StakingParametersModified(
+        uint256 providerRewardPercentage,
+        uint256 burnRate,
+        uint256 minimumDSLAStakedTier1,
+        uint256 minimumDSLAStakedTier2,
+        uint256 minimumDSLAStakedTier3
+    );
 
     /**
      * @dev event for service level agreement creation logging
@@ -134,6 +152,7 @@ contract SLARegistry {
         sloRegistry = _sloRegistry;
         messenger = _messengerAddress;
         messenger.setSLARegistry();
+        addAllowedTokens(address(_dslaToken));
     }
 
     /**
@@ -163,7 +182,13 @@ contract SLARegistry {
                 _SLO,
                 _ipfsHash,
                 address(DSLAToken),
-                _canonicalPeriodIds
+                _canonicalPeriodIds,
+                address(this),
+                _providerRewardPercentage,
+                _burnRate,
+                _minimumDSLAStakedTier1,
+                _minimumDSLAStakedTier2,
+                _minimumDSLAStakedTier3
             );
 
         SLAs.push(sla);
@@ -179,28 +204,22 @@ contract SLARegistry {
      * @param _sla 2. SLA Address
      */
     function requestSLI(uint256 _periodId, SLA _sla) public {
+        bool breachedContract = _sla.breachedContract();
+        require(
+            breachedContract == false,
+            "Should only be called for not breached contracts"
+        );
         CanonicalPeriod memory canonicalPeriod = canonicalPeriods[_periodId];
         require(
             canonicalPeriod.end < block.timestamp,
             "SLA contract period has not finished yet"
         );
-        (, , SLA.Status status, , , ) = _sla.slaPeriods(_periodId);
+        (, , SLA.Status status) = _sla.slaPeriods(_periodId);
         require(
             status == SLA.Status.NotVerified,
             "SLA contract was already verified for the period"
         );
         messenger.requestSLI(_periodId, _sla);
-    }
-
-    function _isValidNetwork(bytes32 _networkName)
-        internal
-        view
-        returns (bool)
-    {
-        for (uint256 index; index < networkNames.length; index++) {
-            if (networkNames[index] == _networkName) return true;
-        }
-        return false;
     }
 
     /**
@@ -331,6 +350,7 @@ contract SLARegistry {
         view
         returns (ActivePool[] memory)
     {
+        bytes4 NAME_SELECTOR = bytes4(keccak256(bytes("name()")));
         uint256 stakeCounter = 0;
         // Count the stakes of the user, checking every SLA staked
         for (
@@ -376,5 +396,74 @@ contract SLARegistry {
             }
         }
         return activePools;
+    }
+
+    function isAllowedToken(address _tokenAddress) public view returns (bool) {
+        for (uint256 index = 0; index < allowedTokens.length; index++) {
+            if (allowedTokens[index] == _tokenAddress) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function _isValidNetwork(bytes32 _networkName)
+        internal
+        view
+        returns (bool)
+    {
+        for (uint256 index; index < networkNames.length; index++) {
+            if (networkNames[index] == _networkName) return true;
+        }
+        return false;
+    }
+
+//    function getStakingParameters()
+//        public
+//        view
+//        returns (
+//            uint256 providerRewardPercentage,
+//            uint256 burnRate,
+//            uint256 minimumDSLAStakedTier1,
+//            uint256 minimumDSLAStakedTier2,
+//            uint256 minimumDSLAStakedTier3
+//        )
+//    {
+//        providerRewardPercentage = _providerRewardPercentage;
+//        burnRate = _burnRate;
+//        minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
+//        minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
+//        minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
+//    }
+
+    //_______ OnlyOwner functions _______
+    function setStakingParameters(
+        uint256 providerRewardPercentage,
+        uint256 burnRate,
+        uint256 minimumDSLAStakedTier1,
+        uint256 minimumDSLAStakedTier2,
+        uint256 minimumDSLAStakedTier3
+    ) public onlyOwner {
+        _providerRewardPercentage = providerRewardPercentage;
+        _burnRate = burnRate;
+        _minimumDSLAStakedTier1 = minimumDSLAStakedTier1;
+        _minimumDSLAStakedTier2 = minimumDSLAStakedTier2;
+        _minimumDSLAStakedTier3 = minimumDSLAStakedTier3;
+        emit StakingParametersModified(
+            providerRewardPercentage,
+            burnRate,
+            minimumDSLAStakedTier1,
+            minimumDSLAStakedTier2,
+            minimumDSLAStakedTier3
+        );
+    }
+
+    /**
+     *@dev add a token to ve allowed for staking
+     *@param _tokenAddress 1. address of the new allowed token
+     */
+    function addAllowedTokens(address _tokenAddress) public onlyOwner {
+        require(isAllowedToken(_tokenAddress) == false, "token already added");
+        allowedTokens.push(_tokenAddress);
     }
 }
