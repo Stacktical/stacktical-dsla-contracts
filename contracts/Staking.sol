@@ -4,13 +4,13 @@ pragma solidity ^0.6.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "./SLARegistry.sol";
+import "./StakeRegistry.sol";
 
 contract Staking is Ownable {
     using SafeMath for uint256;
 
     /// @dev SLARegistry contract
-    SLARegistry private slaRegistry;
+    StakeRegistry private stakeRegistry;
 
     /// @dev (tokenAddress=>uint256) total pooled token balance
     mapping(address => uint256) tokenPools;
@@ -29,14 +29,14 @@ contract Staking is Ownable {
     address[] public stakers;
     /// @dev DSLA token address to burn fees
     address public dslaTokenAddress;
-    /// @dev array with the allowed tokens addresses of the StakeRegistry
+    /// @dev array with the allowed tokens addresses for the current SLA
     address[] public allowedTokens;
 
     //______ onlyOwner modifiable parameters ______
     /// @dev corresponds to the reward percentage to be paid to the provider after a respected period
     uint256 public providerRewardPercentage;
     /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %
-    uint256 public burnRate;
+    uint256 public DSLAburnRate;
     /// @dev minimum deposit for Tier 1 staking
     uint256 public minimumDSLAStakedTier1;
     /// @dev minimum deposit for Tier 2 staking
@@ -55,27 +55,18 @@ contract Staking is Ownable {
     }
 
     /**
-     *@param _dslaTokenAddress 1. address of the base token
-     *@param _providerRewardPercentage 2. percentage of the users pool to be rewarded to the provider
-     *@param _burnRate 3. (_burnRate/1000)% of DSLA to be burned after a reward/compensation is paid
-     *@param _minimumDSLAStakedTier1 4. minimum stake of DSLA to enable tier 1 privileges
-     *@param _minimumDSLAStakedTier2 5. minimum stake of DSLA to enable tier 2 privileges
-     *@param _minimumDSLAStakedTier3 6. minimum stake of DSLA to enable tier 3 privileges
+     *@param _stakeRegistry 1. address of the base token
      */
-    constructor(
-        address _dslaTokenAddress,
-        address _slaRegistryAddress,
-        uint256 _providerRewardPercentage,
-        uint256 _burnRate,
-        uint256 _minimumDSLAStakedTier1,
-        uint256 _minimumDSLAStakedTier2,
-        uint256 _minimumDSLAStakedTier3
-    ) public {
-        dslaTokenAddress = _dslaTokenAddress;
-        slaRegistry = SLARegistry(_slaRegistryAddress);
-        allowedTokens.push(_dslaTokenAddress);
-        providerRewardPercentage = _providerRewardPercentage;
-        burnRate = _burnRate;
+    constructor(address _stakeRegistry) public {
+        stakeRegistry = StakeRegistry(_stakeRegistry);
+        (
+            uint256 _DSLAburnRate,
+            uint256 _minimumDSLAStakedTier1,
+            uint256 _minimumDSLAStakedTier2,
+            uint256 _minimumDSLAStakedTier3
+        ) = stakeRegistry.getStakingParameters();
+        dslaTokenAddress = stakeRegistry.DSLATokenAddress();
+        DSLAburnRate = _DSLAburnRate;
         minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
         minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
         minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
@@ -88,7 +79,7 @@ contract Staking is Ownable {
     function addAllowedTokens(address _tokenAddress) public onlyOwner {
         require(isAllowedToken(_tokenAddress) == false, "Token already added");
         require(
-            slaRegistry.isAllowedToken(_tokenAddress) == true,
+            stakeRegistry.isAllowedToken(_tokenAddress) == true,
             "Token not allowed by the SLARegistry contract"
         );
         (uint256 providerStake, ) = getStakeholdersStakes(dslaTokenAddress);
@@ -189,6 +180,7 @@ contract Staking is Ownable {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
             (, uint256 usersStake) = getStakeholdersStakes(tokenAddress);
+            // TODO to be discussed
             uint256 reward = usersStake.mul(providerRewardPercentage).div(100);
             if (tokenAddress == dslaTokenAddress) {
                 uint256 fees = _burnDSLATokens(reward);
@@ -336,7 +328,7 @@ contract Staking is Ownable {
 
     function _burnDSLATokens(uint256 _amount) internal returns (uint256 fees) {
         bytes4 BURN_SELECTOR = bytes4(keccak256(bytes("burn(uint256)")));
-        fees = _amount.mul(burnRate).div(1000);
+        fees = _amount.mul(DSLAburnRate).div(1000);
         (bool _success, ) =
             dslaTokenAddress.call(abi.encodeWithSelector(BURN_SELECTOR, fees));
         require(_success, "DSLA burn process was not successful");

@@ -5,11 +5,13 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./Messenger.sol";
 import "./SLA.sol";
 import "./SLO.sol";
 import "./SLORegistry.sol";
-import "./Staking.sol";
+import "./PeriodRegistry.sol";
+import "./MessengerRegistry.sol";
+import "./StakeRegistry.sol";
+import "./messenger/IMessenger.sol";
 
 /**
  * @title SLARegistry
@@ -19,79 +21,22 @@ import "./Staking.sol";
 contract SLARegistry is Ownable {
     using SafeMath for uint256;
 
-    /// @dev struct to return on getActivePool function.
-    struct ActivePool {
-        address SLAaddress;
-        uint256 stake;
-        string assetName;
-        address assetAddress;
-    }
-    /// @dev struct to store the start and end of the periods
-    struct CanonicalPeriod {
-        uint256 start;
-        uint256 end;
-    }
-
-    /// @dev address of the DSLA token
-    IERC20 public DSLAToken;
-    /// @dev sloRegistryAddress
+    /// @dev SLO registry
     SLORegistry public sloRegistry;
-    /// @dev Messenger of the SLA Registry
-    Messenger public messenger;
-    /// @dev mapping periodId=>CanonicalPeriod to check if SLA is registered
-    uint256 public canonicalPeriodsLastId;
+    /// @dev Periods registry
+    PeriodRegistry public periodRegistry;
+    /// @dev Messengers registry
+    MessengerRegistry public messengerRegistry;
+    /// @dev Stake registry
+    StakeRegistry public stakeRegistry;
     /// @dev stores the addresses of created SLAs
     SLA[] public SLAs;
-    /// @dev mapping periodId=>CanonicalPeriod to check if SLA is registered
-    mapping(uint256 => CanonicalPeriod) public canonicalPeriods;
-    /// @dev mapping networkName=>periodId=>bytes32 to store ipfsHash of the analytics corresponding to periodId
-    mapping(bytes32 => mapping(uint256 => bytes32))
-        public canonicalPeriodsAnalytics;
-    /// @dev mapping SLA=>bool to check if SLA is registered
+    /// @dev (slaAddress=>bool) to check if SLA is registered
     mapping(address => bool) public registeredSLAs;
-    /// @dev bytes32 to store the available network names
-    bytes32[] public networkNames;
-    /// @dev mapping SLA=>bool to store the if the network is valid
-    mapping(bytes32 => bool) public validNetworks;
     /// @dev stores the indexes of service level agreements owned by an user
     mapping(address => uint256[]) private userToSLAIndexes;
     /// @dev mapping userAddress => SLA[]
     mapping(address => SLA[]) public userStakedSlas;
-
-    //______ onlyOwner modifiable parameters ______
-    /// @dev corresponds to the reward percentage to be paid to the provider after a respected period
-    uint256 private _providerRewardPercentage = 3;
-    /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %
-    uint256 private _burnRate = 3;
-    /// @dev minimum deposit for Tier 1 staking
-    uint256 private _minimumDSLAStakedTier1 = 3000 ether;
-    /// @dev minimum deposit for Tier 2 staking
-    uint256 private _minimumDSLAStakedTier2 = 6000 ether;
-    /// @dev minimum deposit for Tier 3 staking
-    uint256 private _minimumDSLAStakedTier3 = 9000 ether;
-    /// @dev array with the allowed tokens addresses of the StakeRegistry
-    address[] public allowedTokens;
-
-    modifier onlyRegisteredSla {
-        require(registeredSLAs[msg.sender] == true, "Only for registered SLAs");
-        _;
-    }
-
-    /**
-     * @dev event to log modifications on the staking parameters
-     *@param providerRewardPercentage 2. percentage of the users pool to be rewarded to the provider
-     *@param burnRate 3. (burnRate/1000)% of DSLA to be burned after a reward/compensation is paid
-     *@param minimumDSLAStakedTier1 4. minimum stake of DSLA to enable tier 1 privileges
-     *@param minimumDSLAStakedTier2 5. minimum stake of DSLA to enable tier 2 privileges
-     *@param minimumDSLAStakedTier3 6. minimum stake of DSLA to enable tier 3 privileges
-     */
-    event StakingParametersModified(
-        uint256 providerRewardPercentage,
-        uint256 burnRate,
-        uint256 minimumDSLAStakedTier1,
-        uint256 minimumDSLAStakedTier2,
-        uint256 minimumDSLAStakedTier3
-    );
 
     /**
      * @dev event for service level agreement creation logging
@@ -101,94 +46,77 @@ contract SLARegistry is Ownable {
     event SLACreated(SLA indexed sla, address indexed owner);
 
     /**
-     * @dev Event to store a new analytics ipfs hash received
-     * @param _ipfsHash 1. id of the canonical period to be analyzed
-     * @param _network 2. network name to publish analytics
-     */
-    event AnalyticsReceived(
-        bytes32 _ipfsHash,
-        bytes32 _network,
-        uint256 _periodId
-    );
-
-    /**
      * @dev constructor
-     * @param _messengerAddress 1. the address of the chainlink messenger contract
-     * @param _sla_week_period_starts 3. array of the starts of the weeks period
-     * @param _sla_week_period_ends 4. array of the ends of the weeks period
-     * @param _networkNames 5. array of bytes32 with the names of the valid networks
-     * @param _dslaToken 6. DSLA Token
-     * @param _sloRegistry 7. SLORegistry
+     * @param _sloRegistry 1. SLO Registry
+     * @param _periodRegistry 2. Periods registry
+     * @param _messengerRegistry 3. Messenger registry
+     * @param _stakeRegistry 4. Stake registry
      */
     constructor(
-        Messenger _messengerAddress,
-        uint256[] memory _sla_week_period_starts,
-        uint256[] memory _sla_week_period_ends,
-        bytes32[] memory _networkNames,
-        IERC20 _dslaToken,
-        SLORegistry _sloRegistry
+        SLORegistry _sloRegistry,
+        PeriodRegistry _periodRegistry,
+        MessengerRegistry _messengerRegistry,
+        StakeRegistry _stakeRegistry
     ) public {
-        require(
-            _sla_week_period_starts.length == _sla_week_period_ends.length,
-            "Periods starts and ends lengths should match"
-        );
-        for (
-            uint256 index = 0;
-            index < _sla_week_period_starts.length;
-            index++
-        ) {
-            require(
-                _sla_week_period_starts[index] < _sla_week_period_ends[index],
-                "Period end should be greater than period start"
-            );
-            canonicalPeriods[index] = CanonicalPeriod({
-                start: _sla_week_period_starts[index],
-                end: _sla_week_period_ends[index]
-            });
-        }
-        networkNames = _networkNames;
-        canonicalPeriodsLastId = _sla_week_period_starts.length - 1;
-        DSLAToken = _dslaToken;
         sloRegistry = _sloRegistry;
-        messenger = _messengerAddress;
-        messenger.setSLARegistry();
-        addAllowedTokens(address(_dslaToken));
+        periodRegistry = _periodRegistry;
+        stakeRegistry = _stakeRegistry;
+        messengerRegistry = _messengerRegistry;
+        messengerRegistry.setSLARegistry();
     }
 
     /**
      * @dev public function for creating canonical service level agreements
-     * @param _SLO 2. SLO
-     * @param _ipfsHash 4. string with the ipfs hash that contains extra information about the service level agreement
-     * @param _canonicalPeriodIds 6. array of allowed canonical period ids
+     * @param _SLO 1. SLO
+     * @param _ipfsHash 2. string with the ipfs hash that contains extra information about the service level agreement
+     * @param _periodType 3. period type
+     * @param _periodIds 4. array of allowed period ids
+     * @param _messengerAddress 5. address of the messenger for the corresponding SLA
      */
     function createSLA(
         SLO _SLO,
         string memory _ipfsHash,
-        uint256[] calldata _canonicalPeriodIds
+        PeriodRegistry.PeriodType _periodType,
+        uint256[] calldata _periodIds,
+        address _messengerAddress
     ) public {
+        (, , , bool initialized) =
+            periodRegistry.periodDefinitions(_periodType);
+        require(initialized == true, "Period type is not initialized yet");
         require(
             sloRegistry.registeredSLOs(address(_SLO)) == true,
             "SLO not registered on SLORegistry"
         );
-        require(_canonicalPeriodIds.length > 0, "Periods information is empty");
+        require(_periodIds.length > 0, "Periods information is empty");
+        // check if _periodIds are valid and sorted in ascendant order
+        for (uint256 index = 0; index < _periodIds.length; index++) {
+            bool validPeriod =
+                periodRegistry.isValidPeriod(_periodType, _periodIds[index]);
+            require(validPeriod, "Period id not valid");
+            if (index < _periodIds.length - 1) {
+                require(
+                    _periodIds[index] < _periodIds[index + 1],
+                    "Period ids should be sorted "
+                );
+            }
+        }
+        bool registeredMessenger =
+            messengerRegistry.registeredMessengers(_messengerAddress);
         require(
-            _canonicalPeriodIds[_canonicalPeriodIds.length - 1] <=
-                canonicalPeriodsLastId - 1,
-            "Should not select a period id bigger than the last canonical period id"
+            registeredMessenger == true,
+            "messenger address is not registered"
         );
+
         SLA sla =
             new SLA(
                 msg.sender,
                 _SLO,
                 _ipfsHash,
-                address(DSLAToken),
-                _canonicalPeriodIds,
-                address(this),
-                _providerRewardPercentage,
-                _burnRate,
-                _minimumDSLAStakedTier1,
-                _minimumDSLAStakedTier2,
-                _minimumDSLAStakedTier3
+                _messengerAddress,
+                _periodIds,
+                _periodType,
+                address(stakeRegistry),
+                address(periodRegistry)
             );
 
         SLAs.push(sla);
@@ -209,9 +137,16 @@ contract SLARegistry is Ownable {
             breachedContract == false,
             "Should only be called for not breached contracts"
         );
-        CanonicalPeriod memory canonicalPeriod = canonicalPeriods[_periodId];
+        bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
         require(
-            canonicalPeriod.end < block.timestamp,
+            slaAllowedPeriodId == true,
+            "Period ID not registered in the SLA contract"
+        );
+        PeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
+        bool periodFinished =
+            periodRegistry.periodIsFinished(slaPeriodType, _periodId);
+        require(
+            periodFinished == true,
             "SLA contract period has not finished yet"
         );
         (, , SLA.Status status) = _sla.slaPeriods(_periodId);
@@ -219,44 +154,13 @@ contract SLARegistry is Ownable {
             status == SLA.Status.NotVerified,
             "SLA contract was already verified for the period"
         );
-        messenger.requestSLI(_periodId, _sla);
+        address slaMessenger = _sla.messengerAddress();
+        IMessenger(slaMessenger).requestSLI(_periodId, address(_sla));
     }
 
-    /**
-     * @dev Request analytics object for the current period.
-     * @param _canonicalPeriodId 1. id of the canonical period to be analyzed
-     * @param _network 2. network name to publish analytics
-     */
-    function requestAnalytics(uint256 _canonicalPeriodId, bytes32 _network)
-        public
-    {
-        require(_isValidNetwork(_network), "Network name not recognized");
-        CanonicalPeriod memory period = canonicalPeriods[_canonicalPeriodId];
-        require(period.end < block.timestamp, "Period has not finished yet");
-        require(
-            canonicalPeriodsAnalytics[_network][_canonicalPeriodId] == "",
-            "Analytics object already published"
-        );
-        messenger.requestAnalytics(_canonicalPeriodId, _network);
-    }
-
-    /**
-     * @dev Receives the data from the Messenger contract
-     * @param _ipfsHash 1. id of the canonical period to be analyzed
-     * @param _network 2. network name to publish analytics
-     * @param _periodId 3. id of the canonical period
-     */
-    function publishAnalyticsHash(
-        bytes32 _ipfsHash,
-        bytes32 _network,
-        uint256 _periodId
-    ) public {
-        require(
-            address(messenger) == msg.sender,
-            "Can only be called by the Messenger contract"
-        );
-        emit AnalyticsReceived(_ipfsHash, _network, _periodId);
-        canonicalPeriodsAnalytics[_network][_periodId] = _ipfsHash;
+    function setMessengerSLARegistryAddress(address _messengerAddress) public {
+        IMessenger(_messengerAddress).setSLARegistry();
+        messengerRegistry.registerMessenger(_messengerAddress, msg.sender);
     }
 
     /**
@@ -329,141 +233,11 @@ contract SLARegistry is Ownable {
      *@dev register the sending SLA contract as staked by _owner
      *@param _owner 1. SLA contract to stake
      */
-    function registerStakedSla(address _owner)
-        public
-        onlyRegisteredSla
-        returns (bool)
-    {
+    function registerStakedSla(address _owner) public returns (bool) {
+        require(registeredSLAs[msg.sender] == true, "Only for registered SLAs");
         if (slaWasStakedByUser(_owner, msg.sender) == false) {
             userStakedSlas[_owner].push(SLA(msg.sender));
         }
         return true;
-    }
-
-    /**
-     * @dev returns the active pools owned by a user.
-     * @param _slaOwner 1. owner of the active pool
-     * @return ActivePool[], array of structs: {SLAaddress,stake,assetName}
-     */
-    function getActivePool(address _slaOwner)
-        public
-        view
-        returns (ActivePool[] memory)
-    {
-        bytes4 NAME_SELECTOR = bytes4(keccak256(bytes("name()")));
-        uint256 stakeCounter = 0;
-        // Count the stakes of the user, checking every SLA staked
-        for (
-            uint256 index = 0;
-            index < userStakedSlas[_slaOwner].length;
-            index++
-        ) {
-            SLA currentSLA = SLA(userStakedSlas[_slaOwner][index]);
-            stakeCounter = stakeCounter.add(
-                currentSLA.getAllowedTokensLength()
-            );
-        }
-
-        ActivePool[] memory activePools = new ActivePool[](stakeCounter);
-        // to insert on activePools array
-        uint256 stakePosition = 0;
-        for (
-            uint256 index = 0;
-            index < userStakedSlas[_slaOwner].length;
-            index++
-        ) {
-            SLA currentSLA = userStakedSlas[_slaOwner][index];
-            for (
-                uint256 tokenIndex = 0;
-                tokenIndex < currentSLA.getAllowedTokensLength();
-                tokenIndex++
-            ) {
-                (address tokenAddress, uint256 stake) =
-                    currentSLA.getTokenStake(_slaOwner, tokenIndex);
-                (, bytes memory tokenNameBytes) =
-                    tokenAddress.staticcall(
-                        abi.encodeWithSelector(NAME_SELECTOR)
-                    );
-                ActivePool memory currentActivePool =
-                    ActivePool({
-                        SLAaddress: address(currentSLA),
-                        stake: stake,
-                        assetName: string(tokenNameBytes),
-                        assetAddress: tokenAddress
-                    });
-                activePools[stakePosition] = currentActivePool;
-                stakePosition = stakePosition.add(1);
-            }
-        }
-        return activePools;
-    }
-
-    function isAllowedToken(address _tokenAddress) public view returns (bool) {
-        for (uint256 index = 0; index < allowedTokens.length; index++) {
-            if (allowedTokens[index] == _tokenAddress) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function _isValidNetwork(bytes32 _networkName)
-        internal
-        view
-        returns (bool)
-    {
-        for (uint256 index; index < networkNames.length; index++) {
-            if (networkNames[index] == _networkName) return true;
-        }
-        return false;
-    }
-
-//    function getStakingParameters()
-//        public
-//        view
-//        returns (
-//            uint256 providerRewardPercentage,
-//            uint256 burnRate,
-//            uint256 minimumDSLAStakedTier1,
-//            uint256 minimumDSLAStakedTier2,
-//            uint256 minimumDSLAStakedTier3
-//        )
-//    {
-//        providerRewardPercentage = _providerRewardPercentage;
-//        burnRate = _burnRate;
-//        minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
-//        minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
-//        minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
-//    }
-
-    //_______ OnlyOwner functions _______
-    function setStakingParameters(
-        uint256 providerRewardPercentage,
-        uint256 burnRate,
-        uint256 minimumDSLAStakedTier1,
-        uint256 minimumDSLAStakedTier2,
-        uint256 minimumDSLAStakedTier3
-    ) public onlyOwner {
-        _providerRewardPercentage = providerRewardPercentage;
-        _burnRate = burnRate;
-        _minimumDSLAStakedTier1 = minimumDSLAStakedTier1;
-        _minimumDSLAStakedTier2 = minimumDSLAStakedTier2;
-        _minimumDSLAStakedTier3 = minimumDSLAStakedTier3;
-        emit StakingParametersModified(
-            providerRewardPercentage,
-            burnRate,
-            minimumDSLAStakedTier1,
-            minimumDSLAStakedTier2,
-            minimumDSLAStakedTier3
-        );
-    }
-
-    /**
-     *@dev add a token to ve allowed for staking
-     *@param _tokenAddress 1. address of the new allowed token
-     */
-    function addAllowedTokens(address _tokenAddress) public onlyOwner {
-        require(isAllowedToken(_tokenAddress) == false, "token already added");
-        allowedTokens.push(_tokenAddress);
     }
 }

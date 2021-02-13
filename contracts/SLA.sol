@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./SLO.sol";
 import "./SLARegistry.sol";
+import "./PeriodRegistry.sol";
 import "./Staking.sol";
 
 /**
@@ -37,11 +38,19 @@ contract SLA is Staking {
     /// @dev The ipfs hash that stores extra information about the agreement
     string public ipfsHash;
 
+    /// @dev uint8 of the period type
+    PeriodRegistry.PeriodType public periodType;
+
+    PeriodRegistry public periodRegistry;
+
     /// @dev array of he allowed canonical period ids
-    uint256[] public canonicalPeriodIds;
+    uint256[] public periodIds;
 
     /// @dev The address of the slaRegistry contract
     SLARegistry public slaRegistry;
+
+    /// @dev The address of the messenger
+    address public messengerAddress;
 
     /// @dev periodId=>SLAPeriod mapping
     mapping(uint256 => SLAPeriod) public slaPeriods;
@@ -72,7 +81,7 @@ contract SLA is Staking {
      */
     modifier onlyMessenger() {
         require(
-            msg.sender == address(slaRegistry.messenger()),
+            msg.sender == messengerAddress,
             "Only Messenger can call this function"
         );
         _;
@@ -93,48 +102,26 @@ contract SLA is Staking {
      * @param _owner 1. address of the owner of the service level agreement
      * @param _SLO 2. address of the SLO
      * @param _ipfsHash 3. string with the ipfs hash that contains SLA information
-     * @param _dslaTokenAddress 4. DSLA token address
-     * @param _canonicalPeriodIds 5. id of the allowed canonical periods
+     * @param _periodIds 5. id of the allowed canonical periods
      */
     constructor(
         address _owner,
         SLO _SLO,
         string memory _ipfsHash,
-        address _dslaTokenAddress,
-        uint256[] memory _canonicalPeriodIds,
-        address _slaRegistryAddress,
-        uint256 _providerRewardPercentage,
-        uint256 _burnRate,
-        uint256 _minimumDSLAStakedTier1,
-        uint256 _minimumDSLAStakedTier2,
-        uint256 _minimumDSLAStakedTier3
-    )
-        public
-        Staking(
-            _dslaTokenAddress,
-            _slaRegistryAddress,
-            _providerRewardPercentage,
-            _burnRate,
-            _minimumDSLAStakedTier1,
-            _minimumDSLAStakedTier2,
-            _minimumDSLAStakedTier3
-        )
-    {
-        for (
-            uint256 index = 0;
-            index < _canonicalPeriodIds.length - 1;
-            index++
-        ) {
-            require(
-                _canonicalPeriodIds[index] < _canonicalPeriodIds[index + 1],
-                "Period ids array should be sorted"
-            );
-        }
+        address _messengerAddress,
+        uint256[] memory _periodIds,
+        PeriodRegistry.PeriodType _periodType,
+        address _stakeRegistry,
+        address _periodRegistry
+    ) public Staking(_stakeRegistry) {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;
+        messengerAddress = _messengerAddress;
         slaRegistry = SLARegistry(msg.sender);
+        periodRegistry = PeriodRegistry(_periodRegistry);
         creationBlockNumber = block.number;
-        canonicalPeriodIds = _canonicalPeriodIds;
+        periodIds = _periodIds;
+        periodType = _periodType;
         slo = _SLO;
     }
 
@@ -162,9 +149,11 @@ contract SLA is Staking {
         }
     }
 
-    function _isAllowedPeriod(uint256 _periodId) internal view returns (bool) {
-        for (uint256 index = 0; index < canonicalPeriodIds.length; index++) {
-            if (canonicalPeriodIds[index] == _periodId) return true;
+    function isAllowedPeriod(uint256 _periodId) public view returns (bool) {
+        for (uint256 index = 0; index < periodIds.length; index++) {
+            if (periodIds[index] == _periodId) {
+                return true;
+            }
         }
         return false;
     }
@@ -191,23 +180,22 @@ contract SLA is Staking {
      *@param _tokenAddress 2. address of the ERC to be staked
      */
 
-    function withdrawStakedTokens(uint256 _amount, address _tokenAddress) public {
+    function withdrawStakedTokens(uint256 _amount, address _tokenAddress)
+        public
+    {
         require(_amount > 0, "amount cannot be 0");
-        if (msg.sender != owner()) {
-            uint256 lastValidPeriodId =
-                canonicalPeriodIds[canonicalPeriodIds.length - 1];
-            (, uint256 endOfLastValidPeriod) =
-                slaRegistry.canonicalPeriods(lastValidPeriodId);
-            // users can withdraw only if the contract is breached
-            // or if the the last period is finished and the period status was verified
-            require(
-                _breachedContract == true ||
-                    (block.timestamp >= endOfLastValidPeriod &&
-                        slaPeriods[lastValidPeriodId].status !=
-                        Status.NotVerified),
-                "Can only withdraw stake after the final period is finished or if the contract is breached"
-            );
-        }
+
+        uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
+        (, uint256 endOfLastValidPeriod) =
+            periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
+        // providers and users can withdraw only if the contract is breached
+        // or if the the last period is finished and the period status was verified
+        require(
+            _breachedContract == true ||
+                (block.timestamp >= endOfLastValidPeriod &&
+                    slaPeriods[lastValidPeriodId].status != Status.NotVerified),
+            "Can only withdraw stake after the final period is finished or if the contract is breached"
+        );
         _withdraw(_amount, _tokenAddress);
     }
 
@@ -216,16 +204,7 @@ contract SLA is Staking {
      *@param _tokenAddress 1. address of the token to withdraw rewards
      */
 
-    function claimProviderReward(address _tokenAddress) public onlyOwner {
-        _claimReward(_tokenAddress);
-    }
-
-    /**
-     *@dev withdraw provider reward of a given token address
-     *@param _tokenAddress 1. address of the token to withdraw rewards
-     */
-
-    function claimUserCompensation(address _tokenAddress) public onlyOwner {
+    function claimUserCompensation(address _tokenAddress) public {
         _claimCompensation(_tokenAddress);
     }
 
@@ -254,9 +233,9 @@ contract SLA is Staking {
         _slaOwner = owner();
         _ipfsHash = ipfsHash;
         _SLO = slo;
-        _SLAPeriods = new SLAPeriod[](canonicalPeriodIds.length);
-        for (uint256 index = 0; index < canonicalPeriodIds.length; index++) {
-            uint256 periodId = canonicalPeriodIds[index];
+        _SLAPeriods = new SLAPeriod[](periodIds.length);
+        for (uint256 index = 0; index < periodIds.length; index++) {
+            uint256 periodId = periodIds[index];
             SLAPeriod memory slaPeriod = slaPeriods[periodId];
             _SLAPeriods[index] = SLAPeriod({
                 status: slaPeriod.status,
