@@ -102,7 +102,11 @@ contract SLA is Staking {
      * @param _owner 1. address of the owner of the service level agreement
      * @param _SLO 2. address of the SLO
      * @param _ipfsHash 3. string with the ipfs hash that contains SLA information
-     * @param _periodIds 5. id of the allowed canonical periods
+     * @param _periodIds 4. id of the allowed canonical periods
+     * @param _periodType 5. period type of the SLA contract
+     * @param _stakeRegistry 6. stakeRegistry address
+     * @param _periodRegistry 7. periodRegistry address
+     * @param _whitelisted 8. boolean to declare whitelisted contracts
      */
     constructor(
         address _owner,
@@ -112,10 +116,17 @@ contract SLA is Staking {
         uint256[] memory _periodIds,
         PeriodRegistry.PeriodType _periodType,
         address _stakeRegistry,
-        address _periodRegistry
+        address _periodRegistry,
+        bool _whitelisted
     )
         public
-        Staking(_stakeRegistry, _periodRegistry, _periodType, _periodIds.length)
+        Staking(
+            _stakeRegistry,
+            _periodRegistry,
+            _periodType,
+            _periodIds.length,
+            _whitelisted
+        )
     {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;

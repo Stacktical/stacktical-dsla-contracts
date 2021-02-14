@@ -72,13 +72,15 @@ contract SLARegistry is Ownable {
      * @param _periodType 3. period type
      * @param _periodIds 4. array of allowed period ids
      * @param _messengerAddress 5. address of the messenger for the corresponding SLA
+     * @param _whitelisted 6. bool to declare whitelisted SLA
      */
     function createSLA(
         SLO _SLO,
         string memory _ipfsHash,
         PeriodRegistry.PeriodType _periodType,
         uint256[] calldata _periodIds,
-        address _messengerAddress
+        address _messengerAddress,
+        bool _whitelisted
     ) public {
         (, , , bool initialized) =
             periodRegistry.periodDefinitions(_periodType);
@@ -116,7 +118,8 @@ contract SLARegistry is Ownable {
                 _periodIds,
                 _periodType,
                 address(stakeRegistry),
-                address(periodRegistry)
+                address(periodRegistry),
+                _whitelisted
             );
 
         SLAs.push(sla);

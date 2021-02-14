@@ -51,6 +51,11 @@ contract Staking is Ownable {
     /// @dev length of the _periodIds array, to state effective APY
     uint256 public slaPeriodsLength;
 
+    /// @dev boolean to declare if contract is whitelisted
+    bool public whitelisted;
+    /// @dev (userAddress=bool) to declare whitelisted addresses
+    mapping(address => bool) whitelist;
+
     modifier notOwner {
         require(msg.sender != owner(), "Should not be called by the SLA owner");
         _;
@@ -61,6 +66,13 @@ contract Staking is Ownable {
         _;
     }
 
+    modifier onlyWhitelisted {
+        if (whitelisted == true) {
+            require(whitelist[msg.sender] == true, "User is not whitelisted");
+        }
+        _;
+    }
+
     /**
      *@param _stakeRegistry 1. address of the base token
      */
@@ -68,12 +80,14 @@ contract Staking is Ownable {
         address _stakeRegistry,
         address _periodRegistry,
         PeriodRegistry.PeriodType _periodType,
-        uint256 _slaPeriodsLength
+        uint256 _slaPeriodsLength,
+        bool _whitelisted
     ) public {
         stakeRegistry = StakeRegistry(_stakeRegistry);
         periodRegistry = PeriodRegistry(_periodRegistry);
         periodType = _periodType;
         slaPeriodsLength = _slaPeriodsLength;
+        whitelisted = _whitelisted;
         (
             uint256 _DSLAburnRate,
             uint256 _minimumDSLAStakedTier1,
@@ -89,6 +103,11 @@ contract Staking is Ownable {
         minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
         minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
         minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
+    }
+
+    function whitelistUser(address _userAddress) public onlyOwner {
+        require(whitelist[_userAddress] == false, "User already whitelisted");
+        whitelist[_userAddress] = true;
     }
 
     /**
@@ -119,6 +138,7 @@ contract Staking is Ownable {
     function _stake(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
+        onlyWhitelisted
     {
         if (msg.sender != owner()) {
             (uint256 providerStake, uint256 usersStake) =
@@ -159,6 +179,7 @@ contract Staking is Ownable {
     function _withdraw(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
+        onlyWhitelisted
     {
         require(
             stakeHoldersPositions[_tokenAddress][msg.sender] >= _amount,
@@ -233,7 +254,11 @@ contract Staking is Ownable {
      *@notice it uses the user position and the user total position per token to check
      * the proportion of the compensation pool that corresponds to every user
      */
-    function _claimCompensation(address _tokenAddress) public notOwner {
+    function _claimCompensation(address _tokenAddress)
+        public
+        notOwner
+        onlyWhitelisted
+    {
         uint256 precision = 10000;
         uint256 userPosition = stakeHoldersPositions[_tokenAddress][msg.sender];
         require(
@@ -279,6 +304,15 @@ contract Staking is Ownable {
         usersStake = tokenPools[_tokenAddress].sub(providerStake);
     }
 
+    function _burnDSLATokens(uint256 _amount) internal returns (uint256 fees) {
+        bytes4 BURN_SELECTOR = bytes4(keccak256(bytes("burn(uint256)")));
+        fees = _amount.mul(DSLAburnRate).div(1000);
+        (bool _success, ) =
+            dslaTokenAddress.call(abi.encodeWithSelector(BURN_SELECTOR, fees));
+        require(_success, "DSLA burn process was not successful");
+        tokenPools[dslaTokenAddress] = tokenPools[dslaTokenAddress].sub(fees);
+    }
+
     function _isStaker(address _staker) internal view returns (bool) {
         for (uint256 index = 0; index < stakers.length; index++) {
             if (stakers[index] == _staker) return true;
@@ -309,14 +343,5 @@ contract Staking is Ownable {
             }
         }
         return false;
-    }
-
-    function _burnDSLATokens(uint256 _amount) internal returns (uint256 fees) {
-        bytes4 BURN_SELECTOR = bytes4(keccak256(bytes("burn(uint256)")));
-        fees = _amount.mul(DSLAburnRate).div(1000);
-        (bool _success, ) =
-            dslaTokenAddress.call(abi.encodeWithSelector(BURN_SELECTOR, fees));
-        require(_success, "DSLA burn process was not successful");
-        tokenPools[dslaTokenAddress] = tokenPools[dslaTokenAddress].sub(fees);
     }
 }
