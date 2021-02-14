@@ -22,7 +22,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
     PeriodRegistry private periodRegistry;
     /// @dev bytes32 to store the available network names
     bytes32[] public networkNames;
-    /// @dev mapping networkName=>periodType=>periodId=>bytes32 to store ipfsHash of the analytics corresponding to periodId
+    /// @dev (networkName=>periodType=>periodId=>bytes32) to store ipfsHash of the analytics corresponding to periodId
     mapping(bytes32 => mapping(PeriodRegistry.PeriodType => mapping(uint256 => bytes32)))
         public periodAnalytics;
 
@@ -78,6 +78,10 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         return false;
     }
 
+    /**
+     * @dev function to add a valid network name
+     * @param _networkName 1. bytes32 network name
+     */
     function addNetwork(bytes32 _networkName) public onlyOwner returns (bool) {
         require(
             isValidNetwork(_networkName) == false,
@@ -91,7 +95,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @dev Request analytics object for the current period.
      * @param _periodId 1. id of the canonical period to be analyzed
      * @param _periodType 2. type of period to be queried
-     * @param _networkName 2. network name to publish analytics
+     * @param _networkName 3. network name to publish analytics
      */
     function requestAnalytics(
         uint256 _periodId,
@@ -119,6 +123,8 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
 
         request.add("job_type", "staking_efficiency_analytics");
         request.add("network_name", _bytes32ToStr(_networkName));
+        request.add("period_id", _uintToStr(_periodId));
+        request.add("period_type", _uintToStr(uint256(uint8(_periodType))));
         request.add("sla_monitoring_start", _uintToStr(start));
         request.add("sla_monitoring_end", _uintToStr(end));
 

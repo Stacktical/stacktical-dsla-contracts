@@ -28,14 +28,15 @@
         "_stakeRegistry": "4. Stake registry"
       }
     },
-    "createSLA(address,string,uint8,uint256[],address)": {
+    "createSLA(address,string,uint8,uint256[],address,bool)": {
       "details": "public function for creating canonical service level agreements",
       "params": {
         "_SLO": "1. SLO",
         "_ipfsHash": "2. string with the ipfs hash that contains extra information about the service level agreement",
         "_periodType": "3. period type",
         "_periodIds": "4. array of allowed period ids",
-        "_messengerAddress": "5. address of the messenger for the corresponding SLA"
+        "_messengerAddress": "5. address of the messenger for the corresponding SLA",
+        "_whitelisted": "6. bool to declare whitelisted SLA"
       }
     },
     "owner()": { "details": "Returns the address of the current owner." },
@@ -49,6 +50,10 @@
     "requestSLI(uint256,address)": {
       "details": "Gets SLI information for the specified SLA and SLO",
       "params": { "_periodId": "1. id of the period", "_sla": "2. SLA Address" }
+    },
+    "setMessengerSLARegistryAddress(address)": {
+      "details": "function to declare this SLARegistry contract as SLARegistry of _messengerAddress",
+      "params": { "_messengerAddress": "1. address of the messenger" }
     },
     "slaWasStakedByUser(address,address)": {
       "details": "public view function that returns true if the _owner has staked on _sla",

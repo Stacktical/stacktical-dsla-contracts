@@ -3,7 +3,6 @@ pragma experimental ABIEncoderV2;
 
 import "../SLA.sol";
 import "../StringUtils.sol";
-import "../SLARegistry.sol";
 import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
 import "./IMessenger.sol";
 
@@ -18,7 +17,9 @@ contract StakingEfficiency is ChainlinkClient, IMessenger, StringUtils {
     /// @dev Array with all request IDs
     bytes32[] public requests;
     /// @dev The address of the SLARegistry contract
-    SLARegistry public slaRegistry;
+    address public slaRegistryAddress;
+    /// @dev Network analytics contract address
+    address public networkAnalyticsAddress;
     /// @dev Chainlink oracle address
     address public oracle;
     /// @dev chainlink jobId
@@ -29,26 +30,28 @@ contract StakingEfficiency is ChainlinkClient, IMessenger, StringUtils {
     /**
      * @dev parameterize the variables according to network
      * @notice sets the Chainlink parameters (oracle address, token address, jobId) and sets the SLARegistry to 0x0 address
-     * @param _chainlinkOracle the address of the oracle to create requests to
-     * @param _chainlinkToken the address of LINK token contract
-     * @param _jobId the job id for the HTTPGet job
+     * @param _chainlinkOracle 1. the address of the oracle to create requests to
+     * @param _chainlinkToken 2. the address of LINK token contract
+     * @param _jobId 3. the job id for Staking efficiency job
+     * @param _networkAnalyticsAddress 4. Network analytics contract address
      */
     constructor(
         address _chainlinkOracle,
         address _chainlinkToken,
-        bytes32 _jobId
+        bytes32 _jobId,
+        address _networkAnalyticsAddress
     ) public {
         jobId = _jobId;
         setChainlinkToken(_chainlinkToken);
         oracle = _chainlinkOracle;
+        networkAnalyticsAddress = _networkAnalyticsAddress;
     }
 
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
-    modifier onlyAllowedAddresses() {
+    modifier onlySLARegistry() {
         require(
-            msg.sender == address(slaRegistry) ||
-                msg.sender == chainlinkOracleAddress(),
-            "Can only be called by connected SLARegistry or Chainlink Oracle"
+            msg.sender == slaRegistryAddress,
+            "Can only be called by SLARegistry"
         );
         _;
     }
@@ -60,11 +63,11 @@ contract StakingEfficiency is ChainlinkClient, IMessenger, StringUtils {
     function setSLARegistry() public override {
         // Only able to trigger this function once
         require(
-            address(slaRegistry) == address(0),
+            slaRegistryAddress == address(0),
             "SLARegistry address has already been set"
         );
 
-        slaRegistry = SLARegistry(msg.sender);
+        slaRegistryAddress = msg.sender;
     }
 
     /**
@@ -77,7 +80,7 @@ contract StakingEfficiency is ChainlinkClient, IMessenger, StringUtils {
     function requestSLI(uint256 _periodId, address _slaAddress)
         public
         override
-        onlyAllowedAddresses
+        onlySLARegistry
     {
         Chainlink.Request memory request =
             buildChainlinkRequest(
@@ -89,8 +92,8 @@ contract StakingEfficiency is ChainlinkClient, IMessenger, StringUtils {
         request.add("period_id", _uintToStr(_periodId));
         request.add("sla_address", _addressToString(_slaAddress));
         request.add(
-            "sla_registry_address",
-            _addressToString(address(slaRegistry))
+            "network_analytics_address",
+            _addressToString(networkAnalyticsAddress)
         );
 
         // Sends the request with 0.1 LINK to the oracle contract
@@ -125,7 +128,10 @@ contract StakingEfficiency is ChainlinkClient, IMessenger, StringUtils {
         (uint256 hits, uint256 misses) = parseSLIData(_chainlinkResponse);
         uint256 total = hits.add(misses);
         uint256 stakingEfficiency = hits.mul(100 * 1000).div(total);
-        SLA(request.slaAddress).registerSLI(stakingEfficiency, request.periodId);
+        SLA(request.slaAddress).registerSLI(
+            stakingEfficiency,
+            request.periodId
+        );
     }
 
     /**

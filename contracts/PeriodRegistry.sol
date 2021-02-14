@@ -19,7 +19,6 @@ contract PeriodRegistry is Ownable {
     struct PeriodDefinition {
         uint256 apy;
         uint256 yearlyPeriods;
-        uint256 interval;
         bool initialized;
         uint256[] starts;
         uint256[] ends;
@@ -34,14 +33,12 @@ contract PeriodRegistry is Ownable {
      *@param periodsAdded 2. amount of periods added
      *@param apy 3. annual percentage yield offered for a year long SLA
      *@param yearlyPeriods 4. amount of periods of the corresponding periods per year to calculate real APY
-     *@param interval 5. difference of time in seconds between the start and the end of a period
      */
     event PeriodInitialized(
         PeriodType periodType,
         uint256 periodsAdded,
         uint256 apy,
-        uint256 yearlyPeriods,
-        uint256 interval
+        uint256 yearlyPeriods
     );
 
     /**
@@ -51,15 +48,13 @@ contract PeriodRegistry is Ownable {
      *@param _periodEnds 3. array of the ends of the period
      *@param _apy 4. annual percentage yield offered for a year long SLA
      *@param _yearlyPeriods 5. amount of periods of the corresponding periods per year to calculate real APY
-     *@param _interval 6. difference of time in seconds between the start and the end of a period
      */
     function initializePeriod(
         PeriodType _periodType,
         uint256[] memory _periodStarts,
         uint256[] memory _periodEnds,
         uint256 _apy,
-        uint256 _yearlyPeriods,
-        uint256 _interval
+        uint256 _yearlyPeriods
     ) public onlyOwner {
         PeriodDefinition storage periodDefinition =
             periodDefinitions[_periodType];
@@ -77,16 +72,11 @@ contract PeriodRegistry is Ownable {
                 _periodStarts[index] < _periodEnds[index],
                 "Start should be before end"
             );
-            require(
-                _periodEnds[index].sub(_periodStarts[index]) == _interval,
-                "Period intervals should match"
-            );
-            periodDefinition.starts[index] = _periodStarts[index];
-            periodDefinition.ends[index] = _periodEnds[index];
+            periodDefinition.starts.push(_periodStarts[index]);
+            periodDefinition.ends.push(_periodEnds[index]);
         }
         periodDefinition.apy = _apy;
         periodDefinition.yearlyPeriods = _yearlyPeriods;
-        periodDefinition.interval = _interval;
         periodDefinition.initialized = true;
     }
 

@@ -157,6 +157,7 @@ export const SLARegistryABI: AbiItem[] = [
       },
       { internalType: 'uint256[]', name: '_periodIds', type: 'uint256[]' },
       { internalType: 'address', name: '_messengerAddress', type: 'address' },
+      { internalType: 'bool', name: '_whitelisted', type: 'bool' },
     ],
     name: 'createSLA',
     outputs: [],

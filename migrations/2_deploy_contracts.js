@@ -7,7 +7,6 @@ const { getEnvFromNetwork, needsGetJobId, getIndexerAPIUrl } = require('../envir
 
 const SLORegistry = artifacts.require('SLORegistry');
 const SLARegistry = artifacts.require('SLARegistry');
-const Messenger = artifacts.require('Messenger');
 const bDSLAToken = artifacts.require('bDSLAToken');
 const DAI = artifacts.require('DAI');
 
@@ -25,7 +24,6 @@ module.exports = (deployer, network) => {
     const env = getEnvFromNetwork(network);
 
     await deployer.deploy(
-      Messenger,
       env.chainlinkOracleAddress,
       env.chainlinkTokenAddress,
       !needsGetJobId ? env.chainlinkJobId : await getChainlinkJobId(),
@@ -33,7 +31,6 @@ module.exports = (deployer, network) => {
 
     await deployer.deploy(
       SLARegistry,
-      Messenger.address,
       env.startsArray,
       env.endsArray,
       networkNamesBytes32,

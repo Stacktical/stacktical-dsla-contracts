@@ -13,6 +13,10 @@
   },
   "kind": "dev",
   "methods": {
+    "addNetwork(bytes32)": {
+      "details": "function to add a valid network name",
+      "params": { "_networkName": "1. bytes32 network name" }
+    },
     "constructor": {
       "details": "parameterize the variables according to network",
       "params": {
@@ -37,8 +41,8 @@
       "details": "Request analytics object for the current period.",
       "params": {
         "_periodId": "1. id of the canonical period to be analyzed",
-        "_networkName": "2. network name to publish analytics",
-        "_periodType": "2. type of period to be queried"
+        "_periodType": "2. type of period to be queried",
+        "_networkName": "3. network name to publish analytics"
       }
     },
     "transferOwnership(address)": {
@@ -53,7 +57,7 @@
     },
     "oracle": { "details": "Chainlink oracle address" },
     "periodAnalytics": {
-      "details": "mapping networkName=>periodType=>periodId=>bytes32 to store ipfsHash of the analytics corresponding to periodId"
+      "details": "(networkName=>periodType=>periodId=>bytes32) to store ipfsHash of the analytics corresponding to periodId"
     },
     "periodRegistry": { "details": "Period registry" },
     "requestIdToAnalyticsRequest": {

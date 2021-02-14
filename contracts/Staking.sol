@@ -94,7 +94,7 @@ contract Staking is Ownable {
             uint256 _minimumDSLAStakedTier2,
             uint256 _minimumDSLAStakedTier3
         ) = stakeRegistry.getStakingParameters();
-        (uint256 _apy, uint256 _yearlyPeriods, , ) =
+        (uint256 _apy, uint256 _yearlyPeriods, ) =
             periodRegistry.periodDefinitions(_periodType);
         apy = _apy;
         yearlyPeriods = _yearlyPeriods;

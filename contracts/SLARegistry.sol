@@ -82,8 +82,7 @@ contract SLARegistry is Ownable {
         address _messengerAddress,
         bool _whitelisted
     ) public {
-        (, , , bool initialized) =
-            periodRegistry.periodDefinitions(_periodType);
+        (, , bool initialized) = periodRegistry.periodDefinitions(_periodType);
         require(initialized == true, "Period type is not initialized yet");
         require(
             sloRegistry.registeredSLOs(address(_SLO)) == true,
@@ -160,6 +159,11 @@ contract SLARegistry is Ownable {
         address slaMessenger = _sla.messengerAddress();
         IMessenger(slaMessenger).requestSLI(_periodId, address(_sla));
     }
+
+    /**
+     * @dev function to declare this SLARegistry contract as SLARegistry of _messengerAddress
+     * @param _messengerAddress 1. address of the messenger
+     */
 
     function setMessengerSLARegistryAddress(address _messengerAddress) public {
         IMessenger(_messengerAddress).setSLARegistry();

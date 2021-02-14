@@ -1,7 +1,5 @@
 import { expect } from 'chai';
 import { expectRevert } from '@openzeppelin/test-helpers';
-import * as bs58 from 'bs58';
-import axios from 'axios';
 import { needsGetJobId } from '../environments';
 import {
   getChainlinkJobId,
@@ -18,7 +16,11 @@ const IERC20 = artifacts.require('IERC20');
 const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
 const SLORegistry = artifacts.require('SLORegistry');
-const Messenger = artifacts.require('Messenger');
+const PeriodRegistry = artifacts.require('PeriodRegistry');
+const MessengerRegistry = artifacts.require('MessengerRegistry');
+const StakeRegistry = artifacts.require('StakeRegistry');
+const StakingEfficiency = artifacts.require('StakingEfficiency');
+const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const bDSLAToken = artifacts.require('bDSLAToken');
 const DAI = artifacts.require('DAI');
 
@@ -33,6 +35,11 @@ const periodId = 0;
 const sloValue = 95000;
 const sloType = 4;
 const sloName = utf8ToHex('staking_efficiency');
+
+// 2 is Weekly SLA
+const periodType = 2;
+const apy = 13;
+const yearlyPeriods = 52;
 const [periodStarts, periodEnds] = generatePeriods(10);
 const slaNetwork = networkNames[0];
 const slaNetworkBytes32 = networkNamesBytes32[0];
@@ -42,20 +49,29 @@ describe('SLARegistry', () => {
   let notOwner;
   let bDSLA;
   let newToken;
-  let messenger;
+  let stakingEfficiencyMessenger;
   let slaRegistry;
   let chainlinkToken;
   let sloRegistry;
-  let userSlos;
+  let periodRegistry;
+  let messengerRegistry;
+  let stakeRegistry;
+  let networkAnalytics;
+  let slo;
   let dai;
   let ipfsHash;
   const SLAs = [];
 
   before(async () => {
+    // deploy tokens
+    bDSLA = await bDSLAToken.new();
+    dai = await DAI.new();
+    newToken = await bDSLAToken.new(); // to simulate a new token
     const serviceMetadata = {
       serviceName: networks[slaNetwork].validators[0],
       serviceDescription: 'Official DSLA Beta Partner.',
-      serviceImage: 'https://storage.googleapis.com/dsla-incentivized-beta/validators/chainode.svg',
+      serviceImage:
+        'https://storage.googleapis.com/dsla-incentivized-beta/validators/chainode.svg',
       serviceURL: 'https://dsla.network',
       serviceAddress: 'one18hum2avunkz3u448lftwmk7wr88qswdlfvvrdm',
       serviceTicker: slaNetwork,
@@ -67,16 +83,30 @@ describe('SLARegistry', () => {
     sloRegistry = await SLORegistry.new();
     // 4 is "GreatherThan"
     await sloRegistry.createSLO(sloValue, sloType, sloName);
-    userSlos = await sloRegistry.userSLOs.call(owner);
+    [slo] = await sloRegistry.userSLOs.call(owner);
+    periodRegistry = await PeriodRegistry.new();
+    await periodRegistry.initializePeriod(
+      periodType,
+      periodStarts,
+      periodEnds,
+      apy,
+      yearlyPeriods,
+    );
+    messengerRegistry = await MessengerRegistry.new();
+    stakeRegistry = await StakeRegistry.new(bDSLA.address);
+
+    networkAnalytics = await NetworkAnalytics.new(
+      envParameters.chainlinkOracleAddress,
+      envParameters.chainlinkTokenAddress,
+      !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
+      periodRegistry.address,
+    );
+
+    await networkAnalytics.addNetwork(slaNetworkBytes32);
   });
 
   beforeEach(async () => {
     SLAs.length = 0;
-
-    // deploy tokens
-    bDSLA = await bDSLAToken.new();
-    dai = await DAI.new();
-    newToken = await bDSLAToken.new(); // to simulate a new token
 
     // mint to owner
     await bDSLA.mint(owner, toWei(initialTokenSupply));
@@ -90,30 +120,33 @@ describe('SLARegistry', () => {
       from: notOwner,
     });
 
-    messenger = await Messenger.new(
+    stakingEfficiencyMessenger = await StakingEfficiency.new(
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
+      networkAnalytics.address,
     );
 
     chainlinkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
 
     slaRegistry = await SLARegistry.new(
-      messenger.address,
-      periodStarts,
-      periodEnds,
-      networkNamesBytes32,
+      sloRegistry.address,
+      periodRegistry.address,
+      messengerRegistry.address,
+      stakeRegistry.address,
+    );
+
+    await slaRegistry.setMessengerSLARegistryAddress(
+      stakingEfficiencyMessenger.address,
     );
 
     await slaRegistry.createSLA(
-      owner,
-      [sloName],
-      userSlos,
-      0,
+      slo,
       ipfsHash,
-      bDSLA.address,
+      periodType,
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      { from: owner },
+      stakingEfficiencyMessenger.address,
+      false,
     );
 
     const slaAddresses = await slaRegistry.userSLAs(owner);
@@ -121,126 +154,42 @@ describe('SLARegistry', () => {
     SLAs.push(sla);
   });
 
-  it('should ask for active pool correctly', async () => {
-    const [sla] = SLAs;
-    await sla.addAllowedTokens(dai.address);
-
-    // with owner
-    await bDSLA.approve(sla.address, stakeAmount1);
-    await dai.approve(sla.address, stakeAmount2);
-    await sla.stakeTokens(stakeAmount1, bDSLA.address, periodId);
-    await sla.stakeTokens(stakeAmount2, dai.address, periodId);
-
-    const slaStakedByOwner = await slaRegistry.slaWasStakedByUser(
-      owner,
-      sla.address,
-    );
-    // eslint-disable-next-line no-unused-expressions
-    expect(slaStakedByOwner).to.be.true;
-
-    let activePools = await slaRegistry.getActivePool.call(owner);
-    assert.equal(
-      activePools.length,
-      2,
-      'active pools should only be equal to SLAs length',
-    );
-
-    let [pool1, pool2] = activePools;
-    let bDSLAName = await bDSLA.name.call();
-    let daiName = await dai.name.call();
-
-    assert.equal(pool1.stake, stakeAmount1, 'stakes for SLA 1 does not match');
-    assert.equal(pool2.stake, stakeAmount2, 'stakes for SLA 2 does not match');
-    assert.equal(
-      cleanSolidityString(pool1.assetName),
-      bDSLAName,
-      'names for SLA 1 does not match',
-    );
-    assert.equal(
-      cleanSolidityString(pool2.assetName),
-      daiName,
-      'names for SLA 2 does not match',
-    );
-    assert.equal(
-      pool1.SLAaddress,
-      sla.address,
-      'addresses for pool 1 does not match',
-    );
-    assert.equal(
-      pool2.SLAaddress,
-      sla.address,
-      'addresses for pool 2 does not match',
-    );
-
-    // with notOwner
-    await bDSLA.approve(sla.address, stakeAmount1, { from: notOwner });
-    await dai.approve(sla.address, stakeAmount2, { from: notOwner });
-    await sla.stakeTokens(stakeAmount1, bDSLA.address, periodId, {
-      from: notOwner,
-    });
-    await sla.stakeTokens(stakeAmount2, dai.address, periodId, {
-      from: notOwner,
-    });
-
-    // for notOwner
-    activePools = await slaRegistry.getActivePool.call(notOwner);
-    assert.equal(
-      activePools.length,
-      2,
-      'active pools should only be equal to SLAs length',
-    );
-    [pool1, pool2] = activePools;
-    bDSLAName = await bDSLA.name.call({ from: notOwner });
-    daiName = await dai.name.call({ from: notOwner });
-
-    assert.equal(pool1.stake, stakeAmount1, 'stakes for SLA 1 does not match');
-    assert.equal(pool2.stake, stakeAmount2, 'stakes for SLA 2 does not match');
-    assert.equal(
-      cleanSolidityString(pool1.assetName),
-      bDSLAName,
-      'names for SLA 1 does not match',
-    );
-    assert.equal(
-      cleanSolidityString(pool2.assetName),
-      daiName,
-      'names for SLA 2 does not match',
-    );
-    assert.equal(
-      pool1.SLAaddress,
-      sla.address,
-      'addresses for pool 1 does not match',
-    );
-    assert.equal(
-      pool2.SLAaddress,
-      sla.address,
-      'addresses for pool 2 does not match',
-    );
-  });
-
   it('should ask for a SLI and check the SLO status properly', async () => {
     const SLICreatedEvent = 'SLICreated';
     const AnalyticsReceivedEvent = 'AnalyticsReceived';
     const [sla] = SLAs;
 
-    // Fund the messenger contract with LINK
-    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
-    await slaRegistry.requestAnalytics(periodId, slaNetworkBytes32);
-    await eventListener(slaRegistry, AnalyticsReceivedEvent);
+    // Fund the stakingEfficiencyMessenger contract with LINK
+    await chainlinkToken.transfer(
+      networkAnalytics.address,
+      web3.utils.toWei('0.1'),
+    );
 
-    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
-    await slaRegistry.requestSLI(periodId, sla.address, sloName);
+    await networkAnalytics.requestAnalytics(periodId, periodType, slaNetworkBytes32);
+    await eventListener(networkAnalytics, AnalyticsReceivedEvent);
+
+    await chainlinkToken.transfer(
+      stakingEfficiencyMessenger.address,
+      web3.utils.toWei('0.1'),
+    );
+
+    await slaRegistry.requestSLI(periodId, sla.address);
     const { name, values } = await eventListener(sla, SLICreatedEvent);
-    const expectedSLI1 = await getSLI(sla.address, periodId, slaRegistry.address);
+    const expectedSLI1 = await getSLI(
+      sla.address,
+      periodId,
+      networkAnalytics.address,
+    );
     const expectedResponse = {
       name: SLICreatedEvent,
       values: {
-        _value: String(expectedSLI1),
+        _sli: String(expectedSLI1),
         _periodId: String(periodId),
       },
     };
     expect(name).to.equal(expectedResponse.name);
     expect(values).to.include(expectedResponse.values);
-    const { status } = await sla.periods.call(periodId);
+    const { status } = await sla.slaPeriods.call(periodId);
     // 1 is Respected, 2 NotRespected
     // eslint-disable-next-line no-underscore-dangle
     const sloRespected = sloValue < values._value;
@@ -251,13 +200,19 @@ describe('SLARegistry', () => {
     const SLICreatedEvent = 'SLICreated';
     const [sla] = SLAs;
 
-    // Fund the messenger contract with LINK
-    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
+    // Fund the stakingEfficiencyMessenger contract with LINK
+    await chainlinkToken.transfer(
+      stakingEfficiencyMessenger.address,
+      web3.utils.toWei('0.1'),
+    );
     await slaRegistry.requestSLI(periodId, sla.address, sloName);
     await eventListener(sla, SLICreatedEvent);
 
     // call for second time
-    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
+    await chainlinkToken.transfer(
+      stakingEfficiencyMessenger.address,
+      web3.utils.toWei('0.1'),
+    );
     await expectRevert(
       slaRegistry.requestSLI.call(periodId, sla.address, sloName),
       'SLA contract was already verified for the period',
@@ -268,8 +223,11 @@ describe('SLARegistry', () => {
   it('requestSLI can only be called if the period is finished', async () => {
     const SLICreatedEvent = 'SLICreated';
 
-    // Fund the messenger contract with LINK
-    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
+    // Fund the stakingEfficiencyMessenger contract with LINK
+    await chainlinkToken.transfer(
+      stakingEfficiencyMessenger.address,
+      web3.utils.toWei('0.1'),
+    );
 
     const { timestamp: currentBlockTimestamp } = await web3.eth.getBlock(
       'latest',
@@ -279,7 +237,7 @@ describe('SLARegistry', () => {
     slaRegistry.createSLA(
       owner,
       [sloName],
-      userSlos,
+      slo,
       0,
       ipfsHash,
       bDSLA.address,
@@ -300,30 +258,5 @@ describe('SLARegistry', () => {
     await waitBlockTimestamp(slaPeriodEnd);
     await slaRegistry.requestSLI(periodId, slaAddress, sloName);
     await eventListener(await SLA.at(slaAddress), SLICreatedEvent);
-  });
-
-  it('should ask for analytics to Chainlink correctly', async () => {
-    const networkNameBytes32 = networkNamesBytes32[0];
-    const week_id = 0;
-
-    // Fund the messenger contract with LINK
-    await chainlinkToken.transfer(messenger.address, web3.utils.toWei('0.1'));
-
-    // Canonical period 0 is the past week, so is possible to be called
-    slaRegistry.requestAnalytics(week_id, networkNameBytes32);
-    const {
-      values: { _ipfsHash },
-    } = await eventListener(slaRegistry, 'AnalyticsReceived');
-    const ipfsCID = bs58.encode(
-      Buffer.from(`1220${_ipfsHash.replace('0x', '')}`, 'hex'),
-    );
-    const { data: weekAnalytics } = await axios.get(`https://ipfs.dsla.network/ipfs/${ipfsCID}`);
-    expect(weekAnalytics.week_id).to.equal('0');
-
-    const periodAnlyticsIPFSCID = await slaRegistry.canonicalPeriodsAnalytics.call(
-      networkNameBytes32,
-      week_id,
-    );
-    expect(periodAnlyticsIPFSCID).to.equal(_ipfsHash);
   });
 });

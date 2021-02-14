@@ -2,6 +2,10 @@ const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
 const SLO = artifacts.require('SLO');
 const SLORegistry = artifacts.require('SLORegistry');
+const PeriodRegistry = artifacts.require('PeriodRegistry');
+const MessengerRegistry = artifacts.require('MessengerRegistry');
+const StakeRegistry = artifacts.require('StakeRegistry');
+const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const bDSLAToken = artifacts.require('bDSLAToken');
 const fs = require('fs');
 const path = require('path');
@@ -26,6 +30,26 @@ const files = {
     constName: 'export const SLORegistryABI: AbiItem[] =',
     tsFileName: 'SLORegistryABI.ts',
     abi: SLORegistry.abi,
+  },
+  PeriodRegistry: {
+    constName: 'export const PeriodRegistryABI: AbiItem[] =',
+    tsFileName: 'PeriodRegistryABI.ts',
+    abi: PeriodRegistry.abi,
+  },
+  StakeRegistry: {
+    constName: 'export const StakeRegistryABI: AbiItem[] =',
+    tsFileName: 'StakeRegistryABI.ts',
+    abi: StakeRegistry.abi,
+  },
+  MessengerRegistry: {
+    constName: 'export const MessengerRegistryABI: AbiItem[] =',
+    tsFileName: 'MessengerRegistryABI.ts',
+    abi: MessengerRegistry.abi,
+  },
+  NetworkAnalytics: {
+    constName: 'export const NetworkAnalyticsABI: AbiItem[] =',
+    tsFileName: 'NetworkAnalyticsABI.ts',
+    abi: NetworkAnalytics.abi,
   },
   bDSLAToken: {
     constName: 'export const erc20ABI: AbiItem[] =',
