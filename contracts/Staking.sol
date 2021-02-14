@@ -42,8 +42,6 @@ contract Staking is Ownable {
     /// @dev minimum deposit for Tier 3 staking
     uint256 public minimumDSLAStakedTier3;
 
-    /// @dev PeriodRegistry defined apy
-    uint256 public apy;
     /// @dev PeriodRegistry defined amount of periods over a year
     uint256 public yearlyPeriods;
     /// @dev PeriodRegistry period type of the SLA contract
@@ -94,9 +92,8 @@ contract Staking is Ownable {
             uint256 _minimumDSLAStakedTier2,
             uint256 _minimumDSLAStakedTier3
         ) = stakeRegistry.getStakingParameters();
-        (uint256 _apy, uint256 _yearlyPeriods, ) =
+        (uint256 _yearlyPeriods, ) =
             periodRegistry.periodDefinitions(_periodType);
-        apy = _apy;
         yearlyPeriods = _yearlyPeriods;
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
@@ -199,14 +196,16 @@ contract Staking is Ownable {
      *@notice it calculates the usersStake and calculates the provider reward from it.
      * Then it subtract the reward from the users stake, by adding the reward to the
      * owner position without decreasing the tokenPool size
+     * @param _periodId 1. id of the period
+     * @param _sliSurplus difference between the resulting SLI and the SLO value, to calculate provider reward
      */
-    function _setRespectedPeriodReward(uint256 _periodId) internal {
+    function _setRespectedPeriodReward(uint256 _periodId, uint256 _sliSurplus) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
             (, uint256 usersStake) = getStakeholdersPositions(tokenAddress);
             uint256 precision = 10000;
             uint256 providerRewardPercentage =
-                slaPeriodsLength.mul(precision).mul(apy).div(yearlyPeriods);
+                slaPeriodsLength.mul(precision).mul(_sliSurplus).div(yearlyPeriods);
             uint256 reward =
                 usersStake.mul(providerRewardPercentage).div(100 * precision);
             if (tokenAddress == dslaTokenAddress) {

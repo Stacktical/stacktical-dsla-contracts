@@ -82,7 +82,7 @@ contract SLARegistry is Ownable {
         address _messengerAddress,
         bool _whitelisted
     ) public {
-        (, , bool initialized) = periodRegistry.periodDefinitions(_periodType);
+        (, bool initialized) = periodRegistry.periodDefinitions(_periodType);
         require(initialized == true, "Period type is not initialized yet");
         require(
             sloRegistry.registeredSLOs(address(_SLO)) == true,

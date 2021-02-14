@@ -17,7 +17,6 @@ contract PeriodRegistry is Ownable {
 
     /// @dev struct to store the definition of a period
     struct PeriodDefinition {
-        uint256 apy;
         uint256 yearlyPeriods;
         bool initialized;
         uint256[] starts;
@@ -46,14 +45,12 @@ contract PeriodRegistry is Ownable {
      *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      *@param _periodStarts 2. array of the starts of the period
      *@param _periodEnds 3. array of the ends of the period
-     *@param _apy 4. annual percentage yield offered for a year long SLA
      *@param _yearlyPeriods 5. amount of periods of the corresponding periods per year to calculate real APY
      */
     function initializePeriod(
         PeriodType _periodType,
         uint256[] memory _periodStarts,
         uint256[] memory _periodEnds,
-        uint256 _apy,
         uint256 _yearlyPeriods
     ) public onlyOwner {
         PeriodDefinition storage periodDefinition =
@@ -75,7 +72,6 @@ contract PeriodRegistry is Ownable {
             periodDefinition.starts.push(_periodStarts[index]);
             periodDefinition.ends.push(_periodEnds[index]);
         }
-        periodDefinition.apy = _apy;
         periodDefinition.yearlyPeriods = _yearlyPeriods;
         periodDefinition.initialized = true;
     }
