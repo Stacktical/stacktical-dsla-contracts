@@ -7,7 +7,12 @@ const documentedContracts = [
   'SLORegistry',
   'SLARegistry',
   'bDSLAToken',
-  'Messenger',
+  'MessengerRegistry',
+  'IMessenger',
+  'StakingEfficiency',
+  'StakeRegistry',
+  'PeriodRegistry',
+  'NetworkAnalytics',
   'Staking',
 ];
 
@@ -15,11 +20,6 @@ const basePath = '../natspec-docs';
 const devPath = '';
 const userPath = '/userdoc';
 const fileExtension = '.json';
-
-// const sortObject = (object) =>
-//   Object.entries(object)
-//     .sort((a, b) => a[1].split(".")[0] - b[1].split(".")[0])
-//     .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
 
 // sort object fields by value ascending
 const sortObject = (object) => Object.fromEntries(

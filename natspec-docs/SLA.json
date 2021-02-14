@@ -1,145 +1,110 @@
 {
   "details": "SLA is a service level agreement contract used for service downtime compensation",
   "events": {
+    "SLANotRespected(uint256,uint256)": {
+      "details": "event for SLI creation logging",
+      "params": {
+        "_periodId": "1. the id of the given period",
+        "_sli": "2. value of the SLI"
+      }
+    },
     "SLICreated(uint256,uint256,uint256)": {
       "details": "event for SLI creation logging",
       "params": {
         "_timestamp": "1. the time the SLI has been registered",
-        "_value": "2. the value of the SLI",
+        "_sli": "2. the value of the SLI",
         "_periodId": "3. the id of the given period"
       }
     }
   },
   "kind": "dev",
   "methods": {
-    "addAllowedTokens(address)": {
-      "details": "add a token to ve allowed for staking",
-      "params": { "_token": "1. address of the new allowed token" }
-    },
-    "addNewPeriod(uint256,uint256)": {
-      "details": "add a new period to the array",
+    "_claimCompensation(address)": {
+      "details": "claim user compensation. Transfers both the compensation and the user remaining stake.",
       "params": {
-        "_sla_period_start": "1. uint256 of the start of the period",
-        "_sla_period_end": "2. uint256 of the end of the period"
+        "_tokenAddress": "1. address of the token to claim compensation"
       }
     },
-    "claimCompensation(uint256)": {
-      "details": "claim from delegators",
-      "params": { "_period": "1. period id to claim" }
+    "addAllowedTokens(address)": {
+      "details": "add a token to ve allowed for staking",
+      "params": { "_tokenAddress": "1. address of the new allowed token" }
     },
-    "claimReward(uint256)": {
-      "details": "claim from validators",
-      "params": { "_period": "1. period id to claim" }
+    "claimUserCompensation(address)": {
+      "details": "withdraw provider reward of a given token address",
+      "params": {
+        "_tokenAddress": "1. address of the token to withdraw rewards"
+      }
     },
     "constructor": {
       "params": {
         "_owner": "1. address of the owner of the service level agreement",
-        "_SLONames": "2. array of the names of the service level objectives in bytes32",
-        "_SLOs": "3. array of service level objective contract addressess service level objective breach",
-        "_stake": "4. uint of the amount required to stake when signing the service level agreement",
-        "_ipfsHash": "5. string with the ipfs hash that contains extra information about the service level agreement",
-        "_baseTokenAddress": "6. address of the Base Token to be unlocked for staking",
-        "_sla_period_starts": "7. array with the values for the \"start\" of every period",
-        "_sla_period_ends": "8. array with the values for the \"end\" of every period"
+        "_SLO": "2. address of the SLO",
+        "_ipfsHash": "3. string with the ipfs hash that contains SLA information",
+        "_periodIds": "5. id of the allowed canonical periods"
       }
     },
     "getDetails()": {
       "details": "external view function that returns all agreement information",
       "returns": {
-        "_SLAPeriods": "6. SLAPeriod[]  addresses array",
-        "_SLOAddresses": "5. SLO[]  addresses array",
-        "_SLONames": "4. bytes32[]  array",
+        "_SLAPeriods": "5. SLAPeriod[]",
+        "_SLO": "3. addresses of the SLO",
         "_ipfsHash": "2. string  ipfsHash",
         "_slaOwner": "1. address  owner",
-        "_stake": "3. uint256  amount necessary to stake"
+        "_stakersCount": "6. amount of stakers",
+        "_tokensStake": "7. SLAPeriod[]  addresses array"
       }
     },
-    "getPeriodLength()": {
-      "details": "returns the length of the periods array"
-    },
-    "getSLI(bytes32)": {
-      "details": "external function to get SLIs of certain _SLO",
-      "params": { "_SLOName": "1. the name of the SLO in bytes32" },
-      "returns": { "_0": "SLI[] array of SLIs associated to the input SLOs" }
-    },
-    "getTokenStake(address,uint256)": {
-      "details": "returns the token stake according to index",
-      "params": {
-        "_owner": "1. owner of the stake",
-        "_index": "2. index of the TokenStake"
-      }
-    },
-    "getTokenStakeLength(address)": {
-      "details": "returns the length of TokenStakes per user",
-      "params": { "_owner": "1. owner of the stake" }
-    },
-    "getUserTotalValue(address,uint256)": {
-      "details": "get the user total value staked",
-      "params": {
-        "_user": "1. address of the user",
-        "_period": "2. period id to claim"
+    "getStakeholdersPositions(address)": {
+      "details": "gets the positions of stake both for provider and for users",
+      "params": { "_tokenAddress": "1. token address to get the positions" },
+      "returns": {
+        "providerStake": "position of the provider (owner) of the SLA contract",
+        "usersStake": "position of the user of the SLA contract"
       }
     },
     "owner()": { "details": "Returns the address of the current owner." },
-    "registerSLI(bytes32,uint256,uint256)": {
+    "registerSLI(uint256,uint256)": {
       "details": "external function to register SLI's and check them against the SLO's",
       "params": {
-        "_SLOName": "1. the name of the SLO in bytes32",
-        "_value": "2. the value of the SLI to check",
-        "_periodId": "3. the id of the given period"
+        "_sli": "1. the value of the SLI to check",
+        "_periodId": "2. the id of the given period"
       }
     },
     "renounceOwnership()": {
       "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
-    "stakeTokens(uint256,address,uint256)": {
-      "details": "increase the _amount staked per _token of _sla",
+    "stakeTokens(uint256,address)": {
+      "details": "stake _amount tokens into the _token contract",
       "params": {
         "_amount": "1. amount to be staked",
-        "_token": "2. address of the ERC to be staked",
-        "_period": "3. period id to stake"
+        "_token": "2. address of the ERC to be staked"
       }
-    },
-    "stakersCount()": {
-      "details": "public view function that returns the total amount of stakers"
     },
     "transferOwnership(address)": {
       "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
     },
-    "withdraw(address,uint256)": {
-      "details": "withdraw staked tokens",
+    "withdrawStakedTokens(uint256,address)": {
+      "details": "withdraw _amount tokens from the _token contract",
       "params": {
-        "_token": "1. address of the token",
-        "_period": "2. period id to withdraw"
-      }
-    },
-    "withdrawAndStake(address,uint256,uint256)": {
-      "details": "withdraw BaseToken and stake d Tokens",
-      "params": {
-        "_token": "1. address of the token",
-        "_amount": "2. amount to withdraw",
-        "_period": "3. period id to withdraw"
+        "_amount": "1. amount to be staked",
+        "_tokenAddress": "2. address of the ERC to be staked"
       }
     }
   },
   "stateVariables": {
-    "SLIs": {
-      "details": "mapping to get SLI structs from SLO names in bytes32"
+    "_breachedContract": {
+      "details": "states if the contract was breached or not"
     },
-    "SLONames": {
-      "details": "array storing the names of the SLO's of this agreement"
-    },
-    "SLOs": {
-      "details": "mapping to get SLO addresses from SLO names in bytes32"
-    },
-    "blockNumberCreation": { "details": "block timestamp of SLA deployment" },
+    "creationBlockNumber": { "details": "block number of SLA deployment" },
     "ipfsHash": {
       "details": "The ipfs hash that stores extra information about the agreement"
     },
-    "registry": { "details": "The address of the registry contract" },
-    "stake": {
-      "details": "The required amount to stake when subscribing to the agreement"
-    }
+    "messengerAddress": { "details": "The address of the messenger" },
+    "periodIds": { "details": "array of he allowed canonical period ids" },
+    "periodType": { "details": "uint8 of the period type" },
+    "slaPeriods": { "details": "periodId=>SLAPeriod mapping" },
+    "slaRegistry": { "details": "The address of the slaRegistry contract" },
+    "slo": { "details": "address of the SLO" }
   },
   "title": "SLA",
   "version": 1

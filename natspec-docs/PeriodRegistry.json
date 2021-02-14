@@ -1,0 +1,64 @@
+{
+  "details": "SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements",
+  "events": {
+    "PeriodInitialized(uint8,uint256,uint256,uint256,uint256)": {
+      "details": "event to log a new period initialized",
+      "params": {
+        "periodType": "1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly",
+        "periodsAdded": "2. amount of periods added",
+        "apy": "3. annual percentage yield offered for a year long SLA",
+        "yearlyPeriods": "4. amount of periods of the corresponding periods per year to calculate real APY",
+        "interval": "5. difference of time in seconds between the start and the end of a period"
+      }
+    }
+  },
+  "kind": "dev",
+  "methods": {
+    "getPeriodStartAndEnd(uint8,uint256)": {
+      "details": "public function to get the start and end of a period",
+      "params": {
+        "_periodType": "1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly",
+        "_periodId": "2. period id to get start and end"
+      }
+    },
+    "initializePeriod(uint8,uint256[],uint256[],uint256,uint256,uint256)": {
+      "details": "public function for creating canonical service level agreements",
+      "params": {
+        "_periodType": "1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly",
+        "_periodStarts": "2. array of the starts of the period",
+        "_periodEnds": "3. array of the ends of the period",
+        "_apy": "4. annual percentage yield offered for a year long SLA",
+        "_yearlyPeriods": "5. amount of periods of the corresponding periods per year to calculate real APY",
+        "_interval": "6. difference of time in seconds between the start and the end of a period"
+      }
+    },
+    "isValidPeriod(uint8,uint256)": {
+      "details": "public function to check if a period id is valid",
+      "params": {
+        "_periodType": "1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly",
+        "_periodId": "2. period id to get start and end"
+      }
+    },
+    "owner()": { "details": "Returns the address of the current owner." },
+    "periodIsFinished(uint8,uint256)": {
+      "details": "public function to check if a period has finished",
+      "params": {
+        "_periodType": "1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly",
+        "_periodId": "2. period id to get start and end"
+      }
+    },
+    "renounceOwnership()": {
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+    },
+    "transferOwnership(address)": {
+      "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+    }
+  },
+  "stateVariables": {
+    "periodDefinitions": {
+      "details": "(periodType=>PeriodDefinition) hourly/weekly/biWeekly/monthly/yearly are periodTypes"
+    }
+  },
+  "title": "SLARegistry",
+  "version": 1
+}

@@ -113,7 +113,10 @@ contract SLA is Staking {
         PeriodRegistry.PeriodType _periodType,
         address _stakeRegistry,
         address _periodRegistry
-    ) public Staking(_stakeRegistry) {
+    )
+        public
+        Staking(_stakeRegistry, _periodRegistry, _periodType, _periodIds.length)
+    {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;
         messengerAddress = _messengerAddress;
@@ -184,12 +187,11 @@ contract SLA is Staking {
         public
     {
         require(_amount > 0, "amount cannot be 0");
-
         uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
         (, uint256 endOfLastValidPeriod) =
             periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
         // providers and users can withdraw only if the contract is breached
-        // or if the the last period is finished and the period status was verified
+        // or if the last period is finished and the period status was verified
         require(
             _breachedContract == true ||
                 (block.timestamp >= endOfLastValidPeriod &&

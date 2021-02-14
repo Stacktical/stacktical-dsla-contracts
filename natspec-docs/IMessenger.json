@@ -1,0 +1,36 @@
+{
+  "details": "Interface to create new Messenger contract to add lo Messenger lists",
+  "events": {
+    "SLIReceived(address,uint256,bytes32,bytes32)": {
+      "details": "event emitted when having a response from Chainlink with the SLI",
+      "params": {
+        "slaAddress": "1. SLA address to store the SLI",
+        "periodId": "2. id of the Chainlink request",
+        "requestId": "3. id of the Chainlink request",
+        "chainlinkResponse": "4. response from Chainlink"
+      }
+    }
+  },
+  "kind": "dev",
+  "methods": {
+    "fulfillSLI(bytes32,bytes32)": {
+      "details": "callback function for the Chainlink SLI request which stores the SLI in the SLA contract",
+      "params": {
+        "_chainlinkResponse": "response object from Chainlink Oracles",
+        "_requestId": "the ID of the ChainLink request"
+      }
+    },
+    "requestSLI(uint256,address)": {
+      "details": "creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.",
+      "params": {
+        "_periodId": "1. id of the period to be queried",
+        "_slaAddress": "2. address of the receiver SLA"
+      }
+    },
+    "setSLARegistry()": {
+      "details": "sets the SLARegistry contract address and can only be called once"
+    }
+  },
+  "title": "IMessenger",
+  "version": 1
+}

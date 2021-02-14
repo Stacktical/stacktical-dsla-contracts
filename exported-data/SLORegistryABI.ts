@@ -21,6 +21,13 @@ export const SLORegistryABI: AbiItem[] = [
     type: 'event',
   },
   {
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'registeredSLOs',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [
       { internalType: 'uint256', name: '_value', type: 'uint256' },
       { internalType: 'enum SLO.SLOTypes', name: '_SLOType', type: 'uint8' },
@@ -37,6 +44,5 @@ export const SLORegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLO[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
 ];

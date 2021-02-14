@@ -1,0 +1,48 @@
+{
+  "details": "StakeRegistry is a contract to register the staking activity of the platform, along with controlling certain admin privileged parameters",
+  "events": {
+    "StakingParametersModified(uint256,uint256,uint256,uint256)": {
+      "details": "event to log modifications on the staking parameters",
+      "params": {
+        "DSLAburnRate": "1. (DSLAburnRate/1000)% of DSLA to be burned after a reward/compensation is paid",
+        "minimumDSLAStakedTier1": "2. minimum stake of DSLA to enable tier 1 privileges",
+        "minimumDSLAStakedTier2": "3. minimum stake of DSLA to enable tier 2 privileges",
+        "minimumDSLAStakedTier3": "4. minimum stake of DSLA to enable tier 3 privileges"
+      }
+    }
+  },
+  "kind": "dev",
+  "methods": {
+    "addAllowedTokens(address)": {
+      "details": "add a token to ve allowed for staking",
+      "params": { "_tokenAddress": "1. address of the new allowed token" }
+    },
+    "constructor": { "params": { "_dslaTokenAddress": "1. DSLA Token" } },
+    "owner()": { "details": "Returns the address of the current owner." },
+    "renounceOwnership()": {
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+    },
+    "transferOwnership(address)": {
+      "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+    }
+  },
+  "stateVariables": {
+    "_DSLAburnRate": {
+      "details": "corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = DSLAburnRate/1000 %"
+    },
+    "_minimumDSLAStakedTier1": {
+      "details": "minimum deposit for Tier 1 staking"
+    },
+    "_minimumDSLAStakedTier2": {
+      "details": "minimum deposit for Tier 2 staking"
+    },
+    "_minimumDSLAStakedTier3": {
+      "details": "minimum deposit for Tier 3 staking"
+    },
+    "allowedTokens": {
+      "details": "array with the allowed tokens addresses of the StakeRegistry"
+    }
+  },
+  "title": "StakeRegistry",
+  "version": 1
+}

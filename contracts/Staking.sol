@@ -5,12 +5,15 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./StakeRegistry.sol";
+import "./PeriodRegistry.sol";
 
 contract Staking is Ownable {
     using SafeMath for uint256;
 
-    /// @dev SLARegistry contract
+    /// @dev StakeRegistry contract
     StakeRegistry private stakeRegistry;
+    /// @dev SLARegistry contract
+    PeriodRegistry private periodRegistry;
 
     /// @dev (tokenAddress=>uint256) total pooled token balance
     mapping(address => uint256) tokenPools;
@@ -18,8 +21,6 @@ contract Staking is Ownable {
     mapping(address => mapping(address => uint256)) stakeHoldersPositions;
     /// @dev (tokenAddress=>uint256) used to keep track of the stakes of the users, to calculate proportion of compensation pool
     mapping(address => uint256) public usersTotalPositions;
-    /// @dev (tokenAddress=>uint256) provider available reward per token
-    mapping(address => uint256) public providerAvailableReward;
     /// @dev (tokenAddress=>uint256) users available compensation per token
     mapping(address => uint256) public usersCompensationPools;
     /// @dev (periodId=>tokenAddress=>uint256) provider compensation per period and per token
@@ -32,9 +33,6 @@ contract Staking is Ownable {
     /// @dev array with the allowed tokens addresses for the current SLA
     address[] public allowedTokens;
 
-    //______ onlyOwner modifiable parameters ______
-    /// @dev corresponds to the reward percentage to be paid to the provider after a respected period
-    uint256 public providerRewardPercentage;
     /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %
     uint256 public DSLAburnRate;
     /// @dev minimum deposit for Tier 1 staking
@@ -43,6 +41,15 @@ contract Staking is Ownable {
     uint256 public minimumDSLAStakedTier2;
     /// @dev minimum deposit for Tier 3 staking
     uint256 public minimumDSLAStakedTier3;
+
+    /// @dev PeriodRegistry defined apy
+    uint256 public apy;
+    /// @dev PeriodRegistry defined amount of periods over a year
+    uint256 public yearlyPeriods;
+    /// @dev PeriodRegistry period type of the SLA contract
+    PeriodRegistry.PeriodType private periodType;
+    /// @dev length of the _periodIds array, to state effective APY
+    uint256 public slaPeriodsLength;
 
     modifier notOwner {
         require(msg.sender != owner(), "Should not be called by the SLA owner");
@@ -57,14 +64,26 @@ contract Staking is Ownable {
     /**
      *@param _stakeRegistry 1. address of the base token
      */
-    constructor(address _stakeRegistry) public {
+    constructor(
+        address _stakeRegistry,
+        address _periodRegistry,
+        PeriodRegistry.PeriodType _periodType,
+        uint256 _slaPeriodsLength
+    ) public {
         stakeRegistry = StakeRegistry(_stakeRegistry);
+        periodRegistry = PeriodRegistry(_periodRegistry);
+        periodType = _periodType;
+        slaPeriodsLength = _slaPeriodsLength;
         (
             uint256 _DSLAburnRate,
             uint256 _minimumDSLAStakedTier1,
             uint256 _minimumDSLAStakedTier2,
             uint256 _minimumDSLAStakedTier3
         ) = stakeRegistry.getStakingParameters();
+        (uint256 _apy, uint256 _yearlyPeriods, , ) =
+            periodRegistry.periodDefinitions(_periodType);
+        apy = _apy;
+        yearlyPeriods = _yearlyPeriods;
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
         minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
@@ -82,7 +101,7 @@ contract Staking is Ownable {
             stakeRegistry.isAllowedToken(_tokenAddress) == true,
             "Token not allowed by the SLARegistry contract"
         );
-        (uint256 providerStake, ) = getStakeholdersStakes(dslaTokenAddress);
+        (uint256 providerStake, ) = getStakeholdersPositions(dslaTokenAddress);
         require(
             providerStake > minimumDSLAStakedTier1,
             "Should stake at least minimumDSLAStakedTier1 to add a new token"
@@ -103,18 +122,11 @@ contract Staking is Ownable {
     {
         if (msg.sender != owner()) {
             (uint256 providerStake, uint256 usersStake) =
-                getStakeholdersStakes(_tokenAddress);
+                getStakeholdersPositions(_tokenAddress);
             require(
                 usersStake.add(_amount) <= providerStake,
                 "Cannot stake more than SLA providerstake"
             );
-        }
-        tokenPools[_tokenAddress] = tokenPools[_tokenAddress].add(_amount);
-        stakeHoldersPositions[_tokenAddress][
-            msg.sender
-        ] = stakeHoldersPositions[_tokenAddress][msg.sender].add(_amount);
-        if (!_isStaker(msg.sender)) {
-            stakers.push(msg.sender);
         }
         bool success =
             IERC20(_tokenAddress).transferFrom(
@@ -122,10 +134,14 @@ contract Staking is Ownable {
                 address(this),
                 _amount
             );
-        require(
-            success == true,
-            "Transfer process from ERC20 to SLA contract was not succesful"
-        );
+        require(success == true, "Staking process was not succesful");
+        tokenPools[_tokenAddress] = tokenPools[_tokenAddress].add(_amount);
+        stakeHoldersPositions[_tokenAddress][
+            msg.sender
+        ] = stakeHoldersPositions[_tokenAddress][msg.sender].add(_amount);
+        if (!_isStaker(msg.sender)) {
+            stakers.push(msg.sender);
+        }
         // after staking successfully, increase the usersTotalPositions of the token
         if (msg.sender != owner()) {
             usersTotalPositions[_tokenAddress] = usersTotalPositions[
@@ -139,8 +155,6 @@ contract Staking is Ownable {
      *@dev withdraw staked tokens
      *@param _amount 1. amount to withdraw
      *@param _tokenAddress 2. address of the token
-     *@notice providers can withdraw at any time stake only until having an equal pool as user
-     *@notice users can only withdraw after the last period or after a breach
      */
     function _withdraw(uint256 _amount, address _tokenAddress)
         internal
@@ -150,68 +164,39 @@ contract Staking is Ownable {
             stakeHoldersPositions[_tokenAddress][msg.sender] >= _amount,
             "Should not withdraw more stake than staked"
         );
-        if (msg.sender == owner()) {
-            (uint256 providerStake, uint256 usersStake) =
-                getStakeholdersStakes(_tokenAddress);
-            require(
-                providerStake.sub(_amount) >= usersStake,
-                "Should not withdraw more than the users position"
-            );
-        }
         tokenPools[_tokenAddress] = tokenPools[_tokenAddress].sub(_amount);
         stakeHoldersPositions[_tokenAddress][
             msg.sender
         ] = stakeHoldersPositions[_tokenAddress][msg.sender].sub(_amount);
 
         bool success = IERC20(_tokenAddress).transfer(msg.sender, _amount);
-        require(
-            success == true,
-            "Transfer process from SLA contract to msg.sender was not succesful"
-        );
+        require(success == true, "Stake withdraw was not succesful");
     }
 
     /**
      *@dev sets the provider reward
      *@notice it calculates the usersStake and calculates the provider reward from it.
-     * Then it subtract the reward from the users stake, by subtracting to the corresponding
-     * token pool without subtracting from the provider balance
+     * Then it subtract the reward from the users stake, by adding the reward to the
+     * owner position without decreasing the tokenPool size
      */
     function _setRespectedPeriodReward(uint256 _periodId) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
-            (, uint256 usersStake) = getStakeholdersStakes(tokenAddress);
-            // TODO to be discussed
-            uint256 reward = usersStake.mul(providerRewardPercentage).div(100);
+            (, uint256 usersStake) = getStakeholdersPositions(tokenAddress);
+            uint256 precision = 10000;
+            uint256 providerRewardPercentage =
+                slaPeriodsLength.mul(precision).mul(apy).div(yearlyPeriods);
+            uint256 reward =
+                usersStake.mul(providerRewardPercentage).div(100 * precision);
             if (tokenAddress == dslaTokenAddress) {
                 uint256 fees = _burnDSLATokens(reward);
                 reward.sub(fees);
             }
-            tokenPools[tokenAddress] = tokenPools[tokenAddress].sub(reward);
-            providerAvailableReward[tokenAddress] = providerAvailableReward[
-                tokenAddress
-            ]
-                .add(reward);
+            stakeHoldersPositions[tokenAddress][
+                owner()
+            ] = stakeHoldersPositions[tokenAddress][owner()].add(reward);
             providerPeriodsRewards[_periodId][tokenAddress] = reward;
         }
-    }
-
-    /**
-     *@dev claim from provider
-     *@param _tokenAddress 1. address of the token to withdraw rewards
-     */
-    function _claimReward(address _tokenAddress) internal {
-        uint256 tokenAvailableReward = providerAvailableReward[_tokenAddress];
-        require(
-            tokenAvailableReward > 0,
-            "Not available rewards for the given token address"
-        );
-        providerAvailableReward[_tokenAddress] = 0;
-        bool success =
-            IERC20(_tokenAddress).transfer(owner(), tokenAvailableReward);
-        require(
-            success == true,
-            "Transfer process from SLA contract to msg.sender was not succesful"
-        );
     }
 
     /**
@@ -222,7 +207,7 @@ contract Staking is Ownable {
     function _setUsersCompensationPool() internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
-            (, uint256 usersStake) = getStakeholdersStakes(tokenAddress);
+            (, uint256 usersStake) = getStakeholdersPositions(tokenAddress);
             uint256 compensation = usersStake;
             if (tokenAddress == dslaTokenAddress) {
                 uint256 fees = _burnDSLATokens(compensation);
@@ -285,7 +270,7 @@ contract Staking is Ownable {
      *@return providerStake position of the provider (owner) of the SLA contract
      *@return usersStake position of the user of the SLA contract
      */
-    function getStakeholdersStakes(address _tokenAddress)
+    function getStakeholdersPositions(address _tokenAddress)
         public
         view
         returns (uint256 providerStake, uint256 usersStake)

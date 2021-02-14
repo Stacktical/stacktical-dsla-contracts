@@ -1,116 +1,80 @@
 {
-  "events": {
-    "NewPeriodAdded(uint256)": {
-      "params": { "period_index": "1. index of the period added" }
-    }
-  },
   "kind": "dev",
   "methods": {
+    "_claimCompensation(address)": {
+      "details": "claim user compensation. Transfers both the compensation and the user remaining stake.",
+      "params": {
+        "_tokenAddress": "1. address of the token to claim compensation"
+      }
+    },
     "addAllowedTokens(address)": {
       "details": "add a token to ve allowed for staking",
-      "params": { "_token": "1. address of the new allowed token" }
-    },
-    "addNewPeriod(uint256,uint256)": {
-      "details": "add a new period to the array",
-      "params": {
-        "_sla_period_start": "1. uint256 of the start of the period",
-        "_sla_period_end": "2. uint256 of the end of the period"
-      }
-    },
-    "claimCompensation(uint256)": {
-      "details": "claim from delegators",
-      "params": { "_period": "1. period id to claim" }
-    },
-    "claimReward(uint256)": {
-      "details": "claim from validators",
-      "params": { "_period": "1. period id to claim" }
+      "params": { "_tokenAddress": "1. address of the new allowed token" }
     },
     "constructor": {
-      "params": {
-        "_baseTokenAddress": "1. address of the base token",
-        "_sla_period_starts": "2. array of starts of period",
-        "_sla_period_ends": "3. array of ends of period",
-        "_owner": "4. address of the owner of the SLA"
-      }
+      "params": { "_stakeRegistry": "1. address of the base token" }
     },
-    "getPeriodLength()": {
-      "details": "returns the length of the periods array"
-    },
-    "getTokenStake(address,uint256)": {
-      "details": "returns the token stake according to index",
-      "params": {
-        "_owner": "1. owner of the stake",
-        "_index": "2. index of the TokenStake"
-      }
-    },
-    "getTokenStakeLength(address)": {
-      "details": "returns the length of TokenStakes per user",
-      "params": { "_owner": "1. owner of the stake" }
-    },
-    "getUserTotalValue(address,uint256)": {
-      "details": "get the user total value staked",
-      "params": {
-        "_user": "1. address of the user",
-        "_period": "2. period id to claim"
+    "getStakeholdersPositions(address)": {
+      "details": "gets the positions of stake both for provider and for users",
+      "params": { "_tokenAddress": "1. token address to get the positions" },
+      "returns": {
+        "providerStake": "position of the provider (owner) of the SLA contract",
+        "usersStake": "position of the user of the SLA contract"
       }
     },
     "owner()": { "details": "Returns the address of the current owner." },
     "renounceOwnership()": {
       "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
-    "stakersCount()": {
-      "details": "public view function that returns the total amount of stakers"
-    },
     "transferOwnership(address)": {
       "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
-    },
-    "withdraw(address,uint256)": {
-      "details": "withdraw staked tokens",
-      "params": {
-        "_token": "1. address of the token",
-        "_period": "2. period id to withdraw"
-      }
-    },
-    "withdrawAndStake(address,uint256,uint256)": {
-      "details": "withdraw BaseToken and stake d Tokens",
-      "params": {
-        "_token": "1. address of the token",
-        "_amount": "2. amount to withdraw",
-        "_period": "3. period id to withdraw"
-      }
     }
   },
   "stateVariables": {
-    "BaseToken": { "details": "IERC20 of the base stake address for the SLA" },
+    "DSLAburnRate": {
+      "details": "corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %"
+    },
     "allowedTokens": {
-      "details": "array with the allowed tokens addresses of the SLA"
+      "details": "array with the allowed tokens addresses for the current SLA"
     },
-    "allowedTokensMapping": {
-      "details": "mapping for all allowed tokens to be staked"
+    "apy": { "details": "PeriodRegistry defined apy" },
+    "dslaTokenAddress": { "details": "DSLA token address to burn fees" },
+    "minimumDSLAStakedTier1": {
+      "details": "minimum deposit for Tier 1 staking"
     },
-    "periods": { "details": "all periods for an SLA" },
-    "stakers": {
-      "details": "list of all stakers (validators, vouchers, delegators ...)"
+    "minimumDSLAStakedTier2": {
+      "details": "minimum deposit for Tier 2 staking"
     },
-    "tokensPool": {
-      "details": "(mapping) erc20Address => stakeAmount: stake amount by tokenAddress"
+    "minimumDSLAStakedTier3": {
+      "details": "minimum deposit for Tier 3 staking"
     },
-    "totalStaked": {
-      "details": "userAddress => erc20Address => index of userStakes mapping array"
+    "periodRegistry": { "details": "SLARegistry contract" },
+    "periodType": {
+      "details": "PeriodRegistry period type of the SLA contract"
     },
-    "uniqueTokensStaked": {
-      "details": "(mapping) userAddress => amountOf tokens mapping"
+    "providerPeriodsRewards": {
+      "details": "(periodId=>tokenAddress=>uint256) provider compensation per period and per token"
     },
-    "userStakedTokens": {
-      "details": "(mapping) userAddress => erc20Address => bool: user has erc20Address staked"
+    "slaPeriodsLength": {
+      "details": "length of the _periodIds array, to state effective APY"
     },
-    "userStakedTokensIndex": {
-      "details": "(mapping) userAddress => erc20Address => index: index of the TokenStake array"
+    "stakeHoldersPositions": {
+      "details": "(tokenAddress=>stakerAddress=>uint256) staker position to represent his proportion staked"
     },
-    "userStakes": {
-      "details": "(mapping) userAddress => TokenStake[] mapping"
+    "stakeRegistry": { "details": "StakeRegistry contract" },
+    "stakers": { "details": "address[] of the stakers of the SLA contract" },
+    "tokenPools": {
+      "details": "(tokenAddress=>uint256) total pooled token balance"
     },
-    "validator": { "details": "address of the validator for the SLA" }
+    "usersCompensationPools": {
+      "details": "(tokenAddress=>uint256) users available compensation per token"
+    },
+    "usersTotalPositions": {
+      "details": "(tokenAddress=>uint256) used to keep track of the stakes of the users, to calculate proportion of compensation pool"
+    },
+    "yearlyPeriods": {
+      "details": "PeriodRegistry defined amount of periods over a year"
+    }
   },
   "version": 1
 }
