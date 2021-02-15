@@ -58,6 +58,9 @@ contract SLA is Staking {
     /// @dev block number of SLA deployment
     uint256 public creationBlockNumber;
 
+    /// @dev extra data for customized workflows
+    bytes32 public extraData;
+
     /// @dev states if the contract was breached or not
     bool private _breachedContract = false;
 
@@ -107,6 +110,7 @@ contract SLA is Staking {
      * @param _stakeRegistry 6. stakeRegistry address
      * @param _periodRegistry 7. periodRegistry address
      * @param _whitelisted 8. boolean to declare whitelisted contracts
+     * @param _extraData 9. boolean to declare whitelisted contracts
      */
     constructor(
         address _owner,
@@ -117,7 +121,8 @@ contract SLA is Staking {
         PeriodRegistry.PeriodType _periodType,
         address _stakeRegistry,
         address _periodRegistry,
-        bool _whitelisted
+        bool _whitelisted,
+        bytes32 _extraData
     )
         public
         Staking(
@@ -137,6 +142,7 @@ contract SLA is Staking {
         periodIds = _periodIds;
         periodType = _periodType;
         slo = _SLO;
+        extraData = _extraData;
     }
 
     /**

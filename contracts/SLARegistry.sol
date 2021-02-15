@@ -73,6 +73,7 @@ contract SLARegistry is Ownable {
      * @param _periodIds 4. array of allowed period ids
      * @param _messengerAddress 5. address of the messenger for the corresponding SLA
      * @param _whitelisted 6. bool to declare whitelisted SLA
+     * @param _extraData 7. bytes32 to embed extra data for customized workflows
      */
     function createSLA(
         SLO _SLO,
@@ -80,7 +81,8 @@ contract SLARegistry is Ownable {
         PeriodRegistry.PeriodType _periodType,
         uint256[] calldata _periodIds,
         address _messengerAddress,
-        bool _whitelisted
+        bool _whitelisted,
+        bytes32 _extraData
     ) public {
         (, bool initialized) = periodRegistry.periodDefinitions(_periodType);
         require(initialized == true, "Period type is not initialized yet");
@@ -118,7 +120,8 @@ contract SLARegistry is Ownable {
                 _periodType,
                 address(stakeRegistry),
                 address(periodRegistry),
-                _whitelisted
+                _whitelisted,
+                _extraData
             );
 
         SLAs.push(sla);
@@ -135,6 +138,11 @@ contract SLARegistry is Ownable {
      */
     function requestSLI(uint256 _periodId, SLA _sla) public {
         bool breachedContract = _sla.breachedContract();
+        (, , SLA.Status status) = _sla.slaPeriods(_periodId);
+        require(
+            status == SLA.Status.NotVerified,
+            "SLA contract was already verified for the period"
+        );
         require(
             breachedContract == false,
             "Should only be called for not breached contracts"
@@ -150,11 +158,6 @@ contract SLARegistry is Ownable {
         require(
             periodFinished == true,
             "SLA contract period has not finished yet"
-        );
-        (, , SLA.Status status) = _sla.slaPeriods(_periodId);
-        require(
-            status == SLA.Status.NotVerified,
-            "SLA contract was already verified for the period"
         );
         address slaMessenger = _sla.messengerAddress();
         IMessenger(slaMessenger).requestSLI(_periodId, address(_sla));

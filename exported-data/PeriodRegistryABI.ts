@@ -63,7 +63,6 @@ export const PeriodRegistryABI: AbiItem[] = [
     ],
     name: 'periodDefinitions',
     outputs: [
-      { internalType: 'uint256', name: 'apy', type: 'uint256' },
       { internalType: 'uint256', name: 'yearlyPeriods', type: 'uint256' },
       { internalType: 'bool', name: 'initialized', type: 'bool' },
     ],
@@ -93,7 +92,6 @@ export const PeriodRegistryABI: AbiItem[] = [
       },
       { internalType: 'uint256[]', name: '_periodStarts', type: 'uint256[]' },
       { internalType: 'uint256[]', name: '_periodEnds', type: 'uint256[]' },
-      { internalType: 'uint256', name: '_apy', type: 'uint256' },
       { internalType: 'uint256', name: '_yearlyPeriods', type: 'uint256' },
     ],
     name: 'initializePeriod',

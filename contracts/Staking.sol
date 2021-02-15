@@ -107,6 +107,11 @@ contract Staking is Ownable {
         whitelist[_userAddress] = true;
     }
 
+    function unwhitelistUser(address _userAddress) public onlyOwner {
+        require(whitelist[_userAddress] == true, "User not whitelisted");
+        whitelist[_userAddress] = false;
+    }
+
     /**
      *@dev add a token to ve allowed for staking
      *@param _tokenAddress 1. address of the new allowed token
@@ -117,11 +122,11 @@ contract Staking is Ownable {
             stakeRegistry.isAllowedToken(_tokenAddress) == true,
             "Token not allowed by the SLARegistry contract"
         );
-        (uint256 providerStake, ) = getStakeholdersPositions(dslaTokenAddress);
-        require(
-            providerStake > minimumDSLAStakedTier1,
-            "Should stake at least minimumDSLAStakedTier1 to add a new token"
-        );
+//        (uint256 providerStake, ) = getStakeholdersPositions(dslaTokenAddress);
+//        require(
+//            providerStake > minimumDSLAStakedTier1,
+//            "Should stake at least minimumDSLAStakedTier1 to add a new token"
+//        );
         allowedTokens.push(_tokenAddress);
     }
 

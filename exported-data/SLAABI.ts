@@ -16,6 +16,7 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'address', name: '_stakeRegistry', type: 'address' },
       { internalType: 'address', name: '_periodRegistry', type: 'address' },
       { internalType: 'bool', name: '_whitelisted', type: 'bool' },
+      { internalType: 'bytes32', name: '_extraData', type: 'bytes32' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -117,13 +118,6 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [],
-    name: 'apy',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
     name: 'creationBlockNumber',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
@@ -133,6 +127,13 @@ export const SLAABI: AbiItem[] = [
     inputs: [],
     name: 'dslaTokenAddress',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'extraData',
+    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -309,6 +310,15 @@ export const SLAABI: AbiItem[] = [
   {
     inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
     name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '_userAddress', type: 'address' },
+    ],
+    name: 'unwhitelistUser',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',

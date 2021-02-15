@@ -1,3 +1,9 @@
+// const { toWei, utf8ToHex } = web3.utils;
+
+// const initialTokenSupply = '100';
+// const stakeAmount1 = toWei(String(initialTokenSupply / 10));
+// const stakeAmount2 = toWei(String(initialTokenSupply / 5));
+
 // it('should ask for active pool correctly', async () => {
 //   const [sla] = SLAs;
 //   await sla.addAllowedTokens(dai.address);

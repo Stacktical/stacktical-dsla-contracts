@@ -1,9 +1,12 @@
 pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
-import "../SLA.sol";
-import "../StringUtils.sol";
 import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
+import "../SLA.sol";
+import "../SLO.sol";
+import "../PeriodRegistry.sol";
+import "../StringUtils.sol";
+import "../peripherals/NetworkAnalytics.sol";
 import "./IMessenger.sol";
 
 /**
@@ -82,6 +85,20 @@ contract StakingEfficiency is ChainlinkClient, IMessenger, StringUtils {
         override
         onlySLARegistry
     {
+        SLA sla = SLA(_slaAddress);
+        PeriodRegistry.PeriodType periodType = sla.periodType();
+        // extra data is the networkName for StakingEfficiency use case
+        bytes32 networkName = sla.extraData();
+        bytes32 ipfsAnalytics =
+            NetworkAnalytics(networkAnalyticsAddress).periodAnalytics(
+                networkName,
+                periodType,
+                _periodId
+            );
+        require(
+            ipfsAnalytics != 0,
+            "Network analytics object is not assigned yet"
+        );
         Chainlink.Request memory request =
             buildChainlinkRequest(
                 jobId,
