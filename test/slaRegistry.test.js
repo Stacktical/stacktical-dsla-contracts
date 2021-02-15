@@ -52,7 +52,7 @@ describe('SLARegistry', () => {
   let networkAnalytics;
   let slo;
   let ipfsHash;
-  const SLAs = [];
+  let sla;
 
   before(async () => {
     // deploy tokens
@@ -113,9 +113,7 @@ describe('SLARegistry', () => {
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
       networkAnalytics.address,
     );
-  });
 
-  beforeEach(async () => {
     slaRegistry = await SLARegistry.new(
       sloRegistry.address,
       periodRegistry.address,
@@ -123,10 +121,19 @@ describe('SLARegistry', () => {
       stakeRegistry.address,
     );
 
+    stakingEfficiencyMessenger = await StakingEfficiency.new(
+      envParameters.chainlinkOracleAddress,
+      envParameters.chainlinkTokenAddress,
+      !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
+      networkAnalytics.address,
+    );
+
     await slaRegistry.setMessengerSLARegistryAddress(
       stakingEfficiencyMessenger.address,
     );
+  });
 
+  beforeEach(async () => {
     await slaRegistry.createSLA(
       slo,
       ipfsHash,
@@ -138,13 +145,11 @@ describe('SLARegistry', () => {
     );
 
     const slaAddresses = await slaRegistry.userSLAs(owner);
-    const sla = await SLA.at(slaAddresses[0]);
-    SLAs.push(sla);
+    sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);
   });
 
   it('should ask for a SLI and check the SLO status properly', async () => {
     const SLICreatedEvent = 'SLICreated';
-    const [sla] = SLAs;
 
     await chainlinkToken.transfer(
       stakingEfficiencyMessenger.address,
@@ -199,7 +204,7 @@ describe('SLARegistry', () => {
     );
 
     const slaAddresses = await slaRegistry.userSLAs(owner);
-    const sla = await SLA.at(slaAddresses[1]);
+    sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);
 
     // Fund the stakingEfficiencyMessenger contract with LINK
     await chainlinkToken.transfer(
@@ -231,8 +236,6 @@ describe('SLARegistry', () => {
   });
 
   it('requestSLI can be called only once', async () => {
-    const [sla] = SLAs;
-
     // Fund the stakingEfficiencyMessenger contract with LINK
     await chainlinkToken.transfer(
       stakingEfficiencyMessenger.address,
@@ -250,15 +253,15 @@ describe('SLARegistry', () => {
       slaRegistry.requestSLI.call(periodId, sla.address),
       'SLA contract was already verified for the period',
     );
-    await slaRegistry.requestSLI(periodId, sla.address);
   });
 
   it('requestSLI can only be called if the period is finished', async () => {
+    const networkBytesName = networkNamesBytes32[0];
     const { timestamp: currentBlockTimestamp } = await web3.eth.getBlock(
       'latest',
     );
-    // add 30 seconds to fail first transaction
-    const slaPeriodEnd = currentBlockTimestamp + 30;
+    // add 15 seconds to fail first transaction
+    const slaPeriodEnd = currentBlockTimestamp + 15;
     // initialize the hourly period for testing
     await periodRegistry.initializePeriod(
       // 0 is hourly
@@ -274,7 +277,7 @@ describe('SLARegistry', () => {
       web3.utils.toWei('0.1'),
     );
 
-    slaRegistry.createSLA(
+    await slaRegistry.createSLA(
       slo,
       ipfsHash,
       // 0 is hourly
@@ -282,19 +285,34 @@ describe('SLARegistry', () => {
       [0],
       stakingEfficiencyMessenger.address,
       false,
+      networkBytesName,
     );
+    const slaAddresses = await slaRegistry.userSLAs(owner);
+    sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);
 
-    const {
-      values: { sla: slaAddress },
-    } = await eventListener(slaRegistry, 'SLACreated');
     await expectRevert(
-      slaRegistry.requestSLI.call(periodId, slaAddress, sloName),
+      slaRegistry.requestSLI.call(periodId, sla.address),
       'SLA contract period has not finished yet',
     );
 
     // Wait for the correct block timestamp to execute the requestSLI function
     await waitBlockTimestamp(slaPeriodEnd);
-    await slaRegistry.requestSLI(periodId, slaAddress, sloName);
-    await eventListener(await SLA.at(slaAddress), 'SLICreated');
+
+    await chainlinkToken.transfer(
+      networkAnalytics.address,
+      web3.utils.toWei('0.1'),
+    );
+    // request the network analytics object
+    const AnalyticsReceivedEvent = 'AnalyticsReceived';
+    // period 0, periodType 0
+    await networkAnalytics.requestAnalytics(
+      0,
+      0,
+      networkBytesName,
+    );
+    await eventListener(networkAnalytics, AnalyticsReceivedEvent);
+
+    await slaRegistry.requestSLI(periodId, sla.address);
+    await eventListener(sla, 'SLICreated');
   });
 });
