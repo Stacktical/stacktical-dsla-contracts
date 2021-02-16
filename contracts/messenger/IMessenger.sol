@@ -45,5 +45,6 @@ interface IMessenger {
      * @param _requestId the ID of the ChainLink request
      * @param _chainlinkResponse response object from Chainlink Oracles
      */
-    function fulfillSLI(bytes32 _requestId, bytes32 _chainlinkResponse) external;
+    function fulfillSLI(bytes32 _requestId, bytes32 _chainlinkResponse)
+        external;
 }
