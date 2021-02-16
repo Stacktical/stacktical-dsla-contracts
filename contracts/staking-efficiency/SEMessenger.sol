@@ -6,15 +6,15 @@ import "../SLA.sol";
 import "../SLO.sol";
 import "../PeriodRegistry.sol";
 import "../StringUtils.sol";
-import "../peripherals/NetworkAnalytics.sol";
-import "./IMessenger.sol";
+import "./NetworkAnalytics.sol";
+import "../messenger/IMessenger.sol";
 
 /**
  * @title SEMessenger
  * @dev Staking efficiency Messenger
  */
 
-contract StakingEfficiency is ChainlinkClient, IMessenger, StringUtils {
+contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /// @dev Mapping that stores chainlink sli request information
     mapping(bytes32 => SLIRequest) public requestIdToSLIRequest;
     /// @dev Array with all request IDs

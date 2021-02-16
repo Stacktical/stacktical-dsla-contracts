@@ -14,7 +14,7 @@ const SLORegistry = artifacts.require('SLORegistry');
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const MessengerRegistry = artifacts.require('MessengerRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
-const StakingEfficiency = artifacts.require('StakingEfficiency');
+const SEMessenger = artifacts.require('SEMessenger');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const bDSLAToken = artifacts.require('bDSLAToken');
 const DAI = artifacts.require('DAI');
@@ -44,7 +44,7 @@ describe('SLA', () => {
   let dai;
   let usdc;
   let chainlinkToken;
-  let stakingEfficiencyMessenger;
+  let seMessenger;
   let periodRegistry;
   let messengerRegistry;
   let stakeRegistry;
@@ -106,7 +106,7 @@ describe('SLA', () => {
 
     await networkAnalytics.addNetwork(slaNetworkBytes32);
 
-    stakingEfficiencyMessenger = await StakingEfficiency.new(
+    seMessenger = await SEMessenger.new(
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
@@ -123,7 +123,7 @@ describe('SLA', () => {
     );
 
     await slaRegistry.setMessengerSLARegistryAddress(
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
     );
   });
 
@@ -135,7 +135,7 @@ describe('SLA', () => {
       ipfsHash,
       periodType,
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
       false,
     );
 

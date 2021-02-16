@@ -71,7 +71,7 @@ contract PeriodRegistry is Ownable {
             );
             if (index < _periodStarts.length - 1) {
                 require(
-                    _periodStarts[index + 1].sub(_periodEnds[index]),
+                    _periodStarts[index + 1].sub(_periodEnds[index]) == 1,
                     "Start of a period should be 1 second after the end of the previous period"
                 );
             }
@@ -90,8 +90,8 @@ contract PeriodRegistry is Ownable {
      */
     function addPeriodsToPeriodType(
         PeriodType _periodType,
-        uint256[] _periodStarts,
-        uint256[] _periodEnds
+        uint256[] memory _periodStarts,
+        uint256[] memory _periodEnds
     ) public onlyOwner {
         require(_periodStarts.length > 0, "Period length can't be 0");
         PeriodDefinition storage periodDefinition =

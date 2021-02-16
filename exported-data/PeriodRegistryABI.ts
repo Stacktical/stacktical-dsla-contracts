@@ -106,6 +106,21 @@ export const PeriodRegistryABI: AbiItem[] = [
         name: '_periodType',
         type: 'uint8',
       },
+      { internalType: 'uint256[]', name: '_periodStarts', type: 'uint256[]' },
+      { internalType: 'uint256[]', name: '_periodEnds', type: 'uint256[]' },
+    ],
+    name: 'addPeriodsToPeriodType',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'enum PeriodRegistry.PeriodType',
+        name: '_periodType',
+        type: 'uint8',
+      },
       { internalType: 'uint256', name: '_periodId', type: 'uint256' },
     ],
     name: 'getPeriodStartAndEnd',

@@ -9,7 +9,7 @@ const documentedContracts = [
   'bDSLAToken',
   'MessengerRegistry',
   'IMessenger',
-  'StakingEfficiency',
+  'SEMessenger',
   'StakeRegistry',
   'PeriodRegistry',
   'NetworkAnalytics',

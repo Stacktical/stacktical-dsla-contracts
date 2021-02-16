@@ -8,32 +8,19 @@ import "./SLORegistry.sol";
  * @dev SLO is a service level objective contract used to check SLI's against
  */
 contract SLO {
-        /// @dev the checking sloType for this SLO
+    /// @dev the checking sloType for this SLO
     SLORegistry.SLOType public sloType;
 
     /// @dev the value to check the SLI against
     uint256 public value;
 
     /**
-     * @dev event for logging SLO creation
-     * @param _value 1. The value to check the SLI against
-     * @param _sloType 2. The checking sloType for this SLO
-     * @param _name 3. The name of the SLO in bytes32
-     */
-    event SLORegistered(uint256 _value, SLORegistry.SLOType _sloType, bytes32 _name);
-
-    /**
      * @param _value 1. The value to check the SLI against
      * @param _sloType 2. The checking sloType for this SLO
      */
-    constructor(
-        uint256 _value,
-        SLORegistry.SLOType _sloType
-    ) public {
+    constructor(uint256 _value, SLORegistry.SLOType _sloType) public {
         value = _value;
         sloType = _sloType;
-
-        emit SLORegistered(_value, _sloType, _name);
     }
 
     /**
@@ -71,10 +58,7 @@ contract SLO {
     function getDetails()
         public
         view
-        returns (
-            uint256 _value,
-            SLORegistry.SLOType _sloType
-        )
+        returns (uint256 _value, SLORegistry.SLOType _sloType)
     {
         _value = value;
         _sloType = sloType;

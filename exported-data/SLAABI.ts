@@ -110,6 +110,15 @@ export const SLAABI: AbiItem[] = [
     type: 'function',
   },
   {
+    inputs: [
+      { internalType: 'address', name: '_userAddress', type: 'address' },
+    ],
+    name: 'addUserToWhitelist',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     name: 'allowedTokens',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
@@ -260,6 +269,15 @@ export const SLAABI: AbiItem[] = [
     type: 'function',
   },
   {
+    inputs: [
+      { internalType: 'address', name: '_userAddress', type: 'address' },
+    ],
+    name: 'removeUserFromWhitelist',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
@@ -315,15 +333,6 @@ export const SLAABI: AbiItem[] = [
     type: 'function',
   },
   {
-    inputs: [
-      { internalType: 'address', name: '_userAddress', type: 'address' },
-    ],
-    name: 'unwhitelistUser',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
     name: 'usersCompensationPools',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
@@ -335,15 +344,6 @@ export const SLAABI: AbiItem[] = [
     name: 'usersTotalPositions',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '_userAddress', type: 'address' },
-    ],
-    name: 'whitelistUser',
-    outputs: [],
-    stateMutability: 'nonpayable',
     type: 'function',
   },
   {

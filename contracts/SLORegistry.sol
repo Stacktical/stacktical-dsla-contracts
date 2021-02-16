@@ -29,7 +29,7 @@ contract SLORegistry {
      * @dev event for service level objective creation logging
      * @param slo 1.  the address of the created service level objective contract
      * @param value 2.  the value of the SLO
-     * @param type 3.  the type of the SLO
+     * @param sloType 3.  the type of the SLO
      */
     event SLOCreated(SLO indexed slo, uint256 value, SLOType sloType);
 

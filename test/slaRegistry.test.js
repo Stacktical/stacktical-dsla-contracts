@@ -18,7 +18,7 @@ const SLORegistry = artifacts.require('SLORegistry');
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const MessengerRegistry = artifacts.require('MessengerRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
-const StakingEfficiency = artifacts.require('StakingEfficiency');
+const SEMessenger = artifacts.require('SEMessenger');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const bDSLAToken = artifacts.require('bDSLAToken');
 
@@ -42,7 +42,7 @@ describe('SLARegistry', () => {
   let owner;
   let notOwner;
   let bDSLA;
-  let stakingEfficiencyMessenger;
+  let seMessenger;
   let slaRegistry;
   let chainlinkToken;
   let sloRegistry;
@@ -95,7 +95,7 @@ describe('SLARegistry', () => {
 
     const AnalyticsReceivedEvent = 'AnalyticsReceived';
     chainlinkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
-    // Fund the stakingEfficiencyMessenger contract with LINK
+
     await chainlinkToken.transfer(
       networkAnalytics.address,
       web3.utils.toWei('0.1'),
@@ -107,7 +107,8 @@ describe('SLARegistry', () => {
       slaNetworkBytes32,
     );
     await eventListener(networkAnalytics, AnalyticsReceivedEvent);
-    stakingEfficiencyMessenger = await StakingEfficiency.new(
+
+    seMessenger = await SEMessenger.new(
       envParameters.chainlinkOracleAddress,
       envParameters.chainlinkTokenAddress,
       !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
@@ -121,15 +122,8 @@ describe('SLARegistry', () => {
       stakeRegistry.address,
     );
 
-    stakingEfficiencyMessenger = await StakingEfficiency.new(
-      envParameters.chainlinkOracleAddress,
-      envParameters.chainlinkTokenAddress,
-      !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
-      networkAnalytics.address,
-    );
-
     await slaRegistry.setMessengerSLARegistryAddress(
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
     );
   });
 
@@ -139,7 +133,7 @@ describe('SLARegistry', () => {
       ipfsHash,
       periodType,
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
       false,
       slaNetworkBytes32,
     );
@@ -152,7 +146,7 @@ describe('SLARegistry', () => {
     const SLICreatedEvent = 'SLICreated';
 
     await chainlinkToken.transfer(
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
       web3.utils.toWei('0.1'),
     );
 
@@ -198,7 +192,7 @@ describe('SLARegistry', () => {
       newIpfsHash,
       periodType,
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
       false,
       networkBytesName,
     );
@@ -206,9 +200,9 @@ describe('SLARegistry', () => {
     const slaAddresses = await slaRegistry.userSLAs(owner);
     sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);
 
-    // Fund the stakingEfficiencyMessenger contract with LINK
+    // Fund the seMessenger contract with LINK
     await chainlinkToken.transfer(
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
       web3.utils.toWei('0.1'),
     );
 
@@ -236,9 +230,9 @@ describe('SLARegistry', () => {
   });
 
   it('requestSLI can be called only once', async () => {
-    // Fund the stakingEfficiencyMessenger contract with LINK
+    // Fund the seMessenger contract with LINK
     await chainlinkToken.transfer(
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
       web3.utils.toWei('0.1'),
     );
     slaRegistry.requestSLI(periodId, sla.address);
@@ -246,7 +240,7 @@ describe('SLARegistry', () => {
 
     // call for second time
     await chainlinkToken.transfer(
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
       web3.utils.toWei('0.1'),
     );
     await expectRevert(
@@ -271,9 +265,9 @@ describe('SLARegistry', () => {
       yearlyPeriods,
     );
 
-    // Fund the stakingEfficiencyMessenger contract with LINK
+    // Fund the seMessenger contract with LINK
     await chainlinkToken.transfer(
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
       web3.utils.toWei('0.1'),
     );
 
@@ -283,7 +277,7 @@ describe('SLARegistry', () => {
       // 0 is hourly
       0,
       [0],
-      stakingEfficiencyMessenger.address,
+      seMessenger.address,
       false,
       networkBytesName,
     );
