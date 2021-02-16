@@ -58,7 +58,7 @@ export const SLOABI: AbiItem[] = [
   },
   {
     inputs: [{ internalType: 'uint256', name: '_value', type: 'uint256' }],
-    name: 'isSLOHonored',
+    name: 'isRespected',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',

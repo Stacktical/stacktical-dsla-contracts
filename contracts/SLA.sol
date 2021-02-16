@@ -159,7 +159,7 @@ contract SLA is Staking {
         slaPeriod.sli = _sli;
         slaPeriod.timestamp = block.timestamp;
         uint256 sloValue = slo.value();
-        if (slo.isSLOHonored(_sli)) {
+        if (slo.isRespected(_sli)) {
             slaPeriod.status = Status.Respected;
             _setRespectedPeriodReward(_periodId, _sli.sub(sloValue));
         } else {

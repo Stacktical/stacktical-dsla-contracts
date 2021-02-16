@@ -18,65 +18,65 @@ describe('SLO', () => {
       switch (sloType) {
         case sloTypesNames.EqualTo: {
           slo = await SLO.new(sloValue, 0, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.true;
           break;
         }
         case sloTypesNames.NotEqualTo: {
           slo = await SLO.new(sloValue, 1, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.false;
 
           break;
         }
         case sloTypesNames.SmallerThan: {
           slo = await SLO.new(sloValue, 2, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.false;
 
           break;
         }
         case sloTypesNames.SmallerOrEqualTo: {
           slo = await SLO.new(sloValue, 3, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.true;
 
           break;
         }
         case sloTypesNames.GreaterThan: {
           slo = await SLO.new(sloValue, 4, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.false;
 
           break;
         }
         case sloTypesNames.GreaterOrEqualTo: {
           slo = await SLO.new(sloValue, 5, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.true;
 
           break;

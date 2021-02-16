@@ -102,12 +102,12 @@ contract Staking is Ownable {
         minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
     }
 
-    function whitelistUser(address _userAddress) public onlyOwner {
+    function addUserToWhitelist(address _userAddress) public onlyOwner {
         require(whitelist[_userAddress] == false, "User already whitelisted");
         whitelist[_userAddress] = true;
     }
 
-    function unwhitelistUser(address _userAddress) public onlyOwner {
+    function removeUserFromWhitelist(address _userAddress) public onlyOwner {
         require(whitelist[_userAddress] == true, "User not whitelisted");
         whitelist[_userAddress] = false;
     }

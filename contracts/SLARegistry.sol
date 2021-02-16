@@ -87,7 +87,7 @@ contract SLARegistry is Ownable {
         (, bool initialized) = periodRegistry.periodDefinitions(_periodType);
         require(initialized == true, "Period type is not initialized yet");
         require(
-            sloRegistry.registeredSLOs(address(_SLO)) == true,
+            sloRegistry.isRegisteredSLO(address(_SLO)) == true,
             "SLO not registered on SLORegistry"
         );
         require(_periodIds.length > 0, "Periods information is empty");

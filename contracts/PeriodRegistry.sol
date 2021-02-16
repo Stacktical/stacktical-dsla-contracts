@@ -69,11 +69,51 @@ contract PeriodRegistry is Ownable {
                 _periodStarts[index] < _periodEnds[index],
                 "Start should be before end"
             );
+            if (index < _periodStarts.length - 1) {
+                require(
+                    _periodStarts[index + 1].sub(_periodEnds[index]),
+                    "Start of a period should be 1 second after the end of the previous period"
+                );
+            }
             periodDefinition.starts.push(_periodStarts[index]);
             periodDefinition.ends.push(_periodEnds[index]);
         }
         periodDefinition.yearlyPeriods = _yearlyPeriods;
         periodDefinition.initialized = true;
+    }
+
+    /**
+     * @dev function to add new periods to certain period type
+     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
+     *@param _periodStarts 2. array of uint256 of the period starts to add
+     *@param _periodEnds 3. array of uint256 of the period starts to add
+     */
+    function addPeriodsToPeriodType(
+        PeriodType _periodType,
+        uint256[] _periodStarts,
+        uint256[] _periodEnds
+    ) public onlyOwner {
+        require(_periodStarts.length > 0, "Period length can't be 0");
+        PeriodDefinition storage periodDefinition =
+            periodDefinitions[_periodType];
+        require(
+            periodDefinition.initialized == true,
+            "Period was not initialized yet"
+        );
+        for (uint256 index = 0; index < _periodStarts.length; index++) {
+            require(
+                _periodStarts[index] < _periodEnds[index],
+                "Start should be before end"
+            );
+            if (index < _periodStarts.length.sub(1)) {
+                require(
+                    _periodStarts[index + 1].sub(_periodEnds[index]) == 1,
+                    "Start of a period should be 1 second after the end of the previous period"
+                );
+            }
+            periodDefinition.starts.push(_periodStarts[index]);
+            periodDefinition.ends.push(_periodEnds[index]);
+        }
     }
 
     /**
@@ -91,7 +131,7 @@ contract PeriodRegistry is Ownable {
     }
 
     /**
-     * @dev public function to check if a period id is valid
+     * @dev public function to check if a period id is valid i.e. it belongs to the added id array
      *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      *@param _periodId 2. period id to get start and end
      */
