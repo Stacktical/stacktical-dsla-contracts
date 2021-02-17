@@ -14,11 +14,11 @@ const addresses = {
     DAIToken: '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa',
   },
   '1337': {
-    DSLAToken: '0x89c320c75520777AB36f4924cE57c65960370fE1',
+    DSLAToken: '0x757dbc31BB286832d21C505F1D80FbcfF6756e49',
     SLORegistry: 'TBD',
     SLARegistry: 'TBD',
     AdminWallet: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1',
-    DAIToken: '0xCb0834071Ff7dC5d8672859D29858Cc4d7FA4456',
+    DAIToken: '0xEdbb3C98DC9A226518c75E8F641cD0C3F8e3a364',
   },
 };
 

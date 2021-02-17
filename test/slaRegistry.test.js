@@ -16,47 +16,42 @@ const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
 const SLORegistry = artifacts.require('SLORegistry');
 const PeriodRegistry = artifacts.require('PeriodRegistry');
-const MessengerRegistry = artifacts.require('MessengerRegistry');
-const StakeRegistry = artifacts.require('StakeRegistry');
 const SEMessenger = artifacts.require('SEMessenger');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
-const bDSLAToken = artifacts.require('bDSLAToken');
 
 const { envParameters } = require('../environments');
-
-const { utf8ToHex } = web3.utils;
 
 const periodId = 0;
 const sloValue = 95000;
 const sloType = 4;
-const sloName = utf8ToHex('staking_efficiency');
 
 // 2 is Weekly SLA
 const periodType = 2;
 const yearlyPeriods = 52;
-const [periodStarts, periodEnds] = generatePeriods(10);
 const slaNetwork = networkNames[0];
 const slaNetworkBytes32 = networkNamesBytes32[0];
 
 describe('SLARegistry', () => {
   let owner;
   let notOwner;
-  let bDSLA;
   let seMessenger;
   let slaRegistry;
   let chainlinkToken;
   let sloRegistry;
   let periodRegistry;
-  let messengerRegistry;
-  let stakeRegistry;
   let networkAnalytics;
   let slo;
   let ipfsHash;
   let sla;
 
   before(async () => {
-    // deploy tokens
-    bDSLA = await bDSLAToken.new();
+    [owner, notOwner] = await web3.eth.getAccounts();
+    sloRegistry = await SLORegistry.deployed();
+    networkAnalytics = await NetworkAnalytics.deployed();
+    periodRegistry = await PeriodRegistry.deployed();
+    seMessenger = await SEMessenger.deployed();
+    slaRegistry = await SLARegistry.deployed();
+
     const serviceMetadata = {
       serviceName: networks[slaNetwork].validators[0],
       serviceDescription: 'Official DSLA Beta Partner.',
@@ -68,32 +63,10 @@ describe('SLARegistry', () => {
     };
 
     ipfsHash = await getIPFSHash(serviceMetadata);
-    [owner, notOwner] = await web3.eth.getAccounts();
 
-    sloRegistry = await SLORegistry.new();
     // 4 is "GreatherThan"
-    await sloRegistry.createSLO(sloValue, sloType, sloName);
-    [slo] = await sloRegistry.userSLOs.call(owner);
-    periodRegistry = await PeriodRegistry.new();
-    await periodRegistry.initializePeriod(
-      periodType,
-      periodStarts,
-      periodEnds,
-      yearlyPeriods,
-    );
-    messengerRegistry = await MessengerRegistry.new();
-    stakeRegistry = await StakeRegistry.new(bDSLA.address);
+    slo = await sloRegistry.sloAddresses.call(sloValue, sloType);
 
-    networkAnalytics = await NetworkAnalytics.new(
-      envParameters.chainlinkOracleAddress,
-      envParameters.chainlinkTokenAddress,
-      !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
-      periodRegistry.address,
-    );
-
-    await networkAnalytics.addNetwork(slaNetworkBytes32);
-
-    const AnalyticsReceivedEvent = 'AnalyticsReceived';
     chainlinkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
 
     await chainlinkToken.transfer(
@@ -106,25 +79,7 @@ describe('SLARegistry', () => {
       periodType,
       slaNetworkBytes32,
     );
-    await eventListener(networkAnalytics, AnalyticsReceivedEvent);
-
-    seMessenger = await SEMessenger.new(
-      envParameters.chainlinkOracleAddress,
-      envParameters.chainlinkTokenAddress,
-      !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
-      networkAnalytics.address,
-    );
-
-    slaRegistry = await SLARegistry.new(
-      sloRegistry.address,
-      periodRegistry.address,
-      messengerRegistry.address,
-      stakeRegistry.address,
-    );
-
-    await slaRegistry.setMessengerSLARegistryAddress(
-      seMessenger.address,
-    );
+    await eventListener(networkAnalytics, 'AnalyticsReceived');
   });
 
   beforeEach(async () => {
