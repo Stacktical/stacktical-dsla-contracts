@@ -1,0 +1,53 @@
+{
+  "details": "Staking efficiency Messenger",
+  "kind": "dev",
+  "methods": {
+    "constructor": {
+      "details": "parameterize the variables according to network",
+      "params": {
+        "_chainlinkOracle": "1. the address of the oracle to create requests to",
+        "_chainlinkToken": "2. the address of LINK token contract",
+        "_jobId": "3. the job id for Staking efficiency job",
+        "_networkAnalyticsAddress": "4. Network analytics contract address"
+      }
+    },
+    "fulfillSLI(bytes32,bytes32)": {
+      "details": "callback function for the Chainlink SLI request which stores the SLI in the SLA contract",
+      "params": {
+        "_chainlinkResponse": "response object from Chainlink Oracles",
+        "_requestId": "the ID of the ChainLink request"
+      }
+    },
+    "parseSLIData(bytes32)": {
+      "details": "recieves a string of \"hits,misses\" data and returns hits and misses as uint256",
+      "params": { "sliData": "the ID of the ChainLink request" }
+    },
+    "requestSLI(uint256,address)": {
+      "details": "creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.",
+      "params": {
+        "_periodId": "value of the period id",
+        "_slaAddress": "SLA Address"
+      }
+    },
+    "setSLARegistry()": {
+      "details": "sets the SLARegistry contract address and can only be called once"
+    }
+  },
+  "stateVariables": {
+    "fee": { "details": "fee for Chainlink querys. Currently 0.1 LINK" },
+    "jobId": { "details": "chainlink jobId" },
+    "networkAnalyticsAddress": {
+      "details": "Network analytics contract address"
+    },
+    "oracle": { "details": "Chainlink oracle address" },
+    "requestIdToSLIRequest": {
+      "details": "Mapping that stores chainlink sli request information"
+    },
+    "requests": { "details": "Array with all request IDs" },
+    "slaRegistryAddress": {
+      "details": "The address of the SLARegistry contract"
+    }
+  },
+  "title": "SEMessenger",
+  "version": 1
+}
