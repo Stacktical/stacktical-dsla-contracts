@@ -1,13 +1,7 @@
 import { expect } from 'chai';
 import { expectRevert } from '@openzeppelin/test-helpers';
-import { needsGetJobId } from '../environments';
-import {
-  getChainlinkJobId,
-  waitBlockTimestamp,
-  generatePeriods,
-  eventListener,
-} from './helpers';
-import { networkNamesBytes32, networkNames, networks } from '../constants';
+import { eventListener, waitBlockTimestamp } from './helpers';
+import { networkNames, networkNamesBytes32, networks } from '../constants';
 import getIPFSHash from './helpers/getIPFSHash';
 import { getSLI } from './helpers/getSLI';
 
@@ -33,11 +27,9 @@ const slaNetworkBytes32 = networkNamesBytes32[0];
 
 describe('SLARegistry', () => {
   let owner;
-  let notOwner;
   let seMessenger;
   let slaRegistry;
   let chainlinkToken;
-  let sloRegistry;
   let periodRegistry;
   let networkAnalytics;
   let slo;
@@ -45,8 +37,8 @@ describe('SLARegistry', () => {
   let sla;
 
   before(async () => {
-    [owner, notOwner] = await web3.eth.getAccounts();
-    sloRegistry = await SLORegistry.deployed();
+    [owner] = await web3.eth.getAccounts();
+    const sloRegistry = await SLORegistry.deployed();
     networkAnalytics = await NetworkAnalytics.deployed();
     periodRegistry = await PeriodRegistry.deployed();
     seMessenger = await SEMessenger.deployed();

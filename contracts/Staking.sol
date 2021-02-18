@@ -19,7 +19,7 @@ contract Staking is Ownable {
     mapping(address => uint256) tokenPools;
     /// @dev (tokenAddress=>stakerAddress=>uint256) staker position to represent his proportion staked
     mapping(address => mapping(address => uint256)) stakeHoldersPositions;
-    /// @dev (tokenAddress=>uint256) used to keep track of the stakes of the users, to calculate proportion of compensation pool
+    /// @dev (tokenAddress=>uint256) used to keep track of the total stakes per token, to calculate proportion of compensation pool
     mapping(address => uint256) public usersTotalPositions;
     /// @dev (tokenAddress=>uint256) users available compensation per token
     mapping(address => uint256) public usersCompensationPools;
@@ -161,7 +161,7 @@ contract Staking is Ownable {
         stakeHoldersPositions[_tokenAddress][
             msg.sender
         ] = stakeHoldersPositions[_tokenAddress][msg.sender].add(_amount);
-        if (!_isStaker(msg.sender)) {
+        if (!isStaker(msg.sender)) {
             stakers.push(msg.sender);
         }
         // after staking successfully, increase the usersTotalPositions of the token
@@ -321,13 +321,22 @@ contract Staking is Ownable {
         tokenPools[dslaTokenAddress] = tokenPools[dslaTokenAddress].sub(fees);
     }
 
-    function _isStaker(address _staker) internal view returns (bool) {
+    /**
+     *@dev returns true if the _staker address is registered as staker
+     *@param _staker 1. staker address
+     *@return true if address is staker
+     */
+    function isStaker(address _staker) public view returns (bool) {
         for (uint256 index = 0; index < stakers.length; index++) {
             if (stakers[index] == _staker) return true;
         }
         return false;
     }
 
+    /**
+     *@dev use this function to evaluate the length of the allowed tokens length
+     *@return allowedTokens.length
+     */
     function getAllowedTokensLength() public view returns (uint256) {
         return allowedTokens.length;
     }
@@ -344,6 +353,11 @@ contract Staking is Ownable {
         );
     }
 
+    /**
+     *@dev checks in the allowedTokens array if there's a token with _tokenAddress value
+     *@param _tokenAddress 1. token address to check exixtence
+     *@return true if _tokenAddress exists in the allowedTokens array
+     */
     function isAllowedToken(address _tokenAddress) public view returns (bool) {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {

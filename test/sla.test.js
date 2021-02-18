@@ -1,39 +1,27 @@
 import { expectRevert } from '@openzeppelin/test-helpers';
 import { expect } from 'chai';
-
-import { utf8ToHex } from 'web3-utils';
-import { needsGetJobId } from '../environments';
-import { generatePeriods, getChainlinkJobId } from './helpers';
 import { networkNames, networkNamesBytes32, networks } from '../constants';
 import getIPFSHash from './helpers/getIPFSHash';
 
-const IERC20 = artifacts.require('IERC20');
 const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
 const SLORegistry = artifacts.require('SLORegistry');
-const PeriodRegistry = artifacts.require('PeriodRegistry');
-const MessengerRegistry = artifacts.require('MessengerRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const SEMessenger = artifacts.require('SEMessenger');
-const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const bDSLAToken = artifacts.require('bDSLAToken');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
 
 const { toWei } = web3.utils;
-const { envParameters } = require('../environments');
 
 const initialTokenSupply = '100';
 const sloValue = 95000;
 const sloType = 4;
-const sloName = utf8ToHex('staking_efficiency');
 const slaNetwork = networkNames[0];
 const slaNetworkBytes32 = networkNamesBytes32[0];
 
 // 2 is Weekly SLA
 const periodType = 2;
-const yearlyPeriods = 52;
-const [periodStarts, periodEnds] = generatePeriods(10);
 
 describe('SLA', () => {
   // Addresses
@@ -43,25 +31,20 @@ describe('SLA', () => {
   let bDSLA;
   let dai;
   let usdc;
-  let chainlinkToken;
   let seMessenger;
-  let periodRegistry;
-  let messengerRegistry;
   let stakeRegistry;
   let slaRegistry;
-  let networkAnalytics;
   let slo;
   let sla;
   let ipfsHash;
 
   before(async () => {
-    const accounts = await web3.eth.getAccounts();
-    [owner, notOwner] = accounts;
-    bDSLA = await bDSLAToken.new();
+    [owner, notOwner] = await web3.eth.getAccounts();
+    bDSLA = await bDSLAToken.deployed();
     await bDSLA.mint(owner, toWei(initialTokenSupply));
-    usdc = await USDC.new(); // to simulate a new token
+    usdc = await USDC.deployed(); // to simulate a new token
     await usdc.mint(owner, toWei(initialTokenSupply));
-    dai = await DAI.new();
+    dai = await DAI.deployed();
     await dai.mint(owner, toWei(initialTokenSupply));
 
     // mint to notOwner
@@ -80,51 +63,16 @@ describe('SLA', () => {
     };
 
     ipfsHash = await getIPFSHash(serviceMetadata);
-    const sloRegistry = await SLORegistry.new();
+    const sloRegistry = await SLORegistry.deployed();
     // 4 is "GreatherThan"
-    await sloRegistry.createSLO(sloValue, sloType, sloName);
-    [slo] = await sloRegistry.userSLOs.call(owner);
+    slo = await sloRegistry.sloAddresses.call(sloValue, sloType);
 
-    periodRegistry = await PeriodRegistry.new();
-    await periodRegistry.initializePeriod(
-      periodType,
-      periodStarts,
-      periodEnds,
-      yearlyPeriods,
-    );
-    messengerRegistry = await MessengerRegistry.new();
-    stakeRegistry = await StakeRegistry.new(bDSLA.address);
+    stakeRegistry = await StakeRegistry.deployed();
     await stakeRegistry.addAllowedTokens(dai.address);
     await stakeRegistry.addAllowedTokens(usdc.address);
 
-    networkAnalytics = await NetworkAnalytics.new(
-      envParameters.chainlinkOracleAddress,
-      envParameters.chainlinkTokenAddress,
-      !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
-      periodRegistry.address,
-    );
-
-    await networkAnalytics.addNetwork(slaNetworkBytes32);
-
-    seMessenger = await SEMessenger.new(
-      envParameters.chainlinkOracleAddress,
-      envParameters.chainlinkTokenAddress,
-      !needsGetJobId ? envParameters.chainlinkJobId : await getChainlinkJobId(),
-      networkAnalytics.address,
-    );
-
-    chainlinkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
-
-    slaRegistry = await SLARegistry.new(
-      sloRegistry.address,
-      periodRegistry.address,
-      messengerRegistry.address,
-      stakeRegistry.address,
-    );
-
-    await slaRegistry.setMessengerSLARegistryAddress(
-      seMessenger.address,
-    );
+    seMessenger = await SEMessenger.deployed();
+    slaRegistry = await SLARegistry.deployed();
   });
 
   beforeEach(async () => {
@@ -137,15 +85,14 @@ describe('SLA', () => {
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       seMessenger.address,
       false,
+      slaNetworkBytes32,
     );
 
     const slaAddresses = await slaRegistry.userSLAs(owner);
-    sla = await SLA.at(slaAddresses[0]);
-    // allow DAI and
-    await sla.addAllowedTokens(dai.address);
+    sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);
   });
 
-  it.only('should register owner as the SLA contract owner', async () => {
+  it('should register owner as the SLA contract owner', async () => {
     const contractOwner = await sla.owner.call();
     assert.equal(
       contractOwner,
@@ -162,46 +109,27 @@ describe('SLA', () => {
   describe('Staking', () => {
     it('should revert functions with a not allowed token as parameter', async () => {
       const stakeAmount = toWei(String(initialTokenSupply / 10));
-      const periodId = 0;
       await expectRevert(
-        sla.stakeTokens.call(stakeAmount, usdc.address, periodId, {
+        sla.stakeTokens.call(stakeAmount, usdc.address, {
           from: notOwner,
         }),
-        'token is not allowed',
-      );
-      await expectRevert(
-        sla.withdraw.call(usdc.address, periodId, {
-          from: notOwner,
-        }),
-        'token is not allowed',
-      );
-      await expectRevert(
-        sla.withdrawAndStake.call(
-          usdc.address,
-          initialTokenSupply,
-          periodId,
-          {
-            from: notOwner,
-          },
-        ),
         'token is not allowed',
       );
     });
 
-    it('should allow the user to stake bDSLA on deployment', async () => {
+    it('should allow the user to stake DSLA on deployment', async () => {
       const firstTokenAddress = await sla.allowedTokens.call(0);
       assert.equal(
         firstTokenAddress,
         bDSLA.address,
         'bDSLA is not registered as allowed token',
       );
-      const bDSLAisAllowed = await sla.allowedTokensMapping.call(bDSLA.address);
+      const bDSLAisAllowed = await sla.isAllowedToken.call(bDSLA.address);
       assert.equal(
         bDSLAisAllowed,
         true,
         'bDSLA is not registered as allowed in the mapping',
       );
-      const periodId = 0;
       const stakeAmount = toWei(String(initialTokenSupply / 10));
       await bDSLA.approve(sla.address, stakeAmount);
       const allowance = await bDSLA.allowance(owner, sla.address);
@@ -210,7 +138,7 @@ describe('SLA', () => {
         stakeAmount,
         'allowance does not match',
       );
-      await sla.stakeTokens(stakeAmount, bDSLA.address, periodId);
+      await sla.stakeTokens(stakeAmount, bDSLA.address);
       const userStakesLength = await sla.getTokenStakeLength.call(owner);
       assert.equal(
         userStakesLength,

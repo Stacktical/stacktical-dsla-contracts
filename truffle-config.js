@@ -11,6 +11,17 @@ const stagingIP = process.env.STAGING_IP;
 
 module.exports = {
   networks: {
+    testing: {
+      provider() {
+        return new HDWalletProvider(
+          test_mnemonic,
+          'http://localhost:8545',
+          0,
+          10,
+        );
+      },
+      network_id: '1337',
+    },
     develop: {
       provider() {
         return new HDWalletProvider(

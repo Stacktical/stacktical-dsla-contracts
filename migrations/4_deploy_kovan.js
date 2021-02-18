@@ -7,7 +7,6 @@ const { networkNamesBytes32 } = require('../constants');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const SLORegistry = artifacts.require('SLORegistry');
 const PeriodRegistry = artifacts.require('PeriodRegistry');
-const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
 
 const sloValue = 95000;
@@ -19,8 +18,7 @@ const slaNetworkBytes32 = networkNamesBytes32[0];
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
-    if (/develop/i.test(network) || /testing/i.test(network)) {
-      await deployer.deploy(DAI);
+    if (/kovan/i.test(network)) {
       await deployer.deploy(USDC);
       const sloRegistry = await SLORegistry.deployed();
       const periodRegistry = await PeriodRegistry.deployed();

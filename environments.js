@@ -53,6 +53,7 @@ const environments = {
 };
 
 const getNetworkName = (network) => {
+  if (/testing/i.test(network)) return 'develop';
   if (/develop/i.test(network)) return 'develop';
   if (/staging/i.test(network)) return 'staging';
   if (/kovan/i.test(network)) return 'kovan';

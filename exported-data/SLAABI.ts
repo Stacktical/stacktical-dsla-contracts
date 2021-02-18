@@ -195,6 +195,13 @@ export const SLAABI: AbiItem[] = [
     type: 'function',
   },
   {
+    inputs: [{ internalType: 'address', name: '_staker', type: 'address' }],
+    name: 'isStaker',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'messengerAddress',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],

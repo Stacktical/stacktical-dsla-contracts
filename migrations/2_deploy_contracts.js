@@ -1,6 +1,7 @@
 require('babel-polyfill');
 require('babel-register');
 
+const { isTestingNetwork } = require('../environments');
 const { getChainlinkJobId } = require('../test/helpers');
 const { getEnvFromNetwork, needsGetJobId } = require('../environments');
 
