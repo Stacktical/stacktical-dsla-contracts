@@ -1,10 +1,10 @@
-const bDSLAToken = artifacts.require('bDSLAToken');
+const bDSLA = artifacts.require('bDSLA');
 const { fromWei, toWei } = web3.utils;
 const { expect } = require('chai');
 
 let token;
 
-describe('bDSLAToken', () => {
+describe('bDSLA', () => {
   let owner;
   let notOwner;
 
@@ -13,7 +13,7 @@ describe('bDSLAToken', () => {
     // eslint-disable-next-line prefer-destructuring
     [owner, notOwner] = accounts;
     // eslint-disable-next-line prefer-destructuring
-    token = await bDSLAToken.new({ from: owner });
+    token = await bDSLA.new({ from: owner });
   });
 
   it('should deploy without minting at deployment', async () => {

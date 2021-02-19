@@ -82,7 +82,7 @@ describe('SLARegistry', () => {
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       seMessenger.address,
       false,
-      slaNetworkBytes32,
+      [slaNetworkBytes32],
     );
 
     const slaAddresses = await slaRegistry.userSLAs(owner);
@@ -226,7 +226,7 @@ describe('SLARegistry', () => {
       [0],
       seMessenger.address,
       false,
-      networkBytesName,
+      [networkBytesName],
     );
     const slaAddresses = await slaRegistry.userSLAs(owner);
     sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);

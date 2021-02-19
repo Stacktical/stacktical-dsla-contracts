@@ -100,6 +100,8 @@ contract Staking is Ownable {
         minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
         minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
         minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
+        addUserToWhitelist(msg.sender);
+        allowedTokens.push(dslaTokenAddress);
     }
 
     function addUserToWhitelist(address _userAddress) public onlyOwner {
@@ -147,7 +149,7 @@ contract Staking is Ownable {
                 getStakeholdersPositions(_tokenAddress);
             require(
                 usersStake.add(_amount) <= providerStake,
-                "Cannot stake more than SLA providerstake"
+                "Cannot stake more than SLA provider stake"
             );
         }
         bool success =
@@ -183,6 +185,14 @@ contract Staking is Ownable {
         onlyAllowedToken(_tokenAddress)
         onlyWhitelisted
     {
+        if (msg.sender == owner()) {
+            (uint256 providerStake, uint256 usersStake) =
+                getStakeholdersPositions(_tokenAddress);
+            require(
+                providerStake.sub(_amount) >= usersStake,
+                "Should not withdraw more than users stake"
+            );
+        }
         require(
             stakeHoldersPositions[_tokenAddress][msg.sender] >= _amount,
             "Should not withdraw more stake than staked"
@@ -202,21 +212,19 @@ contract Staking is Ownable {
      * Then it subtract the reward from the users stake, by adding the reward to the
      * owner position without decreasing the tokenPool size
      * @param _periodId 1. id of the period
-     * @param _sliSurplus difference between the resulting SLI and the SLO value, to calculate provider reward
+     * @param _rewardPercentage to calculate the provider reward
+     * @param _precision used to avoid getting 0 after division in the SLA's registerSLI function
      */
-    function _setRespectedPeriodReward(uint256 _periodId, uint256 _sliSurplus)
-        internal
-    {
+    function _setRespectedPeriodReward(
+        uint256 _periodId,
+        uint256 _rewardPercentage,
+        uint256 _precision
+    ) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
             (, uint256 usersStake) = getStakeholdersPositions(tokenAddress);
-            uint256 precision = 10000;
-            uint256 providerRewardPercentage =
-                slaPeriodsLength.mul(precision).mul(_sliSurplus).div(
-                    yearlyPeriods
-                );
             uint256 reward =
-                usersStake.mul(providerRewardPercentage).div(100 * precision);
+                usersStake.mul(_rewardPercentage).div(100 * _precision);
             if (tokenAddress == dslaTokenAddress) {
                 uint256 fees = _burnDSLATokens(reward);
                 reward.sub(fees);

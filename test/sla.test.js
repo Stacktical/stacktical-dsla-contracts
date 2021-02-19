@@ -8,7 +8,7 @@ const SLARegistry = artifacts.require('SLARegistry');
 const SLORegistry = artifacts.require('SLORegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const SEMessenger = artifacts.require('SEMessenger');
-const bDSLAToken = artifacts.require('bDSLAToken');
+const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
 
@@ -28,7 +28,7 @@ describe('SLA', () => {
   let owner;
   let notOwner;
   // Tokens
-  let bDSLA;
+  let bdsla;
   let dai;
   let usdc;
   let seMessenger;
@@ -40,15 +40,15 @@ describe('SLA', () => {
 
   before(async () => {
     [owner, notOwner] = await web3.eth.getAccounts();
-    bDSLA = await bDSLAToken.deployed();
-    await bDSLA.mint(owner, toWei(initialTokenSupply));
+    bdsla = await bDSLA.deployed();
+    await bdsla.mint(owner, toWei(initialTokenSupply));
     usdc = await USDC.deployed(); // to simulate a new token
     await usdc.mint(owner, toWei(initialTokenSupply));
     dai = await DAI.deployed();
     await dai.mint(owner, toWei(initialTokenSupply));
 
     // mint to notOwner
-    await bDSLA.mint(notOwner, toWei(initialTokenSupply));
+    await bdsla.mint(notOwner, toWei(initialTokenSupply));
     await usdc.mint(notOwner, toWei(initialTokenSupply));
     await dai.mint(notOwner, toWei(initialTokenSupply));
 
@@ -121,55 +121,28 @@ describe('SLA', () => {
       const firstTokenAddress = await sla.allowedTokens.call(0);
       assert.equal(
         firstTokenAddress,
-        bDSLA.address,
+        bdsla.address,
         'bDSLA is not registered as allowed token',
       );
-      const bDSLAisAllowed = await sla.isAllowedToken.call(bDSLA.address);
+      const bDSLAisAllowed = await sla.isAllowedToken.call(bdsla.address);
       assert.equal(
         bDSLAisAllowed,
         true,
         'bDSLA is not registered as allowed in the mapping',
       );
       const stakeAmount = toWei(String(initialTokenSupply / 10));
-      await bDSLA.approve(sla.address, stakeAmount);
-      const allowance = await bDSLA.allowance(owner, sla.address);
+      await bdsla.approve(sla.address, stakeAmount);
+      const allowance = await bdsla.allowance(owner, sla.address);
       assert.equal(
         allowance.toString(),
         stakeAmount,
         'allowance does not match',
       );
-      await sla.stakeTokens(stakeAmount, bDSLA.address);
-      const userStakesLength = await sla.getTokenStakeLength.call(owner);
-      assert.equal(
-        userStakesLength,
-        1,
-        'userStakes has not increased in length',
-      );
-      const { tokenAddress, stake } = await sla.userStakes.call(owner, 0);
-      assert.equal(
-        tokenAddress,
-        bDSLA.address,
-        'token address does not match with bDSLA',
-      );
-      assert.equal(stake, stakeAmount, 'stakes amount does not match');
-      const bDSLAIndex = await sla.userStakedTokensIndex.call(
-        owner,
-        bDSLA.address,
-      );
-      assert.equal(bDSLAIndex, 0, 'bDSLA index should be 0');
-      const userHasBDSLAstaked = await sla.userStakedTokens.call(
-        owner,
-        bDSLA.address,
-      );
-      assert.equal(
-        userHasBDSLAstaked,
-        true,
-        'bDSLA was not correctly registered',
-      );
+      await sla.stakeTokens(stakeAmount, bdsla.address);
     });
 
-    it('should let the owner to add tokens to the SLA', async () => {
-      let usdcIsAllowed = await sla.allowedTokensMapping.call(
+    it.only('should let the owner to add tokens to the SLA', async () => {
+      let usdcIsAllowed = await sla.isAllowedToken.call(
         usdc.address,
       );
       assert.equal(
@@ -179,7 +152,7 @@ describe('SLA', () => {
       );
 
       await sla.addAllowedTokens(usdc.address);
-      usdcIsAllowed = await sla.allowedTokensMapping.call(usdc.address);
+      usdcIsAllowed = await sla.isAllowedToken.call(usdc.address);
       assert.equal(
         usdcIsAllowed,
         true,
@@ -187,54 +160,22 @@ describe('SLA', () => {
       );
 
       const stakeAmount = toWei(String(initialTokenSupply / 10));
-      const periodId = 0;
 
       await usdc.approve(sla.address, stakeAmount);
-      await sla.stakeTokens(stakeAmount, usdc.address, periodId);
-      const userStakesLength = await sla.getTokenStakeLength.call(owner);
-      assert.equal(
-        userStakesLength,
-        1,
-        'userStakes has not increased in length',
-      );
-
-      const { tokenAddress, stake } = await sla.userStakes.call(owner, 0);
-      assert.equal(
-        tokenAddress,
-        usdc.address,
-        'token address does not match with usdc',
-      );
-
-      assert.equal(stake, stakeAmount, 'stakes amount does not match');
-      const usdcIndex = await sla.userStakedTokensIndex.call(
-        owner,
-        usdc.address,
-      );
-
-      assert.equal(usdcIndex, 0, 'usdc index should be 0');
-      const userHasNewTokenStaked = await sla.userStakedTokens.call(
-        owner,
-        usdc.address,
-      );
-
-      assert.equal(
-        userHasNewTokenStaked,
-        true,
-        'newToken was not correctly registered',
-      );
+      await sla.stakeTokens(stakeAmount, bdsla.address);
     });
 
     it('should add stakes per token properly', async () => {
       const periodId = 0;
       const stakeAmount = toWei(String(initialTokenSupply / 10));
       // approve and stake 2 times the same amount
-      await bDSLA.approve(sla.address, stakeAmount);
-      await sla.stakeTokens(stakeAmount, bDSLA.address, periodId);
-      await bDSLA.approve(sla.address, stakeAmount);
-      await sla.stakeTokens(stakeAmount, bDSLA.address, periodId);
+      await bdsla.approve(sla.address, stakeAmount);
+      await sla.stakeTokens(stakeAmount, bdsla.address, periodId);
+      await bdsla.approve(sla.address, stakeAmount);
+      await sla.stakeTokens(stakeAmount, bdsla.address, periodId);
 
       const bDSLAStakingIndex = Number(
-        await sla.userStakedTokensIndex.call(owner, bDSLA.address),
+        await sla.userStakedTokensIndex.call(owner, bdsla.address),
       );
       expect(bDSLAStakingIndex).to.equal(0);
 
@@ -262,14 +203,14 @@ describe('SLA', () => {
       await sla.stakeTokens(stakeAmount, dai.address, periodId, {
         from: notOwner,
       });
-      await bDSLA.approve(sla.address, stakeAmount, { from: notOwner });
-      await sla.stakeTokens(stakeAmount, bDSLA.address, periodId, {
+      await bdsla.approve(sla.address, stakeAmount, { from: notOwner });
+      await sla.stakeTokens(stakeAmount, bdsla.address, periodId, {
         from: notOwner,
       });
 
       // check from "big totals"
       const daiStake = await sla.tokensPool.call(dai.address);
-      const bDSLAStake = await sla.tokensPool.call(bDSLA.address);
+      const bDSLAStake = await sla.tokensPool.call(bdsla.address);
       const newTokenStake = await sla.tokensPool.call(usdc.address);
       expect(daiStake.toString()).to.equal(String(2 * stakeAmount));
       expect(bDSLAStake.toString()).to.equal(String(3 * stakeAmount));
@@ -277,9 +218,9 @@ describe('SLA', () => {
 
       // withdraw some stakes
       await sla.withdraw(dai.address, periodId, { from: notOwner });
-      await sla.withdraw(bDSLA.address, periodId, { from: notOwner });
+      await sla.withdraw(bdsla.address, periodId, { from: notOwner });
       const daiStake2 = await sla.tokensPool.call(dai.address);
-      const bDSLAStake2 = await sla.tokensPool.call(bDSLA.address);
+      const bDSLAStake2 = await sla.tokensPool.call(bdsla.address);
       // notOwner has staked 1*stakeAmount of bDSLA and 1*stakeAmount of DAI
       expect(daiStake2.toString()).to.equal(String(1 * stakeAmount));
       expect(bDSLAStake2.toString()).to.equal(String(2 * stakeAmount));

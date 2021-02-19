@@ -87,8 +87,8 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     {
         SLA sla = SLA(_slaAddress);
         PeriodRegistry.PeriodType periodType = sla.periodType();
-        // extra data is the networkName for StakingEfficiency use case
-        bytes32 networkName = sla.extraData();
+        // extraData[0] is the networkName for StakingEfficiency use case
+        bytes32 networkName = sla.extraData(0);
         bytes32 ipfsAnalytics =
             NetworkAnalytics(networkAnalyticsAddress).periodAnalytics(
                 networkName,

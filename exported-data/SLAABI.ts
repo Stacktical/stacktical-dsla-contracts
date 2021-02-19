@@ -16,7 +16,7 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'address', name: '_stakeRegistry', type: 'address' },
       { internalType: 'address', name: '_periodRegistry', type: 'address' },
       { internalType: 'bool', name: '_whitelisted', type: 'bool' },
-      { internalType: 'bytes32', name: '_extraData', type: 'bytes32' },
+      { internalType: 'bytes32[]', name: '_extraData', type: 'bytes32[]' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -140,7 +140,7 @@ export const SLAABI: AbiItem[] = [
     type: 'function',
   },
   {
-    inputs: [],
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     name: 'extraData',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',

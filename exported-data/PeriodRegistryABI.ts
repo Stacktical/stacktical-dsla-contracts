@@ -52,6 +52,7 @@ export const PeriodRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -68,6 +69,7 @@ export const PeriodRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -130,6 +132,7 @@ export const PeriodRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -144,6 +147,7 @@ export const PeriodRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: 'valid', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -158,5 +162,6 @@ export const PeriodRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: 'finished', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];

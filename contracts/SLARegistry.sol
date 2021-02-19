@@ -82,7 +82,7 @@ contract SLARegistry is Ownable {
         uint256[] calldata _periodIds,
         address _messengerAddress,
         bool _whitelisted,
-        bytes32 _extraData
+        bytes32[] memory _extraData
     ) public {
         (, bool initialized) = periodRegistry.periodDefinitions(_periodType);
         require(initialized == true, "Period type is not initialized yet");
