@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./SLO.sol";
 import "./SLARegistry.sol";
+import "./StakeRegistry.sol";
 import "./PeriodRegistry.sol";
 import "./Staking.sol";
 
@@ -208,7 +209,8 @@ contract SLA is Staking {
             "Can only stake on not breached contracts"
         );
         _stake(_amount, _token);
-        slaRegistry.registerStakedSla(msg.sender);
+        StakeRegistry stakeRegistry = slaRegistry.stakeRegistry();
+        stakeRegistry.registerStakedSla(msg.sender, address(slaRegistry));
     }
 
     /**
