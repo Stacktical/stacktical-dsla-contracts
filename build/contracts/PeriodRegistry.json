@@ -62,7 +62,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -86,7 +87,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -186,7 +188,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -210,7 +213,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -234,7 +238,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"periodType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"periodsAdded\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"apy\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"yearlyPeriods\",\"type\":\"uint256\"}],\"name\":\"PeriodInitialized\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256[]\",\"name\":\"_periodStarts\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_periodEnds\",\"type\":\"uint256[]\"}],\"name\":\"addPeriodsToPeriodType\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"}],\"name\":\"getPeriodStartAndEnd\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"end\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256[]\",\"name\":\"_periodStarts\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_periodEnds\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256\",\"name\":\"_yearlyPeriods\",\"type\":\"uint256\"}],\"name\":\"initializePeriod\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"}],\"name\":\"isValidPeriod\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"valid\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"\",\"type\":\"uint8\"}],\"name\":\"periodDefinitions\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"yearlyPeriods\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"initialized\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"}],\"name\":\"periodIsFinished\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"finished\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements\",\"events\":{\"PeriodInitialized(uint8,uint256,uint256,uint256)\":{\"details\":\"event to log a new period initialized\",\"params\":{\"apy\":\"3. annual percentage yield offered for a year long SLA\",\"periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\",\"periodsAdded\":\"2. amount of periods added\",\"yearlyPeriods\":\"4. amount of periods of the corresponding periods per year to calculate real APY\"}}},\"kind\":\"dev\",\"methods\":{\"addPeriodsToPeriodType(uint8,uint256[],uint256[])\":{\"details\":\"function to add new periods to certain period type\",\"params\":{\"_periodEnds\":\"3. array of uint256 of the period starts to add\",\"_periodStarts\":\"2. array of uint256 of the period starts to add\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\"}},\"getPeriodStartAndEnd(uint8,uint256)\":{\"details\":\"public function to get the start and end of a period\",\"params\":{\"_periodId\":\"2. period id to get start and end\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\"}},\"initializePeriod(uint8,uint256[],uint256[],uint256)\":{\"details\":\"public function for creating canonical service level agreements\",\"params\":{\"_periodEnds\":\"3. array of the ends of the period\",\"_periodStarts\":\"2. array of the starts of the period\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\",\"_yearlyPeriods\":\"5. amount of periods of the corresponding periods per year to calculate real APY\"}},\"isValidPeriod(uint8,uint256)\":{\"details\":\"public function to check if a period id is valid i.e. it belongs to the added id array\",\"params\":{\"_periodId\":\"2. period id to get start and end\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\"}},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"periodIsFinished(uint8,uint256)\":{\"details\":\"public function to check if a period has finished\",\"params\":{\"_periodId\":\"2. period id to get start and end\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\"}},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"stateVariables\":{\"periodDefinitions\":{\"details\":\"(periodType=>PeriodDefinition) hourly/weekly/biWeekly/monthly/yearly are periodTypes\"}},\"title\":\"SLARegistry\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/PeriodRegistry.sol\":\"PeriodRegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/PeriodRegistry.sol\":{\"keccak256\":\"0xc8f236302d4d859e9c7c5b1193774c5b47d9a615cfc08059bc3428d176a2ce9a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d617461b694a71b7401fc5b02a25551a46177280993a1a50447a946309be8afb\",\"dweb:/ipfs/QmZoNHyXy9DB9cwtqKT25oNYWkcvLkRkuWpETPRMUehZNT\"]},\"@openzeppelin/contracts/GSN/Context.sol\":{\"keccak256\":\"0xdb26cbf4d028490f49831a7865c2fe1b28db44b535ca8d343785a3b768aae183\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://840b14ce0315c47d49ba328f1f9fa7654ded1c9e1559e6c5e777a7b2dc28bf0a\",\"dweb:/ipfs/QmTLLabn4wcfGro9LEmUXUN2nwKqZSotXMvjDCLXEnLtZP\"]},\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0x4bd6402ca6b3419008c2b482aff54e66836e8cb4eba2680e42ac5884ae6424fc\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8f9f711fb8d0d92aeea1c327e3845d13ca1fa8f142e47f8723cd5b3106fb29a3\",\"dweb:/ipfs/QmVQUReDW9f4zGqhizwHnyU8EntMs95tbASdqkGncnikba\"]},\"@openzeppelin/contracts/math/SafeMath.sol\":{\"keccak256\":\"0x9a9cf02622cd7a64261b10534fc3260449da25c98c9e96d1b4ae8110a20e5806\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2df142592d1dc267d9549049ee3317fa190d2f87eaa565f86ab05ec83f7ab8f5\",\"dweb:/ipfs/QmSkJtcfWo7c42KnL5hho6GFxK6HRNV91XABx1P7xDtfLV\"]}},\"version\":1}",
@@ -10676,9 +10681,68 @@
     "name": "solc",
     "version": "0.6.12+commit.27d51765.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "1337": {
+      "events": {
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        "0x6d0cc14e77ddcf8fe6b53e250ca72050c50945ee70dc117defca271283f6390f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "enum PeriodRegistry.PeriodType",
+              "name": "periodType",
+              "type": "uint8"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "periodsAdded",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "apy",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "yearlyPeriods",
+              "type": "uint256"
+            }
+          ],
+          "name": "PeriodInitialized",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xd45A464a2412A2f83498d13635698a041b9dBe9b",
+      "transactionHash": "0x37fba99889fc15e91add6a08a9e776e9411192045db4dadb0129e10e9234781e"
+    }
+  },
   "schemaVersion": "3.3.3",
-  "updatedAt": "2021-02-16T17:31:23.988Z",
+  "updatedAt": "2021-02-19T15:28:04.741Z",
+  "networkType": "ethereum",
   "devdoc": {
     "details": "SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements",
     "events": {

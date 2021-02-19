@@ -1,14 +1,10 @@
-#/bin/bash
+#!/bin/bash
+export NODE_ENV=develop
 npx prettier --write 'contracts/**/*.sol'
 
 truffle deploy --reset --network develop
 
-#Export data
-truffle exec --network develop scripts/export-abis.js
-truffle exec --network develop scripts/export-addresses.js
-truffle exec --network develop scripts/create-natspec-docs.js
-npx prettier --write 'natspec-docs/**/**.json'
-npx prettier --config .prettierrc.abis.json --write 'exported-data/**.ts'
+./scripts/export-data.sh
 
 # Fund account with tokens
 truffle exec --network develop scripts/mint-bdsla.js

@@ -59,7 +59,7 @@ contract SLA is Staking {
     uint256 public creationBlockNumber;
 
     /// @dev extra data for customized workflows
-    bytes32 public extraData;
+    bytes32[] public extraData;
 
     /// @dev states if the contract was breached or not
     bool private _breachedContract = false;
@@ -110,7 +110,7 @@ contract SLA is Staking {
      * @param _stakeRegistry 6. stakeRegistry address
      * @param _periodRegistry 7. periodRegistry address
      * @param _whitelisted 8. boolean to declare whitelisted contracts
-     * @param _extraData 9. boolean to declare whitelisted contracts
+     * @param _extraData 9. array of bytes32 to store extra data on deployment time
      */
     constructor(
         address _owner,
@@ -122,7 +122,7 @@ contract SLA is Staking {
         address _stakeRegistry,
         address _periodRegistry,
         bool _whitelisted,
-        bytes32 _extraData
+        bytes32[] memory _extraData
     )
         public
         Staking(
@@ -161,7 +161,23 @@ contract SLA is Staking {
         uint256 sloValue = slo.value();
         if (slo.isRespected(_sli)) {
             slaPeriod.status = Status.Respected;
-            _setRespectedPeriodReward(_periodId, _sli.sub(sloValue));
+            uint256 precision = 10000;
+            // deviation = (sli-slo)*precision/((sli+slo)/2)
+            uint256 deviation =
+                _sli.sub(sloValue).mul(precision).div(
+                    _sli.add(sloValue).div(2)
+                );
+            // to get the reward formula, we get the periodId but respecting to the SLA
+            // because _periodId is the periodId of the platform
+            // e.g. if periodIds = 7,8,9,10, normalized periods are = 1,2,3,4
+            uint256 normalizedPeriodId = _periodId.sub(periodIds[0]).add(1);
+
+            // if is the last period, then deliver the whole usersStake to the provider
+            uint256 rewardPercentage =
+                _periodId != periodIds[periodIds.length - 1]
+                    ? deviation.mul(normalizedPeriodId).div(periodIds.length)
+                    : uint256(100).mul(precision);
+            _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
             slaPeriod.status = Status.NotRespected;
             _setUsersCompensationPool();
@@ -210,12 +226,15 @@ contract SLA is Staking {
             periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
         // providers and users can withdraw only if the contract is breached
         // or if the last period is finished and the period status was verified
-        require(
-            _breachedContract == true ||
-                (block.timestamp >= endOfLastValidPeriod &&
-                    slaPeriods[lastValidPeriodId].status != Status.NotVerified),
-            "Can only withdraw stake after the final period is finished or if the contract is breached"
-        );
+        if (msg.sender != owner()) {
+            require(
+                _breachedContract == true ||
+                    (block.timestamp >= endOfLastValidPeriod &&
+                        slaPeriods[lastValidPeriodId].status !=
+                        Status.NotVerified),
+                "Can only withdraw stake after the final period is finished or if the contract is breached"
+            );
+        }
         _withdraw(_amount, _tokenAddress);
     }
 

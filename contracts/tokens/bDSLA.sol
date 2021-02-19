@@ -20,7 +20,7 @@ import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
  * and pauser roles to other accounts.
  */
 
-contract bDSLAToken is ERC20PresetMinterPauser {
+contract bDSLA is ERC20PresetMinterPauser {
     mapping(address => uint256) private _allowedBalances;
     mapping(address => bool) private _claimed;
     event Allowed(uint256 indexed _amount, address indexed _claimer);

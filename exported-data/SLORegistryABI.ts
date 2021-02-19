@@ -32,6 +32,7 @@ export const SLORegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -42,6 +43,7 @@ export const SLORegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -63,5 +65,6 @@ export const SLORegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];

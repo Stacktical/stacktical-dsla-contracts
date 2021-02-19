@@ -6,7 +6,7 @@ const PeriodRegistry = artifacts.require('PeriodRegistry');
 const MessengerRegistry = artifacts.require('MessengerRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
-const bDSLAToken = artifacts.require('bDSLAToken');
+const bDSLA = artifacts.require('bDSLA');
 const fs = require('fs');
 const path = require('path');
 
@@ -51,10 +51,10 @@ const files = {
     tsFileName: 'NetworkAnalyticsABI.ts',
     abi: NetworkAnalytics.abi,
   },
-  bDSLAToken: {
+  bDSLA: {
     constName: 'export const erc20ABI: AbiItem[] =',
     tsFileName: 'erc20ABI.ts',
-    abi: bDSLAToken.abi,
+    abi: bDSLA.abi,
   },
 };
 

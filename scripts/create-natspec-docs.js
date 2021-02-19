@@ -6,7 +6,7 @@ const documentedContracts = [
   'SLO',
   'SLORegistry',
   'SLARegistry',
-  'bDSLAToken',
+  'bDSLA',
   'MessengerRegistry',
   'IMessenger',
   'SEMessenger',

@@ -1,7 +1,6 @@
 require('babel-polyfill');
 require('babel-register');
 
-const { isTestingNetwork } = require('../environments');
 const { getChainlinkJobId } = require('../test/helpers');
 const { getEnvFromNetwork, needsGetJobId } = require('../environments');
 
@@ -14,12 +13,12 @@ const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const SEMessenger = artifacts.require('SEMessenger');
 
 // For dev
-const bDSLAToken = artifacts.require('bDSLAToken');
+const bDSLA = artifacts.require('bDSLA');
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
     const env = getEnvFromNetwork(network);
-    const dslaTokenAddress = env?.dslaTokenAddress || (await deployer.deploy(bDSLAToken)).address;
+    const dslaTokenAddress = env?.dslaTokenAddress || (await deployer.deploy(bDSLA)).address;
     const periodRegistry = await deployer.deploy(PeriodRegistry);
     const sloRegistry = await deployer.deploy(SLORegistry);
     const messengerRegistry = await deployer.deploy(MessengerRegistry);

@@ -1,7 +1,6 @@
 import generatePeriods from './helpers';
 
 require('dotenv').config();
-const ngrok = require('ngrok');
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 const devPeriods = generatePeriods(10);
