@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
+pragma experimental ABIEncoderV2;
 
 import "./SLO.sol";
 
@@ -60,5 +61,12 @@ contract SLORegistry {
             }
         }
         return false;
+    }
+
+    /**
+     * @dev function to get all the SLOs addresses
+     */
+    function getAllSLOs() public view returns (address[] memory) {
+        return registeredSLOs;
     }
 }

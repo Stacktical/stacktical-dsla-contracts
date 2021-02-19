@@ -67,4 +67,12 @@ export const SLORegistryABI: AbiItem[] = [
     type: 'function',
     constant: true,
   },
+  {
+    inputs: [],
+    name: 'getAllSLOs',
+    outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
 ];
