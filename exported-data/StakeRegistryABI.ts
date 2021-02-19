@@ -98,6 +98,17 @@ export const StakeRegistryABI: AbiItem[] = [
   },
   {
     inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+    ],
+    name: 'userStakedSlas',
+    outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [
       { internalType: 'address', name: '_tokenAddress', type: 'address' },
     ],
     name: 'addAllowedTokens',
@@ -134,6 +145,47 @@ export const StakeRegistryABI: AbiItem[] = [
         internalType: 'uint256',
         name: 'minimumDSLAStakedTier3',
         type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '_user', type: 'address' },
+      { internalType: 'address', name: '_sla', type: 'address' },
+    ],
+    name: 'slaWasStakedByUser',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '_owner', type: 'address' },
+      { internalType: 'address', name: '_slaRegistry', type: 'address' },
+    ],
+    name: 'registerStakedSla',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '_slaOwner', type: 'address' }],
+    name: 'getActivePool',
+    outputs: [
+      {
+        components: [
+          { internalType: 'address', name: 'SLAAddress', type: 'address' },
+          { internalType: 'uint256', name: 'stake', type: 'uint256' },
+          { internalType: 'string', name: 'assetName', type: 'string' },
+          { internalType: 'address', name: 'assetAddress', type: 'address' },
+        ],
+        internalType: 'struct StakeRegistry.ActivePool[]',
+        name: '',
+        type: 'tuple[]',
       },
     ],
     stateMutability: 'view',

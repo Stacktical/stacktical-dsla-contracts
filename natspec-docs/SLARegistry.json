@@ -40,11 +40,11 @@
         "_extraData": "7. bytes32 to embed extra data for customized workflows"
       }
     },
-    "owner()": { "details": "Returns the address of the current owner." },
-    "registerStakedSla(address)": {
-      "details": "register the sending SLA contract as staked by _owner",
-      "params": { "_owner": "1. SLA contract to stake" }
+    "isRegisteredSLA(address)": {
+      "details": "public view function that returns true if _slaAddress was deployed using this SLARegistry",
+      "params": { "_slaAddress": "address of the SLA to be checked" }
     },
+    "owner()": { "details": "Returns the address of the current owner." },
     "renounceOwnership()": {
       "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
@@ -55,11 +55,6 @@
     "setMessengerSLARegistryAddress(address)": {
       "details": "function to declare this SLARegistry contract as SLARegistry of _messengerAddress",
       "params": { "_messengerAddress": "1. address of the messenger" }
-    },
-    "slaWasStakedByUser(address,address)": {
-      "details": "public view function that returns true if the _owner has staked on _sla",
-      "params": { "_user": "1. address to check", "_sla": "2. sla to check" },
-      "returns": { "_0": "bool, true if _sla was staked by _user" }
     },
     "transferOwnership(address)": {
       "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
@@ -83,12 +78,8 @@
     "SLAs": { "details": "stores the addresses of created SLAs" },
     "messengerRegistry": { "details": "Messengers registry" },
     "periodRegistry": { "details": "Periods registry" },
-    "registeredSLAs": {
-      "details": "(slaAddress=>bool) to check if SLA is registered"
-    },
     "sloRegistry": { "details": "SLO registry" },
     "stakeRegistry": { "details": "Stake registry" },
-    "userStakedSlas": { "details": "mapping userAddress => SLA[]" },
     "userToSLAIndexes": {
       "details": "stores the indexes of service level agreements owned by an user"
     }
