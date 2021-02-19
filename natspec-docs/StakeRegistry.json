@@ -18,9 +18,25 @@
       "params": { "_tokenAddress": "1. address of the new allowed token" }
     },
     "constructor": { "params": { "_dslaTokenAddress": "1. DSLA Token" } },
+    "getActivePool(address)": {
+      "details": "returns the active pools owned by a user.",
+      "params": { "_slaOwner": "1. owner of the active pool" },
+      "returns": {
+        "_0": "ActivePool[], array of structs: {SLAAddress,stake,assetName}"
+      }
+    },
     "owner()": { "details": "Returns the address of the current owner." },
+    "registerStakedSla(address,address)": {
+      "details": "register the sending SLA contract as staked by _owner",
+      "params": { "_owner": "1. SLA contract to stake" }
+    },
     "renounceOwnership()": {
       "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+    },
+    "slaWasStakedByUser(address,address)": {
+      "details": "public view function that returns true if the _owner has staked on _sla",
+      "params": { "_user": "1. address to check", "_sla": "2. sla to check" },
+      "returns": { "_0": "bool, true if _sla was staked by _user" }
     },
     "transferOwnership(address)": {
       "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
@@ -41,6 +57,9 @@
     },
     "allowedTokens": {
       "details": "array with the allowed tokens addresses of the StakeRegistry"
+    },
+    "userStakedSlas": {
+      "details": "(userAddress => SLA[]) with user staked SLAs to get tokenPool"
     }
   },
   "title": "StakeRegistry",

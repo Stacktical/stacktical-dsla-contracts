@@ -164,4 +164,24 @@ export const PeriodRegistryABI: AbiItem[] = [
     type: 'function',
     constant: true,
   },
+  {
+    inputs: [],
+    name: 'getPeriodDefinitions',
+    outputs: [
+      {
+        components: [
+          { internalType: 'uint256', name: 'yearlyPeriods', type: 'uint256' },
+          { internalType: 'bool', name: 'initialized', type: 'bool' },
+          { internalType: 'uint256[]', name: 'starts', type: 'uint256[]' },
+          { internalType: 'uint256[]', name: 'ends', type: 'uint256[]' },
+        ],
+        internalType: 'struct PeriodRegistry.PeriodDefinition[]',
+        name: '',
+        type: 'tuple[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
 ];

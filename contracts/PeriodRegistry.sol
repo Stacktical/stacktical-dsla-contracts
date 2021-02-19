@@ -169,4 +169,23 @@ contract PeriodRegistry is Ownable {
         finished =
             periodDefinitions[_periodType].ends[_periodId] < block.timestamp;
     }
+
+    /**
+     * @dev public function to get the periodDefinitions
+     */
+    function getPeriodDefinitions()
+        public
+        view
+        returns (PeriodDefinition[] memory)
+    {
+        // 6 period types
+        PeriodDefinition[] memory periodDefinition = new PeriodDefinition[](6);
+        periodDefinition[0] = periodDefinitions[PeriodType.Hourly];
+        periodDefinition[1] = periodDefinitions[PeriodType.Daily];
+        periodDefinition[2] = periodDefinitions[PeriodType.Weekly];
+        periodDefinition[3] = periodDefinitions[PeriodType.BiWeekly];
+        periodDefinition[4] = periodDefinitions[PeriodType.Monthly];
+        periodDefinition[5] = periodDefinitions[PeriodType.Yearly];
+        return periodDefinition;
+    }
 }

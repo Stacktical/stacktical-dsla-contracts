@@ -102,14 +102,6 @@ export const SLARegistryABI: AbiItem[] = [
     constant: true,
   },
   {
-    inputs: [{ internalType: 'address', name: '', type: 'address' }],
-    name: 'registeredSLAs',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
@@ -142,17 +134,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '', type: 'address' },
-      { internalType: 'uint256', name: '', type: 'uint256' },
-    ],
-    name: 'userStakedSlas',
-    outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
   },
   {
     inputs: [
@@ -225,21 +206,11 @@ export const SLARegistryABI: AbiItem[] = [
     constant: true,
   },
   {
-    inputs: [
-      { internalType: 'address', name: '_user', type: 'address' },
-      { internalType: 'address', name: '_sla', type: 'address' },
-    ],
-    name: 'slaWasStakedByUser',
+    inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
+    name: 'isRegisteredSLA',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
     constant: true,
-  },
-  {
-    inputs: [{ internalType: 'address', name: '_owner', type: 'address' }],
-    name: 'registerStakedSla',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
   },
 ];
