@@ -16,42 +16,47 @@ const SEMessenger = artifacts.require('SEMessenger');
 const bDSLA = artifacts.require('bDSLA');
 
 module.exports = (deployer, network) => {
-  deployer.then(async () => {
-    const env = getEnvFromNetwork(network);
-    const dslaTokenAddress = env?.dslaTokenAddress || (await deployer.deploy(bDSLA)).address;
-    const periodRegistry = await deployer.deploy(PeriodRegistry);
-    const sloRegistry = await deployer.deploy(SLORegistry);
-    const messengerRegistry = await deployer.deploy(MessengerRegistry);
-    const networkAnalytics = await deployer.deploy(
-      NetworkAnalytics,
-      env.chainlinkOracleAddress,
-      env.chainlinkTokenAddress,
-      !needsGetJobId ? env.chainlinkJobId : await getChainlinkJobId(),
-      periodRegistry.address,
-    );
-    const seMessenger = await deployer.deploy(
-      SEMessenger,
-      env.chainlinkOracleAddress,
-      env.chainlinkTokenAddress,
-      !needsGetJobId ? env.chainlinkJobId : await getChainlinkJobId(),
-      networkAnalytics.address,
-    );
+  if (!/testing/i.test(network)) {
+    deployer.then(async () => {
+      const env = getEnvFromNetwork(network);
+      const dslaTokenAddress = env?.dslaTokenAddress || (await deployer.deploy(bDSLA)).address;
+      const periodRegistry = await deployer.deploy(PeriodRegistry);
+      const sloRegistry = await deployer.deploy(SLORegistry);
+      const messengerRegistry = await deployer.deploy(MessengerRegistry);
 
-    const stakeRegistry = await deployer.deploy(
-      StakeRegistry,
-      dslaTokenAddress,
-    );
+      const chainlinkJobId = !needsGetJobId ? env.chainlinkJobId : await getChainlinkJobId();
 
-    const slaRegistry = await deployer.deploy(
-      SLARegistry,
-      sloRegistry.address,
-      periodRegistry.address,
-      messengerRegistry.address,
-      stakeRegistry.address,
-    );
+      const networkAnalytics = await deployer.deploy(
+        NetworkAnalytics,
+        env.chainlinkOracleAddress,
+        env.chainlinkTokenAddress,
+        chainlinkJobId,
+        periodRegistry.address,
+      );
+      const seMessenger = await deployer.deploy(
+        SEMessenger,
+        env.chainlinkOracleAddress,
+        env.chainlinkTokenAddress,
+        chainlinkJobId,
+        networkAnalytics.address,
+      );
 
-    await slaRegistry.setMessengerSLARegistryAddress(
-      seMessenger.address,
-    );
-  });
+      const stakeRegistry = await deployer.deploy(
+        StakeRegistry,
+        dslaTokenAddress,
+      );
+
+      const slaRegistry = await deployer.deploy(
+        SLARegistry,
+        sloRegistry.address,
+        periodRegistry.address,
+        messengerRegistry.address,
+        stakeRegistry.address,
+      );
+
+      await slaRegistry.setMessengerSLARegistryAddress(
+        seMessenger.address,
+      );
+    });
+  }
 };

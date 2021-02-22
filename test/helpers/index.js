@@ -5,6 +5,7 @@ import cleanSolidityString from './cleanSolidityString';
 import getChainlinkJobId from './getChainlinkJobId';
 import waitBlockTimestamp from './waitBlockTimestamp';
 import generatePeriods from './generatePeriods';
+import getIPFSHash from './getIPFSHash';
 
 export {
   eventListener,
@@ -13,4 +14,5 @@ export {
   getChainlinkJobId,
   waitBlockTimestamp,
   generatePeriods,
+  getIPFSHash,
 };

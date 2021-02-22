@@ -16,11 +16,12 @@ contract Staking is Ownable {
     PeriodRegistry private periodRegistry;
 
     /// @dev (tokenAddress=>uint256) total pooled token balance
-    mapping(address => uint256) tokenPools;
+    mapping(address => uint256) public tokenPools;
     /// @dev (tokenAddress=>stakerAddress=>uint256) staker position to represent his proportion staked
-    mapping(address => mapping(address => uint256)) stakeHoldersPositions;
+    mapping(address => mapping(address => uint256))
+        public stakeHoldersPositions;
     /// @dev (tokenAddress=>uint256) used to keep track of the total stakes per token, to calculate proportion of compensation pool
-    mapping(address => uint256) public usersTotalPositions;
+    mapping(address => uint256) public usersStakeRecord;
     /// @dev (tokenAddress=>uint256) users available compensation per token
     mapping(address => uint256) public usersCompensationPools;
     /// @dev (periodId=>tokenAddress=>uint256) provider compensation per period and per token
@@ -52,7 +53,7 @@ contract Staking is Ownable {
     /// @dev boolean to declare if contract is whitelisted
     bool public whitelisted;
     /// @dev (userAddress=bool) to declare whitelisted addresses
-    mapping(address => bool) whitelist;
+    mapping(address => bool) public whitelist;
 
     modifier notOwner {
         require(msg.sender != owner(), "Should not be called by the SLA owner");
@@ -72,7 +73,25 @@ contract Staking is Ownable {
     }
 
     /**
-     *@param _stakeRegistry 1. address of the base token
+     * @dev event for provider reward log
+     * @param periodId 1. id of the period
+     * @param tokenAddress 2. address of the token
+     * @param rewardPercentage 3. reward percentage for the provider
+     * @param amount 4. amount rewarded
+     */
+    event ProviderRewardGenerated(
+        uint256 indexed periodId,
+        address indexed tokenAddress,
+        uint256 rewardPercentage,
+        uint256 amount
+    );
+
+    /**
+     *@param _stakeRegistry 1. address of the stake registry
+     *@param _periodRegistry 2. address of the period registry
+     *@param _periodType 3. period type of the SLA
+     *@param _slaPeriodsLength 4. length of the SLA periodsId stored on the sla contract
+     *@param _whitelisted 5. enables the white list feature
      */
     constructor(
         address _stakeRegistry,
@@ -166,11 +185,9 @@ contract Staking is Ownable {
         if (!isStaker(msg.sender)) {
             stakers.push(msg.sender);
         }
-        // after staking successfully, increase the usersTotalPositions of the token
+        // after staking successfully, increase the usersStakeRecord of the token
         if (msg.sender != owner()) {
-            usersTotalPositions[_tokenAddress] = usersTotalPositions[
-                _tokenAddress
-            ]
+            usersStakeRecord[_tokenAddress] = usersStakeRecord[_tokenAddress]
                 .add(_amount);
         }
     }
@@ -233,6 +250,12 @@ contract Staking is Ownable {
                 owner()
             ] = stakeHoldersPositions[tokenAddress][owner()].add(reward);
             providerPeriodsRewards[_periodId][tokenAddress] = reward;
+            emit ProviderRewardGenerated(
+                _periodId,
+                tokenAddress,
+                _rewardPercentage,
+                reward
+            );
         }
     }
 
@@ -281,10 +304,10 @@ contract Staking is Ownable {
             userPosition > 0,
             "Can only claim a compensation if position is bigger than 0"
         );
-        // userPosition[tokenAddress]/usersTotalPositions[tokenAddress] is the proportion
+        // userPosition[tokenAddress]/usersStakeRecord[tokenAddress] is the proportion
         // of the compensation pool to be delivered.
         uint256 userCompensationPercentage =
-            userPosition.mul(precision).div(usersTotalPositions[_tokenAddress]);
+            userPosition.mul(precision).div(usersStakeRecord[_tokenAddress]);
         uint256 userCompensation =
             usersCompensationPools[_tokenAddress]
                 .mul(userCompensationPercentage)
@@ -296,8 +319,9 @@ contract Staking is Ownable {
             success == true,
             "Transfer process from SLA contract to msg.sender was not succesful"
         );
-        usersTotalPositions[_tokenAddress] = usersTotalPositions[_tokenAddress]
-            .sub(userPosition);
+        usersStakeRecord[_tokenAddress] = usersStakeRecord[_tokenAddress].sub(
+            userPosition
+        );
         usersCompensationPools[_tokenAddress] = usersCompensationPools[
             _tokenAddress
         ]
