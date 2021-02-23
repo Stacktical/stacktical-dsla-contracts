@@ -80,7 +80,7 @@ contract SLARegistry is Ownable {
         bool _whitelisted,
         bytes32[] memory _extraData
     ) public {
-        (, bool initialized) = periodRegistry.periodDefinitions(_periodType);
+        bool initialized = periodRegistry.periodDefinitions(_periodType);
         require(initialized == true, "Period type is not initialized yet");
         require(
             sloRegistry.isRegisteredSLO(address(_SLO)) == true,
@@ -117,7 +117,8 @@ contract SLARegistry is Ownable {
                 address(stakeRegistry),
                 address(periodRegistry),
                 _whitelisted,
-                _extraData
+                _extraData,
+                SLAs.length
             );
 
         SLAs.push(sla);

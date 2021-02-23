@@ -136,6 +136,19 @@ describe('SLA', () => {
     );
 
     await networkAnalytics.addNetwork(slaNetworkBytes32);
+
+    await chainlinkToken.transfer(
+      networkAnalytics.address,
+      web3.utils.toWei('0.2'),
+    );
+    // periods 0 is already finished
+    await networkAnalytics.requestAnalytics(0, periodType, slaNetworkBytes32);
+    await eventListener(networkAnalytics, 'AnalyticsReceived');
+
+    await chainlinkToken.transfer(
+      seMessenger.address,
+      web3.utils.toWei('10'),
+    );
   });
 
   beforeEach(async () => {
@@ -309,17 +322,7 @@ describe('SLA', () => {
       expect(usdcStakeRecord.toString()).to.eq(String(3 * stakeAmountWei));
     });
 
-    it.only('should calculate provider reward properly', async () => {
-      await chainlinkToken.transfer(
-        networkAnalytics.address,
-        web3.utils.toWei('0.1'),
-      );
-      // periods 0 and 1 are already finished
-      await networkAnalytics.requestAnalytics(0, periodType, slaNetworkBytes32);
-      // await networkAnalytics.requestAnalytics(1, periodType, slaNetworkBytes32);
-
-      await eventListener(networkAnalytics, 'AnalyticsReceived');
-
+    it('should calculate provider reward properly', async () => {
       // allow dai and usdc
       await sla.addAllowedTokens(dai.address);
       await sla.addAllowedTokens(usdc.address);
@@ -347,19 +350,15 @@ describe('SLA', () => {
       await sla.stakeTokens(userUSDCStake, usdc.address, { from: notOwner });
 
       // calculate reward for period 0
-      const periodId = 0;
-      await chainlinkToken.transfer(
-        seMessenger.address,
-        web3.utils.toWei('0.1'),
-      );
+      let periodId = 0;
       await slaRegistry.requestSLI(periodId, sla.address);
       const slaCreationBlock = await sla.creationBlockNumber.call();
       const { values: { _sli } } = await eventListener(sla, 'SLICreated');
       const precision = 10000;
-      const deviation = ((Number(_sli) - sloValue) * precision) / ((Number(_sli) + sloValue) / 2);
+      let deviation = ((Number(_sli) - sloValue) * precision) / ((Number(_sli) + sloValue) / 2);
       // normalizedPeriod = 1, periodsLength = 10
-      const expectedRewardPercentage = String(Math.floor((deviation * 1) / 10));
-      const rewardsGenerated = await sla.getPastEvents('ProviderRewardGenerated', {
+      let expectedRewardPercentage = String(Math.floor((deviation * 1) / 10));
+      let rewardsGenerated = await sla.getPastEvents('ProviderRewardGenerated', {
         filter: {
           periodId,
         },
@@ -370,7 +369,7 @@ describe('SLA', () => {
         (reward) => reward.returnValues.tokenAddress === bdsla.address,
       );
       expect(bdslaReward.rewardPercentage.toString()).to.equal(expectedRewardPercentage);
-      const expectedDSLAReward = toWei(
+      let expectedDSLAReward = toWei(
         String((Number(fromWei(userDSLAStake)) * Number(expectedRewardPercentage))
         / (precision * 100)),
       );
@@ -381,7 +380,7 @@ describe('SLA', () => {
         (reward) => reward.returnValues.tokenAddress === dai.address,
       );
       expect(daiReward.rewardPercentage.toString()).to.equal(expectedRewardPercentage);
-      const expectedDAIReward = toWei(
+      let expectedDAIReward = toWei(
         String((Number(fromWei(userDAIStake)) * Number(expectedRewardPercentage))
         / (precision * 100)),
       );
@@ -392,11 +391,187 @@ describe('SLA', () => {
         (reward) => reward.returnValues.tokenAddress === usdc.address,
       );
       expect(usdcReward.rewardPercentage.toString()).to.equal(expectedRewardPercentage);
-      const expectedUSDCReward = toWei(
+      let expectedUSDCReward = toWei(
         String((Number(fromWei(userUSDCStake)) * Number(expectedRewardPercentage))
         / (precision * 100)),
       );
       expect(usdcReward.amount.toString()).to.equal(expectedUSDCReward);
+
+      // periods 1 is already finished
+      // Request period 1 sli
+      periodId = 1;
+      await networkAnalytics.requestAnalytics(1, periodType, slaNetworkBytes32);
+      await eventListener(networkAnalytics, 'AnalyticsReceived');
+      await slaRegistry.requestSLI(periodId, sla.address);
+      const { values: { _sli: _sli1 } } = await eventListener(sla, 'SLICreated');
+      deviation = ((Number(_sli1) - sloValue) * precision) / ((Number(_sli1) + sloValue) / 2);
+      // normalizedPeriod = 2, periodsLength = 10
+      expectedRewardPercentage = String(Math.floor((deviation * 2) / 10));
+      rewardsGenerated = await sla.getPastEvents('ProviderRewardGenerated', {
+        filter: {
+          periodId,
+        },
+        fromBlock: slaCreationBlock,
+      });
+      // bDSLA reward
+      const { returnValues: bdslaReward1 } = rewardsGenerated.find(
+        (reward) => reward.returnValues.tokenAddress === bdsla.address,
+      );
+      expect(bdslaReward1.rewardPercentage.toString()).to.equal(expectedRewardPercentage);
+      expectedDSLAReward = toWei(
+        String(
+          (Number(
+            fromWei(userDSLAStake) - fromWei(expectedDSLAReward),
+          ) * Number(expectedRewardPercentage))
+        / (precision * 100),
+        ),
+      );
+      expect(bdslaReward1.amount.toString()).to.equal(expectedDSLAReward);
+
+      // DAI reward
+      const { returnValues: daiReward1 } = rewardsGenerated.find(
+        (reward) => reward.returnValues.tokenAddress === dai.address,
+      );
+      expect(daiReward1.rewardPercentage.toString()).to.equal(expectedRewardPercentage);
+      expectedDAIReward = toWei(
+        String(
+          (Number(
+            fromWei(userDAIStake) - fromWei(expectedDAIReward),
+          ) * Number(expectedRewardPercentage))
+        / (precision * 100),
+        ),
+      );
+      expect(daiReward1.amount.toString()).to.equal(expectedDAIReward);
+
+      // // USDC reward
+      const { returnValues: usdcReward1 } = rewardsGenerated.find(
+        (reward) => reward.returnValues.tokenAddress === usdc.address,
+      );
+      expect(usdcReward1.rewardPercentage.toString()).to.equal(expectedRewardPercentage);
+      expectedUSDCReward = toWei(
+        String(
+          (Number(
+            fromWei(userUSDCStake) - fromWei(expectedUSDCReward),
+          ) * Number(expectedRewardPercentage))
+        / (precision * 100),
+        ),
+      );
+      expect(usdcReward1.amount.toString()).to.equal(expectedUSDCReward);
     });
+  });
+
+  it.only('should deplete the pools after last period finishes', async () => {
+    // register only the first period, which is finished but not verified
+    await slaRegistry.createSLA(
+      slo,
+      ipfsHash,
+      periodType,
+      [0],
+      seMessenger.address,
+      false,
+      [slaNetworkBytes32],
+    );
+
+    const slaAddresses = await slaRegistry.userSLAs(owner);
+    sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);
+    await sla.addAllowedTokens(dai.address);
+    await sla.addAllowedTokens(usdc.address);
+
+    // Owner
+    // 3 * bsdla + 3 * dai + 3 usdc
+    const providerDSLAStake = toWei(String(3 * stakeAmount));
+    await bdsla.approve(sla.address, providerDSLAStake);
+    await sla.stakeTokens(providerDSLAStake, bdsla.address);
+    const providerDAIStake = toWei(String(3 * stakeAmount));
+    await dai.approve(sla.address, providerDAIStake);
+    await sla.stakeTokens(providerDAIStake, dai.address);
+    const providerUSDCStake = toWei(String(3 * stakeAmount));
+    await usdc.approve(sla.address, providerUSDCStake);
+    await sla.stakeTokens(providerUSDCStake, usdc.address);
+
+    // NotOwner
+    // 2 * dai + 3 * usdc
+    const userDSLAStake = toWei(String(0 * stakeAmount));
+    const userDAIStake = toWei(String(2 * stakeAmount));
+    await dai.approve(sla.address, userDAIStake, { from: notOwner });
+    await sla.stakeTokens(userDAIStake, dai.address, { from: notOwner });
+    const userUSDCStake = toWei(String(3 * stakeAmount));
+    await usdc.approve(sla.address, userUSDCStake, { from: notOwner });
+    await sla.stakeTokens(userUSDCStake, usdc.address, { from: notOwner });
+
+    // calculate reward for period 0, the only period
+    const periodId = 0;
+    const slaCreationBlock = await sla.creationBlockNumber.call();
+    await slaRegistry.requestSLI(periodId, sla.address);
+    await eventListener(sla, 'SLICreated');
+    const precision = 10000;
+    // uint256 rewardPercentage = _periodId != periodIds[periodIds.length - 1]
+    //  ? deviation.mul(normalizedPeriodId).div(periodIds.length)
+    //  : uint256(100).mul(precision);
+    // normalizedPeriod = 1, periodsLength = 10
+    const expectedRewardPercentage = String(100 * precision);
+    const rewardsGenerated = await sla.getPastEvents('ProviderRewardGenerated', {
+      filter: {
+        periodId,
+      },
+      fromBlock: slaCreationBlock,
+    });
+      // bDSLA reward
+    const { returnValues: bdslaReward } = rewardsGenerated.find(
+      (reward) => reward.returnValues.tokenAddress === bdsla.address,
+    );
+    expect(bdslaReward.rewardPercentage.toString()).to.equal(expectedRewardPercentage);
+    const expectedDSLAReward = toWei(
+      String((Number(fromWei(userDSLAStake)) * Number(expectedRewardPercentage))
+        / (precision * 100)),
+    );
+    expect(bdslaReward.amount.toString()).to.equal(expectedDSLAReward);
+    expect(bdslaReward.amount.toString()).to.equal(userDSLAStake);
+
+    // DAI reward
+    const { returnValues: daiReward } = rewardsGenerated.find(
+      (reward) => reward.returnValues.tokenAddress === dai.address,
+    );
+    expect(daiReward.rewardPercentage.toString()).to.equal(expectedRewardPercentage);
+    const expectedDAIReward = toWei(
+      String((Number(fromWei(userDAIStake)) * Number(expectedRewardPercentage))
+        / (precision * 100)),
+    );
+    expect(daiReward.amount.toString()).to.equal(expectedDAIReward);
+    expect(daiReward.amount.toString()).to.equal(userDAIStake);
+
+    // // USDC reward
+    const { returnValues: usdcReward } = rewardsGenerated.find(
+      (reward) => reward.returnValues.tokenAddress === usdc.address,
+    );
+    expect(usdcReward.rewardPercentage.toString()).to.equal(expectedRewardPercentage);
+    const expectedUSDCReward = toWei(
+      String((Number(fromWei(userUSDCStake)) * Number(expectedRewardPercentage))
+        / (precision * 100)),
+    );
+    expect(usdcReward.amount.toString()).to.equal(expectedUSDCReward);
+    expect(usdcReward.amount.toString()).to.equal(userUSDCStake);
+
+    // User position should be 0 for everything
+    const notOwnerDSLAPosition = await sla.stakeHoldersPositions(bdsla.address, notOwner);
+    const notOwnerDAIPosition = await sla.stakeHoldersPositions(dai.address, notOwner);
+    const notOwnerUSDCPosition = await sla.stakeHoldersPositions(usdc.address, notOwner);
+    expect(notOwnerDSLAPosition.toString()).to.equal('0');
+    expect(notOwnerDAIPosition.toString()).to.equal('0');
+    expect(notOwnerUSDCPosition.toString()).to.equal('0');
+
+    // Provider position should be the summation of user and provider pool
+    const ownerDSLAPosition = await sla.stakeHoldersPositions(bdsla.address, owner);
+    const ownerDAIPosition = await sla.stakeHoldersPositions(dai.address, owner);
+    const ownerUSDCPosition = await sla.stakeHoldersPositions(usdc.address, owner);
+    expect(ownerDSLAPosition).to.equal(
+      toWei(String(fromWei(providerDSLAStake) + fromWei(userDSLAStake))),
+    );
+    expect(ownerDAIPosition).to.equal(
+      toWei(String(fromWei(providerDAIStake) + fromWei(userDAIStake))),
+    );
+    expect(ownerUSDCPosition).to.equal(
+      toWei(String(fromWei(providerUSDCStake) + fromWei(userUSDCStake))),
+    );
   });
 });

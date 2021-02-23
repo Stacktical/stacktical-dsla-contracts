@@ -112,6 +112,7 @@ contract SLA is Staking {
      * @param _periodRegistry 7. periodRegistry address
      * @param _whitelisted 8. boolean to declare whitelisted contracts
      * @param _extraData 9. array of bytes32 to store extra data on deployment time
+     * @param _slaID 10. identifies the SLA to uniquely to emit dTokens
      */
     constructor(
         address _owner,
@@ -123,7 +124,8 @@ contract SLA is Staking {
         address _stakeRegistry,
         address _periodRegistry,
         bool _whitelisted,
-        bytes32[] memory _extraData
+        bytes32[] memory _extraData,
+        uint256 _slaID
     )
         public
         Staking(
@@ -131,7 +133,8 @@ contract SLA is Staking {
             _periodRegistry,
             _periodType,
             _periodIds.length,
-            _whitelisted
+            _whitelisted,
+            _slaID
         )
     {
         transferOwnership(_owner);
@@ -181,7 +184,7 @@ contract SLA is Staking {
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
             slaPeriod.status = Status.NotRespected;
-            _setUsersCompensationPool();
+            _setUsersCompensation();
             _breachedContract = true;
             emit SLANotRespected(_periodId, _sli);
         }
@@ -289,7 +292,8 @@ contract SLA is Staking {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             _tokensStake[index] = TokenStake({
                 tokenAddress: allowedTokens[index],
-                stake: tokenPools[allowedTokens[index]]
+                stake: usersPool[allowedTokens[index]] +
+                    providerPool[allowedTokens[index]]
             });
         }
     }
