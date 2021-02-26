@@ -173,7 +173,7 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
-    name: 'dTokenRegistry',
+    name: 'dpTokenRegistry',
     outputs: [
       {
         internalType: 'contract ERC20PresetMinterPauser',
@@ -188,6 +188,19 @@ export const SLAABI: AbiItem[] = [
     inputs: [],
     name: 'dslaTokenAddress',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'duTokenRegistry',
+    outputs: [
+      {
+        internalType: 'contract ERC20PresetMinterPauser',
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
     type: 'function',
   },

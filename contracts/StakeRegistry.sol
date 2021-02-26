@@ -4,15 +4,17 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
 import "./SLA.sol";
 import "./SLARegistry.sol";
+import "./StringUtils.sol";
 
 /**
  * @title StakeRegistry
  * @dev StakeRegistry is a contract to register the staking activity of the platform, along
  with controlling certain admin privileged parameters
  */
-contract StakeRegistry is Ownable {
+contract StakeRegistry is Ownable, StringUtils {
     using SafeMath for uint256;
 
     /// @dev struct to return on getActivePool function.
@@ -133,6 +135,21 @@ contract StakeRegistry is Ownable {
             userStakedSlas[_owner].push(SLA(msg.sender));
         }
         return true;
+    }
+
+    /**
+     *@dev to create dTokens for staking
+     *@param _name 1. token name
+     *@param _symbol 2. token symbol
+     */
+    function createDToken(string memory _name, string memory _symbol)
+        public
+        returns (address)
+    {
+        ERC20PresetMinterPauser dToken =
+            new ERC20PresetMinterPauser(_name, _symbol);
+        dToken.grantRole(dToken.MINTER_ROLE(), msg.sender);
+        return address(dToken);
     }
 
     /**

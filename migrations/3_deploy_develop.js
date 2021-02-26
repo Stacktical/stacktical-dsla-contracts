@@ -13,14 +13,12 @@ const USDC = artifacts.require('USDC');
 const sloValue = 95000;
 const sloType = 4;
 const periodType = 2;
-const yearlyPeriods = 52;
 const [periodStarts, periodEnds] = generatePeriods(52);
 const slaNetworkBytes32 = networkNamesBytes32[0];
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
     if (/develop/i.test(network)) {
-      console.log('aca');
       await deployer.deploy(DAI);
       await deployer.deploy(USDC);
       const sloRegistry = await SLORegistry.deployed();
@@ -33,7 +31,6 @@ module.exports = (deployer, network) => {
         periodType,
         periodStarts,
         periodEnds,
-        yearlyPeriods,
       );
 
       await networkAnalytics.addNetwork(slaNetworkBytes32);

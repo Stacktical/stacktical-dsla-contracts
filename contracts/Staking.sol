@@ -8,9 +8,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./StakeRegistry.sol";
 import "./PeriodRegistry.sol";
-import "./StringUtils.sol";
 
-contract Staking is Ownable, StringUtils {
+contract Staking is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for ERC20;
 
@@ -137,9 +136,13 @@ contract Staking is Ownable, StringUtils {
         string memory dpTokenSymbol =
             string(abi.encodePacked("dpDSLA-", dTokenID));
         ERC20PresetMinterPauser duDSLA =
-            new ERC20PresetMinterPauser(duTokenName, duTokenSymbol);
+            ERC20PresetMinterPauser(
+                stakeRegistry.createDToken(duTokenName, duTokenSymbol)
+            );
         ERC20PresetMinterPauser dpDSLA =
-            new ERC20PresetMinterPauser(dpTokenName, dpTokenSymbol);
+            ERC20PresetMinterPauser(
+                stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
+            );
         duTokenRegistry[dslaTokenAddress] = duDSLA;
         dpTokenRegistry[dslaTokenAddress] = dpDSLA;
     }
@@ -171,16 +174,22 @@ contract Staking is Ownable, StringUtils {
             string(abi.encodePacked("DSLA-USER-", symbol, "-", dTokenID));
         string memory duTokenSymbol =
             string(abi.encodePacked("du", symbol, "-", dTokenID));
-        ERC20PresetMinterPauser duToken =
-            new ERC20PresetMinterPauser(duTokenName, duTokenSymbol);
-        duTokenRegistry[_tokenAddress] = duToken;
         string memory dpTokenName =
             string(abi.encodePacked("DSLA-PROVIDER-", symbol, "-", dTokenID));
         string memory dpTokenSymbol =
             string(abi.encodePacked("dp", symbol, "-", dTokenID));
+
+        ERC20PresetMinterPauser duToken =
+            ERC20PresetMinterPauser(
+                stakeRegistry.createDToken(duTokenName, duTokenSymbol)
+            );
         ERC20PresetMinterPauser dpToken =
-            new ERC20PresetMinterPauser(dpTokenName, dpTokenSymbol);
+            ERC20PresetMinterPauser(
+                stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
+            );
+
         dpTokenRegistry[_tokenAddress] = dpToken;
+        duTokenRegistry[_tokenAddress] = duToken;
     }
 
     /**
@@ -441,5 +450,29 @@ contract Staking is Ownable, StringUtils {
             }
         }
         return false;
+    }
+
+    function _uintToStr(uint256 _i)
+        internal
+        pure
+        returns (string memory _uintAsString)
+    {
+        uint256 number = _i;
+        if (number == 0) {
+            return "0";
+        }
+        uint256 j = number;
+        uint256 len;
+        while (j != 0) {
+            len++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(len);
+        uint256 k = len - 1;
+        while (number != 0) {
+            bstr[k--] = bytes1(uint8(48 + (number % 10)));
+            number /= 10;
+        }
+        return string(bstr);
     }
 }
