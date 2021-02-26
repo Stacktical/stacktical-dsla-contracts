@@ -19,7 +19,8 @@ const slaNetworkBytes32 = networkNamesBytes32[0];
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
-    if (/develop/i.test(network) || /testing/i.test(network)) {
+    if (/develop/i.test(network)) {
+      console.log('aca');
       await deployer.deploy(DAI);
       await deployer.deploy(USDC);
       const sloRegistry = await SLORegistry.deployed();

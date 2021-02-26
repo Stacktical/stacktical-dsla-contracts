@@ -1,31 +1,40 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./StakeRegistry.sol";
 import "./PeriodRegistry.sol";
+import "./StringUtils.sol";
 
-contract Staking is Ownable {
+contract Staking is Ownable, StringUtils {
     using SafeMath for uint256;
+    using SafeERC20 for ERC20;
 
     /// @dev StakeRegistry contract
     StakeRegistry private stakeRegistry;
     /// @dev SLARegistry contract
     PeriodRegistry private periodRegistry;
-
+    /// @dev current SLA id
+    uint256 public slaID;
     /// @dev (tokenAddress=>uint256) total pooled token balance
-    mapping(address => uint256) tokenPools;
-    /// @dev (tokenAddress=>stakerAddress=>uint256) staker position to represent his proportion staked
-    mapping(address => mapping(address => uint256)) stakeHoldersPositions;
-    /// @dev (tokenAddress=>uint256) used to keep track of the total stakes per token, to calculate proportion of compensation pool
-    mapping(address => uint256) public usersTotalPositions;
-    /// @dev (tokenAddress=>uint256) users available compensation per token
-    mapping(address => uint256) public usersCompensationPools;
-    /// @dev (periodId=>tokenAddress=>uint256) provider compensation per period and per token
-    mapping(uint256 => mapping(address => uint256))
-        public providerPeriodsRewards;
+    mapping(address => uint256) public providerPool;
+    /// @dev (tokenAddress=>uint256) total pooled token balance
+    mapping(address => uint256) public usersPool;
+
+    ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for users
+    mapping(address => ERC20PresetMinterPauser) public duTokenRegistry;
+    ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for provider
+    mapping(address => ERC20PresetMinterPauser) public dpTokenRegistry;
+
+    ///@dev index to keep a deflationary mint of tokens
+    uint256 public cumulatedDevaluation = 10 * 6;
+    ///@dev to keep track of the precision used to avoid multiplying by 0
+    uint256 internal cumulatedDevaluationPrecision = 10**6;
+
     /// @dev address[] of the stakers of the SLA contract
     address[] public stakers;
     /// @dev DSLA token address to burn fees
@@ -42,17 +51,15 @@ contract Staking is Ownable {
     /// @dev minimum deposit for Tier 3 staking
     uint256 public minimumDSLAStakedTier3;
 
-    /// @dev PeriodRegistry defined amount of periods over a year
-    uint256 public yearlyPeriods;
     /// @dev PeriodRegistry period type of the SLA contract
     PeriodRegistry.PeriodType private periodType;
     /// @dev length of the _periodIds array, to state effective APY
     uint256 public slaPeriodsLength;
 
     /// @dev boolean to declare if contract is whitelisted
-    bool public whitelisted;
+    bool public whitelistedContract;
     /// @dev (userAddress=bool) to declare whitelisted addresses
-    mapping(address => bool) whitelist;
+    mapping(address => bool) public whitelist;
 
     modifier notOwner {
         require(msg.sender != owner(), "Should not be called by the SLA owner");
@@ -65,36 +72,53 @@ contract Staking is Ownable {
     }
 
     modifier onlyWhitelisted {
-        if (whitelisted == true) {
+        if (whitelistedContract == true) {
             require(whitelist[msg.sender] == true, "User is not whitelisted");
         }
         _;
     }
 
     /**
-     *@param _stakeRegistry 1. address of the base token
+     * @dev event for provider reward log
+     * @param periodId 1. id of the period
+     * @param tokenAddress 2. address of the token
+     * @param rewardPercentage 3. reward percentage for the provider
+     * @param amount 4. amount rewarded
+     */
+    event ProviderRewardGenerated(
+        uint256 indexed periodId,
+        address indexed tokenAddress,
+        uint256 rewardPercentage,
+        uint256 amount
+    );
+
+    /**
+     *@param _stakeRegistry 1. address of the stake registry
+     *@param _periodRegistry 2. address of the period registry
+     *@param _periodType 3. period type of the SLA
+     *@param _slaPeriodsLength 4. length of the SLA periodsId stored on the sla contract
+     *@param _whitelistedContract 5. enables the white list feature
+     *@param _slaID 6. identifies the SLA to uniquely to emit dTokens
      */
     constructor(
         address _stakeRegistry,
         address _periodRegistry,
         PeriodRegistry.PeriodType _periodType,
         uint256 _slaPeriodsLength,
-        bool _whitelisted
+        bool _whitelistedContract,
+        uint256 _slaID
     ) public {
         stakeRegistry = StakeRegistry(_stakeRegistry);
         periodRegistry = PeriodRegistry(_periodRegistry);
         periodType = _periodType;
         slaPeriodsLength = _slaPeriodsLength;
-        whitelisted = _whitelisted;
+        whitelistedContract = _whitelistedContract;
         (
             uint256 _DSLAburnRate,
             uint256 _minimumDSLAStakedTier1,
             uint256 _minimumDSLAStakedTier2,
             uint256 _minimumDSLAStakedTier3
         ) = stakeRegistry.getStakingParameters();
-        (uint256 _yearlyPeriods, ) =
-            periodRegistry.periodDefinitions(_periodType);
-        yearlyPeriods = _yearlyPeriods;
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
         minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
@@ -102,6 +126,22 @@ contract Staking is Ownable {
         minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
         addUserToWhitelist(msg.sender);
         allowedTokens.push(dslaTokenAddress);
+        slaID = _slaID;
+        string memory dTokenID = _uintToStr(_slaID);
+        string memory duTokenName =
+            string(abi.encodePacked("DSLA-USER-DSLA-", dTokenID));
+        string memory duTokenSymbol =
+            string(abi.encodePacked("duDSLA-", dTokenID));
+        string memory dpTokenName =
+            string(abi.encodePacked("DSLA-PROVIDER-DSLA-", dTokenID));
+        string memory dpTokenSymbol =
+            string(abi.encodePacked("dpDSLA-", dTokenID));
+        ERC20PresetMinterPauser duDSLA =
+            new ERC20PresetMinterPauser(duTokenName, duTokenSymbol);
+        ERC20PresetMinterPauser dpDSLA =
+            new ERC20PresetMinterPauser(dpTokenName, dpTokenSymbol);
+        duTokenRegistry[dslaTokenAddress] = duDSLA;
+        dpTokenRegistry[dslaTokenAddress] = dpDSLA;
     }
 
     function addUserToWhitelist(address _userAddress) public onlyOwner {
@@ -124,12 +164,23 @@ contract Staking is Ownable {
             stakeRegistry.isAllowedToken(_tokenAddress) == true,
             "Token not allowed by the SLARegistry contract"
         );
-        //        (uint256 providerStake, ) = getStakeholdersPositions(dslaTokenAddress);
-        //        require(
-        //            providerStake > minimumDSLAStakedTier1,
-        //            "Should stake at least minimumDSLAStakedTier1 to add a new token"
-        //        );
         allowedTokens.push(_tokenAddress);
+        string memory dTokenID = _uintToStr(slaID);
+        string memory symbol = ERC20(_tokenAddress).symbol();
+        string memory duTokenName =
+            string(abi.encodePacked("DSLA-USER-", symbol, "-", dTokenID));
+        string memory duTokenSymbol =
+            string(abi.encodePacked("du", symbol, "-", dTokenID));
+        ERC20PresetMinterPauser duToken =
+            new ERC20PresetMinterPauser(duTokenName, duTokenSymbol);
+        duTokenRegistry[_tokenAddress] = duToken;
+        string memory dpTokenName =
+            string(abi.encodePacked("DSLA-PROVIDER-", symbol, "-", dTokenID));
+        string memory dpTokenSymbol =
+            string(abi.encodePacked("dp", symbol, "-", dTokenID));
+        ERC20PresetMinterPauser dpToken =
+            new ERC20PresetMinterPauser(dpTokenName, dpTokenSymbol);
+        dpTokenRegistry[_tokenAddress] = dpToken;
     }
 
     /**
@@ -144,73 +195,87 @@ contract Staking is Ownable {
         onlyAllowedToken(_tokenAddress)
         onlyWhitelisted
     {
+        ERC20(_tokenAddress).safeTransferFrom(
+            msg.sender,
+            address(this),
+            _amount
+        );
+
         if (msg.sender != owner()) {
             (uint256 providerStake, uint256 usersStake) =
-                getStakeholdersPositions(_tokenAddress);
+                (providerPool[_tokenAddress], usersPool[_tokenAddress]);
             require(
                 usersStake.add(_amount) <= providerStake,
                 "Cannot stake more than SLA provider stake"
             );
-        }
-        bool success =
-            IERC20(_tokenAddress).transferFrom(
-                msg.sender,
-                address(this),
+            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
+            // mint duTokens considering net present value respect to first period
+            uint256 duTokenAmount =
+                _amount.mul(cumulatedDevaluationPrecision).div(
+                    cumulatedDevaluation
+                );
+            ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
+            duToken.mint(msg.sender, duTokenAmount);
+        } else {
+            ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
+            uint256 p0 = dpToken.totalSupply();
+            uint256 t0 = providerPool[_tokenAddress];
+
+            // if there's no minted tokens, then create 1-1 proportion
+            if (p0 == 0) {
+                dpToken.mint(msg.sender, _amount);
+            } else {
+                // Mint dpTokens in a way that it doesn't affect the PoolTokens/LPTokens average
+                // of current period, so contract owner cannot affect proportional stake of other
+                // provider token owners.
+                // t0/p0 = (t0+_amount)/(p0+mintedDPTokens)
+                // mintedDPTokens = _amount*p0/t0
+                uint256 mintedDPTokens = _amount.mul(p0).div(t0);
+                dpToken.mint(msg.sender, mintedDPTokens);
+            }
+
+            providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
                 _amount
             );
-        require(success == true, "Staking process was not succesful");
-        tokenPools[_tokenAddress] = tokenPools[_tokenAddress].add(_amount);
-        stakeHoldersPositions[_tokenAddress][
-            msg.sender
-        ] = stakeHoldersPositions[_tokenAddress][msg.sender].add(_amount);
+        }
+
         if (!isStaker(msg.sender)) {
             stakers.push(msg.sender);
-        }
-        // after staking successfully, increase the usersTotalPositions of the token
-        if (msg.sender != owner()) {
-            usersTotalPositions[_tokenAddress] = usersTotalPositions[
-                _tokenAddress
-            ]
-                .add(_amount);
         }
     }
 
     /**
-     *@dev withdraw staked tokens
-     *@param _amount 1. amount to withdraw
+     *@dev withdraw staked tokens. Only dpToken owners can withdraw,
+     * users have to claim compensations if available
+     *@param _amount 1. amount to be withdrawn
      *@param _tokenAddress 2. address of the token
      */
     function _withdraw(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
-        onlyWhitelisted
     {
-        if (msg.sender == owner()) {
-            (uint256 providerStake, uint256 usersStake) =
-                getStakeholdersPositions(_tokenAddress);
-            require(
-                providerStake.sub(_amount) >= usersStake,
-                "Should not withdraw more than users stake"
-            );
-        }
+        uint256 providerStake = providerPool[_tokenAddress];
+        uint256 usersStake = usersPool[_tokenAddress];
         require(
-            stakeHoldersPositions[_tokenAddress][msg.sender] >= _amount,
-            "Should not withdraw more stake than staked"
+            providerStake.sub(_amount) >= usersStake,
+            "Should not withdraw more than users stake"
         );
-        tokenPools[_tokenAddress] = tokenPools[_tokenAddress].sub(_amount);
-        stakeHoldersPositions[_tokenAddress][
-            msg.sender
-        ] = stakeHoldersPositions[_tokenAddress][msg.sender].sub(_amount);
-
-        bool success = IERC20(_tokenAddress).transfer(msg.sender, _amount);
-        require(success == true, "Stake withdraw was not succesful");
+        ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
+        uint256 p0 = dpToken.totalSupply();
+        uint256 t0 = providerPool[_tokenAddress];
+        // Burn dpTokens in a way that it doesn't affect the PoolTokens/LPTokens
+        // average for current period.
+        // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
+        // burnedDPTokens = _amount*p0/t0
+        uint256 burnedDPTokens = _amount.mul(p0).div(t0);
+        dpToken.burnFrom(msg.sender, burnedDPTokens);
+        providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
+        ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
 
     /**
      *@dev sets the provider reward
      *@notice it calculates the usersStake and calculates the provider reward from it.
-     * Then it subtract the reward from the users stake, by adding the reward to the
-     * owner position without decreasing the tokenPool size
      * @param _periodId 1. id of the period
      * @param _rewardPercentage to calculate the provider reward
      * @param _precision used to avoid getting 0 after division in the SLA's registerSLI function
@@ -222,45 +287,62 @@ contract Staking is Ownable {
     ) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
-            (, uint256 usersStake) = getStakeholdersPositions(tokenAddress);
+            uint256 usersStake = usersPool[tokenAddress];
             uint256 reward =
                 usersStake.mul(_rewardPercentage).div(100 * _precision);
+
+            // Subtract before burn to match balances
+            usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
+
             if (tokenAddress == dslaTokenAddress) {
                 uint256 fees = _burnDSLATokens(reward);
-                reward.sub(fees);
+                reward = reward.sub(fees);
             }
-            stakeHoldersPositions[tokenAddress][
-                owner()
-            ] = stakeHoldersPositions[tokenAddress][owner()].add(reward);
-            providerPeriodsRewards[_periodId][tokenAddress] = reward;
+
+            // Add after burn to match balances
+            providerPool[tokenAddress] = providerPool[tokenAddress].add(reward);
+
+            emit ProviderRewardGenerated(
+                _periodId,
+                tokenAddress,
+                _rewardPercentage,
+                reward
+            );
         }
+        // update cumulativeDevaluation to increase dTokens generation over time
+        // decimalReward: the decimal proportion of rewards, e.g. 0.05)
+        // rewardPercentage = precision * decimalReward
+        // Then, by definition:
+        // cumulatedDevaluation = cumulatedDevaluation*(1-decimalReward)
+        // cumulatedDevaluation = cumulatedDevaluation*(1-decimalReward)*precision/precision
+        // Finally
+        // cumulatedDevaluation = cumulatedDevaluation*(precision-rewardPercentage)/precision
+        cumulatedDevaluation = cumulatedDevaluation
+            .mul(_precision.sub(_rewardPercentage))
+            .div(_precision);
     }
 
     /**
      *@dev sets the users compensation pool
      *@notice it calculates the usersStake and calculates the users compensation from it
-     * then it subtract it from the provider stake, to compensate users with a compensation pool
      */
-    function _setUsersCompensationPool() internal {
+    function _setUsersCompensation() internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
-            (, uint256 usersStake) = getStakeholdersPositions(tokenAddress);
+            uint256 usersStake = usersPool[tokenAddress];
             uint256 compensation = usersStake;
-            if (tokenAddress == dslaTokenAddress) {
-                uint256 fees = _burnDSLATokens(compensation);
-                compensation.sub(fees);
-            }
-            tokenPools[tokenAddress] = tokenPools[tokenAddress].sub(
+            // Subtract before burn to match balances
+            providerPool[tokenAddress] = providerPool[tokenAddress].sub(
                 compensation
             );
-            // discount the compensation from the provider position
-            stakeHoldersPositions[tokenAddress][
-                owner()
-            ] = stakeHoldersPositions[tokenAddress][owner()].sub(compensation);
-            usersCompensationPools[tokenAddress] = usersCompensationPools[
-                tokenAddress
-            ]
-                .add(compensation);
+
+            if (tokenAddress == dslaTokenAddress) {
+                uint256 fees = _burnDSLATokens(compensation);
+                compensation = compensation.sub(fees);
+            }
+
+            // Add after burn to match balances
+            usersPool[tokenAddress] = usersPool[tokenAddress].add(compensation);
         }
     }
 
@@ -275,49 +357,23 @@ contract Staking is Ownable {
         notOwner
         onlyWhitelisted
     {
+        ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
+        uint256 duTokenBalance = duToken.balanceOf(msg.sender);
+        uint256 duTokenSupply = duToken.totalSupply();
         uint256 precision = 10000;
-        uint256 userPosition = stakeHoldersPositions[_tokenAddress][msg.sender];
         require(
-            userPosition > 0,
+            duTokenBalance > 0,
             "Can only claim a compensation if position is bigger than 0"
         );
-        // userPosition[tokenAddress]/usersTotalPositions[tokenAddress] is the proportion
-        // of the compensation pool to be delivered.
-        uint256 userCompensationPercentage =
-            userPosition.mul(precision).div(usersTotalPositions[_tokenAddress]);
-        uint256 userCompensation =
-            usersCompensationPools[_tokenAddress]
-                .mul(userCompensationPercentage)
-                .div(precision);
-        // transfers the user compensation times two, to return compensation and remaining stake
-        bool success =
-            IERC20(_tokenAddress).transfer(msg.sender, userCompensation * 2);
-        require(
-            success == true,
-            "Transfer process from SLA contract to msg.sender was not succesful"
-        );
-        usersTotalPositions[_tokenAddress] = usersTotalPositions[_tokenAddress]
-            .sub(userPosition);
-        usersCompensationPools[_tokenAddress] = usersCompensationPools[
-            _tokenAddress
-        ]
-            .sub(userCompensation);
-        stakeHoldersPositions[_tokenAddress][msg.sender] = 0;
-    }
 
-    /**
-     *@dev gets the positions of stake both for provider and for users
-     *@param _tokenAddress 1. token address to get the positions
-     *@return providerStake position of the provider (owner) of the SLA contract
-     *@return usersStake position of the user of the SLA contract
-     */
-    function getStakeholdersPositions(address _tokenAddress)
-        public
-        view
-        returns (uint256 providerStake, uint256 usersStake)
-    {
-        providerStake = stakeHoldersPositions[_tokenAddress][owner()];
-        usersStake = tokenPools[_tokenAddress].sub(providerStake);
+        uint256 userCompensationPercentage =
+            duTokenBalance.mul(precision).div(duTokenSupply);
+        uint256 userCompensation =
+            usersPool[_tokenAddress].mul(userCompensationPercentage).div(
+                precision
+            );
+        duToken.burnFrom(msg.sender, duTokenBalance);
+        ERC20(_tokenAddress).safeTransfer(msg.sender, userCompensation);
     }
 
     function _burnDSLATokens(uint256 _amount) internal returns (uint256 fees) {
@@ -326,7 +382,6 @@ contract Staking is Ownable {
         (bool _success, ) =
             dslaTokenAddress.call(abi.encodeWithSelector(BURN_SELECTOR, fees));
         require(_success, "DSLA burn process was not successful");
-        tokenPools[dslaTokenAddress] = tokenPools[dslaTokenAddress].sub(fees);
     }
 
     /**
@@ -355,10 +410,23 @@ contract Staking is Ownable {
         returns (address tokenAddress, uint256 stake)
     {
         address allowedTokenAddress = allowedTokens[_allowedTokenIndex];
-        return (
-            allowedTokenAddress,
-            stakeHoldersPositions[allowedTokenAddress][_staker]
-        );
+        if (_staker == owner()) {
+            return (allowedTokenAddress, providerPool[allowedTokenAddress]);
+        } else {
+            ERC20PresetMinterPauser dToken =
+                duTokenRegistry[allowedTokenAddress];
+            uint256 dTokenBalance = dToken.balanceOf(msg.sender);
+            uint256 dTokenSupply = dToken.totalSupply();
+            uint256 precision = 10000;
+            uint256 userCompensationPercentage =
+                dTokenBalance.mul(precision).div(dTokenSupply);
+            return (
+                allowedTokenAddress,
+                usersPool[allowedTokenAddress]
+                    .mul(userCompensationPercentage)
+                    .div(precision)
+            );
+        }
     }
 
     /**

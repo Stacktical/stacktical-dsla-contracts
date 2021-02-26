@@ -1,4 +1,15 @@
 {
+  "events": {
+    "ProviderRewardGenerated(uint256,address,uint256,uint256)": {
+      "details": "event for provider reward log",
+      "params": {
+        "periodId": "1. id of the period",
+        "tokenAddress": "2. address of the token",
+        "rewardPercentage": "3. address of the token",
+        "amount": "4. amount rewarded"
+      }
+    }
+  },
   "kind": "dev",
   "methods": {
     "_claimCompensation(address)": {
@@ -12,7 +23,13 @@
       "params": { "_tokenAddress": "1. address of the new allowed token" }
     },
     "constructor": {
-      "params": { "_stakeRegistry": "1. address of the base token" }
+      "params": {
+        "_stakeRegistry": "1. address of the stake registry",
+        "_periodRegistry": "2. address of the period registry",
+        "_periodType": "3. period type of the SLA",
+        "_slaPeriodsLength": "4. length of the SLA periodsId stored on the sla contract",
+        "_whitelisted": "5. enables the white list feature"
+      }
     },
     "getAllowedTokensLength()": {
       "details": "use this function to evaluate the length of the allowed tokens length",
@@ -84,7 +101,7 @@
     "usersCompensationPools": {
       "details": "(tokenAddress=>uint256) users available compensation per token"
     },
-    "usersTotalPositions": {
+    "usersStakeRecord": {
       "details": "(tokenAddress=>uint256) used to keep track of the total stakes per token, to calculate proportion of compensation pool"
     },
     "whitelist": {

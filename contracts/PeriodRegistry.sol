@@ -17,7 +17,6 @@ contract PeriodRegistry is Ownable {
 
     /// @dev struct to store the definition of a period
     struct PeriodDefinition {
-        uint256 yearlyPeriods;
         bool initialized;
         uint256[] starts;
         uint256[] ends;
@@ -30,28 +29,19 @@ contract PeriodRegistry is Ownable {
      * @dev event to log a new period initialized
      *@param periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      *@param periodsAdded 2. amount of periods added
-     *@param apy 3. annual percentage yield offered for a year long SLA
-     *@param yearlyPeriods 4. amount of periods of the corresponding periods per year to calculate real APY
      */
-    event PeriodInitialized(
-        PeriodType periodType,
-        uint256 periodsAdded,
-        uint256 apy,
-        uint256 yearlyPeriods
-    );
+    event PeriodInitialized(PeriodType periodType, uint256 periodsAdded);
 
     /**
      * @dev public function for creating canonical service level agreements
      *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      *@param _periodStarts 2. array of the starts of the period
      *@param _periodEnds 3. array of the ends of the period
-     *@param _yearlyPeriods 5. amount of periods of the corresponding periods per year to calculate real APY
      */
     function initializePeriod(
         PeriodType _periodType,
         uint256[] memory _periodStarts,
-        uint256[] memory _periodEnds,
-        uint256 _yearlyPeriods
+        uint256[] memory _periodEnds
     ) public onlyOwner {
         PeriodDefinition storage periodDefinition =
             periodDefinitions[_periodType];
@@ -78,8 +68,8 @@ contract PeriodRegistry is Ownable {
             periodDefinition.starts.push(_periodStarts[index]);
             periodDefinition.ends.push(_periodEnds[index]);
         }
-        periodDefinition.yearlyPeriods = _yearlyPeriods;
         periodDefinition.initialized = true;
+        emit PeriodInitialized(_periodType, _periodStarts.length);
     }
 
     /**
