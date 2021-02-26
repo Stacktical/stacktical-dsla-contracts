@@ -64,6 +64,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
@@ -71,6 +72,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -78,6 +80,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -102,6 +105,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -120,6 +124,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -144,6 +149,7 @@ export const StakeRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -154,6 +160,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -162,6 +169,16 @@ export const StakeRegistryABI: AbiItem[] = [
     ],
     name: 'registerStakedSla',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'string', name: '_name', type: 'string' },
+      { internalType: 'string', name: '_symbol', type: 'string' },
+    ],
+    name: 'createDToken',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'nonpayable',
     type: 'function',
   },
@@ -183,6 +200,7 @@ export const StakeRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [

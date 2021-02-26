@@ -5,7 +5,7 @@
       "params": {
         "periodId": "1. id of the period",
         "tokenAddress": "2. address of the token",
-        "rewardPercentage": "3. address of the token",
+        "rewardPercentage": "3. reward percentage for the provider",
         "amount": "4. amount rewarded"
       }
     }
@@ -28,20 +28,13 @@
         "_periodRegistry": "2. address of the period registry",
         "_periodType": "3. period type of the SLA",
         "_slaPeriodsLength": "4. length of the SLA periodsId stored on the sla contract",
-        "_whitelisted": "5. enables the white list feature"
+        "_whitelistedContract": "5. enables the white list feature",
+        "_slaID": "6. identifies the SLA to uniquely to emit dTokens"
       }
     },
     "getAllowedTokensLength()": {
       "details": "use this function to evaluate the length of the allowed tokens length",
       "returns": { "_0": "allowedTokens.length" }
-    },
-    "getStakeholdersPositions(address)": {
-      "details": "gets the positions of stake both for provider and for users",
-      "params": { "_tokenAddress": "1. token address to get the positions" },
-      "returns": {
-        "providerStake": "position of the provider (owner) of the SLA contract",
-        "usersStake": "position of the user of the SLA contract"
-      }
     },
     "isAllowedToken(address)": {
       "details": "checks in the allowedTokens array if there's a token with _tokenAddress value",
@@ -70,7 +63,19 @@
     "allowedTokens": {
       "details": "array with the allowed tokens addresses for the current SLA"
     },
+    "cumulatedDevaluation": {
+      "details": "index to keep a deflationary mint of tokens"
+    },
+    "cumulatedDevaluationPrecision": {
+      "details": "to keep track of the precision used to avoid multiplying by 0"
+    },
+    "dpTokenRegistry": {
+      "details": "(tokenAddress=>dTokenAddress) to keep track of dToken for provider"
+    },
     "dslaTokenAddress": { "details": "DSLA token address to burn fees" },
+    "duTokenRegistry": {
+      "details": "(tokenAddress=>dTokenAddress) to keep track of dToken for users"
+    },
     "minimumDSLAStakedTier1": {
       "details": "minimum deposit for Tier 1 staking"
     },
@@ -84,34 +89,23 @@
     "periodType": {
       "details": "PeriodRegistry period type of the SLA contract"
     },
-    "providerPeriodsRewards": {
-      "details": "(periodId=>tokenAddress=>uint256) provider compensation per period and per token"
+    "providerPool": {
+      "details": "(tokenAddress=>uint256) total pooled token balance"
     },
+    "slaID": { "details": "current SLA id" },
     "slaPeriodsLength": {
       "details": "length of the _periodIds array, to state effective APY"
     },
-    "stakeHoldersPositions": {
-      "details": "(tokenAddress=>stakerAddress=>uint256) staker position to represent his proportion staked"
-    },
     "stakeRegistry": { "details": "StakeRegistry contract" },
     "stakers": { "details": "address[] of the stakers of the SLA contract" },
-    "tokenPools": {
+    "usersPool": {
       "details": "(tokenAddress=>uint256) total pooled token balance"
-    },
-    "usersCompensationPools": {
-      "details": "(tokenAddress=>uint256) users available compensation per token"
-    },
-    "usersStakeRecord": {
-      "details": "(tokenAddress=>uint256) used to keep track of the total stakes per token, to calculate proportion of compensation pool"
     },
     "whitelist": {
       "details": "(userAddress=bool) to declare whitelisted addresses"
     },
-    "whitelisted": {
+    "whitelistedContract": {
       "details": "boolean to declare if contract is whitelisted"
-    },
-    "yearlyPeriods": {
-      "details": "PeriodRegistry defined amount of periods over a year"
     }
   },
   "version": 1

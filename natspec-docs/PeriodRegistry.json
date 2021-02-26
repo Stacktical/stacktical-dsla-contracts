@@ -1,13 +1,11 @@
 {
   "details": "SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements",
   "events": {
-    "PeriodInitialized(uint8,uint256,uint256,uint256)": {
+    "PeriodInitialized(uint8,uint256)": {
       "details": "event to log a new period initialized",
       "params": {
         "periodType": "1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly",
-        "periodsAdded": "2. amount of periods added",
-        "apy": "3. annual percentage yield offered for a year long SLA",
-        "yearlyPeriods": "4. amount of periods of the corresponding periods per year to calculate real APY"
+        "periodsAdded": "2. amount of periods added"
       }
     }
   },
@@ -31,13 +29,12 @@
         "_periodId": "2. period id to get start and end"
       }
     },
-    "initializePeriod(uint8,uint256[],uint256[],uint256)": {
+    "initializePeriod(uint8,uint256[],uint256[])": {
       "details": "public function for creating canonical service level agreements",
       "params": {
         "_periodType": "1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly",
         "_periodStarts": "2. array of the starts of the period",
-        "_periodEnds": "3. array of the ends of the period",
-        "_yearlyPeriods": "5. amount of periods of the corresponding periods per year to calculate real APY"
+        "_periodEnds": "3. array of the ends of the period"
       }
     },
     "isValidPeriod(uint8,uint256)": {

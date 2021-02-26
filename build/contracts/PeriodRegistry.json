@@ -50,7 +50,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -69,7 +70,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -164,7 +166,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -188,7 +191,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -212,7 +216,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -242,7 +247,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"periodType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"periodsAdded\",\"type\":\"uint256\"}],\"name\":\"PeriodInitialized\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256[]\",\"name\":\"_periodStarts\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_periodEnds\",\"type\":\"uint256[]\"}],\"name\":\"addPeriodsToPeriodType\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getPeriodDefinitions\",\"outputs\":[{\"components\":[{\"internalType\":\"bool\",\"name\":\"initialized\",\"type\":\"bool\"},{\"internalType\":\"uint256[]\",\"name\":\"starts\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"ends\",\"type\":\"uint256[]\"}],\"internalType\":\"struct PeriodRegistry.PeriodDefinition[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"}],\"name\":\"getPeriodStartAndEnd\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"end\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256[]\",\"name\":\"_periodStarts\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_periodEnds\",\"type\":\"uint256[]\"}],\"name\":\"initializePeriod\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"}],\"name\":\"isValidPeriod\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"valid\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"\",\"type\":\"uint8\"}],\"name\":\"periodDefinitions\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"initialized\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum PeriodRegistry.PeriodType\",\"name\":\"_periodType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"}],\"name\":\"periodIsFinished\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"finished\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements\",\"events\":{\"PeriodInitialized(uint8,uint256)\":{\"details\":\"event to log a new period initialized\",\"params\":{\"periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\",\"periodsAdded\":\"2. amount of periods added\"}}},\"kind\":\"dev\",\"methods\":{\"addPeriodsToPeriodType(uint8,uint256[],uint256[])\":{\"details\":\"function to add new periods to certain period type\",\"params\":{\"_periodEnds\":\"3. array of uint256 of the period starts to add\",\"_periodStarts\":\"2. array of uint256 of the period starts to add\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\"}},\"getPeriodDefinitions()\":{\"details\":\"public function to get the periodDefinitions\"},\"getPeriodStartAndEnd(uint8,uint256)\":{\"details\":\"public function to get the start and end of a period\",\"params\":{\"_periodId\":\"2. period id to get start and end\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\"}},\"initializePeriod(uint8,uint256[],uint256[])\":{\"details\":\"public function for creating canonical service level agreements\",\"params\":{\"_periodEnds\":\"3. array of the ends of the period\",\"_periodStarts\":\"2. array of the starts of the period\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\"}},\"isValidPeriod(uint8,uint256)\":{\"details\":\"public function to check if a period id is valid i.e. it belongs to the added id array\",\"params\":{\"_periodId\":\"2. period id to get start and end\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\"}},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"periodIsFinished(uint8,uint256)\":{\"details\":\"public function to check if a period has finished\",\"params\":{\"_periodId\":\"2. period id to get start and end\",\"_periodType\":\"1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly\"}},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"stateVariables\":{\"periodDefinitions\":{\"details\":\"(periodType=>PeriodDefinition) hourly/weekly/biWeekly/monthly/yearly are periodTypes\"}},\"title\":\"SLARegistry\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/PeriodRegistry.sol\":\"PeriodRegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/PeriodRegistry.sol\":{\"keccak256\":\"0xfb4f5966ceb3285dd9c1a03d484e29b4ff295a5db424215ddf34367cfee9dd88\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ebbcf918bbd5734884e1573b0cf197189ee209d001f996e786555895474c33ea\",\"dweb:/ipfs/Qmeh4hpmwLKuVKxPEMGENzTZjixchitqXaaVRfJUSA4E4M\"]},\"@openzeppelin/contracts/GSN/Context.sol\":{\"keccak256\":\"0xdb26cbf4d028490f49831a7865c2fe1b28db44b535ca8d343785a3b768aae183\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://840b14ce0315c47d49ba328f1f9fa7654ded1c9e1559e6c5e777a7b2dc28bf0a\",\"dweb:/ipfs/QmTLLabn4wcfGro9LEmUXUN2nwKqZSotXMvjDCLXEnLtZP\"]},\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0x4bd6402ca6b3419008c2b482aff54e66836e8cb4eba2680e42ac5884ae6424fc\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8f9f711fb8d0d92aeea1c327e3845d13ca1fa8f142e47f8723cd5b3106fb29a3\",\"dweb:/ipfs/QmVQUReDW9f4zGqhizwHnyU8EntMs95tbASdqkGncnikba\"]},\"@openzeppelin/contracts/math/SafeMath.sol\":{\"keccak256\":\"0x9a9cf02622cd7a64261b10534fc3260449da25c98c9e96d1b4ae8110a20e5806\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2df142592d1dc267d9549049ee3317fa190d2f87eaa565f86ab05ec83f7ab8f5\",\"dweb:/ipfs/QmSkJtcfWo7c42KnL5hho6GFxK6HRNV91XABx1P7xDtfLV\"]}},\"version\":1}",
@@ -290,7 +296,7 @@
         "id": 107,
         "nodeType": "ImportDirective",
         "scope": 550,
-        "sourceUnit": 7067,
+        "sourceUnit": 7235,
         "src": "91:51:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -301,7 +307,7 @@
         "id": 108,
         "nodeType": "ImportDirective",
         "scope": 550,
-        "sourceUnit": 6871,
+        "sourceUnit": 7039,
         "src": "143:52:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -316,10 +322,10 @@
               "id": 110,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 6870,
+              "referencedDeclaration": 7038,
               "src": "385:7:1",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$6870",
+                "typeIdentifier": "t_contract$_Ownable_$7038",
                 "typeString": "contract Ownable"
               }
             },
@@ -329,8 +335,8 @@
           }
         ],
         "contractDependencies": [
-          6478,
-          6870
+          6646,
+          7038
         ],
         "contractKind": "contract",
         "documentation": {
@@ -343,8 +349,8 @@
         "id": 549,
         "linearizedBaseContracts": [
           549,
-          6870,
-          6478
+          7038,
+          6646
         ],
         "name": "PeriodRegistry",
         "nodeType": "ContractDefinition",
@@ -356,10 +362,10 @@
               "id": 112,
               "name": "SafeMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 7066,
+              "referencedDeclaration": 7234,
               "src": "405:8:1",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeMath_$7066",
+                "typeIdentifier": "t_contract$_SafeMath_$7234",
                 "typeString": "library SafeMath"
               }
             },
@@ -1600,7 +1606,7 @@
                                         "lValueRequested": false,
                                         "memberName": "sub",
                                         "nodeType": "MemberAccess",
-                                        "referencedDeclaration": 6916,
+                                        "referencedDeclaration": 7084,
                                         "src": "2341:28:1",
                                         "typeDescriptions": {
                                           "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -2276,7 +2282,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 6819,
+                  "referencedDeclaration": 6987,
                   "src": "1588:9:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -3031,7 +3037,7 @@
                               "lValueRequested": false,
                               "memberName": "sub",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 6916,
+                              "referencedDeclaration": 7084,
                               "src": "3797:24:1",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -3218,7 +3224,7 @@
                                         "lValueRequested": false,
                                         "memberName": "sub",
                                         "nodeType": "MemberAccess",
-                                        "referencedDeclaration": 6916,
+                                        "referencedDeclaration": 7084,
                                         "src": "3873:28:1",
                                         "typeDescriptions": {
                                           "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -3739,7 +3745,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 6819,
+                  "referencedDeclaration": 6987,
                   "src": "3258:9:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -4563,7 +4569,7 @@
                           "lValueRequested": false,
                           "memberName": "sub",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 6916,
+                          "referencedDeclaration": 7084,
                           "src": "5424:34:1",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -6204,7 +6210,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 7067,
+          "SourceUnit": 7235,
           "absolutePath": "@openzeppelin/contracts/math/SafeMath.sol",
           "file": "@openzeppelin/contracts/math/SafeMath.sol",
           "scope": 550,
@@ -6219,7 +6225,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 6871,
+          "SourceUnit": 7039,
           "absolutePath": "@openzeppelin/contracts/access/Ownable.sol",
           "file": "@openzeppelin/contracts/access/Ownable.sol",
           "scope": 550,
@@ -6236,15 +6242,15 @@
         "attributes": {
           "abstract": false,
           "contractDependencies": [
-            6478,
-            6870
+            6646,
+            7038
           ],
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             549,
-            6870,
-            6478
+            7038,
+            6646
           ],
           "name": "PeriodRegistry",
           "scope": 550
@@ -6267,7 +6273,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "Ownable",
-                  "referencedDeclaration": 6870,
+                  "referencedDeclaration": 7038,
                   "type": "contract Ownable"
                 },
                 "id": 110,
@@ -6285,7 +6291,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "SafeMath",
-                  "referencedDeclaration": 7066,
+                  "referencedDeclaration": 7234,
                   "type": "library SafeMath"
                 },
                 "id": 112,
@@ -6789,7 +6795,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 6819,
+                      "referencedDeclaration": 6987,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -7848,7 +7854,7 @@
                                                       "isPure": false,
                                                       "lValueRequested": false,
                                                       "member_name": "sub",
-                                                      "referencedDeclaration": 6916,
+                                                      "referencedDeclaration": 7084,
                                                       "type": "function (uint256,uint256) pure returns (uint256)"
                                                     },
                                                     "children": [
@@ -8638,7 +8644,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 6819,
+                      "referencedDeclaration": 6987,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -9414,7 +9420,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "sub",
-                                          "referencedDeclaration": 6916,
+                                          "referencedDeclaration": 7084,
                                           "type": "function (uint256,uint256) pure returns (uint256)"
                                         },
                                         "children": [
@@ -9569,7 +9575,7 @@
                                                       "isPure": false,
                                                       "lValueRequested": false,
                                                       "member_name": "sub",
-                                                      "referencedDeclaration": 6916,
+                                                      "referencedDeclaration": 7084,
                                                       "type": "function (uint256,uint256) pure returns (uint256)"
                                                     },
                                                     "children": [
@@ -10833,7 +10839,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "sub",
-                                      "referencedDeclaration": 6916,
+                                      "referencedDeclaration": 7084,
                                       "type": "function (uint256,uint256) pure returns (uint256)"
                                     },
                                     "children": [
@@ -12543,15 +12549,35 @@
           ],
           "name": "PeriodInitialized",
           "type": "event"
+        },
+        "0x2b0f2d8c9036efbd14cb23d06c56d37fca048c5062ada3454a3ab584762d6301": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "enum PeriodRegistry.PeriodType",
+              "name": "periodType",
+              "type": "uint8"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "periodsAdded",
+              "type": "uint256"
+            }
+          ],
+          "name": "PeriodInitialized",
+          "type": "event"
         }
       },
       "links": {},
-      "address": "0x2EcDBA9Eca792f5B6d620D9031D9C237cE480924",
-      "transactionHash": "0x364f941ad7c6cba3deea223efae61706243c8552a58d280cbdf9604950cd8c95"
+      "address": "0x027e4121d4675465E8029F09511D813c3476Ebf5",
+      "transactionHash": "0x0fb8dd650a8faea245a0858662f9038ced18dab98f2356dded650386bae649f8"
     }
   },
   "schemaVersion": "3.3.3",
-  "updatedAt": "2021-02-23T21:33:54.359Z",
+  "updatedAt": "2021-02-26T19:24:11.728Z",
+  "networkType": "ethereum",
   "devdoc": {
     "details": "SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements",
     "events": {
