@@ -25,8 +25,10 @@ contract Staking is Ownable, StringUtils {
     /// @dev (tokenAddress=>uint256) total pooled token balance
     mapping(address => uint256) public usersPool;
 
-    ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken per token
-    mapping(address => ERC20PresetMinterPauser) public dTokenRegistry;
+    ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for users
+    mapping(address => ERC20PresetMinterPauser) public duTokenRegistry;
+    ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for provider
+    mapping(address => ERC20PresetMinterPauser) public dpTokenRegistry;
 
     ///@dev index to keep a deflationary mint of tokens
     uint256 public cumulatedDevaluation = 10 * 6;
@@ -126,13 +128,20 @@ contract Staking is Ownable, StringUtils {
         allowedTokens.push(dslaTokenAddress);
         slaID = _slaID;
         string memory dTokenID = _uintToStr(_slaID);
-        string memory dTokenName =
-            string(abi.encodePacked("DSLA-DSLA-", dTokenID));
-        string memory dTokenSymbol =
-            string(abi.encodePacked("dDSLA-", dTokenID));
-        ERC20PresetMinterPauser dDSLA =
-            new ERC20PresetMinterPauser(dTokenName, dTokenSymbol);
-        dTokenRegistry[dslaTokenAddress] = dDSLA;
+        string memory duTokenName =
+            string(abi.encodePacked("DSLA-USER-DSLA-", dTokenID));
+        string memory duTokenSymbol =
+            string(abi.encodePacked("duDSLA-", dTokenID));
+        string memory dpTokenName =
+            string(abi.encodePacked("DSLA-PROVIDER-DSLA-", dTokenID));
+        string memory dpTokenSymbol =
+            string(abi.encodePacked("dpDSLA-", dTokenID));
+        ERC20PresetMinterPauser duDSLA =
+            new ERC20PresetMinterPauser(duTokenName, duTokenSymbol);
+        ERC20PresetMinterPauser dpDSLA =
+            new ERC20PresetMinterPauser(dpTokenName, dpTokenSymbol);
+        duTokenRegistry[dslaTokenAddress] = duDSLA;
+        dpTokenRegistry[dslaTokenAddress] = dpDSLA;
     }
 
     function addUserToWhitelist(address _userAddress) public onlyOwner {
@@ -157,14 +166,21 @@ contract Staking is Ownable, StringUtils {
         );
         allowedTokens.push(_tokenAddress);
         string memory dTokenID = _uintToStr(slaID);
-        string memory name = ERC20(_tokenAddress).name();
-        string memory dTokenName =
-            string(abi.encodePacked("DSLA-", name, "-", dTokenID));
-        string memory dTokenSymbol =
-            string(abi.encodePacked("d", name, "-", dTokenID));
-        ERC20PresetMinterPauser dToken =
-            new ERC20PresetMinterPauser(dTokenName, dTokenSymbol);
-        dTokenRegistry[_tokenAddress] = dToken;
+        string memory symbol = ERC20(_tokenAddress).symbol();
+        string memory duTokenName =
+            string(abi.encodePacked("DSLA-USER-", symbol, "-", dTokenID));
+        string memory duTokenSymbol =
+            string(abi.encodePacked("du", symbol, "-", dTokenID));
+        ERC20PresetMinterPauser duToken =
+            new ERC20PresetMinterPauser(duTokenName, duTokenSymbol);
+        duTokenRegistry[_tokenAddress] = duToken;
+        string memory dpTokenName =
+            string(abi.encodePacked("DSLA-PROVIDER-", symbol, "-", dTokenID));
+        string memory dpTokenSymbol =
+            string(abi.encodePacked("dp", symbol, "-", dTokenID));
+        ERC20PresetMinterPauser dpToken =
+            new ERC20PresetMinterPauser(dpTokenName, dpTokenSymbol);
+        dpTokenRegistry[_tokenAddress] = dpToken;
     }
 
     /**
@@ -193,34 +209,50 @@ contract Staking is Ownable, StringUtils {
                 "Cannot stake more than SLA provider stake"
             );
             usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
-            // mint dTokens considering net present value respect to first period
-            uint256 dTokenAmount =
+            // mint duTokens considering net present value respect to first period
+            uint256 duTokenAmount =
                 _amount.mul(cumulatedDevaluationPrecision).div(
                     cumulatedDevaluation
                 );
-            ERC20PresetMinterPauser dToken = dTokenRegistry[_tokenAddress];
-            dToken.mint(msg.sender, dTokenAmount);
+            ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
+            duToken.mint(msg.sender, duTokenAmount);
         } else {
-            // Mint pTokens here
+            ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
+            uint256 p0 = dpToken.totalSupply();
+            uint256 t0 = providerPool[_tokenAddress];
+
+            // if there's no minted tokens, then create 1-1 proportion
+            if (p0 == 0) {
+                dpToken.mint(msg.sender, _amount);
+            } else {
+                // Mint dpTokens in a way that it doesn't affect the PoolTokens/LPTokens average
+                // of current period, so contract owner cannot affect proportional stake of other
+                // provider token owners.
+                // t0/p0 = (t0+_amount)/(p0+mintedDPTokens)
+                // mintedDPTokens = _amount*p0/t0
+                uint256 mintedDPTokens = _amount.mul(p0).div(t0);
+                dpToken.mint(msg.sender, mintedDPTokens);
+            }
+
             providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
                 _amount
             );
         }
+
         if (!isStaker(msg.sender)) {
             stakers.push(msg.sender);
         }
     }
 
     /**
-     *@dev withdraw staked tokens. Only owner can withdraw,
+     *@dev withdraw staked tokens. Only dpToken owners can withdraw,
      * users have to claim compensations if available
-     *@param _amount 1. amount to withdraw
+     *@param _amount 1. amount to be withdrawn
      *@param _tokenAddress 2. address of the token
      */
     function _withdraw(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
-        onlyOwner
     {
         uint256 providerStake = providerPool[_tokenAddress];
         uint256 usersStake = usersPool[_tokenAddress];
@@ -228,7 +260,15 @@ contract Staking is Ownable, StringUtils {
             providerStake.sub(_amount) >= usersStake,
             "Should not withdraw more than users stake"
         );
-        // Burn pTokens
+        ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
+        uint256 p0 = dpToken.totalSupply();
+        uint256 t0 = providerPool[_tokenAddress];
+        // Burn dpTokens in a way that it doesn't affect the PoolTokens/LPTokens
+        // average for current period.
+        // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
+        // burnedDPTokens = _amount*p0/t0
+        uint256 burnedDPTokens = _amount.mul(p0).div(t0);
+        dpToken.burnFrom(msg.sender, burnedDPTokens);
         providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
         ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
@@ -271,14 +311,14 @@ contract Staking is Ownable, StringUtils {
         }
         // update cumulativeDevaluation to increase dTokens generation over time
         // decimalReward: the decimal proportion of rewards, e.g. 0.05)
-        // rewardPercentage = precision * decimal
+        // rewardPercentage = precision * decimalReward
         // Then, by definition:
         // cumulatedDevaluation = cumulatedDevaluation*(1-decimalReward)
         // cumulatedDevaluation = cumulatedDevaluation*(1-decimalReward)*precision/precision
         // Finally
         // cumulatedDevaluation = cumulatedDevaluation*(precision-rewardPercentage)/precision
         cumulatedDevaluation = cumulatedDevaluation
-            .mul(_precision - _rewardPercentage)
+            .mul(_precision.sub(_rewardPercentage))
             .div(_precision);
     }
 
@@ -317,22 +357,22 @@ contract Staking is Ownable, StringUtils {
         notOwner
         onlyWhitelisted
     {
-        ERC20PresetMinterPauser dToken = dTokenRegistry[_tokenAddress];
-        uint256 dTokenBalance = dToken.balanceOf(msg.sender);
-        uint256 dTokenSupply = dToken.totalSupply();
+        ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
+        uint256 duTokenBalance = duToken.balanceOf(msg.sender);
+        uint256 duTokenSupply = duToken.totalSupply();
         uint256 precision = 10000;
         require(
-            dTokenBalance > 0,
+            duTokenBalance > 0,
             "Can only claim a compensation if position is bigger than 0"
         );
 
         uint256 userCompensationPercentage =
-            dTokenBalance.mul(precision).div(dTokenSupply);
+            duTokenBalance.mul(precision).div(duTokenSupply);
         uint256 userCompensation =
             usersPool[_tokenAddress].mul(userCompensationPercentage).div(
                 precision
             );
-        dToken.burn(dTokenBalance);
+        duToken.burnFrom(msg.sender, duTokenBalance);
         ERC20(_tokenAddress).safeTransfer(msg.sender, userCompensation);
     }
 
@@ -374,7 +414,7 @@ contract Staking is Ownable, StringUtils {
             return (allowedTokenAddress, providerPool[allowedTokenAddress]);
         } else {
             ERC20PresetMinterPauser dToken =
-                dTokenRegistry[allowedTokenAddress];
+                duTokenRegistry[allowedTokenAddress];
             uint256 dTokenBalance = dToken.balanceOf(msg.sender);
             uint256 dTokenSupply = dToken.totalSupply();
             uint256 precision = 10000;

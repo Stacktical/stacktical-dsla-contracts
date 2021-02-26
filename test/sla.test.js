@@ -20,7 +20,7 @@ const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
 const { envParameters, needsGetJobId } = require('../environments');
 
-const { toWei } = web3.utils;
+const { toWei, toBN } = web3.utils;
 
 const initialTokenSupply = '1000000';
 const stakeAmount = initialTokenSupply / 100;
@@ -460,7 +460,64 @@ describe('SLA', () => {
     });
   });
 
-  it.only('should deplete the pools after last period finishes', async () => {
+  it.only('should mint dTokens to users properly', async () => {
+    await sla.addAllowedTokens(dai.address);
+    await sla.addAllowedTokens(usdc.address);
+
+    // // Owner, to allow staking
+    // // 3 * bsdla + 3 * dai + 3 usdc
+    // const providerDSLAStake = toWei(String(3 * stakeAmount));
+    // await bdsla.approve(sla.address, providerDSLAStake);
+    // await sla.stakeTokens(providerDSLAStake, bdsla.address);
+    // const providerDAIStake = toWei(String(3 * stakeAmount));
+    // await dai.approve(sla.address, providerDAIStake);
+    // await sla.stakeTokens(providerDAIStake, dai.address);
+    // const providerUSDCStake = toWei(String(3 * stakeAmount));
+    // await usdc.approve(sla.address, providerUSDCStake);
+    // await sla.stakeTokens(providerUSDCStake, usdc.address);
+
+    // // NotOwner
+    // // 2 * dai + 3 * usdc
+    // const userDSLAStake = toWei(String(0 * stakeAmount));
+    // const userDAIStake = toWei(String(2 * stakeAmount));
+    // await dai.approve(sla.address, userDAIStake, { from: notOwner });
+    // await sla.stakeTokens(userDAIStake, dai.address, { from: notOwner });
+    // const userUSDCStake = toWei(String(3 * stakeAmount));
+    // await usdc.approve(sla.address, userUSDCStake, { from: notOwner });
+    // await sla.stakeTokens(userUSDCStake, usdc.address, { from: notOwner });
+
+    // // NotOwner should have 1 dToken per token staked on phase 0
+    // const DSLADTokenAddress = await sla.dTokenRegistry(bdsla.address);
+    // const dToken = await IERC20.at(DSLADTokenAddress);
+    // const notOwnerDSLADTokenBalance0 = await dToken.balanceOf(notOwner);
+    // expect(notOwnerDSLADTokenBalance0).to.equal(userDSLAStake);
+    const cumulatedDevaluation0 = await sla.cumulatedDevaluation.call();
+    const periodId = 0;
+    await slaRegistry.requestSLI(periodId, sla.address);
+    const { values: _sli } = await eventListener(sla, 'SLICreated');
+    const slaCreationBlock = await sla.creationBlockNumber.call();
+    // hardcoded on contract
+    const precision = 10000;
+    const weiPrecision = toBN(toWei(precision));
+    const rewardsGenerated = await sla.getPastEvents('ProviderRewardGenerated', {
+      filter: {
+        periodId,
+      },
+      fromBlock: slaCreationBlock,
+    });
+      // reward percentage is the same for all tokens
+    const { returnValues: { rewardPercentage } } = rewardsGenerated.find(
+      (reward) => reward.returnValues.tokenAddress === bdsla.address,
+    );
+    const cumulatedDevaluation1 = await sla.cumulatedDevaluation.call();
+    // check if cumulatedDevaluation was calculated correctly
+    const expectedCumulatedDevaluation1 = cumulatedDevaluation0.mul(
+      weiPrecision.sub(rewardPercentage),
+    ).div(weiPrecision);
+    expect(expectedCumulatedDevaluation1).to.equal(cumulatedDevaluation1);
+  });
+
+  it('should deplete the pools after last period finishes', async () => {
     // register only the first period, which is finished but not verified
     await slaRegistry.createSLA(
       slo,

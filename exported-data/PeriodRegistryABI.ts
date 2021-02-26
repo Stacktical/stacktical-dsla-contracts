@@ -35,13 +35,6 @@ export const PeriodRegistryABI: AbiItem[] = [
         name: 'periodsAdded',
         type: 'uint256',
       },
-      { indexed: false, internalType: 'uint256', name: 'apy', type: 'uint256' },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'yearlyPeriods',
-        type: 'uint256',
-      },
     ],
     name: 'PeriodInitialized',
     type: 'event',
@@ -52,7 +45,6 @@ export const PeriodRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [
@@ -63,13 +55,9 @@ export const PeriodRegistryABI: AbiItem[] = [
       },
     ],
     name: 'periodDefinitions',
-    outputs: [
-      { internalType: 'uint256', name: 'yearlyPeriods', type: 'uint256' },
-      { internalType: 'bool', name: 'initialized', type: 'bool' },
-    ],
+    outputs: [{ internalType: 'bool', name: 'initialized', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -94,7 +82,6 @@ export const PeriodRegistryABI: AbiItem[] = [
       },
       { internalType: 'uint256[]', name: '_periodStarts', type: 'uint256[]' },
       { internalType: 'uint256[]', name: '_periodEnds', type: 'uint256[]' },
-      { internalType: 'uint256', name: '_yearlyPeriods', type: 'uint256' },
     ],
     name: 'initializePeriod',
     outputs: [],
@@ -132,7 +119,6 @@ export const PeriodRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [
@@ -147,7 +133,6 @@ export const PeriodRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: 'valid', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [
@@ -162,7 +147,6 @@ export const PeriodRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: 'finished', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -170,7 +154,6 @@ export const PeriodRegistryABI: AbiItem[] = [
     outputs: [
       {
         components: [
-          { internalType: 'uint256', name: 'yearlyPeriods', type: 'uint256' },
           { internalType: 'bool', name: 'initialized', type: 'bool' },
           { internalType: 'uint256[]', name: 'starts', type: 'uint256[]' },
           { internalType: 'uint256[]', name: 'ends', type: 'uint256[]' },
@@ -182,6 +165,5 @@ export const PeriodRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
 ];

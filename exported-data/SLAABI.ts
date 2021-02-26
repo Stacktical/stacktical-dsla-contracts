@@ -17,6 +17,7 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'address', name: '_periodRegistry', type: 'address' },
       { internalType: 'bool', name: '_whitelisted', type: 'bool' },
       { internalType: 'bytes32[]', name: '_extraData', type: 'bytes32[]' },
+      { internalType: 'uint256', name: '_slaID', type: 'uint256' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -165,6 +166,26 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [],
+    name: 'cumulatedDevaluation',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'dTokenRegistry',
+    outputs: [
+      {
+        internalType: 'contract ERC20PresetMinterPauser',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'dslaTokenAddress',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
@@ -181,18 +202,6 @@ export const SLAABI: AbiItem[] = [
     inputs: [],
     name: 'getAllowedTokensLength',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '_tokenAddress', type: 'address' },
-    ],
-    name: 'getStakeholdersPositions',
-    outputs: [
-      { internalType: 'uint256', name: 'providerStake', type: 'uint256' },
-      { internalType: 'uint256', name: 'usersStake', type: 'uint256' },
-    ],
     stateMutability: 'view',
     type: 'function',
   },
@@ -297,11 +306,8 @@ export const SLAABI: AbiItem[] = [
     type: 'function',
   },
   {
-    inputs: [
-      { internalType: 'uint256', name: '', type: 'uint256' },
-      { internalType: 'address', name: '', type: 'address' },
-    ],
-    name: 'providerPeriodsRewards',
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'providerPool',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
@@ -320,6 +326,13 @@ export const SLAABI: AbiItem[] = [
     name: 'renounceOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'slaID',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -357,26 +370,9 @@ export const SLAABI: AbiItem[] = [
     type: 'function',
   },
   {
-    inputs: [
-      { internalType: 'address', name: '', type: 'address' },
-      { internalType: 'address', name: '', type: 'address' },
-    ],
-    name: 'stakeHoldersPositions',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     name: 'stakers',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: '', type: 'address' }],
-    name: 'tokenPools',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -389,14 +385,7 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
-    name: 'usersCompensationPools',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: '', type: 'address' }],
-    name: 'usersStakeRecord',
+    name: 'usersPool',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
@@ -410,15 +399,8 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [],
-    name: 'whitelisted',
+    name: 'whitelistedContract',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'yearlyPeriods',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },
