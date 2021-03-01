@@ -5,6 +5,7 @@ const PeriodRegistry = artifacts.require('PeriodRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const SEMessenger = artifacts.require('SEMessenger');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
+const Details = artifacts.require('Details');
 const bDSLA = artifacts.require('bDSLA');
 const USDC = artifacts.require('USDC');
 const DAI = artifacts.require('DAI');
@@ -42,6 +43,9 @@ const addresses = (adminWallet) => ({
     NetworkAnalytics:
       (NetworkAnalytics.networks[1] && NetworkAnalytics.networks[1].address)
       || placeHolder,
+    Details:
+      (Details.networks[1] && Details.networks[1].address)
+      || placeHolder,
   },
   42: {
     DSLAToken:
@@ -68,6 +72,9 @@ const addresses = (adminWallet) => ({
       || placeHolder,
     SLARegistry:
       (SLARegistry.networks[42] && SLARegistry.networks[42].address)
+      || placeHolder,
+    Details:
+      (Details.networks[42] && Details.networks[42].address)
       || placeHolder,
     AdminWallet: adminWallet,
     DAIToken: '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa',
@@ -98,6 +105,9 @@ const addresses = (adminWallet) => ({
       || placeHolder,
     SLARegistry:
       (SLARegistry.networks[1337] && SLARegistry.networks[1337].address)
+      || placeHolder,
+    Details:
+      (Details.networks[1337] && Details.networks[1337].address)
       || placeHolder,
     AdminWallet: adminWallet,
   },

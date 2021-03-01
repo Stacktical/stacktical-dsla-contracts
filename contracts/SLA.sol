@@ -28,11 +28,6 @@ contract SLA is Staking {
         Status status;
     }
 
-    struct TokenStake {
-        address tokenAddress;
-        uint256 stake;
-    }
-
     /// @dev address of the SLO
     SLO public slo;
 
@@ -213,7 +208,7 @@ contract SLA is Staking {
         );
         _stake(_amount, _token);
         StakeRegistry stakeRegistry = slaRegistry.stakeRegistry();
-        stakeRegistry.registerStakedSla(msg.sender, address(slaRegistry));
+        stakeRegistry.registerStakedSla(msg.sender);
     }
 
     /**
@@ -252,50 +247,12 @@ contract SLA is Staking {
         _claimCompensation(_tokenAddress);
     }
 
-    /**
-     * @dev external view function that returns all agreement information
-     * @return _slaOwner 1. address  owner
-     * @return _ipfsHash 2. string  ipfsHash
-     * @return _SLO 3. addresses of the SLO
-     * @return _SLAPeriods 5. SLAPeriod[]
-     * @return _stakersCount 6. amount of stakers
-     * @return _tokensStake 7. SLAPeriod[]  addresses array
-     */
+    function getPeriodIdsLength() public view returns (uint256) {
+        return periodIds.length;
+    }
 
-    function getDetails()
-        external
-        view
-        returns (
-            address _slaOwner,
-            string memory _ipfsHash,
-            SLO _SLO,
-            SLAPeriod[] memory _SLAPeriods,
-            uint256 _stakersCount,
-            TokenStake[] memory _tokensStake
-        )
-    {
-        _slaOwner = owner();
-        _ipfsHash = ipfsHash;
-        _SLO = slo;
-        _SLAPeriods = new SLAPeriod[](periodIds.length);
-        for (uint256 index = 0; index < periodIds.length; index++) {
-            uint256 periodId = periodIds[index];
-            SLAPeriod memory slaPeriod = slaPeriods[periodId];
-            _SLAPeriods[index] = SLAPeriod({
-                status: slaPeriod.status,
-                sli: slaPeriod.sli,
-                timestamp: slaPeriod.timestamp
-            });
-        }
-        _stakersCount = stakers.length;
-        _tokensStake = new TokenStake[](allowedTokens.length);
-        for (uint256 index = 0; index < allowedTokens.length; index++) {
-            _tokensStake[index] = TokenStake({
-                tokenAddress: allowedTokens[index],
-                stake: usersPool[allowedTokens[index]] +
-                    providerPool[allowedTokens[index]]
-            });
-        }
+    function getStakersLength() public view returns (uint256) {
+        return stakers.length;
     }
 
     function breachedContract() public view returns (bool) {

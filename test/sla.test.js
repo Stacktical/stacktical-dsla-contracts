@@ -58,21 +58,8 @@ describe('SLA', () => {
   before(async () => {
     [owner, notOwner] = await web3.eth.getAccounts();
     bdsla = await bDSLA.new();
-    await bdsla.mint(owner, toWei(initialTokenSupply));
     usdc = await USDC.new(); // to simulate a new token
-    await usdc.mint(owner, toWei(initialTokenSupply));
     dai = await DAI.new();
-    await dai.mint(owner, toWei(initialTokenSupply));
-    chainlinkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
-
-    periodRegistry = await PeriodRegistry.new();
-    messengerRegistry = await MessengerRegistry.new();
-    stakeRegistry = await StakeRegistry.new(
-      bdsla.address,
-    );
-
-    const chainlinkJobId = !needsGetJobId
-      ? envParameters.chainlinkJobId : await getChainlinkJobId();
 
     // mint to owner
     await bdsla.mint(owner, toWei(initialTokenSupply));
@@ -83,6 +70,52 @@ describe('SLA', () => {
     await usdc.mint(notOwner, toWei(initialTokenSupply));
     await dai.mint(notOwner, toWei(initialTokenSupply));
 
+    periodRegistry = await PeriodRegistry.new();
+    await periodRegistry.initializePeriod(
+      periodType,
+      periodStarts,
+      periodEnds,
+    );
+
+    stakeRegistry = await StakeRegistry.new(
+      bdsla.address,
+    );
+    await stakeRegistry.addAllowedTokens(dai.address);
+    await stakeRegistry.addAllowedTokens(usdc.address);
+
+    const chainlinkJobId = !needsGetJobId
+      ? envParameters.chainlinkJobId : await getChainlinkJobId();
+    networkAnalytics = await NetworkAnalytics.new(
+      envParameters.chainlinkOracleAddress,
+      envParameters.chainlinkTokenAddress,
+      chainlinkJobId,
+      periodRegistry.address,
+    );
+    await networkAnalytics.addNetwork(slaNetworkBytes32);
+    chainlinkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
+    await chainlinkToken.transfer(
+      networkAnalytics.address,
+      web3.utils.toWei('0.2'),
+    );
+    // periods 0 is already finished
+    await networkAnalytics.requestAnalytics(0, periodType, slaNetworkBytes32);
+    await eventListener(networkAnalytics, 'AnalyticsReceived');
+
+    seMessenger = await SEMessenger.new(
+      envParameters.chainlinkOracleAddress,
+      envParameters.chainlinkTokenAddress,
+      chainlinkJobId,
+      networkAnalytics.address,
+    );
+    await chainlinkToken.transfer(
+      seMessenger.address,
+      web3.utils.toWei('10'),
+    );
+
+    // create a SLO with really low value to get respected period
+    const sloRegistry = await SLORegistry.new();
+    await sloRegistry.createSLO(sloValue, sloType);
+    slo = await sloRegistry.sloAddresses.call(sloValue, sloType);
     const serviceMetadata = {
       serviceName: networks[slaNetwork].validators[0],
       serviceDescription: 'Official DSLA Beta Partner.',
@@ -94,29 +127,7 @@ describe('SLA', () => {
     };
 
     ipfsHash = await getIPFSHash(serviceMetadata);
-    const sloRegistry = await SLORegistry.new();
-
-    // create a SLO with really low value to get respected period
-    await sloRegistry.createSLO(sloValue, sloType);
-    slo = await sloRegistry.sloAddresses.call(sloValue, sloType);
-
-    await stakeRegistry.addAllowedTokens(dai.address);
-    await stakeRegistry.addAllowedTokens(usdc.address);
-
-    networkAnalytics = await NetworkAnalytics.new(
-      envParameters.chainlinkOracleAddress,
-      envParameters.chainlinkTokenAddress,
-      chainlinkJobId,
-      periodRegistry.address,
-    );
-
-    seMessenger = await SEMessenger.new(
-      envParameters.chainlinkOracleAddress,
-      envParameters.chainlinkTokenAddress,
-      chainlinkJobId,
-      networkAnalytics.address,
-    );
-
+    messengerRegistry = await MessengerRegistry.new();
     slaRegistry = await SLARegistry.new(
       sloRegistry.address,
       periodRegistry.address,
@@ -126,28 +137,6 @@ describe('SLA', () => {
 
     await slaRegistry.setMessengerSLARegistryAddress(
       seMessenger.address,
-    );
-
-    await periodRegistry.initializePeriod(
-      periodType,
-      periodStarts,
-      periodEnds,
-      yearlyPeriods,
-    );
-
-    await networkAnalytics.addNetwork(slaNetworkBytes32);
-
-    await chainlinkToken.transfer(
-      networkAnalytics.address,
-      web3.utils.toWei('0.2'),
-    );
-    // periods 0 is already finished
-    await networkAnalytics.requestAnalytics(0, periodType, slaNetworkBytes32);
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
-
-    await chainlinkToken.transfer(
-      seMessenger.address,
-      web3.utils.toWei('10'),
     );
   });
 

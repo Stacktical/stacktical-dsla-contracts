@@ -26,6 +26,7 @@ contract StakeRegistry is Ownable, StringUtils {
     }
 
     address public DSLATokenAddress;
+    SLARegistry public slaRegistry;
 
     //______ onlyOwner modifiable parameters ______
 
@@ -63,6 +64,29 @@ contract StakeRegistry is Ownable, StringUtils {
     constructor(address _dslaTokenAddress) public {
         DSLATokenAddress = _dslaTokenAddress;
         allowedTokens.push(_dslaTokenAddress);
+    }
+
+    /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
+    modifier onlySLARegistry() {
+        require(
+            msg.sender == address(slaRegistry),
+            "Can only be called by SLARegistry"
+        );
+        _;
+    }
+
+    /**
+     * @dev sets the SLARegistry contract address and can only be called
+     * once
+     */
+    function setSLARegistry() public {
+        // Only able to trigger this function once
+        require(
+            address(slaRegistry) == address(0),
+            "SLARegistry address has already been set"
+        );
+
+        slaRegistry = SLARegistry(msg.sender);
     }
 
     /**
@@ -122,11 +146,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@dev register the sending SLA contract as staked by _owner
      *@param _owner 1. SLA contract to stake
      */
-    function registerStakedSla(address _owner, address _slaRegistry)
-        public
-        returns (bool)
-    {
-        SLARegistry slaRegistry = SLARegistry(_slaRegistry);
+    function registerStakedSla(address _owner) public returns (bool) {
         require(
             slaRegistry.isRegisteredSLA(msg.sender) == true,
             "Only for registered SLAs"
@@ -146,6 +166,10 @@ contract StakeRegistry is Ownable, StringUtils {
         public
         returns (address)
     {
+        require(
+            slaRegistry.isRegisteredSLA(msg.sender) == true,
+            "Only for registered SLAs"
+        );
         ERC20PresetMinterPauser dToken =
             new ERC20PresetMinterPauser(_name, _symbol);
         dToken.grantRole(dToken.MINTER_ROLE(), msg.sender);

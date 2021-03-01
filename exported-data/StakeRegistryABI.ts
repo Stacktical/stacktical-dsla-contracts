@@ -90,6 +90,16 @@ export const StakeRegistryABI: AbiItem[] = [
     type: 'function',
   },
   {
+    inputs: [],
+    name: 'slaRegistry',
+    outputs: [
+      { internalType: 'contract SLARegistry', name: '', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
     inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
     name: 'transferOwnership',
     outputs: [],
@@ -106,6 +116,13 @@ export const StakeRegistryABI: AbiItem[] = [
     stateMutability: 'view',
     type: 'function',
     constant: true,
+  },
+  {
+    inputs: [],
+    name: 'setSLARegistry',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
@@ -163,10 +180,7 @@ export const StakeRegistryABI: AbiItem[] = [
     constant: true,
   },
   {
-    inputs: [
-      { internalType: 'address', name: '_owner', type: 'address' },
-      { internalType: 'address', name: '_slaRegistry', type: 'address' },
-    ],
+    inputs: [{ internalType: 'address', name: '_owner', type: 'address' }],
     name: 'registerStakedSla',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'nonpayable',

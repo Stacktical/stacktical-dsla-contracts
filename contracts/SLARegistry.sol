@@ -57,6 +57,7 @@ contract SLARegistry is Ownable {
         sloRegistry = _sloRegistry;
         periodRegistry = _periodRegistry;
         stakeRegistry = _stakeRegistry;
+        stakeRegistry.setSLARegistry();
         messengerRegistry = _messengerRegistry;
         messengerRegistry.setSLARegistry();
     }

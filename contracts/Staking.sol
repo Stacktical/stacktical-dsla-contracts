@@ -124,27 +124,28 @@ contract Staking is Ownable {
         minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
         minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
         addUserToWhitelist(msg.sender);
-        allowedTokens.push(dslaTokenAddress);
         slaID = _slaID;
-        string memory dTokenID = _uintToStr(_slaID);
-        string memory duTokenName =
-            string(abi.encodePacked("DSLA-USER-DSLA-", dTokenID));
-        string memory duTokenSymbol =
-            string(abi.encodePacked("duDSLA-", dTokenID));
-        string memory dpTokenName =
-            string(abi.encodePacked("DSLA-PROVIDER-DSLA-", dTokenID));
-        string memory dpTokenSymbol =
-            string(abi.encodePacked("dpDSLA-", dTokenID));
-        ERC20PresetMinterPauser duDSLA =
-            ERC20PresetMinterPauser(
-                stakeRegistry.createDToken(duTokenName, duTokenSymbol)
-            );
-        ERC20PresetMinterPauser dpDSLA =
-            ERC20PresetMinterPauser(
-                stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
-            );
-        duTokenRegistry[dslaTokenAddress] = duDSLA;
-        dpTokenRegistry[dslaTokenAddress] = dpDSLA;
+        // too heavy to run on deployment time
+        // allowedTokens.push(dslaTokenAddress);
+        // string memory dTokenID = _uintToStr(_slaID);
+        // string memory duTokenName =
+        //     string(abi.encodePacked("DSLA-USER-DSLA-", dTokenID));
+        // string memory duTokenSymbol =
+        //     string(abi.encodePacked("duDSLA-", dTokenID));
+        // string memory dpTokenName =
+        //     string(abi.encodePacked("DSLA-PROVIDER-DSLA-", dTokenID));
+        // string memory dpTokenSymbol =
+        //     string(abi.encodePacked("dpDSLA-", dTokenID));
+        // ERC20PresetMinterPauser duDSLA =
+        //     ERC20PresetMinterPauser(
+        //         stakeRegistry.createDToken(duTokenName, duTokenSymbol)
+        //     );
+        // ERC20PresetMinterPauser dpDSLA =
+        //     ERC20PresetMinterPauser(
+        //         stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
+        //     );
+        // duTokenRegistry[dslaTokenAddress] = duDSLA;
+        // dpTokenRegistry[dslaTokenAddress] = dpDSLA;
     }
 
     function addUserToWhitelist(address _userAddress) public onlyOwner {

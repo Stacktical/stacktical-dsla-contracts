@@ -11,6 +11,7 @@ const StakeRegistry = artifacts.require('StakeRegistry');
 const MessengerRegistry = artifacts.require('MessengerRegistry');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const SEMessenger = artifacts.require('SEMessenger');
+const Details = artifacts.require('Details');
 
 // For dev
 const bDSLA = artifacts.require('bDSLA');
@@ -57,6 +58,8 @@ module.exports = (deployer, network) => {
       await slaRegistry.setMessengerSLARegistryAddress(
         seMessenger.address,
       );
+
+      await deployer.deploy(Details);
     });
   }
 };
