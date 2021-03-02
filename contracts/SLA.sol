@@ -62,11 +62,11 @@ contract SLA is Staking {
 
     /**
      * @dev event for SLI creation logging
-     * @param _timestamp 1. the time the SLI has been registered
-     * @param _sli 2. the value of the SLI
-     * @param _periodId 3. the id of the given period
+     * @param timestamp 1. the time the SLI has been registered
+     * @param sli 2. the value of the SLI
+     * @param periodId 3. the id of the given period
      */
-    event SLICreated(uint256 _timestamp, uint256 _sli, uint256 _periodId);
+    event SLICreated(uint256 timestamp, uint256 sli, uint256 periodId);
 
     /**
      * @dev event for SLI creation logging
@@ -175,7 +175,7 @@ contract SLA is Staking {
             uint256 rewardPercentage =
                 _periodId != periodIds[periodIds.length - 1]
                     ? deviation.mul(normalizedPeriodId).div(periodIds.length)
-                    : uint256(100).mul(precision);
+                    : uint256(1).mul(precision);
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
             periodSLI.status = Status.NotRespected;

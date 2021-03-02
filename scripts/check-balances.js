@@ -3,7 +3,7 @@ const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
 const { fromWei } = web3.utils;
-const slaAddress = '0x43954Db71503B089396BdD81fCC7FE8F9f1b42d0';
+const slaAddress = '0x6b5f082e2bF29D9afb95C7dcfF77e76c03E73FBb';
 
 module.exports = async (callback) => {
   try {

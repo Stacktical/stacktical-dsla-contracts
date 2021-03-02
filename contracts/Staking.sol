@@ -82,13 +82,15 @@ contract Staking is Ownable {
      * @param periodId 1. id of the period
      * @param tokenAddress 2. address of the token
      * @param rewardPercentage 3. reward percentage for the provider
-     * @param amount 4. amount rewarded
+     * @param rewardPercentagePrecision 4. reward percentage for the provider
+     * @param rewardAmount 5. amount rewarded
      */
     event ProviderRewardGenerated(
         uint256 indexed periodId,
         address indexed tokenAddress,
         uint256 rewardPercentage,
-        uint256 amount
+        uint256 rewardPercentagePrecision,
+        uint256 rewardAmount
     );
 
     /**
@@ -298,8 +300,7 @@ contract Staking is Ownable {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
             uint256 usersStake = usersPool[tokenAddress];
-            uint256 reward =
-                usersStake.mul(_rewardPercentage).div(100 * _precision);
+            uint256 reward = usersStake.mul(_rewardPercentage).div(_precision);
 
             // Subtract before burn to match balances
             usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
@@ -316,6 +317,7 @@ contract Staking is Ownable {
                 _periodId,
                 tokenAddress,
                 _rewardPercentage,
+                _precision,
                 reward
             );
         }

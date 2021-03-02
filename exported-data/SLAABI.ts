@@ -65,7 +65,13 @@ export const SLAABI: AbiItem[] = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'amount',
+        name: 'rewardPercentagePrecision',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'rewardAmount',
         type: 'uint256',
       },
     ],
