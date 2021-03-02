@@ -24,47 +24,54 @@ contract Details {
 
     /**
      * @dev external view function that returns all agreement information
-     * @return _slaOwner 1. address  owner
-     * @return _ipfsHash 2. string  ipfsHash
-     * @return _SLO 3. addresses of the SLO
-     * @return _SLAPeriods 5. SLAPeriod[]
-     * @return _stakersCount 6. amount of stakers
-     * @return _tokensStake 7. SLAPeriod[]  addresses array
+     * @return slaOwner 1. address  owner
+     * @return ipfsHash 2. string  ipfsHash
+     * @return slo 3. addresses of the SLO
+     * @return periodSLIs 5. PeriodSLI[]
+     * @return periodIDs 6. array of period IDs
+     * @return periodType 7. periodType of the sla contract
+     * @return stakersCount 8. amount of stakers
+     * @return tokensStake 9. PeriodSLI[]  addresses array
      */
 
     function getSLADetails(address _slaAddress)
         external
         view
         returns (
-            address _slaOwner,
-            string memory _ipfsHash,
-            SLO _SLO,
-            SLA.SLAPeriod[] memory _SLAPeriods,
-            uint256 _stakersCount,
-            TokenStake[] memory _tokensStake
+            address slaOwner,
+            string memory ipfsHash,
+            SLO slo,
+            SLA.PeriodSLI[] memory periodSLIs,
+            uint256[] memory periodIDs,
+            uint256 stakersCount,
+            TokenStake[] memory tokensStake,
+            PeriodRegistry.PeriodType periodType
         )
     {
         SLA sla = SLA(_slaAddress);
-        _slaOwner = sla.owner();
-        _ipfsHash = sla.ipfsHash();
-        _SLO = sla.slo();
+        slaOwner = sla.owner();
+        ipfsHash = sla.ipfsHash();
+        slo = sla.slo();
+        periodType = sla.periodType();
         uint256 periodIdsLength = sla.getPeriodIdsLength();
-        _SLAPeriods = new SLA.SLAPeriod[](periodIdsLength);
+        periodSLIs = new SLA.PeriodSLI[](periodIdsLength);
+        periodIDs = new uint256[](periodIdsLength);
         for (uint256 index = 0; index < periodIdsLength; index++) {
             uint256 periodId = sla.periodIds(index);
             (uint256 timestamp, uint256 sli, SLA.Status status) =
-                sla.slaPeriods(periodId);
-            _SLAPeriods[index] = SLA.SLAPeriod({
+                sla.periodSLIs(periodId);
+            periodSLIs[index] = SLA.PeriodSLI({
                 status: status,
                 sli: sli,
                 timestamp: timestamp
             });
+            periodIDs[index] = sla.periodIds(index);
         }
-        _stakersCount = sla.getStakersLength();
+        stakersCount = sla.getStakersLength();
         uint256 allowedTokensLength = sla.getAllowedTokensLength();
-        _tokensStake = new TokenStake[](allowedTokensLength);
+        tokensStake = new TokenStake[](allowedTokensLength);
         for (uint256 index = 0; index < allowedTokensLength; index++) {
-            _tokensStake[index] = TokenStake({
+            tokensStake[index] = TokenStake({
                 tokenAddress: sla.allowedTokens(index),
                 totalStake: sla.usersPool(sla.allowedTokens(index)) +
                     sla.providerPool(sla.allowedTokens(index)),

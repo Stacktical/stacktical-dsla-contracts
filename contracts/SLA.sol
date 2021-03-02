@@ -22,7 +22,7 @@ contract SLA is Staking {
     enum Status {NotVerified, Respected, NotRespected}
 
     /// @dev Struct used for storing period status
-    struct SLAPeriod {
+    struct PeriodSLI {
         uint256 timestamp;
         uint256 sli;
         Status status;
@@ -48,8 +48,8 @@ contract SLA is Staking {
     /// @dev The address of the messenger
     address public messengerAddress;
 
-    /// @dev periodId=>SLAPeriod mapping
-    mapping(uint256 => SLAPeriod) public slaPeriods;
+    /// @dev periodId=>PeriodSLI mapping
+    mapping(uint256 => PeriodSLI) public periodSLIs;
 
     /// @dev block number of SLA deployment
     uint256 public creationBlockNumber;
@@ -154,12 +154,12 @@ contract SLA is Staking {
         onlyMessenger
     {
         emit SLICreated(block.timestamp, _sli, _periodId);
-        SLAPeriod storage slaPeriod = slaPeriods[_periodId];
-        slaPeriod.sli = _sli;
-        slaPeriod.timestamp = block.timestamp;
+        PeriodSLI storage periodSLI = periodSLIs[_periodId];
+        periodSLI.sli = _sli;
+        periodSLI.timestamp = block.timestamp;
         uint256 sloValue = slo.value();
         if (slo.isRespected(_sli)) {
-            slaPeriod.status = Status.Respected;
+            periodSLI.status = Status.Respected;
             uint256 precision = 10000;
             // deviation = (sli-slo)*precision/((sli+slo)/2)
             uint256 deviation =
@@ -178,7 +178,7 @@ contract SLA is Staking {
                     : uint256(100).mul(precision);
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
-            slaPeriod.status = Status.NotRespected;
+            periodSLI.status = Status.NotRespected;
             _setUsersCompensation();
             _breachedContract = true;
             emit SLANotRespected(_periodId, _sli);
@@ -230,7 +230,7 @@ contract SLA is Staking {
             require(
                 _breachedContract == true ||
                     (block.timestamp >= endOfLastValidPeriod &&
-                        slaPeriods[lastValidPeriodId].status !=
+                        periodSLIs[lastValidPeriodId].status !=
                         Status.NotVerified),
                 "Can only withdraw stake after the final period is finished or if the contract is breached"
             );

@@ -326,6 +326,18 @@ export const SLAABI: AbiItem[] = [
     constant: true,
   },
   {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'periodSLIs',
+    outputs: [
+      { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
+      { internalType: 'uint256', name: 'sli', type: 'uint256' },
+      { internalType: 'enum SLA.Status', name: 'status', type: 'uint8' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
     inputs: [],
     name: 'periodType',
     outputs: [
@@ -367,18 +379,6 @@ export const SLAABI: AbiItem[] = [
     inputs: [],
     name: 'slaID',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    name: 'slaPeriods',
-    outputs: [
-      { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
-      { internalType: 'uint256', name: 'sli', type: 'uint256' },
-      { internalType: 'enum SLA.Status', name: 'status', type: 'uint8' },
-    ],
     stateMutability: 'view',
     type: 'function',
     constant: true,

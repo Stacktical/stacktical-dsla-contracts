@@ -5,20 +5,21 @@ export const DetailsABI: AbiItem[] = [
     inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
     name: 'getSLADetails',
     outputs: [
-      { internalType: 'address', name: '_slaOwner', type: 'address' },
-      { internalType: 'string', name: '_ipfsHash', type: 'string' },
-      { internalType: 'contract SLO', name: '_SLO', type: 'address' },
+      { internalType: 'address', name: 'slaOwner', type: 'address' },
+      { internalType: 'string', name: 'ipfsHash', type: 'string' },
+      { internalType: 'contract SLO', name: 'slo', type: 'address' },
       {
         components: [
           { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
           { internalType: 'uint256', name: 'sli', type: 'uint256' },
           { internalType: 'enum SLA.Status', name: 'status', type: 'uint8' },
         ],
-        internalType: 'struct SLA.SLAPeriod[]',
-        name: '_SLAPeriods',
+        internalType: 'struct SLA.PeriodSLI[]',
+        name: 'periodSLIs',
         type: 'tuple[]',
       },
-      { internalType: 'uint256', name: '_stakersCount', type: 'uint256' },
+      { internalType: 'uint256[]', name: 'periodIDs', type: 'uint256[]' },
+      { internalType: 'uint256', name: 'stakersCount', type: 'uint256' },
       {
         components: [
           { internalType: 'address', name: 'tokenAddress', type: 'address' },
@@ -27,7 +28,7 @@ export const DetailsABI: AbiItem[] = [
           { internalType: 'uint256', name: 'providerPool', type: 'uint256' },
         ],
         internalType: 'struct Details.TokenStake[]',
-        name: '_tokensStake',
+        name: 'tokensStake',
         type: 'tuple[]',
       },
     ],

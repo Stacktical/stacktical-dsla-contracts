@@ -135,7 +135,7 @@ contract SLARegistry is Ownable {
      */
     function requestSLI(uint256 _periodId, SLA _sla) public {
         bool breachedContract = _sla.breachedContract();
-        (, , SLA.Status status) = _sla.slaPeriods(_periodId);
+        (, , SLA.Status status) = _sla.periodSLIs(_periodId);
         require(
             status == SLA.Status.NotVerified,
             "SLA contract was already verified for the period"
