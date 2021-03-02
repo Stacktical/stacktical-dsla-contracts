@@ -43,9 +43,9 @@ contract Details {
             SLO slo,
             SLA.PeriodSLI[] memory periodSLIs,
             uint256[] memory periodIDs,
+            PeriodRegistry.PeriodType periodType,
             uint256 stakersCount,
-            TokenStake[] memory tokensStake,
-            PeriodRegistry.PeriodType periodType
+            TokenStake[] memory tokensStake
         )
     {
         SLA sla = SLA(_slaAddress);

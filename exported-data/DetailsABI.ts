@@ -19,6 +19,11 @@ export const DetailsABI: AbiItem[] = [
         type: 'tuple[]',
       },
       { internalType: 'uint256[]', name: 'periodIDs', type: 'uint256[]' },
+      {
+        internalType: 'enum PeriodRegistry.PeriodType',
+        name: 'periodType',
+        type: 'uint8',
+      },
       { internalType: 'uint256', name: 'stakersCount', type: 'uint256' },
       {
         components: [
