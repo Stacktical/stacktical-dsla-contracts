@@ -102,7 +102,7 @@ module.exports = (deployer, network) => {
         slo,
         ipfsHash,
         periodType,
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [0, 1],
         seMessenger.address,
         false,
         [slaNetworkBytes32],
@@ -139,23 +139,28 @@ module.exports = (deployer, network) => {
       await sla.stakeTokens(stakeAmountWei, usdcToken.address);
 
       // NotOwner
-      // 2 * dai + 3 * usdc
+      // 3 * bdsla + 2 * dai
       console.log('Starting automated job 9.2: notOwner: 0 bDSLA, 20000 DAI, 30000 USDC');
+      await bdslaToken.approve(sla.address, stakeAmountWei, { from: notOwner });
+      await sla.stakeTokens(stakeAmountWei, bdslaToken.address, { from: notOwner });
+      await bdslaToken.approve(sla.address, stakeAmountWei, { from: notOwner });
+      await sla.stakeTokens(stakeAmountWei, bdslaToken.address, { from: notOwner });
+      await bdslaToken.approve(sla.address, stakeAmountWei, { from: notOwner });
+      await sla.stakeTokens(stakeAmountWei, bdslaToken.address, { from: notOwner });
       await daiToken.approve(sla.address, stakeAmountWei, { from: notOwner });
       await sla.stakeTokens(stakeAmountWei, daiToken.address, { from: notOwner });
       await daiToken.approve(sla.address, stakeAmountWei, { from: notOwner });
       await sla.stakeTokens(stakeAmountWei, daiToken.address, { from: notOwner });
-      await usdcToken.approve(sla.address, stakeAmountWei, { from: notOwner });
-      await sla.stakeTokens(stakeAmountWei, usdcToken.address, { from: notOwner });
-      await usdcToken.approve(sla.address, stakeAmountWei, { from: notOwner });
-      await sla.stakeTokens(stakeAmountWei, usdcToken.address, { from: notOwner });
-      await usdcToken.approve(sla.address, stakeAmountWei, { from: notOwner });
-      await sla.stakeTokens(stakeAmountWei, usdcToken.address, { from: notOwner });
 
       console.log('Starting automated job 10: Request SLI for period 0');
       await slaRegistry.requestSLI(0, sla.address);
       await eventListener(sla, 'SLICreated');
 
+      // periods 1 is already finished
+      await networkAnalytics.requestAnalytics(1, periodType, slaNetworkBytes32);
+      await eventListener(networkAnalytics, 'AnalyticsReceived');
+      await slaRegistry.requestSLI(1, sla.address);
+      await eventListener(sla, 'SLICreated');
       console.log('Bootstrap process completed');
     }
   });

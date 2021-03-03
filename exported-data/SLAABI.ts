@@ -103,19 +103,14 @@ export const SLAABI: AbiItem[] = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_timestamp',
+        name: 'timestamp',
         type: 'uint256',
       },
+      { indexed: false, internalType: 'uint256', name: 'sli', type: 'uint256' },
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_sli',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: '_periodId',
+        name: 'periodId',
         type: 'uint256',
       },
     ],

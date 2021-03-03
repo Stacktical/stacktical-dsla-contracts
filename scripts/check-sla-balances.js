@@ -1,9 +1,9 @@
 const SLA = artifacts.require('SLA');
+const SLARegistry = artifacts.require('SLARegistry');
 const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
 const { fromWei } = web3.utils;
-const slaAddress = '0x6b5f082e2bF29D9afb95C7dcfF77e76c03E73FBb';
 
 module.exports = async (callback) => {
   try {
@@ -13,7 +13,14 @@ module.exports = async (callback) => {
     const bdslaToken = await bDSLA.deployed();
     const daiToken = await DAI.deployed();
     const usdcToken = await USDC.deployed();
+
+    // Get last deployed SLA
+    const slaRegistry = await SLARegistry.deployed();
+    const slaAddresses = await slaRegistry.allSLAs.call();
+    const [slaAddress] = slaAddresses.slice(-1);
     const sla = await SLA.at(slaAddress);
+    console.log(`sla address is: ${slaAddress}`);
+
     // SLA balances
     const slabDSLABalance = await bdslaToken.balanceOf(slaAddress);
     const sladaiBalance = await daiToken.balanceOf(slaAddress);
