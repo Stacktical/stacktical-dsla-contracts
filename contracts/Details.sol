@@ -31,7 +31,7 @@ contract Details {
      * @return periodIDs 6. array of period IDs
      * @return periodType 7. periodType of the sla contract
      * @return stakersCount 8. amount of stakers
-     * @return tokensStake 9. PeriodSLI[]  addresses array
+     * @return tokensStake 9. TokenStake[]
      */
 
     function getSLADetails(address _slaAddress)
