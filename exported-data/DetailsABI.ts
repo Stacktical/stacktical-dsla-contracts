@@ -36,6 +36,11 @@ export const DetailsABI: AbiItem[] = [
         name: 'tokensStake',
         type: 'tuple[]',
       },
+      {
+        internalType: 'uint256',
+        name: 'nextVerifiablePeriod',
+        type: 'uint256',
+      },
     ],
     stateMutability: 'view',
     type: 'function',

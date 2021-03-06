@@ -30,7 +30,7 @@ contract Staking is Ownable {
     mapping(address => ERC20PresetMinterPauser) public dpTokenRegistry;
 
     ///@dev index to keep a deflationary mint of tokens
-    uint256 public cumulatedDevaluation = 10 * 6;
+    uint256 public cumulatedDevaluation = 10**6;
     ///@dev to keep track of the precision used to avoid multiplying by 0
     uint256 internal cumulatedDevaluationPrecision = 10**6;
 
@@ -127,27 +127,6 @@ contract Staking is Ownable {
         minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
         addUserToWhitelist(msg.sender);
         slaID = _slaID;
-        // too heavy to run on deployment time
-        // allowedTokens.push(dslaTokenAddress);
-        // string memory dTokenID = _uintToStr(_slaID);
-        // string memory duTokenName =
-        //     string(abi.encodePacked("DSLA-USER-DSLA-", dTokenID));
-        // string memory duTokenSymbol =
-        //     string(abi.encodePacked("duDSLA-", dTokenID));
-        // string memory dpTokenName =
-        //     string(abi.encodePacked("DSLA-PROVIDER-DSLA-", dTokenID));
-        // string memory dpTokenSymbol =
-        //     string(abi.encodePacked("dpDSLA-", dTokenID));
-        // ERC20PresetMinterPauser duDSLA =
-        //     ERC20PresetMinterPauser(
-        //         stakeRegistry.createDToken(duTokenName, duTokenSymbol)
-        //     );
-        // ERC20PresetMinterPauser dpDSLA =
-        //     ERC20PresetMinterPauser(
-        //         stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
-        //     );
-        // duTokenRegistry[dslaTokenAddress] = duDSLA;
-        // dpTokenRegistry[dslaTokenAddress] = dpDSLA;
     }
 
     function addUserToWhitelist(address _userAddress) public onlyOwner {

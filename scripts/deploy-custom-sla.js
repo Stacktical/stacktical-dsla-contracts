@@ -5,7 +5,6 @@ const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
 const SLORegistry = artifacts.require('SLORegistry');
 const SEMessenger = artifacts.require('SEMessenger');
-const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
@@ -30,7 +29,6 @@ module.exports = async (callback) => {
     const slaRegistry = await SLARegistry.deployed();
     const sloRegistry = await SLORegistry.deployed();
     const seMessenger = await SEMessenger.deployed();
-    const networkAnalytics = await NetworkAnalytics.deployed();
 
     const slo = await sloRegistry.sloAddresses.call(sloValue, sloType);
     const serviceMetadata = {

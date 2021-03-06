@@ -302,6 +302,14 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [],
+    name: 'nextVerifiablePeriod',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [],
     name: 'owner',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',

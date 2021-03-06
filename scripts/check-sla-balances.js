@@ -3,6 +3,7 @@ const SLARegistry = artifacts.require('SLARegistry');
 const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
+const IERC20 = artifacts.require('IERC20');
 const { fromWei } = web3.utils;
 
 module.exports = async (callback) => {
@@ -56,6 +57,44 @@ module.exports = async (callback) => {
       console.log(`providerReward ${index}`);
       console.log(reward.returnValues);
     });
+
+    // DP tokens addresses
+    const bdslaDPTokenAddress = await sla.dpTokenRegistry(bdslaToken.address);
+    const daiDPTokenAddress = await sla.dpTokenRegistry(daiToken.address);
+    const usdcDPTokenAddress = await sla.dpTokenRegistry(usdcToken.address);
+    console.log(`dpDSLA token address is: ${bdslaDPTokenAddress}`);
+    console.log(`dpDAI token address is: ${daiDPTokenAddress}`);
+    console.log(`dpUSDC token address is: ${usdcDPTokenAddress}`);
+
+    // Owner dp token balances
+    const bdslaDPToken = await IERC20.at(bdslaDPTokenAddress);
+    const daiDPToken = await IERC20.at(daiDPTokenAddress);
+    const usdcDPToken = await IERC20.at(usdcDPTokenAddress);
+    const ownerDSLAdpTokenBalance = await bdslaDPToken.balanceOf(owner);
+    const ownerDAIdpTokenBalance = await daiDPToken.balanceOf(owner);
+    const ownerUSDCdpTokenBalance = await usdcDPToken.balanceOf(owner);
+    console.log(`Owner dpDSLA token balance is: ${fromWei(ownerDSLAdpTokenBalance)}`);
+    console.log(`Owner dpDAI token balance is: ${fromWei(ownerDAIdpTokenBalance)}`);
+    console.log(`Owner dpUSDC token balance is: ${fromWei(ownerUSDCdpTokenBalance)}`);
+
+    // DU tokens addresses
+    const bdslaDUTokenAddress = await sla.duTokenRegistry(bdslaToken.address);
+    const daiDUTokenAddress = await sla.duTokenRegistry(daiToken.address);
+    const usdcDUTokenAddress = await sla.duTokenRegistry(usdcToken.address);
+    console.log(`duDSLA token address is: ${bdslaDUTokenAddress}`);
+    console.log(`duDAI token address is: ${daiDUTokenAddress}`);
+    console.log(`duUSDC token address is: ${usdcDUTokenAddress}`);
+
+    // notOwner dp token balances
+    const bdslaDUToken = await IERC20.at(bdslaDUTokenAddress);
+    const daiDUToken = await IERC20.at(daiDUTokenAddress);
+    const usdcDUToken = await IERC20.at(usdcDUTokenAddress);
+    const notOwnerDSLAduTokenBalance = await bdslaDUToken.balanceOf(notOwner);
+    const notOwnerDAIdpuokenBalance = await daiDUToken.balanceOf(notOwner);
+    const notOwnerUSDCduTokenBalance = await usdcDUToken.balanceOf(notOwner);
+    console.log(`notOwner duDSLA token balance is: ${fromWei(notOwnerDSLAduTokenBalance)}`);
+    console.log(`notOwner duDAI token balance is: ${fromWei(notOwnerDAIdpuokenBalance)}`);
+    console.log(`notOwner duUSDC token balance is: ${fromWei(notOwnerUSDCduTokenBalance)}`);
 
     callback(null);
   } catch (error) {
