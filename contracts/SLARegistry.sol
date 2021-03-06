@@ -138,6 +138,10 @@ contract SLARegistry is Ownable {
      * @param _sla 2. SLA Address
      */
     function requestSLI(uint256 _periodId, SLA _sla) public {
+        require(
+            _periodId == _sla.nextVerifiablePeriod(),
+            "Should only verify next period"
+        );
         bool breachedContract = _sla.breachedContract();
         (, , SLA.Status status) = _sla.periodSLIs(_periodId);
         require(

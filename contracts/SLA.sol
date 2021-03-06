@@ -48,6 +48,9 @@ contract SLA is Staking {
     /// @dev The address of the messenger
     address public messengerAddress;
 
+    /// @dev states if the contract was breached or not
+    bool private _breachedContract = false;
+
     /// @dev periodId=>PeriodSLI mapping
     mapping(uint256 => PeriodSLI) public periodSLIs;
 
@@ -58,7 +61,7 @@ contract SLA is Staking {
     bytes32[] public extraData;
 
     /// @dev states if the contract was breached or not
-    bool private _breachedContract = false;
+    uint256 public nextVerifiablePeriod;
 
     /**
      * @dev event for SLI creation logging
@@ -142,6 +145,7 @@ contract SLA is Staking {
         periodType = _periodType;
         slo = _SLO;
         extraData = _extraData;
+        nextVerifiablePeriod = _periodIds[0];
     }
 
     /**
@@ -154,6 +158,7 @@ contract SLA is Staking {
         onlyMessenger
     {
         emit SLICreated(block.timestamp, _sli, _periodId);
+        nextVerifiablePeriod = _periodId + 1;
         PeriodSLI storage periodSLI = periodSLIs[_periodId];
         periodSLI.sli = _sli;
         periodSLI.timestamp = block.timestamp;

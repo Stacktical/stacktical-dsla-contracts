@@ -45,7 +45,8 @@ contract Details {
             uint256[] memory periodIDs,
             PeriodRegistry.PeriodType periodType,
             uint256 stakersCount,
-            TokenStake[] memory tokensStake
+            TokenStake[] memory tokensStake,
+            uint256 nextVerifiablePeriod
         )
     {
         SLA sla = SLA(_slaAddress);
@@ -79,5 +80,6 @@ contract Details {
                 providerPool: sla.providerPool(sla.allowedTokens(index))
             });
         }
+        nextVerifiablePeriod = sla.nextVerifiablePeriod();
     }
 }
