@@ -20,40 +20,42 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /// @dev Array with all request IDs
     bytes32[] public requests;
     /// @dev The address of the SLARegistry contract
-    address public slaRegistryAddress;
+    address private _slaRegistryAddress;
     /// @dev Network analytics contract address
     address public networkAnalyticsAddress;
     /// @dev Chainlink oracle address
-    address public oracle;
+    address private _oracle;
     /// @dev chainlink jobId
-    bytes32 public jobId;
+    bytes32 private _jobId;
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
-    uint256 public fee = 0.1 * 10**18;
+    uint256 private _fee = 0.1 * 10**18;
+    /// @dev to multiply the SLI value and get better precision. Useful to deploy SLO correctly
+    uint256 private _messengerPrecision = 10**3;
 
     /**
      * @dev parameterize the variables according to network
      * @notice sets the Chainlink parameters (oracle address, token address, jobId) and sets the SLARegistry to 0x0 address
-     * @param _chainlinkOracle 1. the address of the oracle to create requests to
-     * @param _chainlinkToken 2. the address of LINK token contract
-     * @param _jobId 3. the job id for Staking efficiency job
+     * @param _messengerChainlinkOracle 1. the address of the oracle to create requests to
+     * @param _messengerChainlinkToken 2. the address of LINK token contract
+     * @param _messengerJobId 3. the job id for Staking efficiency job
      * @param _networkAnalyticsAddress 4. Network analytics contract address
      */
     constructor(
-        address _chainlinkOracle,
-        address _chainlinkToken,
-        bytes32 _jobId,
+        address _messengerChainlinkOracle,
+        address _messengerChainlinkToken,
+        bytes32 _messengerJobId,
         address _networkAnalyticsAddress
     ) public {
-        jobId = _jobId;
-        setChainlinkToken(_chainlinkToken);
-        oracle = _chainlinkOracle;
+        _jobId = _messengerJobId;
+        setChainlinkToken(_messengerChainlinkToken);
+        _oracle = _messengerChainlinkOracle;
         networkAnalyticsAddress = _networkAnalyticsAddress;
     }
 
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
     modifier onlySLARegistry() {
         require(
-            msg.sender == slaRegistryAddress,
+            msg.sender == _slaRegistryAddress,
             "Can only be called by SLARegistry"
         );
         _;
@@ -66,11 +68,11 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     function setSLARegistry() public override {
         // Only able to trigger this function once
         require(
-            slaRegistryAddress == address(0),
+            _slaRegistryAddress == address(0),
             "SLARegistry address has already been set"
         );
 
-        slaRegistryAddress = msg.sender;
+        _slaRegistryAddress = msg.sender;
     }
 
     /**
@@ -101,7 +103,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         );
         Chainlink.Request memory request =
             buildChainlinkRequest(
-                jobId,
+                _jobId,
                 address(this),
                 this.fulfillSLI.selector
             );
@@ -114,7 +116,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         );
 
         // Sends the request with 0.1 LINK to the oracle contract
-        bytes32 requestId = sendChainlinkRequestTo(oracle, request, fee);
+        bytes32 requestId = sendChainlinkRequestTo(_oracle, request, _fee);
 
         requests.push(requestId);
 
@@ -144,7 +146,8 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         );
         (uint256 hits, uint256 misses) = parseSLIData(_chainlinkResponse);
         uint256 total = hits.add(misses);
-        uint256 stakingEfficiency = hits.mul(100 * 1000).div(total);
+        uint256 stakingEfficiency =
+            hits.mul(100 * _messengerPrecision).div(total);
         SLA(request.slaAddress).registerSLI(
             stakingEfficiency,
             request.periodId
@@ -181,5 +184,40 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         uint256 hits = _bytesToUint(bytesHits);
         uint256 misses = _bytesToUint(bytesMisses);
         return (hits, misses);
+    }
+
+    /**
+     * @dev returns the value of the sla registry address
+     */
+    function slaRegistryAddress() public view override returns (address) {
+        return _slaRegistryAddress;
+    }
+
+    /**
+     * @dev returns the value of the messenger precision
+     */
+    function messengerPrecision() public view override returns (uint256) {
+        return _messengerPrecision;
+    }
+
+    /**
+     * @dev returns the chainlink oracle contract address
+     */
+    function oracle() public view override returns (address) {
+        return _oracle;
+    }
+
+    /**
+     * @dev returns the chainlink job id
+     */
+    function jobId() public view override returns (bytes32) {
+        return _jobId;
+    }
+
+    /**
+     * @dev returns the chainlink fee value on LINK tokens
+     */
+    function fee() public view override returns (uint256) {
+        return _fee;
     }
 }
