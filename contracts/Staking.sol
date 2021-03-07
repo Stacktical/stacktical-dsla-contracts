@@ -406,11 +406,11 @@ contract Staking is Ownable {
         } else {
             ERC20PresetMinterPauser dToken =
                 duTokenRegistry[allowedTokenAddress];
-            uint256 dTokenBalance = dToken.balanceOf(msg.sender);
             uint256 dTokenSupply = dToken.totalSupply();
             if (dTokenSupply == 0) {
                 return (allowedTokenAddress, 0);
             }
+            uint256 dTokenBalance = dToken.balanceOf(_staker);
             uint256 precision = 10000;
             uint256 userCompensationPercentage =
                 dTokenBalance.mul(precision).div(dTokenSupply);
