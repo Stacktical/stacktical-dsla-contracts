@@ -142,12 +142,12 @@ contract SLARegistry is Ownable {
             _periodId == _sla.nextVerifiablePeriod(),
             "Should only verify next period"
         );
-        bool breachedContract = _sla.breachedContract();
         (, , SLA.Status status) = _sla.periodSLIs(_periodId);
         require(
             status == SLA.Status.NotVerified,
             "SLA contract was already verified for the period"
         );
+        bool breachedContract = _sla.breachedContract();
         require(
             breachedContract == false,
             "Should only be called for not breached contracts"

@@ -6,8 +6,22 @@ export const DetailsABI: AbiItem[] = [
     name: 'getSLADetails',
     outputs: [
       { internalType: 'address', name: 'slaOwner', type: 'address' },
-      { internalType: 'string', name: 'ipfsHash', type: 'string' },
+      {
+        internalType: 'enum PeriodRegistry.PeriodType',
+        name: 'periodType',
+        type: 'uint8',
+      },
+      { internalType: 'bool', name: 'breachedContract', type: 'bool' },
       { internalType: 'contract SLO', name: 'slo', type: 'address' },
+      { internalType: 'uint256', name: 'creationBlockNumber', type: 'uint256' },
+      { internalType: 'uint256', name: 'stakersCount', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'nextVerifiablePeriod',
+        type: 'uint256',
+      },
+      { internalType: 'string', name: 'ipfsHash', type: 'string' },
+      { internalType: 'uint256[]', name: 'periodIDs', type: 'uint256[]' },
       {
         components: [
           { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
@@ -18,13 +32,6 @@ export const DetailsABI: AbiItem[] = [
         name: 'periodSLIs',
         type: 'tuple[]',
       },
-      { internalType: 'uint256[]', name: 'periodIDs', type: 'uint256[]' },
-      {
-        internalType: 'enum PeriodRegistry.PeriodType',
-        name: 'periodType',
-        type: 'uint8',
-      },
-      { internalType: 'uint256', name: 'stakersCount', type: 'uint256' },
       {
         components: [
           { internalType: 'address', name: 'tokenAddress', type: 'address' },
@@ -35,11 +42,6 @@ export const DetailsABI: AbiItem[] = [
         internalType: 'struct Details.TokenStake[]',
         name: 'tokensStake',
         type: 'tuple[]',
-      },
-      {
-        internalType: 'uint256',
-        name: 'nextVerifiablePeriod',
-        type: 'uint256',
       },
     ],
     stateMutability: 'view',

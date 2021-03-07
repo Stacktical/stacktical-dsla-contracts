@@ -25,13 +25,16 @@ contract Details {
     /**
      * @dev external view function that returns all agreement information
      * @return slaOwner 1. address  owner
-     * @return ipfsHash 2. string  ipfsHash
-     * @return slo 3. addresses of the SLO
-     * @return periodSLIs 5. PeriodSLI[]
-     * @return periodIDs 6. array of period IDs
-     * @return periodType 7. periodType of the sla contract
-     * @return stakersCount 8. amount of stakers
-     * @return tokensStake 9. TokenStake[]
+     * @return periodType 2. periodType of the sla contract
+     * @return breachedContract 3. breached contract
+     * @return slo 4. addresses of the SLO
+     * @return creationBlockNumber 5. addresses of the SLO
+     * @return stakersCount 6. amount of stakers
+     * @return nextVerifiablePeriod 7. amount of stakers
+     * @return ipfsHash 8. string  ipfsHash
+     * @return periodIDs 9. array of period IDs
+     * @return periodSLIs 10. PeriodSLI[]
+     * @return tokensStake 11. TokenStake[]
      */
 
     function getSLADetails(address _slaAddress)
@@ -39,17 +42,20 @@ contract Details {
         view
         returns (
             address slaOwner,
-            string memory ipfsHash,
-            SLO slo,
-            SLA.PeriodSLI[] memory periodSLIs,
-            uint256[] memory periodIDs,
             PeriodRegistry.PeriodType periodType,
+            bool breachedContract,
+            SLO slo,
+            uint256 creationBlockNumber,
             uint256 stakersCount,
-            TokenStake[] memory tokensStake,
-            uint256 nextVerifiablePeriod
+            uint256 nextVerifiablePeriod,
+            string memory ipfsHash,
+            uint256[] memory periodIDs,
+            SLA.PeriodSLI[] memory periodSLIs,
+            TokenStake[] memory tokensStake
         )
     {
         SLA sla = SLA(_slaAddress);
+        breachedContract = sla.breachedContract();
         slaOwner = sla.owner();
         ipfsHash = sla.ipfsHash();
         slo = sla.slo();
@@ -81,5 +87,6 @@ contract Details {
             });
         }
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
+        creationBlockNumber = sla.creationBlockNumber();
     }
 }

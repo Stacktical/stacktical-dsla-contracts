@@ -40,12 +40,13 @@ module.exports = async (callback) => {
       serviceAddress: 'one18hum2avunkz3u448lftwmk7wr88qswdlfvvrdm',
       serviceTicker: slaNetwork,
     };
+
     const ipfsHash = await getIPFSHash(serviceMetadata);
     await slaRegistry.createSLA(
       slo,
       ipfsHash,
       periodType,
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      [0, 1, 2, 3, 4, 5],
       seMessenger.address,
       false,
       [slaNetworkBytes32],
