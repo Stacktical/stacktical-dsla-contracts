@@ -27,12 +27,15 @@ contract Details {
      * @return slaOwner 1. address  owner
      * @return periodType 2. periodType of the sla contract
      * @return breachedContract 3. breached contract
+     * @return whiteListed 3. breached contract
      * @return slo 4. addresses of the SLO
      * @return creationBlockNumber 5. addresses of the SLO
      * @return stakersCount 6. amount of stakers
      * @return nextVerifiablePeriod 7. amount of stakers
      * @return slaId 8. -
-     * @return ipfsHash 9. string  ipfsHash
+     * @return cumulatedDevaluation 9. -
+     * @return cumulatedDevaluationPrecision 10. -
+     * @return ipfsHash 11. string  ipfsHash
      */
 
     function getSLADetails(address _slaAddress)
@@ -42,11 +45,14 @@ contract Details {
             address slaOwner,
             PeriodRegistry.PeriodType periodType,
             bool breachedContract,
+            bool whiteListed,
             SLO slo,
             uint256 creationBlockNumber,
             uint256 stakersCount,
             uint256 nextVerifiablePeriod,
             uint256 slaId,
+            uint256 cumulatedDevaluation,
+            uint256 cumulatedDevaluationPrecision,
             string memory ipfsHash
         )
     {
@@ -54,11 +60,14 @@ contract Details {
         slaOwner = sla.owner();
         periodType = sla.periodType();
         breachedContract = sla.breachedContract();
+        whiteListed = sla.whiteListed();
         slo = sla.slo();
         creationBlockNumber = sla.creationBlockNumber();
         stakersCount = sla.getStakersLength();
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
         slaId = sla.slaID();
+        cumulatedDevaluation = sla.cumulatedDevaluation();
+        cumulatedDevaluationPrecision = sla.cumulatedDevaluationPrecision();
         ipfsHash = sla.ipfsHash();
     }
 

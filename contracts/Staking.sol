@@ -33,7 +33,7 @@ contract Staking is Ownable {
     ///@dev index to keep a deflationary mint of tokens
     uint256 public cumulatedDevaluation = 10**6;
     ///@dev to keep track of the precision used to avoid multiplying by 0
-    uint256 internal cumulatedDevaluationPrecision = 10**6;
+    uint256 public cumulatedDevaluationPrecision = 10**6;
 
     /// @dev address[] of the stakers of the SLA contract
     address[] public stakers;

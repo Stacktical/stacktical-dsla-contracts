@@ -177,6 +177,14 @@ export const SLAABI: AbiItem[] = [
     constant: true,
   },
   {
+    inputs: [],
+    name: 'cumulatedDevaluationPrecision',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
     name: 'dpTokenRegistry',
     outputs: [

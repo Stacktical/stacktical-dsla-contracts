@@ -21,6 +21,16 @@ export const DetailsABI: AbiItem[] = [
         type: 'uint256',
       },
       { internalType: 'uint256', name: 'slaId', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'cumulatedDevaluation',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'cumulatedDevaluationPrecision',
+        type: 'uint256',
+      },
       { internalType: 'string', name: 'ipfsHash', type: 'string' },
     ],
     stateMutability: 'view',
