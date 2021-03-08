@@ -21,6 +21,14 @@ import "./messenger/IMessenger.sol";
 contract SLARegistry is Ownable {
     using SafeMath for uint256;
 
+    struct LockedValue {
+        uint256 lockedValue;
+        uint256 dslaDepositByPeriod;
+        uint256 dslaPlatformReward;
+        uint256 dslaUserReward;
+        uint256 dslaBurnedByVerification;
+    }
+
     /// @dev SLO registry
     SLORegistry public sloRegistry;
     /// @dev Periods registry
@@ -33,8 +41,9 @@ contract SLARegistry is Ownable {
     SLA[] public SLAs;
     /// @dev stores the indexes of service level agreements owned by an user
     mapping(address => uint256[]) private userToSLAIndexes;
-    /// @dev (ownerAddress => slaAddress => balance) stores the DSLA balance left for sla owners
-    mapping(address => mapping(address => uint256)) public slaOwnerLockedValue;
+    /// @dev (ownerAddress => slaAddress => LockedValue) stores the locked value by the staker
+    mapping(address => mapping(address => LockedValue))
+        public slaOwnerLockedValue;
 
     /**
      * @dev event for service level agreement creation logging
@@ -106,13 +115,6 @@ contract SLARegistry is Ownable {
             "SLO not registered on SLORegistry"
         );
         require(_periodIds.length > 0, "Periods information is empty");
-        (, uint256 dslaDepositByPeriod, , , ) =
-            stakeRegistry.getStakingParameters();
-        IERC20(stakeRegistry.DSLATokenAddress()).transferFrom(
-            msg.sender,
-            address(this),
-            dslaDepositByPeriod.mul(_periodIds.length)
-        );
         // check if _periodIds are valid and sorted in ascendant order
         for (uint256 index = 0; index < _periodIds.length; index++) {
             bool validPeriod =
@@ -151,9 +153,26 @@ contract SLARegistry is Ownable {
                 SLAs.length
             );
 
-        slaOwnerLockedValue[msg.sender][address(sla)] = dslaDepositByPeriod.mul(
-            _periodIds.length
+        (
+            ,
+            uint256 dslaDepositByPeriod,
+            uint256 dslaPlatformReward,
+            uint256 dslaUserReward,
+            uint256 dslaBurnedByVerification
+        ) = stakeRegistry.getStakingParameters();
+        uint256 lockedValue = dslaDepositByPeriod.mul(_periodIds.length);
+        IERC20(stakeRegistry.DSLATokenAddress()).transferFrom(
+            msg.sender,
+            address(this),
+            lockedValue
         );
+        slaOwnerLockedValue[msg.sender][address(sla)] = LockedValue({
+            lockedValue: lockedValue,
+            dslaDepositByPeriod: dslaDepositByPeriod,
+            dslaPlatformReward: dslaPlatformReward,
+            dslaUserReward: dslaUserReward,
+            dslaBurnedByVerification: dslaBurnedByVerification
+        });
         SLAs.push(sla);
         uint256 index = SLAs.length.sub(1);
         userToSLAIndexes[msg.sender].push(index);
@@ -194,34 +213,26 @@ contract SLARegistry is Ownable {
         );
         address slaMessenger = _sla.messengerAddress();
         IMessenger(slaMessenger).requestSLI(_periodId, address(_sla));
-        (
-            ,
-            ,
-            uint256 dslaPlatformReward,
-            uint256 dslaUserReward,
-            uint256 dslaBurnedByVerification
-        ) = stakeRegistry.getStakingParameters();
+        LockedValue storage _lockedValue =
+            slaOwnerLockedValue[_sla.owner()][address(_sla)];
         IERC20(stakeRegistry.DSLATokenAddress()).transfer(
             msg.sender,
-            dslaUserReward
+            _lockedValue.dslaUserReward
         );
         IERC20(stakeRegistry.DSLATokenAddress()).transfer(
             owner(),
-            dslaPlatformReward
+            _lockedValue.dslaPlatformReward
         );
-        _burnDSLATokens(dslaBurnedByVerification);
-        slaOwnerLockedValue[_sla.owner()][address(_sla)] = slaOwnerLockedValue[
-            _sla.owner()
-        ][address(_sla)]
-            .sub(
-            dslaPlatformReward.add(dslaUserReward).add(dslaBurnedByVerification)
+        _burnDSLATokens(_lockedValue.dslaBurnedByVerification);
+        _lockedValue.lockedValue = _lockedValue.lockedValue.sub(
+            _lockedValue.dslaDepositByPeriod
         );
         emit SLIRequested(
             _sla,
             msg.sender,
-            dslaUserReward,
-            dslaPlatformReward,
-            dslaBurnedByVerification
+            _lockedValue.dslaUserReward,
+            _lockedValue.dslaPlatformReward,
+            _lockedValue.dslaBurnedByVerification
         );
     }
 
@@ -252,7 +263,8 @@ contract SLARegistry is Ownable {
                     lastPeriodStatus != SLA.Status.NotVerified),
             "Can only withdraw locked DSLA after the final period is verified or if the contract is breached"
         );
-        uint256 leftBalance = slaOwnerLockedValue[msg.sender][address(_sla)];
+        uint256 leftBalance =
+            slaOwnerLockedValue[msg.sender][address(_sla)].lockedValue;
         require(leftBalance > 0, "locked value is empty ");
         IERC20(stakeRegistry.DSLATokenAddress()).transfer(
             msg.sender,
