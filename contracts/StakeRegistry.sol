@@ -32,12 +32,16 @@ contract StakeRegistry is Ownable, StringUtils {
 
     /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = DSLAburnRate/1000 %
     uint256 private _DSLAburnRate = 3;
-    /// @dev minimum deposit for Tier 1 staking
-    uint256 private _minimumDSLAStakedTier1 = 3000 ether;
-    /// @dev minimum deposit for Tier 2 staking
-    uint256 private _minimumDSLAStakedTier2 = 6000 ether;
-    /// @dev minimum deposit for Tier 3 staking
-    uint256 private _minimumDSLAStakedTier3 = 9000 ether;
+
+    /// @dev DSLA deposit by period to create SLA
+    uint256 private _dslaDepositByPeriod = 20000 ether;
+    /// @dev DSLA rewarded to Stacktical team
+    uint256 private _dslaPlatformReward = 10000 ether;
+    /// @dev DSLA rewarded to user calling the period verification
+    uint256 private _dslaUserReward = 9940 ether;
+    /// @dev DSLA burned after every period verification
+    uint256 private _dslaBurnedByVerification = 60 ether;
+
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
 
@@ -47,21 +51,30 @@ contract StakeRegistry is Ownable, StringUtils {
     /**
      * @dev event to log modifications on the staking parameters
      *@param DSLAburnRate 1. (DSLAburnRate/1000)% of DSLA to be burned after a reward/compensation is paid
-     *@param minimumDSLAStakedTier1 2. minimum stake of DSLA to enable tier 1 privileges
-     *@param minimumDSLAStakedTier2 3. minimum stake of DSLA to enable tier 2 privileges
-     *@param minimumDSLAStakedTier3 4. minimum stake of DSLA to enable tier 3 privileges
+     *@param dslaDepositByPeriod 2. DSLA deposit by period to create SLA
+     *@param dslaPlatformReward 3. DSLA rewarded to Stacktical team
+     *@param dslaUserReward 4. DSLA rewarded to user calling the period verification
+     *@param dslaBurnedByVerification 5. DSLA burned after every period verification
      */
     event StakingParametersModified(
         uint256 DSLAburnRate,
-        uint256 minimumDSLAStakedTier1,
-        uint256 minimumDSLAStakedTier2,
-        uint256 minimumDSLAStakedTier3
+        uint256 dslaDepositByPeriod,
+        uint256 dslaPlatformReward,
+        uint256 dslaUserReward,
+        uint256 dslaBurnedByVerification
     );
 
     /**
      * @param _dslaTokenAddress 1. DSLA Token
      */
     constructor(address _dslaTokenAddress) public {
+        require(
+            _dslaDepositByPeriod ==
+                _dslaPlatformReward.add(_dslaUserReward).add(
+                    _dslaBurnedByVerification
+                ),
+            "Staking parameters should match on summation"
+        );
         DSLATokenAddress = _dslaTokenAddress;
         allowedTokens.push(_dslaTokenAddress);
     }
@@ -105,22 +118,6 @@ contract StakeRegistry is Ownable, StringUtils {
             }
         }
         return false;
-    }
-
-    function getStakingParameters()
-        public
-        view
-        returns (
-            uint256 DSLAburnRate,
-            uint256 minimumDSLAStakedTier1,
-            uint256 minimumDSLAStakedTier2,
-            uint256 minimumDSLAStakedTier3
-        )
-    {
-        DSLAburnRate = _DSLAburnRate;
-        minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
-        minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
-        minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
     }
 
     /**
@@ -237,19 +234,47 @@ contract StakeRegistry is Ownable, StringUtils {
     //_______ OnlyOwner functions _______
     function setStakingParameters(
         uint256 DSLAburnRate,
-        uint256 minimumDSLAStakedTier1,
-        uint256 minimumDSLAStakedTier2,
-        uint256 minimumDSLAStakedTier3
+        uint256 dslaDepositByPeriod,
+        uint256 dslaPlatformReward,
+        uint256 dslaUserReward,
+        uint256 dslaBurnedByVerification
     ) public onlyOwner {
         _DSLAburnRate = DSLAburnRate;
-        _minimumDSLAStakedTier1 = minimumDSLAStakedTier1;
-        _minimumDSLAStakedTier2 = minimumDSLAStakedTier2;
-        _minimumDSLAStakedTier3 = minimumDSLAStakedTier3;
+        require(
+            dslaDepositByPeriod ==
+                dslaPlatformReward.add(dslaUserReward).add(
+                    dslaBurnedByVerification
+                ),
+            "Staking parameters should match on summation"
+        );
+        _dslaDepositByPeriod = dslaDepositByPeriod;
+        _dslaPlatformReward = dslaPlatformReward;
+        _dslaUserReward = dslaUserReward;
+        _dslaBurnedByVerification = dslaBurnedByVerification;
         emit StakingParametersModified(
             DSLAburnRate,
-            minimumDSLAStakedTier1,
-            minimumDSLAStakedTier2,
-            minimumDSLAStakedTier3
+            dslaDepositByPeriod,
+            dslaPlatformReward,
+            dslaUserReward,
+            dslaBurnedByVerification
         );
+    }
+
+    function getStakingParameters()
+        public
+        view
+        returns (
+            uint256 DSLAburnRate,
+            uint256 dslaDepositByPeriod,
+            uint256 dslaPlatformReward,
+            uint256 dslaUserReward,
+            uint256 dslaBurnedByVerification
+        )
+    {
+        DSLAburnRate = _DSLAburnRate;
+        dslaDepositByPeriod = _dslaDepositByPeriod;
+        dslaPlatformReward = _dslaPlatformReward;
+        dslaUserReward = _dslaUserReward;
+        dslaBurnedByVerification = _dslaBurnedByVerification;
     }
 }

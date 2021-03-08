@@ -229,7 +229,7 @@ contract SLA is Staking {
         uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
         (, uint256 endOfLastValidPeriod) =
             periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
-        // providers and users can withdraw only if the contract is breached
+        // users can withdraw only if the contract is breached
         // or if the last period is finished and the period status was verified
         if (msg.sender != owner()) {
             require(

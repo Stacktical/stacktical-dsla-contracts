@@ -19,6 +19,7 @@ contract Staking is Ownable {
     PeriodRegistry private periodRegistry;
     /// @dev current SLA id
     uint256 public slaID;
+
     /// @dev (tokenAddress=>uint256) total pooled token balance
     mapping(address => uint256) public providerPool;
     /// @dev (tokenAddress=>uint256) total pooled token balance
@@ -43,12 +44,6 @@ contract Staking is Ownable {
 
     /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %
     uint256 public DSLAburnRate;
-    /// @dev minimum deposit for Tier 1 staking
-    uint256 public minimumDSLAStakedTier1;
-    /// @dev minimum deposit for Tier 2 staking
-    uint256 public minimumDSLAStakedTier2;
-    /// @dev minimum deposit for Tier 3 staking
-    uint256 public minimumDSLAStakedTier3;
 
     /// @dev PeriodRegistry period type of the SLA contract
     PeriodRegistry.PeriodType private periodType;
@@ -114,17 +109,9 @@ contract Staking is Ownable {
         periodType = _periodType;
         slaPeriodsLength = _slaPeriodsLength;
         whitelistedContract = _whitelistedContract;
-        (
-            uint256 _DSLAburnRate,
-            uint256 _minimumDSLAStakedTier1,
-            uint256 _minimumDSLAStakedTier2,
-            uint256 _minimumDSLAStakedTier3
-        ) = stakeRegistry.getStakingParameters();
+        (uint256 _DSLAburnRate, , , , ) = stakeRegistry.getStakingParameters();
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
-        minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
-        minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
-        minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
         addUserToWhitelist(msg.sender);
         slaID = _slaID;
     }

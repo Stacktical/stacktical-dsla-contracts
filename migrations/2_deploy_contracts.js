@@ -35,14 +35,12 @@ module.exports = (deployer, network) => {
         periodRegistry.address,
       );
 
-      const messengerPrecision = 10000;
       const seMessenger = await deployer.deploy(
         SEMessenger,
         env.chainlinkOracleAddress,
         env.chainlinkTokenAddress,
         chainlinkJobId,
         networkAnalytics.address,
-        messengerPrecision,
       );
 
       const stakeRegistry = await deployer.deploy(
