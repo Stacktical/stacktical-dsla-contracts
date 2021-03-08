@@ -31,7 +31,8 @@ contract Details {
      * @return creationBlockNumber 5. addresses of the SLO
      * @return stakersCount 6. amount of stakers
      * @return nextVerifiablePeriod 7. amount of stakers
-     * @return ipfsHash 8. string  ipfsHash
+     * @return slaId 8. -
+     * @return ipfsHash 9. string  ipfsHash
      */
 
     function getSLADetails(address _slaAddress)
@@ -45,6 +46,7 @@ contract Details {
             uint256 creationBlockNumber,
             uint256 stakersCount,
             uint256 nextVerifiablePeriod,
+            uint256 slaId,
             string memory ipfsHash
         )
     {
@@ -56,6 +58,7 @@ contract Details {
         creationBlockNumber = sla.creationBlockNumber();
         stakersCount = sla.getStakersLength();
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
+        slaId = sla.slaID();
         ipfsHash = sla.ipfsHash();
     }
 
@@ -63,8 +66,8 @@ contract Details {
         external
         view
         returns (
-            address[] memory dpTokensAddresses,
-            address[] memory duTokensAddresses,
+            string[] memory dpTokensAddresses,
+            string[] memory duTokensAddresses,
             uint256[] memory periodIDs,
             SLA.PeriodSLI[] memory periodSLIs,
             TokenStake[] memory tokensStake
@@ -87,8 +90,8 @@ contract Details {
         }
         uint256 allowedTokensLength = sla.getAllowedTokensLength();
         tokensStake = new TokenStake[](allowedTokensLength);
-        dpTokensAddresses = new address[](allowedTokensLength);
-        duTokensAddresses = new address[](allowedTokensLength);
+        dpTokensAddresses = new string[](allowedTokensLength);
+        duTokensAddresses = new string[](allowedTokensLength);
         for (uint256 index = 0; index < allowedTokensLength; index++) {
             address tokenAddress = sla.allowedTokens(index);
             tokensStake[index] = TokenStake({
@@ -98,12 +101,44 @@ contract Details {
                 usersPool: sla.usersPool(sla.allowedTokens(index)),
                 providerPool: sla.providerPool(sla.allowedTokens(index))
             });
-            dpTokensAddresses[index] = address(
-                sla.dpTokenRegistry(tokenAddress)
+            dpTokensAddresses[index] = _packDToken(
+                tokenAddress,
+                address(sla.dpTokenRegistry(tokenAddress))
             );
-            duTokensAddresses[index] = address(
-                sla.duTokenRegistry(tokenAddress)
+            duTokensAddresses[index] = _packDToken(
+                tokenAddress,
+                address(sla.duTokenRegistry(tokenAddress))
             );
         }
+    }
+
+    function _packDToken(address _tokenAddress, address _dTokenAddress)
+        internal
+        pure
+        returns (string memory)
+    {
+        string memory dTokenStringAddress = _addressToString(_dTokenAddress);
+        string memory tokenStringAddress = _addressToString(_tokenAddress);
+        return
+            string(
+                abi.encodePacked(tokenStringAddress, ":", dTokenStringAddress)
+            );
+    }
+
+    function _addressToString(address _address)
+        internal
+        pure
+        returns (string memory)
+    {
+        bytes32 _bytes = bytes32(uint256(_address));
+        bytes memory HEX = "0123456789abcdef";
+        bytes memory _string = new bytes(42);
+        _string[0] = "0";
+        _string[1] = "x";
+        for (uint256 i = 0; i < 20; i++) {
+            _string[2 + i * 2] = HEX[uint8(_bytes[i + 12] >> 4)];
+            _string[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
+        }
+        return string(_string);
     }
 }

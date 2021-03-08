@@ -20,6 +20,7 @@ export const DetailsABI: AbiItem[] = [
         name: 'nextVerifiablePeriod',
         type: 'uint256',
       },
+      { internalType: 'uint256', name: 'slaId', type: 'uint256' },
       { internalType: 'string', name: 'ipfsHash', type: 'string' },
     ],
     stateMutability: 'view',
@@ -30,16 +31,8 @@ export const DetailsABI: AbiItem[] = [
     inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
     name: 'getSLADetailsArrays',
     outputs: [
-      {
-        internalType: 'address[]',
-        name: 'dpTokensAddresses',
-        type: 'address[]',
-      },
-      {
-        internalType: 'address[]',
-        name: 'duTokensAddresses',
-        type: 'address[]',
-      },
+      { internalType: 'string[]', name: 'dpTokensAddresses', type: 'string[]' },
+      { internalType: 'string[]', name: 'duTokensAddresses', type: 'string[]' },
       { internalType: 'uint256[]', name: 'periodIDs', type: 'uint256[]' },
       {
         components: [
