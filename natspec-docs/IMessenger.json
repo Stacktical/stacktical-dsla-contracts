@@ -13,6 +13,7 @@
   },
   "kind": "dev",
   "methods": {
+    "fee()": { "details": "gets the fee amount of LINK token" },
     "fulfillSLI(bytes32,bytes32)": {
       "details": "callback function for the Chainlink SLI request which stores the SLI in the SLA contract",
       "params": {
@@ -20,6 +21,9 @@
         "_requestId": "the ID of the ChainLink request"
       }
     },
+    "jobId()": { "details": "gets the chainlink job id" },
+    "messengerPrecision()": { "details": "gets the messenger precision" },
+    "oracle()": { "details": "gets the chainlink oracle contract address" },
     "requestSLI(uint256,address)": {
       "details": "creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.",
       "params": {
@@ -29,7 +33,8 @@
     },
     "setSLARegistry()": {
       "details": "sets the SLARegistry contract address and can only be called once"
-    }
+    },
+    "slaRegistryAddress()": { "details": "gets the slaRegistryAddress" }
   },
   "title": "IMessenger",
   "version": 1

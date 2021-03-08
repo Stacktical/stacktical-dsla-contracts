@@ -5,6 +5,7 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./SLA.sol";
 import "./SLARegistry.sol";
 import "./StringUtils.sol";
@@ -25,6 +26,16 @@ contract StakeRegistry is Ownable, StringUtils {
         address assetAddress;
     }
 
+    struct LockedValue {
+        uint256 lockedValue;
+        uint256 slaPeriodIdsLength;
+        uint256 dslaDepositByPeriod;
+        uint256 dslaPlatformReward;
+        uint256 dslaUserReward;
+        uint256 dslaBurnedByVerification;
+        mapping(uint256 => bool) verifiedPeriods;
+    }
+
     address public DSLATokenAddress;
     SLARegistry public slaRegistry;
 
@@ -32,7 +43,8 @@ contract StakeRegistry is Ownable, StringUtils {
 
     /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = DSLAburnRate/1000 %
     uint256 private _DSLAburnRate = 3;
-
+    /// @dev (ownerAddress => slaAddress => LockedValue) stores the locked value by the staker
+    mapping(address => LockedValue) public slaLockedValue;
     /// @dev DSLA deposit by period to create SLA
     uint256 private _dslaDepositByPeriod = 20000 ether;
     /// @dev DSLA rewarded to Stacktical team
@@ -47,6 +59,22 @@ contract StakeRegistry is Ownable, StringUtils {
 
     /// @dev (userAddress => SLA[]) with user staked SLAs to get tokenPool
     mapping(address => SLA[]) public userStakedSlas;
+
+    /**
+     * @dev event to log a verifiation reward distributed
+     * @param sla 1. The address of the created service level agreement contract
+     * @param requester 2. -
+     * @param userReward 3. -
+     * @param platformReward 4. -
+     * @param burnedDSLA 5. -
+     */
+    event VerificationRewardDistributed(
+        address indexed sla,
+        address indexed requester,
+        uint256 userReward,
+        uint256 platformReward,
+        uint256 burnedDSLA
+    );
 
     /**
      * @dev event to log modifications on the staking parameters
@@ -173,6 +201,76 @@ contract StakeRegistry is Ownable, StringUtils {
         return address(dToken);
     }
 
+    function lockDSLAValue(
+        address _slaOwner,
+        address _sla,
+        uint256 _periodIdsLength
+    ) public onlySLARegistry {
+        uint256 lockedValue = _dslaDepositByPeriod.mul(_periodIdsLength);
+        IERC20(DSLATokenAddress).transferFrom(
+            _slaOwner,
+            address(this),
+            lockedValue
+        );
+        slaLockedValue[_sla] = LockedValue({
+            lockedValue: lockedValue,
+            slaPeriodIdsLength: _periodIdsLength,
+            dslaDepositByPeriod: _dslaDepositByPeriod,
+            dslaPlatformReward: _dslaPlatformReward,
+            dslaUserReward: _dslaUserReward,
+            dslaBurnedByVerification: _dslaBurnedByVerification
+        });
+    }
+
+    function distributeVerificationRewards(
+        address _sla,
+        address _verificationRewardReceiver,
+        uint256 _periodId
+    ) public onlySLARegistry {
+        LockedValue storage _lockedValue = slaLockedValue[_sla];
+        require(
+            _lockedValue.verifiedPeriods[_periodId] == false,
+            "Period rewards already distributed"
+        );
+        _lockedValue.verifiedPeriods[_periodId] = true;
+        _lockedValue.lockedValue = _lockedValue.lockedValue.sub(
+            _lockedValue.dslaDepositByPeriod
+        );
+        IERC20(DSLATokenAddress).transfer(
+            _verificationRewardReceiver,
+            _lockedValue.dslaUserReward
+        );
+        IERC20(DSLATokenAddress).transfer(
+            owner(),
+            _lockedValue.dslaPlatformReward
+        );
+        _burnDSLATokens(_lockedValue.dslaBurnedByVerification);
+        emit VerificationRewardDistributed(
+            _sla,
+            _verificationRewardReceiver,
+            _lockedValue.dslaUserReward,
+            _lockedValue.dslaPlatformReward,
+            _lockedValue.dslaBurnedByVerification
+        );
+    }
+
+    function returnLockedValue(address _sla) public onlySLARegistry {
+        LockedValue storage _lockedValue = slaLockedValue[_sla];
+        uint256 remainingBalance = _lockedValue.lockedValue;
+        require(remainingBalance > 0, "locked value is empty");
+        _lockedValue.lockedValue = 0;
+        IERC20(DSLATokenAddress).transfer(SLA(_sla).owner(), remainingBalance);
+    }
+
+    function _burnDSLATokens(uint256 _amount) internal {
+        bytes4 BURN_SELECTOR = bytes4(keccak256(bytes("burn(uint256)")));
+        (bool _success, ) =
+            DSLATokenAddress.call(
+                abi.encodeWithSelector(BURN_SELECTOR, _amount)
+            );
+        require(_success, "DSLA burn process was not successful");
+    }
+
     /**
      * @dev returns the active pools owned by a user.
      * @param _slaOwner 1. owner of the active pool
@@ -276,5 +374,13 @@ contract StakeRegistry is Ownable, StringUtils {
         dslaPlatformReward = _dslaPlatformReward;
         dslaUserReward = _dslaUserReward;
         dslaBurnedByVerification = _dslaBurnedByVerification;
+    }
+
+    function periodIsVerified(address _sla, uint256 _periodId)
+        public
+        view
+        returns (bool)
+    {
+        return slaLockedValue[_sla].verifiedPeriods[_periodId];
     }
 }

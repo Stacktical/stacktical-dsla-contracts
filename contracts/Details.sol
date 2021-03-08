@@ -32,9 +32,6 @@ contract Details {
      * @return stakersCount 6. amount of stakers
      * @return nextVerifiablePeriod 7. amount of stakers
      * @return ipfsHash 8. string  ipfsHash
-     * @return periodIDs 9. array of period IDs
-     * @return periodSLIs 10. PeriodSLI[]
-     * @return tokensStake 11. TokenStake[]
      */
 
     function getSLADetails(address _slaAddress)
@@ -48,18 +45,32 @@ contract Details {
             uint256 creationBlockNumber,
             uint256 stakersCount,
             uint256 nextVerifiablePeriod,
-            string memory ipfsHash,
+            string memory ipfsHash
+        )
+    {
+        SLA sla = SLA(_slaAddress);
+        slaOwner = sla.owner();
+        periodType = sla.periodType();
+        breachedContract = sla.breachedContract();
+        slo = sla.slo();
+        creationBlockNumber = sla.creationBlockNumber();
+        stakersCount = sla.getStakersLength();
+        nextVerifiablePeriod = sla.nextVerifiablePeriod();
+        ipfsHash = sla.ipfsHash();
+    }
+
+    function getSLADetailsArrays(address _slaAddress)
+        external
+        view
+        returns (
+            address[] memory dpTokensAddresses,
+            address[] memory duTokensAddresses,
             uint256[] memory periodIDs,
             SLA.PeriodSLI[] memory periodSLIs,
             TokenStake[] memory tokensStake
         )
     {
         SLA sla = SLA(_slaAddress);
-        breachedContract = sla.breachedContract();
-        slaOwner = sla.owner();
-        ipfsHash = sla.ipfsHash();
-        slo = sla.slo();
-        periodType = sla.periodType();
         uint256 periodIdsLength = sla.getPeriodIdsLength();
         periodSLIs = new SLA.PeriodSLI[](periodIdsLength);
         periodIDs = new uint256[](periodIdsLength);
@@ -74,19 +85,25 @@ contract Details {
             });
             periodIDs[index] = sla.periodIds(index);
         }
-        stakersCount = sla.getStakersLength();
         uint256 allowedTokensLength = sla.getAllowedTokensLength();
         tokensStake = new TokenStake[](allowedTokensLength);
+        dpTokensAddresses = new address[](allowedTokensLength);
+        duTokensAddresses = new address[](allowedTokensLength);
         for (uint256 index = 0; index < allowedTokensLength; index++) {
+            address tokenAddress = sla.allowedTokens(index);
             tokensStake[index] = TokenStake({
-                tokenAddress: sla.allowedTokens(index),
+                tokenAddress: tokenAddress,
                 totalStake: sla.usersPool(sla.allowedTokens(index)) +
                     sla.providerPool(sla.allowedTokens(index)),
                 usersPool: sla.usersPool(sla.allowedTokens(index)),
                 providerPool: sla.providerPool(sla.allowedTokens(index))
             });
+            dpTokensAddresses[index] = address(
+                sla.dpTokenRegistry(tokenAddress)
+            );
+            duTokensAddresses[index] = address(
+                sla.duTokenRegistry(tokenAddress)
+            );
         }
-        nextVerifiablePeriod = sla.nextVerifiablePeriod();
-        creationBlockNumber = sla.creationBlockNumber();
     }
 }

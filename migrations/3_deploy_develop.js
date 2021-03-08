@@ -61,7 +61,7 @@ module.exports = (deployer, network) => {
       await stakeRegistry.addAllowedTokens(daiToken.address);
       await stakeRegistry.addAllowedTokens(usdcToken.address);
 
-      console.log('Starting automated job 4: Asking for network analytics for period 1');
+      console.log('Starting automated job 4: Asking for network analytics for period 0');
       const networkAnalytics = await NetworkAnalytics.deployed();
       await networkAnalytics.addNetwork(slaNetworkBytes32);
       const linkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
@@ -98,11 +98,14 @@ module.exports = (deployer, network) => {
       };
       const ipfsHash = await getIPFSHash(serviceMetadata);
       const slaRegistry = await SLARegistry.deployed();
+      const periodIds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      const dslaDepositByPeriod = toWei(String(20000 * periodIds.length));
+      await bdslaToken.approve(stakeRegistry.address, dslaDepositByPeriod);
       await slaRegistry.createSLA(
         slo,
         ipfsHash,
         periodType,
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        periodIds,
         seMessenger.address,
         false,
         [slaNetworkBytes32],

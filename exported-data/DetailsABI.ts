@@ -21,6 +21,25 @@ export const DetailsABI: AbiItem[] = [
         type: 'uint256',
       },
       { internalType: 'string', name: 'ipfsHash', type: 'string' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
+    name: 'getSLADetailsArrays',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: 'dpTokensAddresses',
+        type: 'address[]',
+      },
+      {
+        internalType: 'address[]',
+        name: 'duTokensAddresses',
+        type: 'address[]',
+      },
       { internalType: 'uint256[]', name: 'periodIDs', type: 'uint256[]' },
       {
         components: [

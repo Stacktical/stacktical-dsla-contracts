@@ -39,23 +39,61 @@ export const StakeRegistryABI: AbiItem[] = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'minimumDSLAStakedTier1',
+        name: 'dslaDepositByPeriod',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'minimumDSLAStakedTier2',
+        name: 'dslaPlatformReward',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'minimumDSLAStakedTier3',
+        name: 'dslaUserReward',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'dslaBurnedByVerification',
         type: 'uint256',
       },
     ],
     name: 'StakingParametersModified',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'sla', type: 'address' },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'requester',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'userReward',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'platformReward',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'burnedDSLA',
+        type: 'uint256',
+      },
+    ],
+    name: 'VerificationRewardDistributed',
     type: 'event',
   },
   {
@@ -88,6 +126,25 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'slaLockedValue',
+    outputs: [
+      { internalType: 'uint256', name: 'lockedValue', type: 'uint256' },
+      { internalType: 'uint256', name: 'slaPeriodIdsLength', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaDepositByPeriod', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaPlatformReward', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaUserReward', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'dslaBurnedByVerification',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -144,31 +201,6 @@ export const StakeRegistryABI: AbiItem[] = [
     constant: true,
   },
   {
-    inputs: [],
-    name: 'getStakingParameters',
-    outputs: [
-      { internalType: 'uint256', name: 'DSLAburnRate', type: 'uint256' },
-      {
-        internalType: 'uint256',
-        name: 'minimumDSLAStakedTier1',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'minimumDSLAStakedTier2',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'minimumDSLAStakedTier3',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
     inputs: [
       { internalType: 'address', name: '_user', type: 'address' },
       { internalType: 'address', name: '_sla', type: 'address' },
@@ -197,6 +229,39 @@ export const StakeRegistryABI: AbiItem[] = [
     type: 'function',
   },
   {
+    inputs: [
+      { internalType: 'address', name: '_slaOwner', type: 'address' },
+      { internalType: 'address', name: '_sla', type: 'address' },
+      { internalType: 'uint256', name: '_periodIdsLength', type: 'uint256' },
+    ],
+    name: 'lockDSLAValue',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '_sla', type: 'address' },
+      {
+        internalType: 'address',
+        name: '_verificationRewardReceiver',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: '_periodId', type: 'uint256' },
+    ],
+    name: 'distributeVerificationRewards',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '_sla', type: 'address' }],
+    name: 'returnLockedValue',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [{ internalType: 'address', name: '_slaOwner', type: 'address' }],
     name: 'getActivePool',
     outputs: [
@@ -219,19 +284,12 @@ export const StakeRegistryABI: AbiItem[] = [
   {
     inputs: [
       { internalType: 'uint256', name: 'DSLAburnRate', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaDepositByPeriod', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaPlatformReward', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaUserReward', type: 'uint256' },
       {
         internalType: 'uint256',
-        name: 'minimumDSLAStakedTier1',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'minimumDSLAStakedTier2',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'minimumDSLAStakedTier3',
+        name: 'dslaBurnedByVerification',
         type: 'uint256',
       },
     ],
@@ -239,5 +297,34 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getStakingParameters',
+    outputs: [
+      { internalType: 'uint256', name: 'DSLAburnRate', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaDepositByPeriod', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaPlatformReward', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaUserReward', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'dslaBurnedByVerification',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '_sla', type: 'address' },
+      { internalType: 'uint256', name: '_periodId', type: 'uint256' },
+    ],
+    name: 'periodIsVerified',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
 ];
