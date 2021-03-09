@@ -5,6 +5,7 @@ const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
 const SLORegistry = artifacts.require('SLORegistry');
 const SEMessenger = artifacts.require('SEMessenger');
+const StakeRegistry = artifacts.require('StakeRegistry');
 const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
@@ -29,6 +30,7 @@ module.exports = async (callback) => {
     const slaRegistry = await SLARegistry.deployed();
     const sloRegistry = await SLORegistry.deployed();
     const seMessenger = await SEMessenger.deployed();
+    const stakeRegistry = await StakeRegistry.deployed();
 
     const slo = await sloRegistry.sloAddresses.call(sloValue, sloType);
     const serviceMetadata = {
@@ -42,11 +44,14 @@ module.exports = async (callback) => {
     };
 
     const ipfsHash = await getIPFSHash(serviceMetadata);
+    const periodIds = [0, 1, 2];
+    const dslaDepositByPeriod = toWei(String(20000 * periodIds.length));
+    await bdslaToken.approve(stakeRegistry.address, dslaDepositByPeriod);
     await slaRegistry.createSLA(
       slo,
       ipfsHash,
       periodType,
-      [0, 1, 2, 3, 4, 5],
+      periodIds,
       seMessenger.address,
       false,
       [slaNetworkBytes32],

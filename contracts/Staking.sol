@@ -223,35 +223,6 @@ contract Staking is Ownable {
     }
 
     /**
-     *@dev withdraw staked tokens. Only dpToken owners can withdraw,
-     * users have to claim compensations if available
-     *@param _amount 1. amount to be withdrawn
-     *@param _tokenAddress 2. address of the token
-     */
-    function _withdraw(uint256 _amount, address _tokenAddress)
-        internal
-        onlyAllowedToken(_tokenAddress)
-    {
-        uint256 providerStake = providerPool[_tokenAddress];
-        uint256 usersStake = usersPool[_tokenAddress];
-        require(
-            providerStake.sub(_amount) >= usersStake,
-            "Should not withdraw more than users stake"
-        );
-        ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
-        uint256 p0 = dpToken.totalSupply();
-        uint256 t0 = providerPool[_tokenAddress];
-        // Burn dpTokens in a way that it doesn't affect the PoolTokens/LPTokens
-        // average for current period.
-        // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
-        // burnedDPTokens = _amount*p0/t0
-        uint256 burnedDPTokens = _amount.mul(p0).div(t0);
-        dpToken.burnFrom(msg.sender, burnedDPTokens);
-        providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
-    }
-
-    /**
      *@dev sets the provider reward
      *@notice it calculates the usersStake and calculates the provider reward from it.
      * @param _periodId 1. id of the period
@@ -322,6 +293,59 @@ contract Staking is Ownable {
             // Add after burn to match balances
             usersPool[tokenAddress] = usersPool[tokenAddress].add(compensation);
         }
+    }
+
+    /**
+     *@dev withdraw staked tokens. Only dpToken owners can withdraw,
+     *@param _amount 1. amount to be withdrawn
+     *@param _tokenAddress 2. address of the token
+     *@param _contractFinished 3. contract finished
+     */
+    function _withdrawProviderTokens(
+        uint256 _amount,
+        address _tokenAddress,
+        bool _contractFinished
+    ) internal onlyAllowedToken(_tokenAddress) {
+        uint256 providerStake = providerPool[_tokenAddress];
+        uint256 usersStake = usersPool[_tokenAddress];
+        if (!_contractFinished) {
+            require(
+                providerStake.sub(_amount) >= usersStake,
+                "Should not withdraw more than users stake"
+            );
+        }
+        ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
+        uint256 p0 = dpToken.totalSupply();
+        uint256 t0 = providerPool[_tokenAddress];
+        // Burn duTokens in a way that it doesn't affect the PoolTokens/LPTokens average
+        // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
+        // burnedDPTokens = _amount*p0/t0
+        uint256 burnedDPTokens = _amount.mul(p0).div(t0);
+        dpToken.burnFrom(msg.sender, burnedDPTokens);
+        providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
+        ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
+    }
+
+    /**
+     *@dev withdraw staked tokens. Only duToken owners can withdraw,
+     *@param _amount 1. amount to be withdrawn
+     *@param _tokenAddress 2. address of the token
+     */
+    function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
+        internal
+        onlyAllowedToken(_tokenAddress)
+    {
+        ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
+        uint256 p0 = duToken.totalSupply();
+        uint256 t0 = usersPool[_tokenAddress];
+        // Burn duTokens in a way that it doesn't affect the PoolTokens/LPTokens
+        // average for current period.
+        // t0/p0 = (t0-_amount)/(p0-burnedDUTokens)
+        // burnedDUTokens = _amount*p0/t0
+        uint256 burnedDUTokens = _amount.mul(p0).div(t0);
+        duToken.burnFrom(msg.sender, burnedDUTokens);
+        usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
+        ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
 
     /**

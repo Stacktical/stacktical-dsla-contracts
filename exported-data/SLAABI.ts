@@ -221,19 +221,6 @@ export const SLAABI: AbiItem[] = [
     constant: true,
   },
   {
-    inputs: [{ internalType: 'address', name: '', type: 'address' }],
-    name: 'duTokenRegistry',
-    outputs: [
-      {
-        internalType: 'contract ERC20PresetMinterPauser',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     name: 'extraData',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
