@@ -238,7 +238,6 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [

@@ -217,20 +217,33 @@ contract SLA is Staking {
         stakeRegistry.registerStakedSla(msg.sender);
     }
 
-    /**
-     *@dev withdraw _amount tokens from the _token contract
-     *@param _amount 1. amount to be staked
-     *@param _tokenAddress 2. address of the ERC to be staked
-     */
-
-    function withdrawStakedTokens(uint256 _amount, address _tokenAddress)
+    function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         public
     {
         require(_amount > 0, "amount cannot be 0");
         uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
         (, uint256 endOfLastValidPeriod) =
             periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
-        // users can withdraw only if the contract is breached
+        // contract is finished if is breached or if the last period is finished and verified
+        bool contractFinished =
+            _breachedContract == true ||
+                (block.timestamp >= endOfLastValidPeriod &&
+                    periodSLIs[lastValidPeriodId].status != Status.NotVerified);
+        _withdrawProviderTokens(_amount, _tokenAddress, _contractFinished);
+    }
+
+    /**
+     *@dev withdraw _amount tokens from the _token contract
+     *@param _amount 1. amount to be staked
+     *@param _tokenAddress 2. address of the ERC to be staked
+     */
+
+    function withdrawUserTokens(uint256 _amount, address _tokenAddress) public {
+        require(_amount > 0, "amount cannot be 0");
+        uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
+        (, uint256 endOfLastValidPeriod) =
+            periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
+        // users tokens can be withdrawn only if the contract is breached
         // or if the last period is finished and the period status was verified
         if (msg.sender != owner()) {
             require(
@@ -241,7 +254,7 @@ contract SLA is Staking {
                 "Can only withdraw stake after the final period is finished or if the contract is breached"
             );
         }
-        _withdraw(_amount, _tokenAddress);
+        _withdrawUserTokens(_amount, _tokenAddress);
     }
 
     /**
