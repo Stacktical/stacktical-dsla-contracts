@@ -12,6 +12,7 @@ export const DetailsABI: AbiItem[] = [
         type: 'uint8',
       },
       { internalType: 'bool', name: 'breachedContract', type: 'bool' },
+      { internalType: 'bool', name: 'whiteListed', type: 'bool' },
       { internalType: 'contract SLO', name: 'slo', type: 'address' },
       { internalType: 'uint256', name: 'creationBlockNumber', type: 'uint256' },
       { internalType: 'uint256', name: 'stakersCount', type: 'uint256' },
@@ -41,8 +42,30 @@ export const DetailsABI: AbiItem[] = [
     inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
     name: 'getSLADetailsArrays',
     outputs: [
-      { internalType: 'string[]', name: 'dpTokensAddresses', type: 'string[]' },
-      { internalType: 'string[]', name: 'duTokensAddresses', type: 'string[]' },
+      {
+        components: [
+          { internalType: 'address', name: 'tokenAddress', type: 'address' },
+          { internalType: 'uint256', name: 'totalSupply', type: 'uint256' },
+          { internalType: 'address', name: 'dTokenAddress', type: 'address' },
+          { internalType: 'string', name: 'dTokenSymbol', type: 'string' },
+          { internalType: 'string', name: 'dTokenName', type: 'string' },
+        ],
+        internalType: 'struct Details.DtokenDetails[]',
+        name: 'dpTokens',
+        type: 'tuple[]',
+      },
+      {
+        components: [
+          { internalType: 'address', name: 'tokenAddress', type: 'address' },
+          { internalType: 'uint256', name: 'totalSupply', type: 'uint256' },
+          { internalType: 'address', name: 'dTokenAddress', type: 'address' },
+          { internalType: 'string', name: 'dTokenSymbol', type: 'string' },
+          { internalType: 'string', name: 'dTokenName', type: 'string' },
+        ],
+        internalType: 'struct Details.DtokenDetails[]',
+        name: 'duTokens',
+        type: 'tuple[]',
+      },
       { internalType: 'uint256[]', name: 'periodIDs', type: 'uint256[]' },
       {
         components: [

@@ -72,4 +72,9 @@ interface IMessenger {
      * @dev gets the fee amount of LINK token
      */
     function fee() external view returns (uint256);
+
+    /**
+     * @dev gets the owner of the contract
+     */
+    function owner() external view returns (address);
 }

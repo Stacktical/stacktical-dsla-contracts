@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./SLA.sol";
+import "./messenger/IMessenger.sol";
 import "./SLARegistry.sol";
 import "./StringUtils.sol";
 
@@ -241,7 +242,7 @@ contract StakeRegistry is Ownable, StringUtils {
             _lockedValue.dslaUserReward
         );
         IERC20(DSLATokenAddress).transfer(
-            owner(),
+            IMessenger(SLA(_sla).messengerAddress()).owner(),
             _lockedValue.dslaPlatformReward
         );
         _burnDSLATokens(_lockedValue.dslaBurnedByVerification);

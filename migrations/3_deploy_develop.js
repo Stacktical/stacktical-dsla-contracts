@@ -31,7 +31,8 @@ const slaNetwork = networkNames[0];
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
-    if (/develop/i.test(network)) {
+    if (/mainnet/i.test(network)) {
+      if (!!process.env.ONLY_DETAILS === true) return;
       console.log('Starting automated jobs to bootstrap protocol correctly');
       const [owner, notOwner] = await web3.eth.getAccounts();
 

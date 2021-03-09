@@ -175,12 +175,13 @@ contract SLA is Staking {
             // because _periodId is the periodId of the platform
             // e.g. if periodIds = 7,8,9,10, normalized periods are = 1,2,3,4
             uint256 normalizedPeriodId = _periodId.sub(periodIds[0]).add(1);
-
             // if is the last period, then deliver the whole usersStake to the provider
+            // uint256 rewardPercentage =
+            //     _periodId != periodIds[periodIds.length - 1] &&
+            //         ? deviation.mul(normalizedPeriodId).div(periodIds.length)
+            //         : uint256(1).mul(precision);
             uint256 rewardPercentage =
-                _periodId != periodIds[periodIds.length - 1]
-                    ? deviation.mul(normalizedPeriodId).div(periodIds.length)
-                    : uint256(1).mul(precision);
+                deviation.mul(normalizedPeriodId).div(periodIds.length);
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
             periodSLI.status = Status.NotRespected;

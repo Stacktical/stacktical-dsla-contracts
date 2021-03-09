@@ -9,6 +9,7 @@ import "./StakeRegistry.sol";
 import "./PeriodRegistry.sol";
 import "./MessengerRegistry.sol";
 import "./Staking.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /**
  * @title Details
@@ -20,6 +21,14 @@ contract Details {
         uint256 totalStake;
         uint256 usersPool;
         uint256 providerPool;
+    }
+
+    struct DtokenDetails {
+        address tokenAddress;
+        uint256 totalSupply;
+        address dTokenAddress;
+        string dTokenSymbol;
+        string dTokenName;
     }
 
     /**
@@ -60,7 +69,7 @@ contract Details {
         slaOwner = sla.owner();
         periodType = sla.periodType();
         breachedContract = sla.breachedContract();
-        whiteListed = sla.whiteListed();
+        whiteListed = sla.whitelistedContract();
         slo = sla.slo();
         creationBlockNumber = sla.creationBlockNumber();
         stakersCount = sla.getStakersLength();
@@ -75,8 +84,8 @@ contract Details {
         external
         view
         returns (
-            string[] memory dpTokensAddresses,
-            string[] memory duTokensAddresses,
+            DtokenDetails[] memory dpTokens,
+            DtokenDetails[] memory duTokens,
             uint256[] memory periodIDs,
             SLA.PeriodSLI[] memory periodSLIs,
             TokenStake[] memory tokensStake
@@ -99,8 +108,8 @@ contract Details {
         }
         uint256 allowedTokensLength = sla.getAllowedTokensLength();
         tokensStake = new TokenStake[](allowedTokensLength);
-        dpTokensAddresses = new string[](allowedTokensLength);
-        duTokensAddresses = new string[](allowedTokensLength);
+        dpTokens = new DtokenDetails[](allowedTokensLength);
+        duTokens = new DtokenDetails[](allowedTokensLength);
         for (uint256 index = 0; index < allowedTokensLength; index++) {
             address tokenAddress = sla.allowedTokens(index);
             tokensStake[index] = TokenStake({
@@ -110,28 +119,23 @@ contract Details {
                 usersPool: sla.usersPool(sla.allowedTokens(index)),
                 providerPool: sla.providerPool(sla.allowedTokens(index))
             });
-            dpTokensAddresses[index] = _packDToken(
-                tokenAddress,
-                address(sla.dpTokenRegistry(tokenAddress))
-            );
-            duTokensAddresses[index] = _packDToken(
-                tokenAddress,
-                address(sla.duTokenRegistry(tokenAddress))
-            );
+            address dpTokenAddress = address(sla.dpTokenRegistry(tokenAddress));
+            dpTokens[index] = DtokenDetails({
+                dTokenAddress: dpTokenAddress,
+                tokenAddress: tokenAddress,
+                totalSupply: ERC20(dpTokenAddress).totalSupply(),
+                dTokenSymbol: ERC20(dpTokenAddress).symbol(),
+                dTokenName: ERC20(dpTokenAddress).name()
+            });
+            address duTokenAddress = address(sla.duTokenRegistry(tokenAddress));
+            duTokens[index] = DtokenDetails({
+                dTokenAddress: duTokenAddress,
+                tokenAddress: tokenAddress,
+                totalSupply: ERC20(duTokenAddress).totalSupply(),
+                dTokenSymbol: ERC20(duTokenAddress).symbol(),
+                dTokenName: ERC20(duTokenAddress).name()
+            });
         }
-    }
-
-    function _packDToken(address _tokenAddress, address _dTokenAddress)
-        internal
-        pure
-        returns (string memory)
-    {
-        string memory dTokenStringAddress = _addressToString(_dTokenAddress);
-        string memory tokenStringAddress = _addressToString(_tokenAddress);
-        return
-            string(
-                abi.encodePacked(tokenStringAddress, ":", dTokenStringAddress)
-            );
     }
 
     function _addressToString(address _address)

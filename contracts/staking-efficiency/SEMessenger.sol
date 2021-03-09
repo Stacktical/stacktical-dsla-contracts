@@ -25,6 +25,8 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     address public networkAnalyticsAddress;
     /// @dev Chainlink oracle address
     address private _oracle;
+    /// @dev Contract owner
+    address private _owner;
     /// @dev chainlink jobId
     bytes32 private _jobId;
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
@@ -50,6 +52,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         setChainlinkToken(_messengerChainlinkToken);
         _oracle = _messengerChainlinkOracle;
         networkAnalyticsAddress = _networkAnalyticsAddress;
+        _owner = msg.sender;
     }
 
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
@@ -81,7 +84,6 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * @param _periodId value of the period id
      * @param _slaAddress SLA Address
      */
-
     function requestSLI(uint256 _periodId, address _slaAddress)
         public
         override
@@ -219,5 +221,12 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      */
     function fee() public view override returns (uint256) {
         return _fee;
+    }
+
+    /**
+     * @dev returns the contract owner
+     */
+    function owner() public view override returns (address) {
+        return _owner;
     }
 }
