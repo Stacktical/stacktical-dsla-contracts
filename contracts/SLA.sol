@@ -229,7 +229,7 @@ contract SLA is Staking {
             _breachedContract == true ||
                 (block.timestamp >= endOfLastValidPeriod &&
                     periodSLIs[lastValidPeriodId].status != Status.NotVerified);
-        _withdrawProviderTokens(_amount, _tokenAddress, _contractFinished);
+        _withdrawProviderTokens(_amount, _tokenAddress, contractFinished);
     }
 
     /**
