@@ -208,9 +208,16 @@ contract SLA is Staking {
 
     function stakeTokens(uint256 _amount, address _token) public {
         require(_amount > 0, "amount cannot be 0");
+        uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
+        (, uint256 endOfLastValidPeriod) =
+            periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
+        bool contractFinished =
+            _breachedContract == true ||
+                (block.timestamp >= endOfLastValidPeriod &&
+                    periodSLIs[lastValidPeriodId].status != Status.NotVerified);
         require(
-            _breachedContract == false,
-            "Can only stake on not breached contracts"
+            contractFinished == false,
+            "Can only stake on not finished contracts"
         );
         _stake(_amount, _token);
         StakeRegistry stakeRegistry = slaRegistry.stakeRegistry();

@@ -474,7 +474,17 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'uint256', name: '_amount', type: 'uint256' },
       { internalType: 'address', name: '_tokenAddress', type: 'address' },
     ],
-    name: 'withdrawStakedTokens',
+    name: 'withdrawProviderTokens',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'uint256', name: '_amount', type: 'uint256' },
+      { internalType: 'address', name: '_tokenAddress', type: 'address' },
+    ],
+    name: 'withdrawUserTokens',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
