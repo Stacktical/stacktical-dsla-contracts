@@ -19,6 +19,7 @@ contract Staking is Ownable {
     PeriodRegistry private periodRegistry;
     /// @dev current SLA id
     uint256 public slaID;
+
     /// @dev (tokenAddress=>uint256) total pooled token balance
     mapping(address => uint256) public providerPool;
     /// @dev (tokenAddress=>uint256) total pooled token balance
@@ -30,9 +31,9 @@ contract Staking is Ownable {
     mapping(address => ERC20PresetMinterPauser) public dpTokenRegistry;
 
     ///@dev index to keep a deflationary mint of tokens
-    uint256 public cumulatedDevaluation = 10 * 6;
+    uint256 public cumulatedDevaluation = 10**6;
     ///@dev to keep track of the precision used to avoid multiplying by 0
-    uint256 internal cumulatedDevaluationPrecision = 10**6;
+    uint256 public cumulatedDevaluationPrecision = 10**6;
 
     /// @dev address[] of the stakers of the SLA contract
     address[] public stakers;
@@ -43,12 +44,6 @@ contract Staking is Ownable {
 
     /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %
     uint256 public DSLAburnRate;
-    /// @dev minimum deposit for Tier 1 staking
-    uint256 public minimumDSLAStakedTier1;
-    /// @dev minimum deposit for Tier 2 staking
-    uint256 public minimumDSLAStakedTier2;
-    /// @dev minimum deposit for Tier 3 staking
-    uint256 public minimumDSLAStakedTier3;
 
     /// @dev PeriodRegistry period type of the SLA contract
     PeriodRegistry.PeriodType private periodType;
@@ -82,13 +77,15 @@ contract Staking is Ownable {
      * @param periodId 1. id of the period
      * @param tokenAddress 2. address of the token
      * @param rewardPercentage 3. reward percentage for the provider
-     * @param amount 4. amount rewarded
+     * @param rewardPercentagePrecision 4. reward percentage for the provider
+     * @param rewardAmount 5. amount rewarded
      */
     event ProviderRewardGenerated(
         uint256 indexed periodId,
         address indexed tokenAddress,
         uint256 rewardPercentage,
-        uint256 amount
+        uint256 rewardPercentagePrecision,
+        uint256 rewardAmount
     );
 
     /**
@@ -112,39 +109,11 @@ contract Staking is Ownable {
         periodType = _periodType;
         slaPeriodsLength = _slaPeriodsLength;
         whitelistedContract = _whitelistedContract;
-        (
-            uint256 _DSLAburnRate,
-            uint256 _minimumDSLAStakedTier1,
-            uint256 _minimumDSLAStakedTier2,
-            uint256 _minimumDSLAStakedTier3
-        ) = stakeRegistry.getStakingParameters();
+        (uint256 _DSLAburnRate, , , , ) = stakeRegistry.getStakingParameters();
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
-        minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
-        minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
-        minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
         addUserToWhitelist(msg.sender);
-        allowedTokens.push(dslaTokenAddress);
         slaID = _slaID;
-        string memory dTokenID = _uintToStr(_slaID);
-        string memory duTokenName =
-            string(abi.encodePacked("DSLA-USER-DSLA-", dTokenID));
-        string memory duTokenSymbol =
-            string(abi.encodePacked("duDSLA-", dTokenID));
-        string memory dpTokenName =
-            string(abi.encodePacked("DSLA-PROVIDER-DSLA-", dTokenID));
-        string memory dpTokenSymbol =
-            string(abi.encodePacked("dpDSLA-", dTokenID));
-        ERC20PresetMinterPauser duDSLA =
-            ERC20PresetMinterPauser(
-                stakeRegistry.createDToken(duTokenName, duTokenSymbol)
-            );
-        ERC20PresetMinterPauser dpDSLA =
-            ERC20PresetMinterPauser(
-                stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
-            );
-        duTokenRegistry[dslaTokenAddress] = duDSLA;
-        dpTokenRegistry[dslaTokenAddress] = dpDSLA;
     }
 
     function addUserToWhitelist(address _userAddress) public onlyOwner {
@@ -297,8 +266,7 @@ contract Staking is Ownable {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
             uint256 usersStake = usersPool[tokenAddress];
-            uint256 reward =
-                usersStake.mul(_rewardPercentage).div(100 * _precision);
+            uint256 reward = usersStake.mul(_rewardPercentage).div(_precision);
 
             // Subtract before burn to match balances
             usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
@@ -315,6 +283,7 @@ contract Staking is Ownable {
                 _periodId,
                 tokenAddress,
                 _rewardPercentage,
+                _precision,
                 reward
             );
         }
@@ -424,8 +393,11 @@ contract Staking is Ownable {
         } else {
             ERC20PresetMinterPauser dToken =
                 duTokenRegistry[allowedTokenAddress];
-            uint256 dTokenBalance = dToken.balanceOf(msg.sender);
             uint256 dTokenSupply = dToken.totalSupply();
+            if (dTokenSupply == 0) {
+                return (allowedTokenAddress, 0);
+            }
+            uint256 dTokenBalance = dToken.balanceOf(_staker);
             uint256 precision = 10000;
             uint256 userCompensationPercentage =
                 dTokenBalance.mul(precision).div(dTokenSupply);

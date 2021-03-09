@@ -11,9 +11,9 @@
     "SLICreated(uint256,uint256,uint256)": {
       "details": "event for SLI creation logging",
       "params": {
-        "_timestamp": "1. the time the SLI has been registered",
-        "_sli": "2. the value of the SLI",
-        "_periodId": "3. the id of the given period"
+        "timestamp": "1. the time the SLI has been registered",
+        "sli": "2. the value of the SLI",
+        "periodId": "3. the id of the given period"
       }
     }
   },
@@ -52,17 +52,6 @@
     "getAllowedTokensLength()": {
       "details": "use this function to evaluate the length of the allowed tokens length",
       "returns": { "_0": "allowedTokens.length" }
-    },
-    "getDetails()": {
-      "details": "external view function that returns all agreement information",
-      "returns": {
-        "_SLAPeriods": "5. SLAPeriod[]",
-        "_SLO": "3. addresses of the SLO",
-        "_ipfsHash": "2. string  ipfsHash",
-        "_slaOwner": "1. address  owner",
-        "_stakersCount": "6. amount of stakers",
-        "_tokensStake": "7. SLAPeriod[]  addresses array"
-      }
     },
     "isAllowedToken(address)": {
       "details": "checks in the allowedTokens array if there's a token with _tokenAddress value",
@@ -115,9 +104,12 @@
       "details": "The ipfs hash that stores extra information about the agreement"
     },
     "messengerAddress": { "details": "The address of the messenger" },
+    "nextVerifiablePeriod": {
+      "details": "states if the contract was breached or not"
+    },
     "periodIds": { "details": "array of he allowed canonical period ids" },
+    "periodSLIs": { "details": "periodId=>PeriodSLI mapping" },
     "periodType": { "details": "uint8 of the period type" },
-    "slaPeriods": { "details": "periodId=>SLAPeriod mapping" },
     "slaRegistry": { "details": "The address of the slaRegistry contract" },
     "slo": { "details": "address of the SLO" }
   },

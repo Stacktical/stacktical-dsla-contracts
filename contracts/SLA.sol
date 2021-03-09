@@ -22,15 +22,10 @@ contract SLA is Staking {
     enum Status {NotVerified, Respected, NotRespected}
 
     /// @dev Struct used for storing period status
-    struct SLAPeriod {
+    struct PeriodSLI {
         uint256 timestamp;
         uint256 sli;
         Status status;
-    }
-
-    struct TokenStake {
-        address tokenAddress;
-        uint256 stake;
     }
 
     /// @dev address of the SLO
@@ -53,8 +48,11 @@ contract SLA is Staking {
     /// @dev The address of the messenger
     address public messengerAddress;
 
-    /// @dev periodId=>SLAPeriod mapping
-    mapping(uint256 => SLAPeriod) public slaPeriods;
+    /// @dev states if the contract was breached or not
+    bool private _breachedContract = false;
+
+    /// @dev periodId=>PeriodSLI mapping
+    mapping(uint256 => PeriodSLI) public periodSLIs;
 
     /// @dev block number of SLA deployment
     uint256 public creationBlockNumber;
@@ -63,15 +61,15 @@ contract SLA is Staking {
     bytes32[] public extraData;
 
     /// @dev states if the contract was breached or not
-    bool private _breachedContract = false;
+    uint256 public nextVerifiablePeriod;
 
     /**
      * @dev event for SLI creation logging
-     * @param _timestamp 1. the time the SLI has been registered
-     * @param _sli 2. the value of the SLI
-     * @param _periodId 3. the id of the given period
+     * @param timestamp 1. the time the SLI has been registered
+     * @param sli 2. the value of the SLI
+     * @param periodId 3. the id of the given period
      */
-    event SLICreated(uint256 _timestamp, uint256 _sli, uint256 _periodId);
+    event SLICreated(uint256 timestamp, uint256 sli, uint256 periodId);
 
     /**
      * @dev event for SLI creation logging
@@ -147,6 +145,7 @@ contract SLA is Staking {
         periodType = _periodType;
         slo = _SLO;
         extraData = _extraData;
+        nextVerifiablePeriod = _periodIds[0];
     }
 
     /**
@@ -159,12 +158,13 @@ contract SLA is Staking {
         onlyMessenger
     {
         emit SLICreated(block.timestamp, _sli, _periodId);
-        SLAPeriod storage slaPeriod = slaPeriods[_periodId];
-        slaPeriod.sli = _sli;
-        slaPeriod.timestamp = block.timestamp;
+        nextVerifiablePeriod = _periodId + 1;
+        PeriodSLI storage periodSLI = periodSLIs[_periodId];
+        periodSLI.sli = _sli;
+        periodSLI.timestamp = block.timestamp;
         uint256 sloValue = slo.value();
         if (slo.isRespected(_sli)) {
-            slaPeriod.status = Status.Respected;
+            periodSLI.status = Status.Respected;
             uint256 precision = 10000;
             // deviation = (sli-slo)*precision/((sli+slo)/2)
             uint256 deviation =
@@ -175,15 +175,16 @@ contract SLA is Staking {
             // because _periodId is the periodId of the platform
             // e.g. if periodIds = 7,8,9,10, normalized periods are = 1,2,3,4
             uint256 normalizedPeriodId = _periodId.sub(periodIds[0]).add(1);
-
             // if is the last period, then deliver the whole usersStake to the provider
+            // uint256 rewardPercentage =
+            //     _periodId != periodIds[periodIds.length - 1] &&
+            //         ? deviation.mul(normalizedPeriodId).div(periodIds.length)
+            //         : uint256(1).mul(precision);
             uint256 rewardPercentage =
-                _periodId != periodIds[periodIds.length - 1]
-                    ? deviation.mul(normalizedPeriodId).div(periodIds.length)
-                    : uint256(100).mul(precision);
+                deviation.mul(normalizedPeriodId).div(periodIds.length);
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
-            slaPeriod.status = Status.NotRespected;
+            periodSLI.status = Status.NotRespected;
             _setUsersCompensation();
             _breachedContract = true;
             emit SLANotRespected(_periodId, _sli);
@@ -213,7 +214,7 @@ contract SLA is Staking {
         );
         _stake(_amount, _token);
         StakeRegistry stakeRegistry = slaRegistry.stakeRegistry();
-        stakeRegistry.registerStakedSla(msg.sender, address(slaRegistry));
+        stakeRegistry.registerStakedSla(msg.sender);
     }
 
     /**
@@ -229,13 +230,13 @@ contract SLA is Staking {
         uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
         (, uint256 endOfLastValidPeriod) =
             periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
-        // providers and users can withdraw only if the contract is breached
+        // users can withdraw only if the contract is breached
         // or if the last period is finished and the period status was verified
         if (msg.sender != owner()) {
             require(
                 _breachedContract == true ||
                     (block.timestamp >= endOfLastValidPeriod &&
-                        slaPeriods[lastValidPeriodId].status !=
+                        periodSLIs[lastValidPeriodId].status !=
                         Status.NotVerified),
                 "Can only withdraw stake after the final period is finished or if the contract is breached"
             );
@@ -252,50 +253,12 @@ contract SLA is Staking {
         _claimCompensation(_tokenAddress);
     }
 
-    /**
-     * @dev external view function that returns all agreement information
-     * @return _slaOwner 1. address  owner
-     * @return _ipfsHash 2. string  ipfsHash
-     * @return _SLO 3. addresses of the SLO
-     * @return _SLAPeriods 5. SLAPeriod[]
-     * @return _stakersCount 6. amount of stakers
-     * @return _tokensStake 7. SLAPeriod[]  addresses array
-     */
+    function getPeriodIdsLength() public view returns (uint256) {
+        return periodIds.length;
+    }
 
-    function getDetails()
-        external
-        view
-        returns (
-            address _slaOwner,
-            string memory _ipfsHash,
-            SLO _SLO,
-            SLAPeriod[] memory _SLAPeriods,
-            uint256 _stakersCount,
-            TokenStake[] memory _tokensStake
-        )
-    {
-        _slaOwner = owner();
-        _ipfsHash = ipfsHash;
-        _SLO = slo;
-        _SLAPeriods = new SLAPeriod[](periodIds.length);
-        for (uint256 index = 0; index < periodIds.length; index++) {
-            uint256 periodId = periodIds[index];
-            SLAPeriod memory slaPeriod = slaPeriods[periodId];
-            _SLAPeriods[index] = SLAPeriod({
-                status: slaPeriod.status,
-                sli: slaPeriod.sli,
-                timestamp: slaPeriod.timestamp
-            });
-        }
-        _stakersCount = stakers.length;
-        _tokensStake = new TokenStake[](allowedTokens.length);
-        for (uint256 index = 0; index < allowedTokens.length; index++) {
-            _tokensStake[index] = TokenStake({
-                tokenAddress: allowedTokens[index],
-                stake: usersPool[allowedTokens[index]] +
-                    providerPool[allowedTokens[index]]
-            });
-        }
+    function getStakersLength() public view returns (uint256) {
+        return stakers.length;
     }
 
     function breachedContract() public view returns (bool) {

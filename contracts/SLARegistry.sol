@@ -3,7 +3,6 @@ pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./SLA.sol";
 import "./SLO.sol";
@@ -57,6 +56,7 @@ contract SLARegistry is Ownable {
         sloRegistry = _sloRegistry;
         periodRegistry = _periodRegistry;
         stakeRegistry = _stakeRegistry;
+        stakeRegistry.setSLARegistry();
         messengerRegistry = _messengerRegistry;
         messengerRegistry.setSLARegistry();
     }
@@ -97,6 +97,10 @@ contract SLARegistry is Ownable {
                     _periodIds[index] < _periodIds[index + 1],
                     "Period ids should be sorted "
                 );
+                require(
+                    _periodIds[index + 1].sub(_periodIds[index]) == 1,
+                    "Period ids should be consecutive"
+                );
             }
         }
         bool registeredMessenger =
@@ -121,6 +125,11 @@ contract SLARegistry is Ownable {
                 SLAs.length
             );
 
+        stakeRegistry.lockDSLAValue(
+            msg.sender,
+            address(sla),
+            _periodIds.length
+        );
         SLAs.push(sla);
         uint256 index = SLAs.length.sub(1);
         userToSLAIndexes[msg.sender].push(index);
@@ -133,12 +142,16 @@ contract SLARegistry is Ownable {
      * @param _sla 2. SLA Address
      */
     function requestSLI(uint256 _periodId, SLA _sla) public {
-        bool breachedContract = _sla.breachedContract();
-        (, , SLA.Status status) = _sla.slaPeriods(_periodId);
+        require(
+            _periodId == _sla.nextVerifiablePeriod(),
+            "Should only verify next period"
+        );
+        (, , SLA.Status status) = _sla.periodSLIs(_periodId);
         require(
             status == SLA.Status.NotVerified,
             "SLA contract was already verified for the period"
         );
+        bool breachedContract = _sla.breachedContract();
         require(
             breachedContract == false,
             "Should only be called for not breached contracts"
@@ -157,6 +170,32 @@ contract SLARegistry is Ownable {
         );
         address slaMessenger = _sla.messengerAddress();
         IMessenger(slaMessenger).requestSLI(_periodId, address(_sla));
+        stakeRegistry.distributeVerificationRewards(
+            address(_sla),
+            msg.sender,
+            _periodId
+        );
+    }
+
+    function returnLockedValue(SLA _sla) public {
+        require(
+            msg.sender == _sla.owner(),
+            "Only SLA owner can claim locked value"
+        );
+        uint256 periodIdsLength = _sla.getPeriodIdsLength();
+        uint256 lastValidPeriodId = _sla.periodIds(periodIdsLength - 1);
+        PeriodRegistry.PeriodType periodType = _sla.periodType();
+        (, uint256 endOfLastValidPeriod) =
+            periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
+
+        (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(lastValidPeriodId);
+        require(
+            _sla.breachedContract() == true ||
+                (block.timestamp >= endOfLastValidPeriod &&
+                    lastPeriodStatus != SLA.Status.NotVerified),
+            "Can only withdraw locked DSLA after the final period is verified or if the contract is breached"
+        );
+        stakeRegistry.returnLockedValue(address(_sla));
     }
 
     /**

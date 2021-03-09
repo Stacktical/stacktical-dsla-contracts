@@ -1,13 +1,24 @@
 {
   "details": "StakeRegistry is a contract to register the staking activity of the platform, along with controlling certain admin privileged parameters",
   "events": {
-    "StakingParametersModified(uint256,uint256,uint256,uint256)": {
+    "StakingParametersModified(uint256,uint256,uint256,uint256,uint256)": {
       "details": "event to log modifications on the staking parameters",
       "params": {
         "DSLAburnRate": "1. (DSLAburnRate/1000)% of DSLA to be burned after a reward/compensation is paid",
-        "minimumDSLAStakedTier1": "2. minimum stake of DSLA to enable tier 1 privileges",
-        "minimumDSLAStakedTier2": "3. minimum stake of DSLA to enable tier 2 privileges",
-        "minimumDSLAStakedTier3": "4. minimum stake of DSLA to enable tier 3 privileges"
+        "dslaDepositByPeriod": "2. DSLA deposit by period to create SLA",
+        "dslaPlatformReward": "3. DSLA rewarded to Stacktical team",
+        "dslaUserReward": "4. DSLA rewarded to user calling the period verification",
+        "dslaBurnedByVerification": "5. DSLA burned after every period verification"
+      }
+    },
+    "VerificationRewardDistributed(address,address,uint256,uint256,uint256)": {
+      "details": "event to log a verifiation reward distributed",
+      "params": {
+        "sla": "1. The address of the created service level agreement contract",
+        "requester": "2. -",
+        "userReward": "3. -",
+        "platformReward": "4. -",
+        "burnedDSLA": "5. -"
       }
     }
   },
@@ -30,12 +41,15 @@
       }
     },
     "owner()": { "details": "Returns the address of the current owner." },
-    "registerStakedSla(address,address)": {
+    "registerStakedSla(address)": {
       "details": "register the sending SLA contract as staked by _owner",
       "params": { "_owner": "1. SLA contract to stake" }
     },
     "renounceOwnership()": {
       "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+    },
+    "setSLARegistry()": {
+      "details": "sets the SLARegistry contract address and can only be called once"
     },
     "slaWasStakedByUser(address,address)": {
       "details": "public view function that returns true if the _owner has staked on _sla",
@@ -50,17 +64,21 @@
     "_DSLAburnRate": {
       "details": "corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = DSLAburnRate/1000 %"
     },
-    "_minimumDSLAStakedTier1": {
-      "details": "minimum deposit for Tier 1 staking"
+    "_dslaBurnedByVerification": {
+      "details": "DSLA burned after every period verification"
     },
-    "_minimumDSLAStakedTier2": {
-      "details": "minimum deposit for Tier 2 staking"
+    "_dslaDepositByPeriod": {
+      "details": "DSLA deposit by period to create SLA"
     },
-    "_minimumDSLAStakedTier3": {
-      "details": "minimum deposit for Tier 3 staking"
+    "_dslaPlatformReward": { "details": "DSLA rewarded to Stacktical team" },
+    "_dslaUserReward": {
+      "details": "DSLA rewarded to user calling the period verification"
     },
     "allowedTokens": {
       "details": "array with the allowed tokens addresses of the StakeRegistry"
+    },
+    "slaLockedValue": {
+      "details": "(ownerAddress => slaAddress => LockedValue) stores the locked value by the staker"
     },
     "userStakedSlas": {
       "details": "(userAddress => SLA[]) with user staked SLAs to get tokenPool"

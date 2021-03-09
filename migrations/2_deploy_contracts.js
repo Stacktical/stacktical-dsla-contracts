@@ -11,6 +11,7 @@ const StakeRegistry = artifacts.require('StakeRegistry');
 const MessengerRegistry = artifacts.require('MessengerRegistry');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const SEMessenger = artifacts.require('SEMessenger');
+const Details = artifacts.require('Details');
 
 // For dev
 const bDSLA = artifacts.require('bDSLA');
@@ -18,6 +19,10 @@ const bDSLA = artifacts.require('bDSLA');
 module.exports = (deployer, network) => {
   if (!/testing/i.test(network)) {
     deployer.then(async () => {
+      if (!!process.env.ONLY_DETAILS === true) {
+        return deployer.deploy(Details);
+      }
+      await deployer.deploy(Details);
       const env = getEnvFromNetwork(network);
       const dslaTokenAddress = env?.dslaTokenAddress || (await deployer.deploy(bDSLA)).address;
       const periodRegistry = await deployer.deploy(PeriodRegistry);
@@ -33,6 +38,7 @@ module.exports = (deployer, network) => {
         chainlinkJobId,
         periodRegistry.address,
       );
+
       const seMessenger = await deployer.deploy(
         SEMessenger,
         env.chainlinkOracleAddress,
@@ -54,7 +60,7 @@ module.exports = (deployer, network) => {
         stakeRegistry.address,
       );
 
-      await slaRegistry.setMessengerSLARegistryAddress(
+      return slaRegistry.setMessengerSLARegistryAddress(
         seMessenger.address,
       );
     });

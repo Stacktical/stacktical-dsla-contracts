@@ -7,6 +7,7 @@ const MessengerRegistry = artifacts.require('MessengerRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const bDSLA = artifacts.require('bDSLA');
+const Details = artifacts.require('Details');
 const fs = require('fs');
 const path = require('path');
 
@@ -45,6 +46,11 @@ const files = {
     constName: 'export const MessengerRegistryABI: AbiItem[] =',
     tsFileName: 'MessengerRegistryABI.ts',
     abi: MessengerRegistry.abi,
+  },
+  Details: {
+    constName: 'export const DetailsABI: AbiItem[] =',
+    tsFileName: 'DetailsABI.ts',
+    abi: Details.abi,
   },
   NetworkAnalytics: {
     constName: 'export const NetworkAnalyticsABI: AbiItem[] =',

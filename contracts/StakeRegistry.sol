@@ -5,7 +5,9 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./SLA.sol";
+import "./messenger/IMessenger.sol";
 import "./SLARegistry.sol";
 import "./StringUtils.sol";
 
@@ -25,18 +27,34 @@ contract StakeRegistry is Ownable, StringUtils {
         address assetAddress;
     }
 
+    struct LockedValue {
+        uint256 lockedValue;
+        uint256 slaPeriodIdsLength;
+        uint256 dslaDepositByPeriod;
+        uint256 dslaPlatformReward;
+        uint256 dslaUserReward;
+        uint256 dslaBurnedByVerification;
+        mapping(uint256 => bool) verifiedPeriods;
+    }
+
     address public DSLATokenAddress;
+    SLARegistry public slaRegistry;
 
     //______ onlyOwner modifiable parameters ______
 
     /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = DSLAburnRate/1000 %
     uint256 private _DSLAburnRate = 3;
-    /// @dev minimum deposit for Tier 1 staking
-    uint256 private _minimumDSLAStakedTier1 = 3000 ether;
-    /// @dev minimum deposit for Tier 2 staking
-    uint256 private _minimumDSLAStakedTier2 = 6000 ether;
-    /// @dev minimum deposit for Tier 3 staking
-    uint256 private _minimumDSLAStakedTier3 = 9000 ether;
+    /// @dev (ownerAddress => slaAddress => LockedValue) stores the locked value by the staker
+    mapping(address => LockedValue) public slaLockedValue;
+    /// @dev DSLA deposit by period to create SLA
+    uint256 private _dslaDepositByPeriod = 20000 ether;
+    /// @dev DSLA rewarded to Stacktical team
+    uint256 private _dslaPlatformReward = 10000 ether;
+    /// @dev DSLA rewarded to user calling the period verification
+    uint256 private _dslaUserReward = 9940 ether;
+    /// @dev DSLA burned after every period verification
+    uint256 private _dslaBurnedByVerification = 60 ether;
+
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
 
@@ -44,25 +62,73 @@ contract StakeRegistry is Ownable, StringUtils {
     mapping(address => SLA[]) public userStakedSlas;
 
     /**
+     * @dev event to log a verifiation reward distributed
+     * @param sla 1. The address of the created service level agreement contract
+     * @param requester 2. -
+     * @param userReward 3. -
+     * @param platformReward 4. -
+     * @param burnedDSLA 5. -
+     */
+    event VerificationRewardDistributed(
+        address indexed sla,
+        address indexed requester,
+        uint256 userReward,
+        uint256 platformReward,
+        uint256 burnedDSLA
+    );
+
+    /**
      * @dev event to log modifications on the staking parameters
      *@param DSLAburnRate 1. (DSLAburnRate/1000)% of DSLA to be burned after a reward/compensation is paid
-     *@param minimumDSLAStakedTier1 2. minimum stake of DSLA to enable tier 1 privileges
-     *@param minimumDSLAStakedTier2 3. minimum stake of DSLA to enable tier 2 privileges
-     *@param minimumDSLAStakedTier3 4. minimum stake of DSLA to enable tier 3 privileges
+     *@param dslaDepositByPeriod 2. DSLA deposit by period to create SLA
+     *@param dslaPlatformReward 3. DSLA rewarded to Stacktical team
+     *@param dslaUserReward 4. DSLA rewarded to user calling the period verification
+     *@param dslaBurnedByVerification 5. DSLA burned after every period verification
      */
     event StakingParametersModified(
         uint256 DSLAburnRate,
-        uint256 minimumDSLAStakedTier1,
-        uint256 minimumDSLAStakedTier2,
-        uint256 minimumDSLAStakedTier3
+        uint256 dslaDepositByPeriod,
+        uint256 dslaPlatformReward,
+        uint256 dslaUserReward,
+        uint256 dslaBurnedByVerification
     );
 
     /**
      * @param _dslaTokenAddress 1. DSLA Token
      */
     constructor(address _dslaTokenAddress) public {
+        require(
+            _dslaDepositByPeriod ==
+                _dslaPlatformReward.add(_dslaUserReward).add(
+                    _dslaBurnedByVerification
+                ),
+            "Staking parameters should match on summation"
+        );
         DSLATokenAddress = _dslaTokenAddress;
         allowedTokens.push(_dslaTokenAddress);
+    }
+
+    /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
+    modifier onlySLARegistry() {
+        require(
+            msg.sender == address(slaRegistry),
+            "Can only be called by SLARegistry"
+        );
+        _;
+    }
+
+    /**
+     * @dev sets the SLARegistry contract address and can only be called
+     * once
+     */
+    function setSLARegistry() public {
+        // Only able to trigger this function once
+        require(
+            address(slaRegistry) == address(0),
+            "SLARegistry address has already been set"
+        );
+
+        slaRegistry = SLARegistry(msg.sender);
     }
 
     /**
@@ -81,22 +147,6 @@ contract StakeRegistry is Ownable, StringUtils {
             }
         }
         return false;
-    }
-
-    function getStakingParameters()
-        public
-        view
-        returns (
-            uint256 DSLAburnRate,
-            uint256 minimumDSLAStakedTier1,
-            uint256 minimumDSLAStakedTier2,
-            uint256 minimumDSLAStakedTier3
-        )
-    {
-        DSLAburnRate = _DSLAburnRate;
-        minimumDSLAStakedTier1 = _minimumDSLAStakedTier1;
-        minimumDSLAStakedTier2 = _minimumDSLAStakedTier2;
-        minimumDSLAStakedTier3 = _minimumDSLAStakedTier3;
     }
 
     /**
@@ -122,11 +172,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@dev register the sending SLA contract as staked by _owner
      *@param _owner 1. SLA contract to stake
      */
-    function registerStakedSla(address _owner, address _slaRegistry)
-        public
-        returns (bool)
-    {
-        SLARegistry slaRegistry = SLARegistry(_slaRegistry);
+    function registerStakedSla(address _owner) public returns (bool) {
         require(
             slaRegistry.isRegisteredSLA(msg.sender) == true,
             "Only for registered SLAs"
@@ -146,10 +192,84 @@ contract StakeRegistry is Ownable, StringUtils {
         public
         returns (address)
     {
+        require(
+            slaRegistry.isRegisteredSLA(msg.sender) == true,
+            "Only for registered SLAs"
+        );
         ERC20PresetMinterPauser dToken =
             new ERC20PresetMinterPauser(_name, _symbol);
         dToken.grantRole(dToken.MINTER_ROLE(), msg.sender);
         return address(dToken);
+    }
+
+    function lockDSLAValue(
+        address _slaOwner,
+        address _sla,
+        uint256 _periodIdsLength
+    ) public onlySLARegistry {
+        uint256 lockedValue = _dslaDepositByPeriod.mul(_periodIdsLength);
+        IERC20(DSLATokenAddress).transferFrom(
+            _slaOwner,
+            address(this),
+            lockedValue
+        );
+        slaLockedValue[_sla] = LockedValue({
+            lockedValue: lockedValue,
+            slaPeriodIdsLength: _periodIdsLength,
+            dslaDepositByPeriod: _dslaDepositByPeriod,
+            dslaPlatformReward: _dslaPlatformReward,
+            dslaUserReward: _dslaUserReward,
+            dslaBurnedByVerification: _dslaBurnedByVerification
+        });
+    }
+
+    function distributeVerificationRewards(
+        address _sla,
+        address _verificationRewardReceiver,
+        uint256 _periodId
+    ) public onlySLARegistry {
+        LockedValue storage _lockedValue = slaLockedValue[_sla];
+        require(
+            _lockedValue.verifiedPeriods[_periodId] == false,
+            "Period rewards already distributed"
+        );
+        _lockedValue.verifiedPeriods[_periodId] = true;
+        _lockedValue.lockedValue = _lockedValue.lockedValue.sub(
+            _lockedValue.dslaDepositByPeriod
+        );
+        IERC20(DSLATokenAddress).transfer(
+            _verificationRewardReceiver,
+            _lockedValue.dslaUserReward
+        );
+        IERC20(DSLATokenAddress).transfer(
+            IMessenger(SLA(_sla).messengerAddress()).owner(),
+            _lockedValue.dslaPlatformReward
+        );
+        _burnDSLATokens(_lockedValue.dslaBurnedByVerification);
+        emit VerificationRewardDistributed(
+            _sla,
+            _verificationRewardReceiver,
+            _lockedValue.dslaUserReward,
+            _lockedValue.dslaPlatformReward,
+            _lockedValue.dslaBurnedByVerification
+        );
+    }
+
+    function returnLockedValue(address _sla) public onlySLARegistry {
+        LockedValue storage _lockedValue = slaLockedValue[_sla];
+        uint256 remainingBalance = _lockedValue.lockedValue;
+        require(remainingBalance > 0, "locked value is empty");
+        _lockedValue.lockedValue = 0;
+        IERC20(DSLATokenAddress).transfer(SLA(_sla).owner(), remainingBalance);
+    }
+
+    function _burnDSLATokens(uint256 _amount) internal {
+        bytes4 BURN_SELECTOR = bytes4(keccak256(bytes("burn(uint256)")));
+        (bool _success, ) =
+            DSLATokenAddress.call(
+                abi.encodeWithSelector(BURN_SELECTOR, _amount)
+            );
+        require(_success, "DSLA burn process was not successful");
     }
 
     /**
@@ -213,19 +333,55 @@ contract StakeRegistry is Ownable, StringUtils {
     //_______ OnlyOwner functions _______
     function setStakingParameters(
         uint256 DSLAburnRate,
-        uint256 minimumDSLAStakedTier1,
-        uint256 minimumDSLAStakedTier2,
-        uint256 minimumDSLAStakedTier3
+        uint256 dslaDepositByPeriod,
+        uint256 dslaPlatformReward,
+        uint256 dslaUserReward,
+        uint256 dslaBurnedByVerification
     ) public onlyOwner {
         _DSLAburnRate = DSLAburnRate;
-        _minimumDSLAStakedTier1 = minimumDSLAStakedTier1;
-        _minimumDSLAStakedTier2 = minimumDSLAStakedTier2;
-        _minimumDSLAStakedTier3 = minimumDSLAStakedTier3;
+        require(
+            dslaDepositByPeriod ==
+                dslaPlatformReward.add(dslaUserReward).add(
+                    dslaBurnedByVerification
+                ),
+            "Staking parameters should match on summation"
+        );
+        _dslaDepositByPeriod = dslaDepositByPeriod;
+        _dslaPlatformReward = dslaPlatformReward;
+        _dslaUserReward = dslaUserReward;
+        _dslaBurnedByVerification = dslaBurnedByVerification;
         emit StakingParametersModified(
             DSLAburnRate,
-            minimumDSLAStakedTier1,
-            minimumDSLAStakedTier2,
-            minimumDSLAStakedTier3
+            dslaDepositByPeriod,
+            dslaPlatformReward,
+            dslaUserReward,
+            dslaBurnedByVerification
         );
+    }
+
+    function getStakingParameters()
+        public
+        view
+        returns (
+            uint256 DSLAburnRate,
+            uint256 dslaDepositByPeriod,
+            uint256 dslaPlatformReward,
+            uint256 dslaUserReward,
+            uint256 dslaBurnedByVerification
+        )
+    {
+        DSLAburnRate = _DSLAburnRate;
+        dslaDepositByPeriod = _dslaDepositByPeriod;
+        dslaPlatformReward = _dslaPlatformReward;
+        dslaUserReward = _dslaUserReward;
+        dslaBurnedByVerification = _dslaBurnedByVerification;
+    }
+
+    function periodIsVerified(address _sla, uint256 _periodId)
+        public
+        view
+        returns (bool)
+    {
+        return slaLockedValue[_sla].verifiedPeriods[_periodId];
     }
 }

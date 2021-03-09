@@ -14,6 +14,7 @@ const documentedContracts = [
   'PeriodRegistry',
   'NetworkAnalytics',
   'Staking',
+  'Details',
 ];
 
 const basePath = '../natspec-docs';

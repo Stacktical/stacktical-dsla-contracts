@@ -47,4 +47,34 @@ interface IMessenger {
      */
     function fulfillSLI(bytes32 _requestId, bytes32 _chainlinkResponse)
         external;
+
+    /**
+     * @dev gets the messenger precision
+     */
+    function messengerPrecision() external view returns (uint256);
+
+    /**
+     * @dev gets the slaRegistryAddress
+     */
+    function slaRegistryAddress() external view returns (address);
+
+    /**
+     * @dev gets the chainlink oracle contract address
+     */
+    function oracle() external view returns (address);
+
+    /**
+     * @dev gets the chainlink job id
+     */
+    function jobId() external view returns (bytes32);
+
+    /**
+     * @dev gets the fee amount of LINK token
+     */
+    function fee() external view returns (uint256);
+
+    /**
+     * @dev gets the owner of the contract
+     */
+    function owner() external view returns (address);
 }

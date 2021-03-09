@@ -65,7 +65,13 @@ export const SLAABI: AbiItem[] = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'amount',
+        name: 'rewardPercentagePrecision',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'rewardAmount',
         type: 'uint256',
       },
     ],
@@ -97,19 +103,14 @@ export const SLAABI: AbiItem[] = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_timestamp',
+        name: 'timestamp',
         type: 'uint256',
       },
+      { indexed: false, internalType: 'uint256', name: 'sli', type: 'uint256' },
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_sli',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: '_periodId',
+        name: 'periodId',
         type: 'uint256',
       },
     ],
@@ -122,6 +123,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -156,6 +158,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -163,6 +166,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -170,6 +174,15 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [],
+    name: 'cumulatedDevaluationPrecision',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
@@ -183,6 +196,7 @@ export const SLAABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -190,6 +204,21 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'duTokenRegistry',
+    outputs: [
+      {
+        internalType: 'contract ERC20PresetMinterPauser',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
@@ -210,6 +239,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -217,6 +247,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -230,6 +261,7 @@ export const SLAABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -237,6 +269,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'string', name: '', type: 'string' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -246,6 +279,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_staker', type: 'address' }],
@@ -253,6 +287,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -260,27 +295,15 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
-    name: 'minimumDSLAStakedTier1',
+    name: 'nextVerifiablePeriod',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'minimumDSLAStakedTier2',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'minimumDSLAStakedTier3',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -288,6 +311,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
@@ -295,6 +319,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -304,6 +329,19 @@ export const SLAABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'periodSLIs',
+    outputs: [
+      { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
+      { internalType: 'uint256', name: 'sli', type: 'uint256' },
+      { internalType: 'enum SLA.Status', name: 'status', type: 'uint8' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -317,6 +355,7 @@ export const SLAABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
@@ -324,6 +363,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -347,17 +387,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    name: 'slaPeriods',
-    outputs: [
-      { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
-      { internalType: 'uint256', name: 'sli', type: 'uint256' },
-      { internalType: 'enum SLA.Status', name: 'status', type: 'uint8' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -365,6 +395,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -374,6 +405,7 @@ export const SLAABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -381,6 +413,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLO', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
@@ -388,6 +421,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
@@ -402,6 +436,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
@@ -409,6 +444,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -416,6 +452,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -433,6 +470,7 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -465,34 +503,19 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [],
-    name: 'getDetails',
-    outputs: [
-      { internalType: 'address', name: '_slaOwner', type: 'address' },
-      { internalType: 'string', name: '_ipfsHash', type: 'string' },
-      { internalType: 'contract SLO', name: '_SLO', type: 'address' },
-      {
-        components: [
-          { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
-          { internalType: 'uint256', name: 'sli', type: 'uint256' },
-          { internalType: 'enum SLA.Status', name: 'status', type: 'uint8' },
-        ],
-        internalType: 'struct SLA.SLAPeriod[]',
-        name: '_SLAPeriods',
-        type: 'tuple[]',
-      },
-      { internalType: 'uint256', name: '_stakersCount', type: 'uint256' },
-      {
-        components: [
-          { internalType: 'address', name: 'tokenAddress', type: 'address' },
-          { internalType: 'uint256', name: 'stake', type: 'uint256' },
-        ],
-        internalType: 'struct SLA.TokenStake[]',
-        name: '_tokensStake',
-        type: 'tuple[]',
-      },
-    ],
+    name: 'getPeriodIdsLength',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [],
+    name: 'getStakersLength',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -500,5 +523,6 @@ export const SLAABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];

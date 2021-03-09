@@ -165,6 +165,13 @@ export const SLARegistryABI: AbiItem[] = [
     type: 'function',
   },
   {
+    inputs: [{ internalType: 'contract SLA', name: '_sla', type: 'address' }],
+    name: 'returnLockedValue',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [
       { internalType: 'address', name: '_messengerAddress', type: 'address' },
     ],
