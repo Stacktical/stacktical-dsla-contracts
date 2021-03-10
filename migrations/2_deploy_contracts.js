@@ -2,7 +2,7 @@ require('babel-polyfill');
 require('babel-register');
 
 const { toWei } = require('web3-utils');
-const { getChainlinkJobId } = require('../test/helpers');
+const { getChainlinkJobId, eventListener } = require('../test/helpers');
 const { getEnvFromNetwork, needsGetJobId } = require('../environments');
 
 const PeriodRegistry = artifacts.require('PeriodRegistry');
@@ -41,12 +41,11 @@ module.exports = (deployer, network) => {
       const minResponses = 1;
       const oracles = [env.chainlinkOracleAddress];
       const jobIds = [chainlinkJobId];
-      const payments = [toWei('0,1')];
-      const saId = await preCoordinator.createServiceAgreement(
+      const payments = [toWei('0.1')];
+      preCoordinator.createServiceAgreement(
         minResponses, oracles, jobIds, payments,
-      ).call();
-
-      console.log(saId);
+      );
+      const { values: { saId } } = await eventListener(preCoordinator, 'NewServiceAgreement');
 
       const networkAnalytics = await deployer.deploy(
         NetworkAnalytics,

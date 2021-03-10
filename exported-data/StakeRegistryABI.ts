@@ -102,6 +102,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
@@ -109,6 +110,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -116,6 +118,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -141,6 +144,7 @@ export const StakeRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -150,6 +154,7 @@ export const StakeRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
@@ -167,6 +172,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -192,6 +198,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -202,6 +209,7 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_owner', type: 'address' }],
@@ -271,6 +279,7 @@ export const StakeRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -305,6 +314,7 @@ export const StakeRegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -315,5 +325,6 @@ export const StakeRegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];

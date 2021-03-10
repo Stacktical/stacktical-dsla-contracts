@@ -1,15 +1,5 @@
 {
   "details": "SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements",
-  "events": {
-    "SLACreated(address,address)": {
-      "details": "event for service level agreement creation logging",
-      "params": {
-        "sla": "1. The address of the created service level agreement contract",
-        "owner": "2. The address of the owner of the service level agreement"
-      }
-    }
-  },
-  "kind": "dev",
   "methods": {
     "SLACount()": {
       "details": "public view function that returns the total amount of service level agreements",
@@ -46,7 +36,7 @@
     },
     "owner()": { "details": "Returns the address of the current owner." },
     "renounceOwnership()": {
-      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
     "requestSLI(uint256,address)": {
       "details": "Gets SLI information for the specified SLA and SLO",
@@ -74,16 +64,5 @@
       "returns": { "_0": "array of SLAs" }
     }
   },
-  "stateVariables": {
-    "SLAs": { "details": "stores the addresses of created SLAs" },
-    "messengerRegistry": { "details": "Messengers registry" },
-    "periodRegistry": { "details": "Periods registry" },
-    "sloRegistry": { "details": "SLO registry" },
-    "stakeRegistry": { "details": "Stake registry" },
-    "userToSLAIndexes": {
-      "details": "stores the indexes of service level agreements owned by an user"
-    }
-  },
-  "title": "SLARegistry",
-  "version": 1
+  "title": "SLARegistry"
 }

@@ -1,30 +1,21 @@
 {
   "details": "Interface to create new Messenger contract to add lo Messenger lists",
-  "events": {
-    "SLIReceived(address,uint256,bytes32,bytes32)": {
-      "details": "event emitted when having a response from Chainlink with the SLI",
-      "params": {
-        "slaAddress": "1. SLA address to store the SLI",
-        "periodId": "2. id of the Chainlink request",
-        "requestId": "3. id of the Chainlink request",
-        "chainlinkResponse": "4. response from Chainlink"
-      }
-    }
-  },
-  "kind": "dev",
   "methods": {
     "fee()": { "details": "gets the fee amount of LINK token" },
-    "fulfillSLI(bytes32,bytes32)": {
+    "fulfillSLI(bytes32,uint256)": {
       "details": "callback function for the Chainlink SLI request which stores the SLI in the SLA contract",
       "params": {
-        "_chainlinkResponse": "response object from Chainlink Oracles",
+        "_chainlinkResponseUint256": "response object from Chainlink Oracles",
         "_requestId": "the ID of the ChainLink request"
       }
     },
     "jobId()": { "details": "gets the chainlink job id" },
     "messengerPrecision()": { "details": "gets the messenger precision" },
     "oracle()": { "details": "gets the chainlink oracle contract address" },
-    "owner()": { "details": "gets the owner of the contract" },
+    "owner()": { "details": "Returns the address of the current owner." },
+    "renounceOwnership()": {
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+    },
     "requestSLI(uint256,address)": {
       "details": "creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.",
       "params": {
@@ -35,8 +26,10 @@
     "setSLARegistry()": {
       "details": "sets the SLARegistry contract address and can only be called once"
     },
-    "slaRegistryAddress()": { "details": "gets the slaRegistryAddress" }
+    "slaRegistryAddress()": { "details": "gets the slaRegistryAddress" },
+    "transferOwnership(address)": {
+      "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+    }
   },
-  "title": "IMessenger",
-  "version": 1
+  "title": "IMessenger"
 }

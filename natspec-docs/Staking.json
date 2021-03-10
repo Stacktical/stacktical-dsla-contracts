@@ -1,104 +1,11 @@
 {
-  "events": {
-    "ProviderRewardGenerated(uint256,address,uint256,uint256,uint256)": {
-      "details": "event for provider reward log",
-      "params": {
-        "periodId": "1. id of the period",
-        "tokenAddress": "2. address of the token",
-        "rewardPercentage": "3. reward percentage for the provider",
-        "rewardPercentagePrecision": "4. reward percentage for the provider",
-        "rewardAmount": "5. amount rewarded"
-      }
-    }
-  },
-  "kind": "dev",
   "methods": {
-    "_claimCompensation(address)": {
-      "details": "claim user compensation. Transfers both the compensation and the user remaining stake.",
-      "params": {
-        "_tokenAddress": "1. address of the token to claim compensation"
-      }
-    },
-    "addAllowedTokens(address)": {
-      "details": "add a token to ve allowed for staking",
-      "params": { "_tokenAddress": "1. address of the new allowed token" }
-    },
-    "constructor": {
-      "params": {
-        "_stakeRegistry": "1. address of the stake registry",
-        "_periodRegistry": "2. address of the period registry",
-        "_periodType": "3. period type of the SLA",
-        "_slaPeriodsLength": "4. length of the SLA periodsId stored on the sla contract",
-        "_whitelistedContract": "5. enables the white list feature",
-        "_slaID": "6. identifies the SLA to uniquely to emit dTokens"
-      }
-    },
-    "getAllowedTokensLength()": {
-      "details": "use this function to evaluate the length of the allowed tokens length",
-      "returns": { "_0": "allowedTokens.length" }
-    },
-    "isAllowedToken(address)": {
-      "details": "checks in the allowedTokens array if there's a token with _tokenAddress value",
-      "params": { "_tokenAddress": "1. token address to check exixtence" },
-      "returns": {
-        "_0": "true if _tokenAddress exists in the allowedTokens array"
-      }
-    },
-    "isStaker(address)": {
-      "details": "returns true if the _staker address is registered as staker",
-      "params": { "_staker": "1. staker address" },
-      "returns": { "_0": "true if address is staker" }
-    },
     "owner()": { "details": "Returns the address of the current owner." },
     "renounceOwnership()": {
-      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
     "transferOwnership(address)": {
       "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
     }
-  },
-  "stateVariables": {
-    "DSLAburnRate": {
-      "details": "corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %"
-    },
-    "allowedTokens": {
-      "details": "array with the allowed tokens addresses for the current SLA"
-    },
-    "cumulatedDevaluation": {
-      "details": "index to keep a deflationary mint of tokens"
-    },
-    "cumulatedDevaluationPrecision": {
-      "details": "to keep track of the precision used to avoid multiplying by 0"
-    },
-    "dpTokenRegistry": {
-      "details": "(tokenAddress=>dTokenAddress) to keep track of dToken for provider"
-    },
-    "dslaTokenAddress": { "details": "DSLA token address to burn fees" },
-    "duTokenRegistry": {
-      "details": "(tokenAddress=>dTokenAddress) to keep track of dToken for users"
-    },
-    "periodRegistry": { "details": "SLARegistry contract" },
-    "periodType": {
-      "details": "PeriodRegistry period type of the SLA contract"
-    },
-    "providerPool": {
-      "details": "(tokenAddress=>uint256) total pooled token balance"
-    },
-    "slaID": { "details": "current SLA id" },
-    "slaPeriodsLength": {
-      "details": "length of the _periodIds array, to state effective APY"
-    },
-    "stakeRegistry": { "details": "StakeRegistry contract" },
-    "stakers": { "details": "address[] of the stakers of the SLA contract" },
-    "usersPool": {
-      "details": "(tokenAddress=>uint256) total pooled token balance"
-    },
-    "whitelist": {
-      "details": "(userAddress=bool) to declare whitelisted addresses"
-    },
-    "whitelistedContract": {
-      "details": "boolean to declare if contract is whitelisted"
-    }
-  },
-  "version": 1
+  }
 }
