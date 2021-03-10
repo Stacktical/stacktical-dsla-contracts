@@ -1,11 +1,13 @@
 require('babel-polyfill');
 require('babel-register');
 
+const { toWei } = require('web3-utils');
 const { getChainlinkJobId } = require('../test/helpers');
 const { getEnvFromNetwork, needsGetJobId } = require('../environments');
 
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const SLARegistry = artifacts.require('SLARegistry');
+const PreCoordinator = artifacts.require('PreCoordinator');
 const SLORegistry = artifacts.require('SLORegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const MessengerRegistry = artifacts.require('MessengerRegistry');
@@ -31,19 +33,34 @@ module.exports = (deployer, network) => {
 
       const chainlinkJobId = !needsGetJobId ? env.chainlinkJobId : await getChainlinkJobId();
 
+      const preCoordinator = await deployer.deploy(
+        PreCoordinator,
+        env.chainlinkTokenAddress,
+      );
+
+      const minResponses = 1;
+      const oracles = [env.chainlinkOracleAddress];
+      const jobIds = [chainlinkJobId];
+      const payments = [toWei('0,1')];
+      const saId = await preCoordinator.createServiceAgreement(
+        minResponses, oracles, jobIds, payments,
+      ).call();
+
+      console.log(saId);
+
       const networkAnalytics = await deployer.deploy(
         NetworkAnalytics,
-        env.chainlinkOracleAddress,
+        preCoordinator.address,
         env.chainlinkTokenAddress,
-        chainlinkJobId,
+        saId,
         periodRegistry.address,
       );
 
       const seMessenger = await deployer.deploy(
         SEMessenger,
-        env.chainlinkOracleAddress,
+        preCoordinator.address,
         env.chainlinkTokenAddress,
-        chainlinkJobId,
+        saId,
         networkAnalytics.address,
       );
 

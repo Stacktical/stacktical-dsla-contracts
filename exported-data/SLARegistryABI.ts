@@ -71,7 +71,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -81,7 +80,6 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -89,7 +87,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -99,7 +96,6 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -116,7 +112,6 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -126,7 +121,6 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
@@ -186,7 +180,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
@@ -194,7 +187,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -202,7 +194,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -210,7 +201,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
@@ -218,6 +208,5 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
 ];

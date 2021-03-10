@@ -1,11 +1,13 @@
-pragma solidity ^0.6.0;
+pragma solidity 0.6.6;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title IMessenger
  * @dev Interface to create new Messenger contract to add lo Messenger lists
  */
 
-interface IMessenger {
+abstract contract IMessenger is Ownable {
     struct SLIRequest {
         address slaAddress;
         uint256 periodId;
@@ -28,7 +30,7 @@ interface IMessenger {
     /**
      * @dev sets the SLARegistry contract address and can only be called once
      */
-    function setSLARegistry() external;
+    function setSLARegistry() external virtual;
 
     /**
      * @dev creates a ChainLink request to get a new SLI value for the
@@ -37,44 +39,42 @@ interface IMessenger {
      * @param _slaAddress 2. address of the receiver SLA
      */
 
-    function requestSLI(uint256 _periodId, address _slaAddress) external;
+    function requestSLI(uint256 _periodId, address _slaAddress)
+        external
+        virtual;
 
     /**
      * @dev callback function for the Chainlink SLI request which stores
      * the SLI in the SLA contract
      * @param _requestId the ID of the ChainLink request
-     * @param _chainlinkResponse response object from Chainlink Oracles
+     * @param _chainlinkResponseUint256 response object from Chainlink Oracles
      */
-    function fulfillSLI(bytes32 _requestId, bytes32 _chainlinkResponse)
-        external;
+    function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponseUint256)
+        external
+        virtual;
 
     /**
      * @dev gets the messenger precision
      */
-    function messengerPrecision() external view returns (uint256);
+    function messengerPrecision() external view virtual returns (uint256);
 
     /**
      * @dev gets the slaRegistryAddress
      */
-    function slaRegistryAddress() external view returns (address);
+    function slaRegistryAddress() external view virtual returns (address);
 
     /**
      * @dev gets the chainlink oracle contract address
      */
-    function oracle() external view returns (address);
+    function oracle() external view virtual returns (address);
 
     /**
      * @dev gets the chainlink job id
      */
-    function jobId() external view returns (bytes32);
+    function jobId() external view virtual returns (bytes32);
 
     /**
      * @dev gets the fee amount of LINK token
      */
-    function fee() external view returns (uint256);
-
-    /**
-     * @dev gets the owner of the contract
-     */
-    function owner() external view returns (address);
+    function fee() external view virtual returns (uint256);
 }

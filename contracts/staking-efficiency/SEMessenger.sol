@@ -1,4 +1,5 @@
-pragma solidity ^0.6.0;
+pragma solidity 0.6.6;
+
 pragma experimental ABIEncoderV2;
 
 import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
@@ -25,8 +26,6 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     address public networkAnalyticsAddress;
     /// @dev Chainlink oracle address
     address private _oracle;
-    /// @dev Contract owner
-    address private _owner;
     /// @dev chainlink jobId
     bytes32 private _jobId;
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
@@ -52,8 +51,9 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         setChainlinkToken(_messengerChainlinkToken);
         _oracle = _messengerChainlinkOracle;
         networkAnalyticsAddress = _networkAnalyticsAddress;
-        _owner = msg.sender;
     }
+
+    event JobId(bytes32 _jobId, address indexed sender);
 
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
     modifier onlySLARegistry() {
@@ -132,13 +132,14 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * @dev callback function for the Chainlink SLI request which stores
      * the SLI in the SLA contract
      * @param _requestId the ID of the ChainLink request
-     * @param _chainlinkResponse response object from Chainlink Oracles
+     * @param _chainlinkResponseUint256 response object from Chainlink Oracles
      */
-    function fulfillSLI(bytes32 _requestId, bytes32 _chainlinkResponse)
+    function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponseUint256)
         public
         override
         recordChainlinkFulfillment(_requestId)
     {
+        bytes32 _chainlinkResponse = bytes32(_chainlinkResponseUint256);
         SLIRequest memory request = requestIdToSLIRequest[_requestId];
         emit SLIReceived(
             request.slaAddress,
@@ -188,6 +189,11 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         return (hits, misses);
     }
 
+    function setJobId(bytes32 _newJobId) public onlyOwner {
+        _jobId = _newJobId;
+        emit JobId(_newJobId, msg.sender);
+    }
+
     /**
      * @dev returns the value of the sla registry address
      */
@@ -221,12 +227,5 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      */
     function fee() public view override returns (uint256) {
         return _fee;
-    }
-
-    /**
-     * @dev returns the contract owner
-     */
-    function owner() public view override returns (address) {
-        return _owner;
     }
 }
