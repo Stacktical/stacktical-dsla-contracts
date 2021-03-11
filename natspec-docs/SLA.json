@@ -1,40 +1,6 @@
 {
   "details": "SLA is a service level agreement contract used for service downtime compensation",
-  "events": {
-    "SLANotRespected(uint256,uint256)": {
-      "details": "event for SLI creation logging",
-      "params": {
-        "_periodId": "1. the id of the given period",
-        "_sli": "2. value of the SLI"
-      }
-    },
-    "SLICreated(uint256,uint256,uint256)": {
-      "details": "event for SLI creation logging",
-      "params": {
-        "timestamp": "1. the time the SLI has been registered",
-        "sli": "2. the value of the SLI",
-        "periodId": "3. the id of the given period"
-      }
-    }
-  },
-  "kind": "dev",
   "methods": {
-    "_claimCompensation(address)": {
-      "details": "claim user compensation. Transfers both the compensation and the user remaining stake.",
-      "params": {
-        "_tokenAddress": "1. address of the token to claim compensation"
-      }
-    },
-    "addAllowedTokens(address)": {
-      "details": "add a token to ve allowed for staking",
-      "params": { "_tokenAddress": "1. address of the new allowed token" }
-    },
-    "claimUserCompensation(address)": {
-      "details": "withdraw provider reward of a given token address",
-      "params": {
-        "_tokenAddress": "1. address of the token to withdraw rewards"
-      }
-    },
     "constructor": {
       "params": {
         "_owner": "1. address of the owner of the service level agreement",
@@ -49,22 +15,6 @@
         "_slaID": "10. identifies the SLA to uniquely to emit dTokens"
       }
     },
-    "getAllowedTokensLength()": {
-      "details": "use this function to evaluate the length of the allowed tokens length",
-      "returns": { "_0": "allowedTokens.length" }
-    },
-    "isAllowedToken(address)": {
-      "details": "checks in the allowedTokens array if there's a token with _tokenAddress value",
-      "params": { "_tokenAddress": "1. token address to check exixtence" },
-      "returns": {
-        "_0": "true if _tokenAddress exists in the allowedTokens array"
-      }
-    },
-    "isStaker(address)": {
-      "details": "returns true if the _staker address is registered as staker",
-      "params": { "_staker": "1. staker address" },
-      "returns": { "_0": "true if address is staker" }
-    },
     "owner()": { "details": "Returns the address of the current owner." },
     "registerSLI(uint256,uint256)": {
       "details": "external function to register SLI's and check them against the SLO's",
@@ -74,45 +24,11 @@
       }
     },
     "renounceOwnership()": {
-      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
-    },
-    "stakeTokens(uint256,address)": {
-      "details": "stake _amount tokens into the _token contract",
-      "params": {
-        "_amount": "1. amount to be staked",
-        "_token": "2. address of the ERC to be staked"
-      }
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
     "transferOwnership(address)": {
       "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
-    },
-    "withdrawStakedTokens(uint256,address)": {
-      "details": "withdraw _amount tokens from the _token contract",
-      "params": {
-        "_amount": "1. amount to be staked",
-        "_tokenAddress": "2. address of the ERC to be staked"
-      }
     }
   },
-  "stateVariables": {
-    "_breachedContract": {
-      "details": "states if the contract was breached or not"
-    },
-    "creationBlockNumber": { "details": "block number of SLA deployment" },
-    "extraData": { "details": "extra data for customized workflows" },
-    "ipfsHash": {
-      "details": "The ipfs hash that stores extra information about the agreement"
-    },
-    "messengerAddress": { "details": "The address of the messenger" },
-    "nextVerifiablePeriod": {
-      "details": "states if the contract was breached or not"
-    },
-    "periodIds": { "details": "array of he allowed canonical period ids" },
-    "periodSLIs": { "details": "periodId=>PeriodSLI mapping" },
-    "periodType": { "details": "uint8 of the period type" },
-    "slaRegistry": { "details": "The address of the slaRegistry contract" },
-    "slo": { "details": "address of the SLO" }
-  },
-  "title": "SLA",
-  "version": 1
+  "title": "SLA"
 }

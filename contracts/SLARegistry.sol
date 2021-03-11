@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -75,7 +75,7 @@ contract SLARegistry is Ownable {
         SLO _SLO,
         string memory _ipfsHash,
         PeriodRegistry.PeriodType _periodType,
-        uint256[] calldata _periodIds,
+        uint256[] memory _periodIds,
         address _messengerAddress,
         bool _whitelisted,
         bytes32[] memory _extraData

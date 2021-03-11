@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -150,11 +150,9 @@ contract PeriodRegistry is Ownable {
         view
         returns (bool finished)
     {
-        PeriodDefinition memory periodDefinition =
-            periodDefinitions[_periodType];
         require(
-            periodDefinition.initialized,
-            "Period type not initialized yet"
+            isValidPeriod(_periodType, _periodId) == true,
+            "Period type is not valid"
         );
         finished =
             periodDefinitions[_periodType].ends[_periodId] < block.timestamp;
