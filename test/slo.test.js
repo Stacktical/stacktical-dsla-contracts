@@ -5,9 +5,7 @@ import { expect } from 'chai';
 import { sloTypes, sloTypesNames } from '../constants';
 
 const SLO = artifacts.require('SLO');
-const { utf8ToHex } = web3.utils;
 
-const sloName = utf8ToHex('staking_efficiency');
 const sloValue = 97000;
 
 describe('SLO', () => {
@@ -17,66 +15,66 @@ describe('SLO', () => {
       let honored;
       switch (sloType) {
         case sloTypesNames.EqualTo: {
-          slo = await SLO.new(sloValue, 0, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          slo = await SLO.new(sloValue, 0);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.true;
           break;
         }
         case sloTypesNames.NotEqualTo: {
-          slo = await SLO.new(sloValue, 1, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          slo = await SLO.new(sloValue, 1);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.false;
 
           break;
         }
         case sloTypesNames.SmallerThan: {
-          slo = await SLO.new(sloValue, 2, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          slo = await SLO.new(sloValue, 2);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.false;
 
           break;
         }
         case sloTypesNames.SmallerOrEqualTo: {
-          slo = await SLO.new(sloValue, 3, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          slo = await SLO.new(sloValue, 3);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.true;
 
           break;
         }
         case sloTypesNames.GreaterThan: {
-          slo = await SLO.new(sloValue, 4, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          slo = await SLO.new(sloValue, 4);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.false;
 
           break;
         }
         case sloTypesNames.GreaterOrEqualTo: {
-          slo = await SLO.new(sloValue, 5, sloName);
-          honored = await slo.isSLOHonored.call(sloValue + 1);
+          slo = await SLO.new(sloValue, 5);
+          honored = await slo.isRespected.call(sloValue + 1);
           expect(honored).to.be.true;
-          honored = await slo.isSLOHonored.call(sloValue - 1);
+          honored = await slo.isRespected.call(sloValue - 1);
           expect(honored).to.be.false;
-          honored = await slo.isSLOHonored.call(sloValue);
+          honored = await slo.isRespected.call(sloValue);
           expect(honored).to.be.true;
 
           break;
@@ -88,7 +86,7 @@ describe('SLO', () => {
   });
 
   // it('should return details correctly', async () => {
-  //   const slo = await SLO.new(sloValue, 4, sloName);
+  //   const slo = await SLO.new(sloValue, 4);
   //   const details = await slo.getDetails();
   //   console.log(details);
   // });

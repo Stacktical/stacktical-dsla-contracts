@@ -4,8 +4,8 @@ const axios = require('axios');
 
 export const getSLI = async (
   slaAddress,
-  weekId,
-  slaRegistryAddress,
+  periodId,
+  networkAnalyticsAddress,
 ) => {
   const {
     data: { data: { result } },
@@ -15,10 +15,10 @@ export const getSLI = async (
     data: {
       id: '1',
       data: {
-        job_type: 'get_sli',
+        job_type: 'staking_efficiency',
         sla_address: slaAddress,
-        week_id: weekId,
-        sla_registry_address: slaRegistryAddress,
+        period_id: periodId,
+        network_analytics_address: networkAnalyticsAddress,
       },
     },
     withCredentials: true,

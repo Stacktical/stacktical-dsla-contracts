@@ -1,7 +1,6 @@
 import generatePeriods from './helpers';
 
 require('dotenv').config();
-const ngrok = require('ngrok');
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 const devPeriods = generatePeriods(10);
@@ -13,6 +12,9 @@ const environments = {
     chainlinkTokenAddress: null,
     chainlinkJobId: null,
     indexerAPIUrl: 'https://dsla.network/api',
+    dslaTokenAddress: '0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe',
+    daiTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
+    usdcTokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   },
   kovan: {
     web3WebsocketProviderUrl:
@@ -21,6 +23,9 @@ const environments = {
     chainlinkTokenAddress: '0xa36085F69e2889c224210F603D836748e7dC0088',
     chainlinkJobId: '0x' + '29fa9aa13bf1468788b7cc4a500a45b8',
     indexerAPIUrl: 'https://dsla.network/api',
+    dslaTokenAddress: null,
+    daiTokenAddress: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa',
+    usdcTokenAddress: null,
   },
   staging: {
     web3WebsocketProviderUrl: `ws://${process.env.STAGING_IP}:8545`,
@@ -28,6 +33,9 @@ const environments = {
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
     chainlinkNodeUrl: `http://${process.env.STAGING_IP}:6688`,
     indexerAPIUrl: 'https://dsla-staging-indexer.herokuapp.com/api',
+    dslaTokenAddress: null,
+    daiTokenAddress: null,
+    usdcTokenAddress: null,
   },
   develop: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
@@ -37,10 +45,14 @@ const environments = {
     indexerAPIUrl: 'https://dsla-staging-indexer.herokuapp.com/api',
     startsArray: devPeriods[0],
     endsArray: devPeriods[1],
+    dslaTokenAddress: null,
+    daiTokenAddress: null,
+    usdcTokenAddress: null,
   },
 };
 
 const getNetworkName = (network) => {
+  if (/testing/i.test(network)) return 'develop';
   if (/develop/i.test(network)) return 'develop';
   if (/staging/i.test(network)) return 'staging';
   if (/kovan/i.test(network)) return 'kovan';

@@ -1,35 +1,17 @@
 {
   "details": "SLO is a service level objective contract used to check SLI's against",
-  "events": {
-    "SLORegistered(uint256,uint8,bytes32)": {
-      "details": "event for logging SLO creation",
-      "params": {
-        "_value": "1. The value to check the SLI against",
-        "_SLOType": "2. The checking type for this SLO",
-        "_name": "3. The name of the SLO in bytes32"
-      }
-    }
-  },
-  "kind": "dev",
   "methods": {
     "constructor": {
       "params": {
         "_value": "1. The value to check the SLI against",
-        "_SLOType": "2. The checking type for this SLO",
-        "_name": "3. The name of the SLO in bytes32"
+        "_sloType": "2. The checking sloType for this SLO"
       }
     },
-    "isSLOHonored(uint256)": {
+    "isRespected(uint256)": {
       "details": "external view function to check a value against the SLO",
       "params": { "_value": "The SLI value to check against the SL" },
       "returns": { "_0": "boolean with the SLO honored state" }
     }
   },
-  "stateVariables": {
-    "SLOType": { "details": "the checking type for this SLO" },
-    "name": { "details": "the name of the SLO in bytes32" },
-    "value": { "details": "the value to check the SLI against" }
-  },
-  "title": "SLO",
-  "version": 1
+  "title": "SLO"
 }

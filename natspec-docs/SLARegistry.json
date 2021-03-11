@@ -1,22 +1,5 @@
 {
   "details": "SLARegistry is a contract for handling creation of service level agreements and keeping track of the created agreements",
-  "events": {
-    "AnalyticsReceived(bytes32,bytes32,uint256)": {
-      "details": "Event to store a new analytics ipfs hash received",
-      "params": {
-        "_ipfsHash": "1. id of the canonical period to be analyzed",
-        "_network": "2. network name to publish analytics"
-      }
-    },
-    "SLACreated(address,address)": {
-      "details": "event for service level agreement creation logging",
-      "params": {
-        "sla": "1. The address of the created service level agreement contract",
-        "owner": "2. The address of the owner of the service level agreement"
-      }
-    }
-  },
-  "kind": "dev",
   "methods": {
     "SLACount()": {
       "details": "public view function that returns the total amount of service level agreements",
@@ -29,61 +12,42 @@
     "constructor": {
       "details": "constructor",
       "params": {
-        "_messengerAddress": "1. the address of the chainlink messenger contract",
-        "_sla_week_period_starts": "3. array of the starts of the weeks period",
-        "_sla_week_period_ends": "4. array of the ends of the weeks period",
-        "_networkNames": "5. array of bytes32 with the names of the valid networks"
+        "_sloRegistry": "1. SLO Registry",
+        "_periodRegistry": "2. Periods registry",
+        "_messengerRegistry": "3. Messenger registry",
+        "_stakeRegistry": "4. Stake registry"
       }
     },
-    "createSLA(address,bytes32[],address[],uint256,string,address,uint256[])": {
+    "createSLA(address,string,uint8,uint256[],address,bool,bytes32[])": {
       "details": "public function for creating canonical service level agreements",
       "params": {
-        "_owner": "1. address of the owner of the service level agreement",
-        "_SLONames": "2. array of the names of the service level objectives in bytes32",
-        "_SLOs": "3. array of service level objective contract addressess service level objective breach",
-        "_stake": "4. uint of the amount required to stake when signing the service level agreement",
-        "_ipfsHash": "5. string with the ipfs hash that contains extra information about the service level agreement",
-        "_baseTokenAddress": "6. address of the base token",
-        "_periodIds": "7. array of week ids to look in the"
+        "_SLO": "1. SLO",
+        "_ipfsHash": "2. string with the ipfs hash that contains extra information about the service level agreement",
+        "_periodType": "3. period type",
+        "_periodIds": "4. array of allowed period ids",
+        "_messengerAddress": "5. address of the messenger for the corresponding SLA",
+        "_whitelisted": "6. bool to declare whitelisted SLA",
+        "_extraData": "7. bytes32 to embed extra data for customized workflows"
       }
     },
-    "getActivePool(address)": {
-      "details": "returns the active pools owned by a user.",
-      "params": { "_slaOwner": "1. owner of the active pool" },
-      "returns": {
-        "_0": "ActivePool[], array of structs: {SLAaddress,stake,assetName}"
-      }
+    "isRegisteredSLA(address)": {
+      "details": "public view function that returns true if _slaAddress was deployed using this SLARegistry",
+      "params": { "_slaAddress": "address of the SLA to be checked" }
     },
-    "publishAnalyticsHash(bytes32,bytes32,uint256)": {
-      "details": "Receives the data from the Messenger contract",
-      "params": {
-        "_ipfsHash": "1. id of the canonical period to be analyzed",
-        "_network": "2. network name to publish analytics"
-      }
+    "owner()": { "details": "Returns the address of the current owner." },
+    "renounceOwnership()": {
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
-    "registerStakedSla(address)": {
-      "details": "register the sending SLA contract as staked by _owner",
-      "params": { "_owner": "1. SLA contract to stake" }
-    },
-    "requestAnalytics(uint256,bytes32)": {
-      "details": "Request analytics object for the current period.",
-      "params": {
-        "_canonicalPeriodId": "1. id of the canonical period to be analyzed",
-        "_network": "2. network name to publish analytics"
-      }
-    },
-    "requestSLI(uint256,address,bytes32)": {
+    "requestSLI(uint256,address)": {
       "details": "Gets SLI information for the specified SLA and SLO",
-      "params": {
-        "_periodId": "1. id of the period",
-        "_sla": "2. SLA Address",
-        "_sloName": "3. SLO Name"
-      }
+      "params": { "_periodId": "1. id of the period", "_sla": "2. SLA Address" }
     },
-    "slaWasStakedByUser(address,address)": {
-      "details": "public view function that returns true if the _owner has staked on _sla",
-      "params": { "_user": "1. address to check", "_sla": "2. sla to check" },
-      "returns": { "_0": "bool, true if _sla was staked by _user" }
+    "setMessengerSLARegistryAddress(address)": {
+      "details": "function to declare this SLARegistry contract as SLARegistry of _messengerAddress",
+      "params": { "_messengerAddress": "1. address of the messenger" }
+    },
+    "transferOwnership(address)": {
+      "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
     },
     "userSLACount(address)": {
       "details": "public view function that returns the amount of service level agreements the given user is the owner of",
@@ -100,32 +64,5 @@
       "returns": { "_0": "array of SLAs" }
     }
   },
-  "stateVariables": {
-    "SLAs": { "details": "stores the addresses of created SLAs" },
-    "canonicalPeriodLastID": {
-      "details": "mapping periodId=>CanonicalPeriod to check if SLA is registered"
-    },
-    "canonicalPeriods": {
-      "details": "mapping periodId=>CanonicalPeriod to check if SLA is registered"
-    },
-    "canonicalPeriodsAnalytics": {
-      "details": "mapping networkName=>periodId=>bytes32 to store ipfsHash of the analytics corresponding to periodId"
-    },
-    "messenger": { "details": "Messenger of the SLA Registry" },
-    "networkNames": {
-      "details": "bytes32 to store the available network names"
-    },
-    "registeredSLAs": {
-      "details": "mapping SLA=>bool to check if SLA is registered"
-    },
-    "userStakedSlas": { "details": "mapping userAddress => SLA[]" },
-    "userToSLAIndexes": {
-      "details": "stores the indexes of service level agreements owned by an user"
-    },
-    "validNetworks": {
-      "details": "mapping SLA=>bool to store the if the network is valid"
-    }
-  },
-  "title": "SLARegistry",
-  "version": 1
+  "title": "SLARegistry"
 }

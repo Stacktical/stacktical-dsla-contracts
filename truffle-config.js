@@ -11,6 +11,18 @@ const stagingIP = process.env.STAGING_IP;
 
 module.exports = {
   networks: {
+    testing: {
+      provider() {
+        return new HDWalletProvider(
+          test_mnemonic,
+          'http://localhost:8545',
+          0,
+          10,
+        );
+      },
+      network_id: '1337',
+      gas: 12000000,
+    },
     develop: {
       provider() {
         return new HDWalletProvider(
@@ -64,7 +76,7 @@ module.exports = {
 
   compilers: {
     solc: {
-      version: '^0.6.0',
+      version: '0.6.6',
       settings: {
         optimizer: {
           enabled: true,

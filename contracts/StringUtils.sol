@@ -1,35 +1,7 @@
 // solhint-disable-line
-pragma solidity ^0.6.0;
+pragma solidity 0.6.6;
 
 contract StringUtils {
-    function _parseSLIData(string memory sliData)
-        internal
-        pure
-        returns (uint256, uint256)
-    {
-        bytes memory bytesSLIData = bytes(sliData);
-        uint256 sliDataLength = bytesSLIData.length;
-        bytes memory bytesHits = new bytes(sliDataLength);
-        bytes memory bytesMisses = new bytes(sliDataLength);
-        for (uint256 index; index < sliDataLength; index++) {
-            if (bytesSLIData[index] == bytes1(",")) {
-                for (uint256 index2 = 0; index2 < index; index2++) {
-                    bytesHits[index2] = bytesSLIData[index2];
-                }
-                for (
-                    uint256 index3 = 0;
-                    index3 < sliDataLength - index - 1;
-                    index3++
-                ) {
-                    bytesMisses[index3] = bytesSLIData[index + 1 + index3];
-                }
-            }
-        }
-        uint256 hits = _bytesToUint(bytesHits);
-        uint256 misses = _bytesToUint(bytesMisses);
-        return (hits, misses);
-    }
-
     function _addressToString(address _address)
         internal
         pure
