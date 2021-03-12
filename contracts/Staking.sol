@@ -121,13 +121,13 @@ contract Staking is Ownable {
         whitelist[_userAddress] = true;
     }
 
-    function addMultipleUsersToWhitelist(address[] _userAddresses)
+    function addMultipleUsersToWhitelist(address[] memory _userAddresses)
         public
         onlyOwner
     {
         for (uint256 index = 0; index < _userAddresses.length; index++) {
             if (whitelist[_userAddresses[index]] == false) {
-                whitelist[_userAddress[index]] = true;
+                whitelist[_userAddresses[index]] = true;
             }
         }
     }
@@ -137,13 +137,13 @@ contract Staking is Ownable {
         whitelist[_userAddress] = false;
     }
 
-    function removeMultipleUsersFromWhitelist(address[] _userAddresses)
+    function removeMultipleUsersFromWhitelist(address[] memory _userAddresses)
         public
         onlyOwner
     {
         for (uint256 index = 0; index < _userAddresses.length; index++) {
             if (whitelist[_userAddresses[index]] == true) {
-                whitelist[_userAddress[index]] = false;
+                whitelist[_userAddresses[index]] = false;
             }
         }
     }
