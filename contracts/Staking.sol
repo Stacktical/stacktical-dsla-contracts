@@ -121,9 +121,31 @@ contract Staking is Ownable {
         whitelist[_userAddress] = true;
     }
 
+    function addMultipleUsersToWhitelist(address[] _userAddresses)
+        public
+        onlyOwner
+    {
+        for (uint256 index = 0; index < _userAddresses.length; index++) {
+            if (whitelist[_userAddresses[index]] == false) {
+                whitelist[_userAddress[index]] = true;
+            }
+        }
+    }
+
     function removeUserFromWhitelist(address _userAddress) public onlyOwner {
         require(whitelist[_userAddress] == true, "User not whitelisted");
         whitelist[_userAddress] = false;
+    }
+
+    function removeMultipleUsersFromWhitelist(address[] _userAddresses)
+        public
+        onlyOwner
+    {
+        for (uint256 index = 0; index < _userAddresses.length; index++) {
+            if (whitelist[_userAddresses[index]] == true) {
+                whitelist[_userAddress[index]] = false;
+            }
+        }
     }
 
     /**
