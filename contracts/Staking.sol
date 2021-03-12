@@ -370,36 +370,6 @@ contract Staking is Ownable {
         ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
 
-    /**
-     *@dev claim user compensation. Transfers both the compensation and the user remaining stake.
-     *@param _tokenAddress 1. address of the token to claim compensation
-     *@notice it uses the user position and the user total position per token to check
-     * the proportion of the compensation pool that corresponds to every user
-     */
-    function _claimCompensation(address _tokenAddress)
-        public
-        notOwner
-        onlyWhitelisted
-    {
-        ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
-        uint256 duTokenBalance = duToken.balanceOf(msg.sender);
-        uint256 duTokenSupply = duToken.totalSupply();
-        uint256 precision = 10000;
-        require(
-            duTokenBalance > 0,
-            "Can only claim a compensation if position is bigger than 0"
-        );
-
-        uint256 userCompensationPercentage =
-            duTokenBalance.mul(precision).div(duTokenSupply);
-        uint256 userCompensation =
-            usersPool[_tokenAddress].mul(userCompensationPercentage).div(
-                precision
-            );
-        duToken.burnFrom(msg.sender, duTokenBalance);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, userCompensation);
-    }
-
     function _burnDSLATokens(uint256 _amount) internal returns (uint256 fees) {
         bytes4 BURN_SELECTOR = bytes4(keccak256(bytes("burn(uint256)")));
         fees = _amount.mul(DSLAburnRate).div(1000);
