@@ -264,15 +264,6 @@ contract SLA is Staking {
         _withdrawUserTokens(_amount, _tokenAddress);
     }
 
-    /**
-     *@dev withdraw provider reward of a given token address
-     *@param _tokenAddress 1. address of the token to withdraw rewards
-     */
-
-    function claimUserCompensation(address _tokenAddress) public {
-        _claimCompensation(_tokenAddress);
-    }
-
     function getPeriodIdsLength() public view returns (uint256) {
         return periodIds.length;
     }
