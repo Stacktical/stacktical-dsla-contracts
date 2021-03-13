@@ -1,21 +1,28 @@
 {
   "details": "Details is a contract to fetch details of contracts with a single RPC endpoint",
   "methods": {
-    "getSLADetails(address)": {
-      "details": "external view function that returns all agreement information",
+    "getSLADynamicDetails(address)": {
+      "details": "external view function that returns all dynamic agreement information",
       "returns": {
         "breachedContract": "3. breached contract",
-        "creationBlockNumber": "5. addresses of the SLO",
-        "cumulatedDevaluation": "9. -",
-        "cumulatedDevaluationPrecision": "10. -",
-        "ipfsHash": "11. string  ipfsHash",
-        "nextVerifiablePeriod": "7. amount of stakers",
+        "cumulatedDevaluation": "12. -",
+        "nextVerifiablePeriod": "10. amount of stakers",
+        "stakersCount": "9. amount of stakers"
+      }
+    },
+    "getSLAStaticDetails(address)": {
+      "details": "external view function that returns all static agreement information",
+      "returns": {
+        "creationBlockNumber": "8. addresses of the SLO",
+        "cumulatedDevaluationPrecision": "13. -",
+        "ipfsHash": "14. string  ipfsHash",
         "periodType": "2. periodType of the sla contract",
-        "slaId": "8. -",
+        "slaId": "11. -",
         "slaOwner": "1. address  owner",
-        "slo": "4. addresses of the SLO",
-        "stakersCount": "6. amount of stakers",
-        "whiteListed": "3. breached contract"
+        "sloAddress": "5. addresses of the SLO",
+        "sloType": "6. slo type",
+        "sloValue": "7. slo value",
+        "whiteListed": "4. breached contract"
       }
     }
   },

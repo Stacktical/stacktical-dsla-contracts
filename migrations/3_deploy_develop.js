@@ -99,7 +99,7 @@ module.exports = (deployer, network) => {
       };
       const ipfsHash = await getIPFSHash(serviceMetadata);
       const slaRegistry = await SLARegistry.deployed();
-      const periodIds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      const periodIds = [0, 1, 2];
       const dslaDepositByPeriod = toWei(String(20000 * periodIds.length));
       await bdslaToken.approve(stakeRegistry.address, dslaDepositByPeriod);
       await slaRegistry.createSLA(
