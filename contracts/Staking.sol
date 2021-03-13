@@ -30,11 +30,6 @@ contract Staking is Ownable {
     ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for provider
     mapping(address => ERC20PresetMinterPauser) public dpTokenRegistry;
 
-    ///@dev index to keep a deflationary mint of tokens
-    uint256 public cumulatedDevaluation = 10**6;
-    ///@dev to keep track of the precision used to avoid multiplying by 0
-    uint256 public cumulatedDevaluationPrecision = 10**6;
-
     /// @dev address[] of the stakers of the SLA contract
     address[] public stakers;
     /// @dev DSLA token address to burn fees
@@ -200,7 +195,7 @@ contract Staking is Ownable {
             address(this),
             _amount
         );
-
+        //duTokens
         if (msg.sender != owner()) {
             (uint256 providerStake, uint256 usersStake) =
                 (providerPool[_tokenAddress], usersPool[_tokenAddress]);
@@ -208,28 +203,29 @@ contract Staking is Ownable {
                 usersStake.add(_amount) <= providerStake,
                 "Cannot stake more than SLA provider stake"
             );
-            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
-            // mint duTokens considering net present value respect to first period
-            uint256 duTokenAmount =
-                _amount.mul(cumulatedDevaluationPrecision).div(
-                    cumulatedDevaluation
-                );
             ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
-            duToken.mint(msg.sender, duTokenAmount);
-        } else {
-            ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
-            uint256 p0 = dpToken.totalSupply();
-            uint256 t0 = providerPool[_tokenAddress];
+            uint256 p0 = duToken.totalSupply();
 
             // if there's no minted tokens, then create 1-1 proportion
             if (p0 == 0) {
+                duToken.mint(msg.sender, _amount);
+            } else {
+                uint256 t0 = usersPool[_tokenAddress];
+                // mint dTokens proportionally
+                uint256 mintedDUTokens = _amount.mul(p0).div(t0);
+                duToken.mint(msg.sender, mintedDUTokens);
+            }
+            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
+            //dpTokens
+        } else {
+            ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
+            uint256 p0 = dpToken.totalSupply();
+
+            if (p0 == 0) {
                 dpToken.mint(msg.sender, _amount);
             } else {
-                // Mint dpTokens in a way that it doesn't affect the PoolTokens/LPTokens average
-                // of current period, so contract owner cannot affect proportional stake of other
-                // provider token owners.
-                // t0/p0 = (t0+_amount)/(p0+mintedDPTokens)
-                // mintedDPTokens = _amount*p0/t0
+                uint256 t0 = providerPool[_tokenAddress];
+                // mint dTokens proportionally
                 uint256 mintedDPTokens = _amount.mul(p0).div(t0);
                 dpToken.mint(msg.sender, mintedDPTokens);
             }
@@ -280,17 +276,6 @@ contract Staking is Ownable {
                 reward
             );
         }
-        // update cumulativeDevaluation to increase dTokens generation over time
-        // decimalReward: the decimal proportion of rewards, e.g. 0.05)
-        // rewardPercentage = precision * decimalReward
-        // Then, by definition:
-        // cumulatedDevaluation = cumulatedDevaluation*(1-decimalReward)
-        // cumulatedDevaluation = cumulatedDevaluation*(1-decimalReward)*precision/precision
-        // Finally
-        // cumulatedDevaluation = cumulatedDevaluation*(precision-rewardPercentage)/precision
-        cumulatedDevaluation = cumulatedDevaluation
-            .mul(_precision.sub(_rewardPercentage))
-            .div(_precision);
     }
 
     /**

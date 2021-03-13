@@ -35,10 +35,9 @@ contract Details {
 
     /**
      * @dev external view function that returns all dynamic agreement information
-     * @return breachedContract 3. breached contract
-     * @return stakersCount 9. amount of stakers
-     * @return nextVerifiablePeriod 10. amount of stakers
-     * @return cumulatedDevaluation 12. -
+     * @return breachedContract 1. breached contract
+     * @return stakersCount 2. amount of stakers
+     * @return nextVerifiablePeriod 3. amount of stakers
      */
 
     function getSLADynamicDetails(address _slaAddress)
@@ -47,15 +46,13 @@ contract Details {
         returns (
             bool breachedContract,
             uint256 stakersCount,
-            uint256 nextVerifiablePeriod,
-            uint256 cumulatedDevaluation
+            uint256 nextVerifiablePeriod
         )
     {
         SLA sla = SLA(_slaAddress);
         breachedContract = sla.breachedContract();
         stakersCount = sla.getStakersLength();
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
-        cumulatedDevaluation = sla.cumulatedDevaluation();
     }
 
     /**
@@ -68,7 +65,6 @@ contract Details {
      * @return sloValue 7. slo value
      * @return creationBlockNumber 8. addresses of the SLO
      * @return slaId 11. -
-     * @return cumulatedDevaluationPrecision 13. -
      * @return ipfsHash 14. string  ipfsHash
      */
     function getSLAStaticDetails(address _slaAddress)
@@ -83,7 +79,6 @@ contract Details {
             uint256 sloValue,
             uint256 creationBlockNumber,
             uint256 slaId,
-            uint256 cumulatedDevaluationPrecision,
             string memory ipfsHash
         )
     {
@@ -97,7 +92,6 @@ contract Details {
         sloValue = slo.value();
         creationBlockNumber = sla.creationBlockNumber();
         slaId = sla.slaID();
-        cumulatedDevaluationPrecision = sla.cumulatedDevaluationPrecision();
         ipfsHash = sla.ipfsHash();
     }
 
