@@ -95,7 +95,7 @@ contract SLARegistry is Ownable {
             if (index < _periodIds.length - 1) {
                 require(
                     _periodIds[index] < _periodIds[index + 1],
-                    "Period ids should be sorted "
+                    "Period ids should be sorted"
                 );
                 require(
                     _periodIds[index + 1].sub(_periodIds[index]) == 1,

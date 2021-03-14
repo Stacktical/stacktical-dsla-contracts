@@ -10,9 +10,11 @@ function generateWeeklyPeriods(amountOfPeriods, expiredPeriods) {
   const periodStarts = [];
   const periodEnds = [];
   for (let index = -expiredPeriods; index < amountOfPeriods - expiredPeriods; index += 1) {
-    const start = moment().utc(0).add(index, 'week').startOf('week')
+    const start = moment().utc(0).startOf('isoWeek')
+      .add(index + 1, 'week')
       .unix();
-    const end = moment().utc(0).add(index, 'week').endOf('week')
+    const end = moment().utc(0).endOf('isoWeek')
+      .add(index + 1, 'week')
       .unix();
     periodStarts.push(start);
     periodEnds.push(end);
