@@ -129,16 +129,16 @@ export const SLAABI: AbiItem[] = [
     inputs: [
       { internalType: 'address', name: '_tokenAddress', type: 'address' },
     ],
-    name: '_claimCompensation',
+    name: 'addAllowedTokens',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [
-      { internalType: 'address', name: '_tokenAddress', type: 'address' },
+      { internalType: 'address[]', name: '_userAddresses', type: 'address[]' },
     ],
-    name: 'addAllowedTokens',
+    name: 'addMultipleUsersToWhitelist',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -163,22 +163,6 @@ export const SLAABI: AbiItem[] = [
   {
     inputs: [],
     name: 'creationBlockNumber',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
-    inputs: [],
-    name: 'cumulatedDevaluation',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
-    inputs: [],
-    name: 'cumulatedDevaluationPrecision',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
@@ -354,6 +338,15 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [
+      { internalType: 'address[]', name: '_userAddresses', type: 'address[]' },
+    ],
+    name: 'removeMultipleUsersFromWhitelist',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
       { internalType: 'address', name: '_userAddress', type: 'address' },
     ],
     name: 'removeUserFromWhitelist',
@@ -485,15 +478,6 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'address', name: '_tokenAddress', type: 'address' },
     ],
     name: 'withdrawUserTokens',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '_tokenAddress', type: 'address' },
-    ],
-    name: 'claimUserCompensation',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',

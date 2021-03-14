@@ -11,6 +11,12 @@ export const NetworkAnalyticsABI: AbiItem[] = [
         name: '_periodRegistry',
         type: 'address',
       },
+      {
+        internalType: 'contract StakeRegistry',
+        name: '_stakeRegistry',
+        type: 'address',
+      },
+      { internalType: 'uint256', name: '_feeMultiplier', type: 'uint256' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -49,6 +55,25 @@ export const NetworkAnalyticsABI: AbiItem[] = [
   {
     anonymous: false,
     inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'newValue',
+        type: 'uint256',
+      },
+    ],
+    name: 'CallerRewardModified',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
       { indexed: true, internalType: 'bytes32', name: 'id', type: 'bytes32' },
     ],
     name: 'ChainlinkCancelled',
@@ -76,6 +101,26 @@ export const NetworkAnalyticsABI: AbiItem[] = [
       {
         indexed: true,
         internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes32',
+        name: 'jobId',
+        type: 'bytes32',
+      },
+      { indexed: false, internalType: 'uint256', name: 'fee', type: 'uint256' },
+    ],
+    name: 'JobIdModified',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
         name: 'previousOwner',
         type: 'address',
       },
@@ -91,7 +136,7 @@ export const NetworkAnalyticsABI: AbiItem[] = [
   },
   {
     inputs: [],
-    name: 'fee',
+    name: 'callerReward',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
@@ -99,8 +144,8 @@ export const NetworkAnalyticsABI: AbiItem[] = [
   },
   {
     inputs: [],
-    name: 'jobId',
-    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    name: 'fee',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
     constant: true,
@@ -109,14 +154,6 @@ export const NetworkAnalyticsABI: AbiItem[] = [
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     name: 'networkNames',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
-    inputs: [],
-    name: 'oracle',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
     constant: true,
@@ -141,6 +178,22 @@ export const NetworkAnalyticsABI: AbiItem[] = [
     ],
     name: 'periodAnalytics',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [
+      { internalType: 'bytes32', name: '', type: 'bytes32' },
+      {
+        internalType: 'enum PeriodRegistry.PeriodType',
+        name: '',
+        type: 'uint8',
+      },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+    ],
+    name: 'periodAnalyticsRequested',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
     constant: true,
@@ -204,6 +257,15 @@ export const NetworkAnalyticsABI: AbiItem[] = [
   },
   {
     inputs: [
+      { internalType: 'bytes32[]', name: '_networkNames', type: 'bytes32[]' },
+    ],
+    name: 'addMultipleNetworks',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
       { internalType: 'uint256', name: '_periodId', type: 'uint256' },
       {
         internalType: 'enum PeriodRegistry.PeriodType',
@@ -211,6 +273,8 @@ export const NetworkAnalyticsABI: AbiItem[] = [
         type: 'uint8',
       },
       { internalType: 'bytes32', name: '_networkName', type: 'bytes32' },
+      { internalType: 'bool', name: '_ownerApproval', type: 'bool' },
+      { internalType: 'bool', name: '_callerReward', type: 'bool' },
     ],
     name: 'requestAnalytics',
     outputs: [],
@@ -224,6 +288,34 @@ export const NetworkAnalyticsABI: AbiItem[] = [
     ],
     name: 'fulFillAnalytics',
     outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'bytes32', name: '_jobId', type: 'bytes32' },
+      { internalType: 'uint256', name: '_feeMultiplier', type: 'uint256' },
+    ],
+    name: 'setChainlinkJobID',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'uint256', name: '_callerReward', type: 'uint256' },
+    ],
+    name: 'setCallerReward',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getNetworkNames',
+    outputs: [
+      { internalType: 'bytes32[]', name: 'networks', type: 'bytes32[]' },
+    ],
     stateMutability: 'nonpayable',
     type: 'function',
   },

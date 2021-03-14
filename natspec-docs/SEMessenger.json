@@ -7,7 +7,8 @@
         "_messengerChainlinkOracle": "1. the address of the oracle to create requests to",
         "_messengerChainlinkToken": "2. the address of LINK token contract",
         "_messengerJobId": "3. the job id for Staking efficiency job",
-        "_networkAnalyticsAddress": "4. Network analytics contract address"
+        "_networkAnalyticsAddress": "4. Network analytics contract address",
+        "_feeMultiplier": "6. states the amount of paid nodes running behind the precoordinator, to set the fee"
       }
     },
     "fee()": { "details": "returns the chainlink fee value on LINK tokens" },
@@ -31,11 +32,19 @@
     "renounceOwnership()": {
       "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
-    "requestSLI(uint256,address)": {
+    "requestSLI(uint256,address,bool)": {
       "details": "creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.",
       "params": {
-        "_periodId": "value of the period id",
-        "_slaAddress": "SLA Address"
+        "_periodId": "1. value of the period id",
+        "_slaAddress": "2. SLA Address",
+        "_ownerApproval": "3. if approval by owner or msg sender"
+      }
+    },
+    "setChainlinkJobID(bytes32,uint256)": {
+      "details": "sets a new jobId, which is a agreement Id of a PreCoordinator contract",
+      "params": {
+        "_feeMultiplier": "how many Chainlink nodes would be paid on the agreement id, to set the fee value",
+        "_newJobId": "the id of the PreCoordinator agreement"
       }
     },
     "setSLARegistry()": {

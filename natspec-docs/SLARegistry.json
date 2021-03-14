@@ -38,9 +38,13 @@
     "renounceOwnership()": {
       "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
-    "requestSLI(uint256,address)": {
+    "requestSLI(uint256,address,bool)": {
       "details": "Gets SLI information for the specified SLA and SLO",
-      "params": { "_periodId": "1. id of the period", "_sla": "2. SLA Address" }
+      "params": {
+        "_periodId": "1. id of the period",
+        "_sla": "2. SLA Address",
+        "_ownerApproval": "3. if approval by owner or msg.sender"
+      }
     },
     "setMessengerSLARegistryAddress(address)": {
       "details": "function to declare this SLARegistry contract as SLARegistry of _messengerAddress",
