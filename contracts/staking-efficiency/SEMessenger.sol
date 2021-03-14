@@ -9,6 +9,8 @@ import "../PeriodRegistry.sol";
 import "../StringUtils.sol";
 import "./NetworkAnalytics.sol";
 import "../messenger/IMessenger.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /**
  * @title SEMessenger
@@ -16,6 +18,8 @@ import "../messenger/IMessenger.sol";
  */
 
 contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
+    using SafeERC20 for ERC20;
+
     /// @dev Mapping that stores chainlink sli request information
     mapping(bytes32 => SLIRequest) public requestIdToSLIRequest;
     /// @dev Array with all request IDs
@@ -28,8 +32,10 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     address private _oracle;
     /// @dev chainlink jobId
     bytes32 private _jobId;
+    // @dev fee for Chainlink querys. Currently 0.1 LINK
+    uint256 private _baseFee = 0.1 ether;
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
-    uint256 private _fee = 0.1 * 10**18;
+    uint256 private _fee;
     /// @dev to multiply the SLI value and get better precision. Useful to deploy SLO correctly
     uint256 private _messengerPrecision = 10**3;
 
@@ -40,20 +46,29 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * @param _messengerChainlinkToken 2. the address of LINK token contract
      * @param _messengerJobId 3. the job id for Staking efficiency job
      * @param _networkAnalyticsAddress 4. Network analytics contract address
+     * @param _feeMultiplier 6. states the amount of paid nodes running behind the precoordinator, to set the fee
      */
     constructor(
         address _messengerChainlinkOracle,
         address _messengerChainlinkToken,
         bytes32 _messengerJobId,
-        address _networkAnalyticsAddress
+        address _networkAnalyticsAddress,
+        uint256 _feeMultiplier
     ) public {
         _jobId = _messengerJobId;
         setChainlinkToken(_messengerChainlinkToken);
         _oracle = _messengerChainlinkOracle;
         networkAnalyticsAddress = _networkAnalyticsAddress;
+        _fee = _feeMultiplier * _baseFee;
     }
 
-    event JobId(bytes32 _jobId, address indexed sender);
+    /**
+     * @dev event emitted when modifying the jobId
+     * @param owner 1. -
+     * @param jobId 2. -
+     * @param fee 3. -
+     */
+    event JobIdModified(address indexed owner, bytes32 jobId, uint256 fee);
 
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
     modifier onlySLARegistry() {
@@ -81,14 +96,15 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /**
      * @dev creates a ChainLink request to get a new SLI value for the
      * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.
-     * @param _periodId value of the period id
-     * @param _slaAddress SLA Address
+     * @param _periodId 1. value of the period id
+     * @param _slaAddress 2. SLA Address
+     * @param _ownerApproval 3. if approval by owner or msg sender
      */
-    function requestSLI(uint256 _periodId, address _slaAddress)
-        public
-        override
-        onlySLARegistry
-    {
+    function requestSLI(
+        uint256 _periodId,
+        address _slaAddress,
+        bool _ownerApproval
+    ) public override onlySLARegistry {
         SLA sla = SLA(_slaAddress);
         PeriodRegistry.PeriodType periodType = sla.periodType();
         // extraData[0] is the networkName for StakingEfficiency use case
@@ -103,6 +119,19 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             ipfsAnalytics != 0,
             "Network analytics object is not assigned yet"
         );
+        if (_ownerApproval) {
+            ERC20(chainlinkTokenAddress()).safeTransferFrom(
+                owner(),
+                address(this),
+                _fee
+            );
+        } else {
+            ERC20(chainlinkTokenAddress()).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _fee
+            );
+        }
         Chainlink.Request memory request =
             buildChainlinkRequest(
                 _jobId,
@@ -189,9 +218,18 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         return (hits, misses);
     }
 
-    function setJobId(bytes32 _newJobId) public onlyOwner {
+    /**
+     * @dev sets a new jobId, which is a agreement Id of a PreCoordinator contract
+     * @param _newJobId the id of the PreCoordinator agreement
+     * @param _feeMultiplier how many Chainlink nodes would be paid on the agreement id, to set the fee value
+     */
+    function setChainlinkJobID(bytes32 _newJobId, uint256 _feeMultiplier)
+        public
+        onlyOwner
+    {
         _jobId = _newJobId;
-        emit JobId(_newJobId, msg.sender);
+        _fee = _feeMultiplier * _baseFee;
+        emit JobIdModified(msg.sender, _newJobId, _fee);
     }
 
     /**

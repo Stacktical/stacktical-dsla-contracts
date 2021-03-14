@@ -104,7 +104,8 @@ contract Staking is Ownable {
         periodType = _periodType;
         slaPeriodsLength = _slaPeriodsLength;
         whitelistedContract = _whitelistedContract;
-        (uint256 _DSLAburnRate, , , , ) = stakeRegistry.getStakingParameters();
+        (uint256 _DSLAburnRate, , , , , ) =
+            stakeRegistry.getStakingParameters();
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
         addUserToWhitelist(msg.sender);

@@ -140,8 +140,13 @@ contract SLARegistry is Ownable {
      * @dev Gets SLI information for the specified SLA and SLO
      * @param _periodId 1. id of the period
      * @param _sla 2. SLA Address
+     * @param _ownerApproval 3. if approval by owner or msg.sender
      */
-    function requestSLI(uint256 _periodId, SLA _sla) public {
+    function requestSLI(
+        uint256 _periodId,
+        SLA _sla,
+        bool _ownerApproval
+    ) public {
         require(
             _periodId == _sla.nextVerifiablePeriod(),
             "Should only verify next period"
@@ -169,7 +174,11 @@ contract SLARegistry is Ownable {
             "SLA contract period has not finished yet"
         );
         address slaMessenger = _sla.messengerAddress();
-        IMessenger(slaMessenger).requestSLI(_periodId, address(_sla));
+        IMessenger(slaMessenger).requestSLI(
+            _periodId,
+            address(_sla),
+            _ownerApproval
+        );
         stakeRegistry.distributeVerificationRewards(
             address(_sla),
             msg.sender,
