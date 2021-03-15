@@ -19,7 +19,7 @@ const SEMessenger = artifacts.require('SEMessenger');
 const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
-const initialTokenSupply = '1000000';
+const initialTokenSupply = '10000000';
 const stakeAmount = initialTokenSupply / 100;
 const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
 
@@ -105,8 +105,9 @@ module.exports = (deployer, network) => {
       );
       await bdslaToken.approve(stakeRegistry.address, dslaDeposit);
       const whitelisted = false;
-      // revert to last snapshot
-      const receipt = await slaRegistry.createSLA(
+      const periodDefinitions = await periodRegistry.getPeriodDefinitions.call();
+      console.log(periodDefinitions);
+      await slaRegistry.createSLA(
         slo,
         whitelisted,
         seMessenger.address,
@@ -116,7 +117,6 @@ module.exports = (deployer, network) => {
         ipfsHash,
         [slaNetworkBytes32],
       );
-      console.log(receipt);
 
       console.log('Starting automated job 8: Adding bDSLA, DAI and USDC tokens as allowed to SLA contract');
       const slaAddresses = await slaRegistry.userSLAs(owner);

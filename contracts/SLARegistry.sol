@@ -209,9 +209,19 @@ contract SLARegistry is Ownable {
      * @param _messengerAddress 1. address of the messenger
      */
 
-    function setMessengerSLARegistryAddress(address _messengerAddress) public {
+    function registerMessenger(
+        address _messengerAddress,
+        string memory _messengerBaseURL,
+        string memory _messengerOwnershipURL,
+        string memory _messengerSpecificationURL
+    ) public {
         IMessenger(_messengerAddress).setSLARegistry();
-        messengerRegistry.registerMessenger(_messengerAddress, msg.sender);
+        messengerRegistry.registerMessenger(
+            _messengerAddress,
+            _messengerBaseURL,
+            _messengerOwnershipURL,
+            _messengerSpecificationURL
+        );
     }
 
     /**

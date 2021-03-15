@@ -17,7 +17,9 @@ const [periodStarts, periodEnds] = generateWeeklyPeriods(periods);
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
-    console.log('Remember to uncomment the periodHasFinished check at SLARegistry.createSLA');
+    console.log('Remember to:');
+    console.log('1.- uncomment the periodHasFinished check at SLARegistry.createSLA');
+    console.log('2.- set the correct values for StakeRegistry');
     process.exit(0);
     if (/mainnet/i.test(network)) {
       if (!!process.env.ONLY_DETAILS === true) return;

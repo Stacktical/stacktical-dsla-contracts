@@ -2,36 +2,45 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
+import "./messenger/IMessenger.sol";
+
 /**
  * @title MessengerRegistry
  * @dev MessengerRegistry is a contract to register openly distributed Messengers
  */
 contract MessengerRegistry {
     struct Messenger {
+        address messengerOwner;
+        address messengerAddress;
         string messengerBaseURL;
         string messengerOwnershipURL;
         string messengerSpecificationURL;
-        address messengerOwner;
-        address messengerAddress;
     }
 
     /// @dev array to store the messengers
     Messenger[] public messengers;
     /// @dev (messengerAddress=>bool) to check if the Messenger was
     mapping(address => bool) public registeredMessengers;
-    /// @dev (messengerAddress=>ownerAddress) to register the owner of a Messenger
-    mapping(address => address) public messengerOwners;
     /// @dev (userAddress=>messengerAddress[]) to register the messengers of an owner
-    mapping(address => address[]) public ownerMessengers;
+    mapping(address => uint256[]) public ownerMessengers;
     /// @dev (userAddress=>messengerAddress[]) to register the owner of a Messenger
     address public slaRegistry;
 
-    /**
-     * @dev event to log a new registered messenger
-     *@param messenger 1. address of the registered messenger
-     *@param owner 2. address of the owner
-     */
-    event MessengerRegistered(address indexed messenger, address indexed owner);
+    event MessengerRegistered(
+        address indexed messengerOwner,
+        address indexed messengerAddress,
+        string messengerBaseURL,
+        string messengerOwnershipURL,
+        string messengerSpecificationURL
+    );
+
+    event MessengerModified(
+        address indexed messengerOwner,
+        address indexed messengerAddress,
+        string messengerBaseURL,
+        string messengerOwnershipURL,
+        string messengerSpecificationURL
+    );
 
     /**
      * @dev sets the SLARegistry contract address and can only be called
@@ -49,12 +58,13 @@ contract MessengerRegistry {
 
     /**
      * @dev function to register a new Messenger
-     * @param _messengerAddress 1. address of the messenger
-     * @param _ownerAddress 2. address of the owner
      */
-    function registerMessenger(address _messengerAddress, address _ownerAddress)
-        public
-    {
+    function registerMessenger(
+        address _messengerAddress,
+        string memory _messengerBaseURL,
+        string memory _messengerOwnershipURL,
+        string memory _messengerSpecificationURL
+    ) public {
         require(
             msg.sender == slaRegistry,
             "Should only be called using the SLARegistry contract"
@@ -63,21 +73,51 @@ contract MessengerRegistry {
             registeredMessengers[_messengerAddress] == false,
             "messenger already registered"
         );
+        address messengerOwner = IMessenger(_messengerAddress).owner();
         registeredMessengers[_messengerAddress] = true;
-        messengerOwners[_messengerAddress] = _ownerAddress;
-        ownerMessengers[_ownerAddress].push(_messengerAddress);
-        emit MessengerRegistered(_messengerAddress, _ownerAddress);
+        messengers.push(
+            Messenger({
+                messengerBaseURL: _messengerBaseURL,
+                messengerOwnershipURL: _messengerOwnershipURL,
+                messengerSpecificationURL: _messengerSpecificationURL,
+                messengerOwner: messengerOwner,
+                messengerAddress: _messengerAddress
+            })
+        );
+        uint256 index = messengers.length - 1;
+        ownerMessengers[messengerOwner].push(index);
+        emit MessengerRegistered(
+            messengerOwner,
+            _messengerAddress,
+            _messengerBaseURL,
+            _messengerOwnershipURL,
+            _messengerSpecificationURL
+        );
     }
 
-    function isRegisteredMessenger(address _messengerAddress)
-        public
-        view
-        returns (bool)
-    {
-        for (uint256 index = 0; index < messengers.length; index++) {
-            if (messengers[index].messengerAddress == _messengerAddress)
-                return true;
-        }
-        return false;
+    /**
+     * @dev function to modifyMessenger a new Messenger
+     */
+    function modifyMessenger(
+        string memory _messengerBaseURL,
+        string memory _messengerOwnershipURL,
+        string memory _messengerSpecificationURL,
+        uint256 messengerId
+    ) public {
+        Messenger storage messenger = messengers[messengerId];
+        require(
+            msg.sender == messenger.messengerOwner,
+            "Can only be modified by the owner"
+        );
+        messenger.messengerBaseURL = _messengerBaseURL;
+        messenger.messengerOwnershipURL = _messengerOwnershipURL;
+        messenger.messengerSpecificationURL = _messengerSpecificationURL;
+        emit MessengerModified(
+            messenger.messengerOwner,
+            messenger.messengerAddress,
+            messenger.messengerBaseURL,
+            messenger.messengerOwnershipURL,
+            messenger.messengerSpecificationURL
+        );
     }
 }

@@ -79,8 +79,11 @@ module.exports = (deployer, network) => {
         stakeRegistry.address,
       );
 
-      return slaRegistry.setMessengerSLARegistryAddress(
+      return slaRegistry.registerMessenger(
         seMessenger.address,
+        '',
+        '',
+        '',
       );
     });
   }

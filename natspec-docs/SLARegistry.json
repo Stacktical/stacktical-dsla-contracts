@@ -18,16 +18,17 @@
         "_stakeRegistry": "4. Stake registry"
       }
     },
-    "createSLA(address,string,uint8,uint256[],address,bool,bytes32[])": {
+    "createSLA(address,bool,address,uint8,uint128,uint128,string,bytes32[])": {
       "details": "public function for creating canonical service level agreements",
       "params": {
         "_SLO": "1. SLO",
         "_ipfsHash": "2. string with the ipfs hash that contains extra information about the service level agreement",
         "_periodType": "3. period type",
-        "_periodIds": "4. array of allowed period ids",
-        "_messengerAddress": "5. address of the messenger for the corresponding SLA",
-        "_whitelisted": "6. bool to declare whitelisted SLA",
-        "_extraData": "7. bytes32 to embed extra data for customized workflows"
+        "_initialPeriodId": "4. -",
+        "_finalPeriodId": "5. -",
+        "_messengerAddress": "6. -",
+        "_whitelisted": "7. -",
+        "_extraData": "8. -"
       }
     },
     "isRegisteredSLA(address)": {
@@ -35,6 +36,10 @@
       "params": { "_slaAddress": "address of the SLA to be checked" }
     },
     "owner()": { "details": "Returns the address of the current owner." },
+    "registerMessenger(address,string,string,string)": {
+      "details": "function to declare this SLARegistry contract as SLARegistry of _messengerAddress",
+      "params": { "_messengerAddress": "1. address of the messenger" }
+    },
     "renounceOwnership()": {
       "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
     },
@@ -45,10 +50,6 @@
         "_sla": "2. SLA Address",
         "_ownerApproval": "3. if approval by owner or msg.sender"
       }
-    },
-    "setMessengerSLARegistryAddress(address)": {
-      "details": "function to declare this SLARegistry contract as SLARegistry of _messengerAddress",
-      "params": { "_messengerAddress": "1. address of the messenger" }
     },
     "transferOwnership(address)": {
       "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
