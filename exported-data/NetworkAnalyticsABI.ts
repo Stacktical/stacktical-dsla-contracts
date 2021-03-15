@@ -316,7 +316,8 @@ export const NetworkAnalyticsABI: AbiItem[] = [
     outputs: [
       { internalType: 'bytes32[]', name: 'networks', type: 'bytes32[]' },
     ],
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];

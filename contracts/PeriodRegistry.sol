@@ -159,6 +159,24 @@ contract PeriodRegistry is Ownable {
     }
 
     /**
+     * @dev public function to check if a period has started
+     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
+     *@param _periodId 2. period id to get start and end
+     */
+    function periodHasStarted(PeriodType _periodType, uint256 _periodId)
+        public
+        view
+        returns (bool started)
+    {
+        require(
+            isValidPeriod(_periodType, _periodId) == true,
+            "Period type is not valid"
+        );
+        started =
+            periodDefinitions[_periodType].starts[_periodId] < block.timestamp;
+    }
+
+    /**
      * @dev public function to get the periodDefinitions
      */
     function getPeriodDefinitions()

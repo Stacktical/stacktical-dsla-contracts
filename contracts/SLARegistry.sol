@@ -80,8 +80,6 @@ contract SLARegistry is Ownable {
         bool _whitelisted,
         bytes32[] memory _extraData
     ) public {
-        bool initialized = periodRegistry.periodDefinitions(_periodType);
-        require(initialized == true, "Period type is not initialized yet");
         require(
             sloRegistry.isRegisteredSLO(address(_SLO)) == true,
             "SLO not registered on SLORegistry"
@@ -92,6 +90,10 @@ contract SLARegistry is Ownable {
             bool validPeriod =
                 periodRegistry.isValidPeriod(_periodType, _periodIds[index]);
             require(validPeriod, "Period id not valid");
+            // UNCOMMENT THE NEXT 3 LINES BEFORE MAINNET
+            // bool periodHasStarted =
+            //     periodRegistry.periodHasStarted(_periodType, _periodIds[index]);
+            // require(!periodHasStarted, "Period has started");
             if (index < _periodIds.length - 1) {
                 require(
                     _periodIds[index] < _periodIds[index + 1],

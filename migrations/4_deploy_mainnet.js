@@ -13,11 +13,12 @@ const SEMessenger = artifacts.require('SEMessenger');
 
 const periodType = 2;
 const periods = 52;
-const expiredPeriods = 0;
-const [periodStarts, periodEnds] = generateWeeklyPeriods(periods, expiredPeriods);
+const [periodStarts, periodEnds] = generateWeeklyPeriods(periods);
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
+    console.log('Remember to uncomment the periodHasFinished check at SLARegistry.createSLA');
+    process.exit(0);
     if (/mainnet/i.test(network)) {
       if (!!process.env.ONLY_DETAILS === true) return;
       console.log('Starting automated jobs to bootstrap protocol correctly');
