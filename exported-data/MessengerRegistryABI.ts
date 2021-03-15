@@ -167,4 +167,37 @@ export const MessengerRegistryABI: AbiItem[] = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    inputs: [],
+    name: 'getMessengers',
+    outputs: [
+      {
+        components: [
+          { internalType: 'address', name: 'messengerOwner', type: 'address' },
+          {
+            internalType: 'address',
+            name: 'messengerAddress',
+            type: 'address',
+          },
+          { internalType: 'string', name: 'messengerBaseURL', type: 'string' },
+          {
+            internalType: 'string',
+            name: 'messengerOwnershipURL',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'messengerSpecificationURL',
+            type: 'string',
+          },
+        ],
+        internalType: 'struct MessengerRegistry.Messenger[]',
+        name: '',
+        type: 'tuple[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
 ];

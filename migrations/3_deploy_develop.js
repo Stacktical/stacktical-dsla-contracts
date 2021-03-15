@@ -105,8 +105,6 @@ module.exports = (deployer, network) => {
       );
       await bdslaToken.approve(stakeRegistry.address, dslaDeposit);
       const whitelisted = false;
-      const periodDefinitions = await periodRegistry.getPeriodDefinitions.call();
-      console.log(periodDefinitions);
       await slaRegistry.createSLA(
         slo,
         whitelisted,

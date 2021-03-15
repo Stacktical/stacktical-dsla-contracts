@@ -120,4 +120,8 @@ contract MessengerRegistry {
             messenger.messengerSpecificationURL
         );
     }
+
+    function getMessengers() public view returns (Messenger[] memory) {
+        return messengers;
+    }
 }

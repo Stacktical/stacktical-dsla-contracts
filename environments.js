@@ -45,7 +45,7 @@ const getNetworkName = (network) => {
   if (/develop/i.test(network)) return 'develop';
   if (/staging/i.test(network)) return 'staging';
   if (/kovan/i.test(network)) return 'kovan';
-  if (/live/i.test(network)) return 'mainnet';
+  if (/mainnet/i.test(network)) return 'mainnet';
   throw new Error(`Network not recognized: ${network}`);
 };
 
