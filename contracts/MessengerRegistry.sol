@@ -7,6 +7,16 @@ pragma experimental ABIEncoderV2;
  * @dev MessengerRegistry is a contract to register openly distributed Messengers
  */
 contract MessengerRegistry {
+    struct Messenger {
+        string messengerBaseURL;
+        string messengerOwnershipURL;
+        string messengerSpecificationURL;
+        address messengerOwner;
+        address messengerAddress;
+    }
+
+    /// @dev array to store the messengers
+    Messenger[] public messengers;
     /// @dev (messengerAddress=>bool) to check if the Messenger was
     mapping(address => bool) public registeredMessengers;
     /// @dev (messengerAddress=>ownerAddress) to register the owner of a Messenger
@@ -57,5 +67,17 @@ contract MessengerRegistry {
         messengerOwners[_messengerAddress] = _ownerAddress;
         ownerMessengers[_ownerAddress].push(_messengerAddress);
         emit MessengerRegistered(_messengerAddress, _ownerAddress);
+    }
+
+    function isRegisteredMessenger(address _messengerAddress)
+        public
+        view
+        returns (bool)
+    {
+        for (uint256 index = 0; index < messengers.length; index++) {
+            if (messengers[index].messengerAddress == _messengerAddress)
+                return true;
+        }
+        return false;
     }
 }

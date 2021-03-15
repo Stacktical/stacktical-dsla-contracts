@@ -29,6 +29,24 @@ export const MessengerRegistryABI: AbiItem[] = [
     constant: true,
   },
   {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'messengers',
+    outputs: [
+      { internalType: 'string', name: 'messengerBaseURL', type: 'string' },
+      { internalType: 'string', name: 'messengerOwnershipURL', type: 'string' },
+      {
+        internalType: 'string',
+        name: 'messengerSpecificationURL',
+        type: 'string',
+      },
+      { internalType: 'address', name: 'messengerOwner', type: 'address' },
+      { internalType: 'address', name: 'messengerAddress', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
     inputs: [
       { internalType: 'address', name: '', type: 'address' },
       { internalType: 'uint256', name: '', type: 'uint256' },
@@ -71,5 +89,15 @@ export const MessengerRegistryABI: AbiItem[] = [
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '_messengerAddress', type: 'address' },
+    ],
+    name: 'isRegisteredMessenger',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
   },
 ];

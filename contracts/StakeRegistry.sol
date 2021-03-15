@@ -149,6 +149,7 @@ contract StakeRegistry is Ownable, StringUtils {
         allowedTokens.push(_tokenAddress);
     }
 
+    // check loop
     function isAllowedToken(address _tokenAddress) public view returns (bool) {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {
@@ -164,6 +165,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@param _sla 2. sla to check
      *@return bool, true if _sla was staked by _user
      */
+    // check loop
     function slaWasStakedByUser(address _user, address _sla)
         public
         view

@@ -97,21 +97,26 @@ module.exports = (deployer, network) => {
       };
       const ipfsHash = await getIPFSHash(serviceMetadata);
       const slaRegistry = await SLARegistry.deployed();
-      const periodIds = [0, 1, 2];
+      const initialPeriodId = 0;
+      const finalPeriodId = 51;
       const dslaDepositByPeriod = 20000;
-      const dslaDeposit = toWei(String(dslaDepositByPeriod * periodIds.length));
+      const dslaDeposit = toWei(
+        String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1)),
+      );
       await bdslaToken.approve(stakeRegistry.address, dslaDeposit);
       const whitelisted = false;
       // revert to last snapshot
-      await slaRegistry.createSLA(
+      const receipt = await slaRegistry.createSLA(
         slo,
-        ipfsHash,
-        periodType,
-        periodIds,
-        seMessenger.address,
         whitelisted,
+        seMessenger.address,
+        periodType,
+        initialPeriodId,
+        finalPeriodId,
+        ipfsHash,
         [slaNetworkBytes32],
       );
+      console.log(receipt);
 
       console.log('Starting automated job 8: Adding bDSLA, DAI and USDC tokens as allowed to SLA contract');
       const slaAddresses = await slaRegistry.userSLAs(owner);

@@ -32,6 +32,8 @@ contract SLARegistry is Ownable {
     SLA[] public SLAs;
     /// @dev stores the indexes of service level agreements owned by an user
     mapping(address => uint256[]) private userToSLAIndexes;
+    /// @dev to check if registered SLA
+    mapping(address => bool) private registeredSLAs;
 
     /**
      * @dev event for service level agreement creation logging
@@ -66,45 +68,39 @@ contract SLARegistry is Ownable {
      * @param _SLO 1. SLO
      * @param _ipfsHash 2. string with the ipfs hash that contains extra information about the service level agreement
      * @param _periodType 3. period type
-     * @param _periodIds 4. array of allowed period ids
-     * @param _messengerAddress 5. address of the messenger for the corresponding SLA
-     * @param _whitelisted 6. bool to declare whitelisted SLA
-     * @param _extraData 7. bytes32 to embed extra data for customized workflows
+     * @param _initialPeriodId 4. -
+     * @param _finalPeriodId 5. -
+     * @param _messengerAddress 6. -
+     * @param _whitelisted 7. -
+     * @param _extraData 8. -
      */
     function createSLA(
         SLO _SLO,
-        string memory _ipfsHash,
-        PeriodRegistry.PeriodType _periodType,
-        uint256[] memory _periodIds,
-        address _messengerAddress,
         bool _whitelisted,
+        address _messengerAddress,
+        PeriodRegistry.PeriodType _periodType,
+        uint128 _initialPeriodId,
+        uint128 _finalPeriodId,
+        string memory _ipfsHash,
         bytes32[] memory _extraData
     ) public {
         require(
             sloRegistry.isRegisteredSLO(address(_SLO)) == true,
             "SLO not registered on SLORegistry"
         );
-        require(_periodIds.length > 0, "Periods information is empty");
-        // check if _periodIds are valid and sorted in ascendant order
-        for (uint256 index = 0; index < _periodIds.length; index++) {
-            bool validPeriod =
-                periodRegistry.isValidPeriod(_periodType, _periodIds[index]);
-            require(validPeriod, "Period id not valid");
-            // UNCOMMENT THE NEXT 3 LINES BEFORE MAINNET
-            // bool periodHasStarted =
-            //     periodRegistry.periodHasStarted(_periodType, _periodIds[index]);
-            // require(!periodHasStarted, "Period has started");
-            if (index < _periodIds.length - 1) {
-                require(
-                    _periodIds[index] < _periodIds[index + 1],
-                    "Period ids should be sorted"
-                );
-                require(
-                    _periodIds[index + 1].sub(_periodIds[index]) == 1,
-                    "Period ids should be consecutive"
-                );
-            }
-        }
+        bool validPeriod =
+            periodRegistry.isValidPeriod(_periodType, _initialPeriodId);
+        require(validPeriod, "First period id not valid");
+        validPeriod = periodRegistry.isValidPeriod(_periodType, _finalPeriodId);
+        require(validPeriod, "Final period id not valid");
+        require(
+            _finalPeriodId >= _initialPeriodId,
+            "finalPeriodId should be greater than or equal to initialPeriodId"
+        );
+        // UNCOMMENT THE NEXT 3 LINES BEFORE MAINNET
+        // bool periodHasStarted =
+        //     periodRegistry.periodHasStarted(_periodType, _initialPeriodId);
+        // require(!periodHasStarted, "Period has started");
         bool registeredMessenger =
             messengerRegistry.registeredMessengers(_messengerAddress);
         require(
@@ -115,24 +111,24 @@ contract SLARegistry is Ownable {
         SLA sla =
             new SLA(
                 msg.sender,
-                _SLO,
-                _ipfsHash,
-                _messengerAddress,
-                _periodIds,
-                _periodType,
-                address(stakeRegistry),
-                address(periodRegistry),
                 _whitelisted,
-                _extraData,
-                SLAs.length
+                _SLO,
+                _periodType,
+                _messengerAddress,
+                _initialPeriodId,
+                _finalPeriodId,
+                uint128(SLAs.length),
+                _ipfsHash,
+                _extraData
             );
 
         stakeRegistry.lockDSLAValue(
             msg.sender,
             address(sla),
-            _periodIds.length
+            _finalPeriodId - _initialPeriodId + 1
         );
         SLAs.push(sla);
+        registeredSLAs[address(sla)] = true;
         uint256 index = SLAs.length.sub(1);
         userToSLAIndexes[msg.sender].push(index);
         emit SLACreated(sla, msg.sender);
@@ -193,8 +189,7 @@ contract SLARegistry is Ownable {
             msg.sender == _sla.owner(),
             "Only SLA owner can claim locked value"
         );
-        uint256 periodIdsLength = _sla.getPeriodIdsLength();
-        uint256 lastValidPeriodId = _sla.periodIds(periodIdsLength - 1);
+        uint256 lastValidPeriodId = _sla.finalPeriodId();
         PeriodRegistry.PeriodType periodType = _sla.periodType();
         (, uint256 endOfLastValidPeriod) =
             periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
@@ -271,11 +266,6 @@ contract SLARegistry is Ownable {
      * @param _slaAddress address of the SLA to be checked
      */
     function isRegisteredSLA(address _slaAddress) public view returns (bool) {
-        for (uint256 index = 0; index < SLAs.length; index++) {
-            if (address(SLAs[index]) == _slaAddress) {
-                return true;
-            }
-        }
-        return false;
+        return registeredSLAs[_slaAddress];
     }
 }
