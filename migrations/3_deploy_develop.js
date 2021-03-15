@@ -1,9 +1,10 @@
 require('babel-polyfill');
 require('babel-register');
 
-const { generatePeriods, getIPFSHash, eventListener } = require('../test/helpers');
+const { getIPFSHash, eventListener } = require('../test/helpers');
 const { networks, networkNames, networkNamesBytes32 } = require('../constants');
-const { envParameters, needsGetJobId } = require('../environments');
+const { envParameters } = require('../environments');
+const { generateWeeklyPeriods } = require('../utils');
 
 const { toWei } = web3.utils;
 
@@ -20,12 +21,12 @@ const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
 const initialTokenSupply = '1000000';
 const stakeAmount = initialTokenSupply / 100;
-const stakeAmountWei = toWei(String(stakeAmount));
+const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
 
-const sloValue = 85000;
+const sloValue = 50000;
 const sloType = 4;
 const periodType = 2;
-const [periodStarts, periodEnds] = generatePeriods(52);
+const [periodStarts, periodEnds] = generateWeeklyPeriods(52, 7);
 const slaNetworkBytes32 = networkNamesBytes32[0];
 const slaNetwork = networkNames[0];
 
@@ -62,21 +63,18 @@ module.exports = (deployer, network) => {
       await stakeRegistry.addAllowedTokens(daiToken.address);
       await stakeRegistry.addAllowedTokens(usdcToken.address);
 
-      console.log('Starting automated job 4: Asking for network analytics for period 0');
+      console.log('Starting automated job 4: Adding the network names to the NetworkAnalytics contract');
       const networkAnalytics = await NetworkAnalytics.deployed();
-      await networkAnalytics.addNetwork(slaNetworkBytes32);
+      await networkAnalytics.addMultipleNetworks(networkNamesBytes32);
+
+      console.log('Starting automated job 5: Increasing allowance for NetworkAnalytics and SEMessenger with 10 link tokens');
+      const seMessenger = await SEMessenger.deployed();
       const linkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
-      await linkToken.transfer(
+      await linkToken.approve(
         networkAnalytics.address,
         web3.utils.toWei('10'),
       );
-      // periods 0 is already finished
-      await networkAnalytics.requestAnalytics(0, periodType, slaNetworkBytes32);
-      await eventListener(networkAnalytics, 'AnalyticsReceived');
-
-      console.log('Starting automated job 5: Funding SEMessenger with 10 link tokens');
-      const seMessenger = await SEMessenger.deployed();
-      await linkToken.transfer(
+      await linkToken.approve(
         seMessenger.address,
         web3.utils.toWei('10'),
       );
@@ -100,15 +98,18 @@ module.exports = (deployer, network) => {
       const ipfsHash = await getIPFSHash(serviceMetadata);
       const slaRegistry = await SLARegistry.deployed();
       const periodIds = [0, 1, 2];
-      const dslaDepositByPeriod = toWei(String(20000 * periodIds.length));
-      await bdslaToken.approve(stakeRegistry.address, dslaDepositByPeriod);
+      const dslaDepositByPeriod = 20000;
+      const dslaDeposit = toWei(String(dslaDepositByPeriod * periodIds.length));
+      await bdslaToken.approve(stakeRegistry.address, dslaDeposit);
+      const whitelisted = false;
+      // revert to last snapshot
       await slaRegistry.createSLA(
         slo,
         ipfsHash,
         periodType,
         periodIds,
         seMessenger.address,
-        false,
+        whitelisted,
         [slaNetworkBytes32],
       );
 
@@ -123,69 +124,68 @@ module.exports = (deployer, network) => {
       console.log('Starting automated job 9.1: owner: 30000 bDSLA, 30000 DAI, 30000 USDC');
       // Owner
       // 3 * bsdla + 3 * dai + 3 usdc
-      await bdslaToken.approve(sla.address, stakeAmountWei);
-      await sla.stakeTokens(stakeAmountWei, bdslaToken.address);
-      await bdslaToken.approve(sla.address, stakeAmountWei);
-      await sla.stakeTokens(stakeAmountWei, bdslaToken.address);
-      await bdslaToken.approve(sla.address, stakeAmountWei);
-      await sla.stakeTokens(stakeAmountWei, bdslaToken.address);
-      await daiToken.approve(sla.address, stakeAmountWei);
-      await sla.stakeTokens(stakeAmountWei, daiToken.address);
-      await daiToken.approve(sla.address, stakeAmountWei);
-      await sla.stakeTokens(stakeAmountWei, daiToken.address);
-      await daiToken.approve(sla.address, stakeAmountWei);
-      await sla.stakeTokens(stakeAmountWei, daiToken.address);
-      await usdcToken.approve(sla.address, stakeAmountWei);
-      await sla.stakeTokens(stakeAmountWei, usdcToken.address);
-      await usdcToken.approve(sla.address, stakeAmountWei);
-      await sla.stakeTokens(stakeAmountWei, usdcToken.address);
-      await usdcToken.approve(sla.address, stakeAmountWei);
-      await sla.stakeTokens(stakeAmountWei, usdcToken.address);
+      await bdslaToken.approve(sla.address, stakeAmountTimesWei(3));
+      await sla.stakeTokens(stakeAmountTimesWei(3), bdslaToken.address);
+      await daiToken.approve(sla.address, stakeAmountTimesWei(3));
+      await sla.stakeTokens(stakeAmountTimesWei(3), daiToken.address);
+      await usdcToken.approve(sla.address, stakeAmountTimesWei(3));
+      await sla.stakeTokens(stakeAmountTimesWei(3), usdcToken.address);
 
       // NotOwner
       // 3 * bdsla + 2 * dai
       console.log('Starting automated job 9.2: notOwner: 0 bDSLA, 20000 DAI, 30000 USDC');
-      await bdslaToken.approve(sla.address, stakeAmountWei, { from: notOwner });
-      await sla.stakeTokens(stakeAmountWei, bdslaToken.address, { from: notOwner });
-      await bdslaToken.approve(sla.address, stakeAmountWei, { from: notOwner });
-      await sla.stakeTokens(stakeAmountWei, bdslaToken.address, { from: notOwner });
-      await bdslaToken.approve(sla.address, stakeAmountWei, { from: notOwner });
-      await sla.stakeTokens(stakeAmountWei, bdslaToken.address, { from: notOwner });
-      await daiToken.approve(sla.address, stakeAmountWei, { from: notOwner });
-      await sla.stakeTokens(stakeAmountWei, daiToken.address, { from: notOwner });
-      await daiToken.approve(sla.address, stakeAmountWei, { from: notOwner });
-      await sla.stakeTokens(stakeAmountWei, daiToken.address, { from: notOwner });
+      await bdslaToken.approve(sla.address, stakeAmountTimesWei(3), { from: notOwner });
+      await sla.stakeTokens(stakeAmountTimesWei(3), bdslaToken.address, { from: notOwner });
+      await daiToken.approve(sla.address, stakeAmountTimesWei(2), { from: notOwner });
+      await sla.stakeTokens(stakeAmountTimesWei(2), daiToken.address, { from: notOwner });
 
-      // periods 0 is already finished
-      console.log('Starting automated job 10: Request SLI for period 0');
-      await slaRegistry.requestSLI(0, sla.address);
+      // period 0 is already finished
+      console.log('Starting automated job 10: Request Analytics and SLI for period 0');
+      const ownerApproval = true;
+      const callerReward = true;
+      // period 0 is already finished
+      networkAnalytics.requestAnalytics(
+        0, periodType, slaNetworkBytes32, ownerApproval, callerReward,
+      );
+      await eventListener(networkAnalytics, 'AnalyticsReceived');
+      await slaRegistry.requestSLI(0, sla.address, ownerApproval);
       await eventListener(sla, 'SLICreated');
 
-      // periods 1 is already finished
+      // period 1 is already finished
       console.log('Starting automated job 11: Request Analytics and SLI for period 1');
-      await networkAnalytics.requestAnalytics(1, periodType, slaNetworkBytes32);
+      networkAnalytics.requestAnalytics(
+        1, periodType, slaNetworkBytes32, ownerApproval, callerReward,
+      );
       await eventListener(networkAnalytics, 'AnalyticsReceived');
-      await slaRegistry.requestSLI(1, sla.address);
+      await slaRegistry.requestSLI(1, sla.address, callerReward);
       await eventListener(sla, 'SLICreated');
 
-      // periods 2 is already finished
+      // period 2 is already finished
       console.log('Starting automated job 12: Request Analytics for period 2');
-      await networkAnalytics.requestAnalytics(2, periodType, slaNetworkBytes32);
+      networkAnalytics.requestAnalytics(
+        2, periodType, slaNetworkBytes32, ownerApproval, callerReward,
+      );
       await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-      // periods 3 is already finished
+      // period 3 is already finished
       console.log('Starting automated job 13: Request Analytics for period 3');
-      await networkAnalytics.requestAnalytics(3, periodType, slaNetworkBytes32);
+      networkAnalytics.requestAnalytics(
+        3, periodType, slaNetworkBytes32, ownerApproval, callerReward,
+      );
       await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-      // periods 4 is already finished
+      // period 4 is already finished
       console.log('Starting automated job 14: Request Analytics for period 4');
-      await networkAnalytics.requestAnalytics(4, periodType, slaNetworkBytes32);
+      networkAnalytics.requestAnalytics(
+        4, periodType, slaNetworkBytes32, ownerApproval, callerReward,
+      );
       await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-      // periods 5 is already finished
+      // period 5 is already finished
       console.log('Starting automated job 15: Request Analytics for period 5');
-      await networkAnalytics.requestAnalytics(5, periodType, slaNetworkBytes32);
+      networkAnalytics.requestAnalytics(
+        5, periodType, slaNetworkBytes32, ownerApproval, callerReward,
+      );
       await eventListener(networkAnalytics, 'AnalyticsReceived');
 
       console.log('Bootstrap process completed');

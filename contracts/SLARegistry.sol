@@ -80,8 +80,6 @@ contract SLARegistry is Ownable {
         bool _whitelisted,
         bytes32[] memory _extraData
     ) public {
-        bool initialized = periodRegistry.periodDefinitions(_periodType);
-        require(initialized == true, "Period type is not initialized yet");
         require(
             sloRegistry.isRegisteredSLO(address(_SLO)) == true,
             "SLO not registered on SLORegistry"
@@ -92,10 +90,14 @@ contract SLARegistry is Ownable {
             bool validPeriod =
                 periodRegistry.isValidPeriod(_periodType, _periodIds[index]);
             require(validPeriod, "Period id not valid");
+            // UNCOMMENT THE NEXT 3 LINES BEFORE MAINNET
+            // bool periodHasStarted =
+            //     periodRegistry.periodHasStarted(_periodType, _periodIds[index]);
+            // require(!periodHasStarted, "Period has started");
             if (index < _periodIds.length - 1) {
                 require(
                     _periodIds[index] < _periodIds[index + 1],
-                    "Period ids should be sorted "
+                    "Period ids should be sorted"
                 );
                 require(
                     _periodIds[index + 1].sub(_periodIds[index]) == 1,
@@ -140,8 +142,13 @@ contract SLARegistry is Ownable {
      * @dev Gets SLI information for the specified SLA and SLO
      * @param _periodId 1. id of the period
      * @param _sla 2. SLA Address
+     * @param _ownerApproval 3. if approval by owner or msg.sender
      */
-    function requestSLI(uint256 _periodId, SLA _sla) public {
+    function requestSLI(
+        uint256 _periodId,
+        SLA _sla,
+        bool _ownerApproval
+    ) public {
         require(
             _periodId == _sla.nextVerifiablePeriod(),
             "Should only verify next period"
@@ -169,7 +176,11 @@ contract SLARegistry is Ownable {
             "SLA contract period has not finished yet"
         );
         address slaMessenger = _sla.messengerAddress();
-        IMessenger(slaMessenger).requestSLI(_periodId, address(_sla));
+        IMessenger(slaMessenger).requestSLI(
+            _periodId,
+            address(_sla),
+            _ownerApproval
+        );
         stakeRegistry.distributeVerificationRewards(
             address(_sla),
             msg.sender,

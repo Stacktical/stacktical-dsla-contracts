@@ -158,6 +158,7 @@ export const SLARegistryABI: AbiItem[] = [
     inputs: [
       { internalType: 'uint256', name: '_periodId', type: 'uint256' },
       { internalType: 'contract SLA', name: '_sla', type: 'address' },
+      { internalType: 'bool', name: '_ownerApproval', type: 'bool' },
     ],
     name: 'requestSLI',
     outputs: [],

@@ -37,11 +37,14 @@ abstract contract IMessenger is Ownable {
      * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.
      * @param _periodId 1. id of the period to be queried
      * @param _slaAddress 2. address of the receiver SLA
+     * @param _slaAddress 2. if approval by owner or msg.sender
      */
 
-    function requestSLI(uint256 _periodId, address _slaAddress)
-        external
-        virtual;
+    function requestSLI(
+        uint256 _periodId,
+        address _slaAddress,
+        bool _ownerApproval
+    ) external virtual;
 
     /**
      * @dev callback function for the Chainlink SLI request which stores
