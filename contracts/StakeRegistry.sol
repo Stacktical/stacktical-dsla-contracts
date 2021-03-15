@@ -5,7 +5,8 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./SLA.sol";
 import "./messenger/IMessenger.sol";
 import "./SLARegistry.sol";
@@ -17,6 +18,7 @@ import "./StringUtils.sol";
  with controlling certain admin privileged parameters
  */
 contract StakeRegistry is Ownable, StringUtils {
+    using SafeERC20 for ERC20;
     using SafeMath for uint256;
 
     /// @dev struct to return on getActivePool function.
@@ -32,6 +34,7 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 slaPeriodIdsLength;
         uint256 dslaDepositByPeriod;
         uint256 dslaPlatformReward;
+        uint256 dslaMessengerReward;
         uint256 dslaUserReward;
         uint256 dslaBurnedByVerification;
         mapping(uint256 => bool) verifiedPeriods;
@@ -49,7 +52,9 @@ contract StakeRegistry is Ownable, StringUtils {
     /// @dev DSLA deposit by period to create SLA
     uint256 private _dslaDepositByPeriod = 20000 ether;
     /// @dev DSLA rewarded to Stacktical team
-    uint256 private _dslaPlatformReward = 10000 ether;
+    uint256 private _dslaPlatformReward = 5000 ether;
+    /// @dev DSLA rewarded to the Messenger creator
+    uint256 private _dslaMessengerReward = 5000 ether;
     /// @dev DSLA rewarded to user calling the period verification
     uint256 private _dslaUserReward = 9940 ether;
     /// @dev DSLA burned after every period verification
@@ -67,13 +72,15 @@ contract StakeRegistry is Ownable, StringUtils {
      * @param requester 2. -
      * @param userReward 3. -
      * @param platformReward 4. -
-     * @param burnedDSLA 5. -
+     * @param messengerReward 5. -
+     * @param burnedDSLA 6. -
      */
     event VerificationRewardDistributed(
         address indexed sla,
         address indexed requester,
         uint256 userReward,
         uint256 platformReward,
+        uint256 messengerReward,
         uint256 burnedDSLA
     );
 
@@ -89,6 +96,7 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 DSLAburnRate,
         uint256 dslaDepositByPeriod,
         uint256 dslaPlatformReward,
+        uint256 dslaMessengerReward,
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification
     );
@@ -99,9 +107,10 @@ contract StakeRegistry is Ownable, StringUtils {
     constructor(address _dslaTokenAddress) public {
         require(
             _dslaDepositByPeriod ==
-                _dslaPlatformReward.add(_dslaUserReward).add(
-                    _dslaBurnedByVerification
-                ),
+                _dslaPlatformReward
+                    .add(_dslaMessengerReward)
+                    .add(_dslaUserReward)
+                    .add(_dslaBurnedByVerification),
             "Staking parameters should match on summation"
         );
         DSLATokenAddress = _dslaTokenAddress;
@@ -208,7 +217,7 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 _periodIdsLength
     ) public onlySLARegistry {
         uint256 lockedValue = _dslaDepositByPeriod.mul(_periodIdsLength);
-        IERC20(DSLATokenAddress).transferFrom(
+        ERC20(DSLATokenAddress).safeTransferFrom(
             _slaOwner,
             address(this),
             lockedValue
@@ -218,6 +227,7 @@ contract StakeRegistry is Ownable, StringUtils {
             slaPeriodIdsLength: _periodIdsLength,
             dslaDepositByPeriod: _dslaDepositByPeriod,
             dslaPlatformReward: _dslaPlatformReward,
+            dslaMessengerReward: _dslaMessengerReward,
             dslaUserReward: _dslaUserReward,
             dslaBurnedByVerification: _dslaBurnedByVerification
         });
@@ -237,13 +247,17 @@ contract StakeRegistry is Ownable, StringUtils {
         _lockedValue.lockedValue = _lockedValue.lockedValue.sub(
             _lockedValue.dslaDepositByPeriod
         );
-        IERC20(DSLATokenAddress).transfer(
+        ERC20(DSLATokenAddress).safeTransfer(
             _verificationRewardReceiver,
             _lockedValue.dslaUserReward
         );
-        IERC20(DSLATokenAddress).transfer(
-            IMessenger(SLA(_sla).messengerAddress()).owner(),
+        ERC20(DSLATokenAddress).safeTransfer(
+            owner(),
             _lockedValue.dslaPlatformReward
+        );
+        ERC20(DSLATokenAddress).safeTransfer(
+            IMessenger(SLA(_sla).messengerAddress()).owner(),
+            _lockedValue.dslaMessengerReward
         );
         _burnDSLATokens(_lockedValue.dslaBurnedByVerification);
         emit VerificationRewardDistributed(
@@ -251,6 +265,7 @@ contract StakeRegistry is Ownable, StringUtils {
             _verificationRewardReceiver,
             _lockedValue.dslaUserReward,
             _lockedValue.dslaPlatformReward,
+            _lockedValue.dslaMessengerReward,
             _lockedValue.dslaBurnedByVerification
         );
     }
@@ -260,7 +275,10 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 remainingBalance = _lockedValue.lockedValue;
         require(remainingBalance > 0, "locked value is empty");
         _lockedValue.lockedValue = 0;
-        IERC20(DSLATokenAddress).transfer(SLA(_sla).owner(), remainingBalance);
+        ERC20(DSLATokenAddress).safeTransfer(
+            SLA(_sla).owner(),
+            remainingBalance
+        );
     }
 
     function _burnDSLATokens(uint256 _amount) internal {
@@ -335,6 +353,7 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 DSLAburnRate,
         uint256 dslaDepositByPeriod,
         uint256 dslaPlatformReward,
+        uint256 dslaMessengerReward,
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification
     ) public onlyOwner {
@@ -348,12 +367,14 @@ contract StakeRegistry is Ownable, StringUtils {
         );
         _dslaDepositByPeriod = dslaDepositByPeriod;
         _dslaPlatformReward = dslaPlatformReward;
+        _dslaMessengerReward = dslaMessengerReward;
         _dslaUserReward = dslaUserReward;
         _dslaBurnedByVerification = dslaBurnedByVerification;
         emit StakingParametersModified(
             DSLAburnRate,
             dslaDepositByPeriod,
             dslaPlatformReward,
+            dslaMessengerReward,
             dslaUserReward,
             dslaBurnedByVerification
         );
@@ -366,6 +387,7 @@ contract StakeRegistry is Ownable, StringUtils {
             uint256 DSLAburnRate,
             uint256 dslaDepositByPeriod,
             uint256 dslaPlatformReward,
+            uint256 dslaMessengerReward,
             uint256 dslaUserReward,
             uint256 dslaBurnedByVerification
         )
@@ -373,6 +395,7 @@ contract StakeRegistry is Ownable, StringUtils {
         DSLAburnRate = _DSLAburnRate;
         dslaDepositByPeriod = _dslaDepositByPeriod;
         dslaPlatformReward = _dslaPlatformReward;
+        dslaMessengerReward = _dslaMessengerReward;
         dslaUserReward = _dslaUserReward;
         dslaBurnedByVerification = _dslaBurnedByVerification;
     }

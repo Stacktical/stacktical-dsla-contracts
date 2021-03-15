@@ -3,8 +3,11 @@ pragma experimental ABIEncoderV2;
 
 import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "../StringUtils.sol";
 import "../PeriodRegistry.sol";
+import "../StakeRegistry.sol";
 
 /**
  * @title NetworkAnalytics
@@ -12,6 +15,8 @@ import "../PeriodRegistry.sol";
  */
 
 contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
+    using SafeERC20 for ERC20;
+
     struct AnalyticsRequest {
         bytes32 networkName;
         uint256 periodId;
@@ -20,22 +25,47 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
 
     /// @dev Period registry
     PeriodRegistry private periodRegistry;
+    /// @dev StakeRegistry
+    StakeRegistry private stakeRegistry;
+
     /// @dev bytes32 to store the available network names
     bytes32[] public networkNames;
     /// @dev (networkName=>periodType=>periodId=>bytes32) to store ipfsHash of the analytics corresponding to periodId
     mapping(bytes32 => mapping(PeriodRegistry.PeriodType => mapping(uint256 => bytes32)))
         public periodAnalytics;
+    /// @dev (networkName=>periodType=>periodId=>bool) to state if a network-periodType-periodId was already requested
+    mapping(bytes32 => mapping(PeriodRegistry.PeriodType => mapping(uint256 => bool)))
+        public periodAnalyticsRequested;
 
     /// @dev Mapping that stores chainlink analytics request information
     mapping(bytes32 => AnalyticsRequest) public requestIdToAnalyticsRequest;
     /// @dev Array with all request IDs
     bytes32[] public requests;
     /// @dev Chainlink oracle address
-    address public oracle;
+    address private oracle;
     /// @dev chainlink jobId
-    bytes32 public jobId;
+    bytes32 private jobId;
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
-    uint256 public fee = 0.1 * 10**18;
+    uint256 private baseFee = 0.1 ether;
+    /// @dev fee for Chainlink querys. Currently 0.1 LINK
+    uint256 public fee;
+    /// @dev fee for Chainlink querys. Currently 0.1 LINK
+    uint256 public callerReward = 0 ether;
+
+    /**
+     * @dev event emitted when modifying the callerReward
+     * @param owner 1. -
+     * @param newValue 2. -
+     */
+    event CallerRewardModified(address indexed owner, uint256 newValue);
+
+    /**
+     * @dev event emitted when modifying the jobId
+     * @param owner 1. -
+     * @param jobId 2. -
+     * @param fee 3. -
+     */
+    event JobIdModified(address indexed owner, bytes32 jobId, uint256 fee);
 
     /**
      * @dev event emitted when having a response from Chainlink with the SLI
@@ -57,18 +87,24 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @param _chainlinkOracle 1. the address of the oracle to create requests to
      * @param _chainlinkToken 2. the address of LINK token contract
      * @param _jobId 3. the job id for the HTTPGet job
-     * @param _periodRegistry 4. the job id for the HTTPGet job
+     * @param _periodRegistry 4. period registry
+     * @param _stakeRegistry 5. stake registry
+     * @param _feeMultiplier 6. states the amount of paid nodes running behind the precoordinator, to set the fee
      */
     constructor(
         address _chainlinkOracle,
         address _chainlinkToken,
         bytes32 _jobId,
-        PeriodRegistry _periodRegistry
+        PeriodRegistry _periodRegistry,
+        StakeRegistry _stakeRegistry,
+        uint256 _feeMultiplier
     ) public {
         jobId = _jobId;
         setChainlinkToken(_chainlinkToken);
         oracle = _chainlinkOracle;
         periodRegistry = _periodRegistry;
+        stakeRegistry = _stakeRegistry;
+        fee = _feeMultiplier * baseFee;
     }
 
     function isValidNetwork(bytes32 _networkName) public view returns (bool) {
@@ -92,24 +128,68 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
     }
 
     /**
+     * @dev function to add multiple valid network names
+     * @param _networkNames 1. bytes32[] network names
+     */
+    function addMultipleNetworks(bytes32[] memory _networkNames)
+        public
+        onlyOwner
+        returns (bool)
+    {
+        for (uint256 index = 0; index < _networkNames.length; index++) {
+            if (!isValidNetwork(_networkNames[index])) {
+                networkNames.push(_networkNames[index]);
+            }
+        }
+        return false;
+    }
+
+    /**
      * @dev Request analytics object for the current period.
      * @param _periodId 1. id of the canonical period to be analyzed
      * @param _periodType 2. type of period to be queried
      * @param _networkName 3. network name to publish analytics
+     * @param _ownerApproval 4. used to choose if the call is going to be funded by the contract owner, to avoid a block by contract owner
+     * @param _callerReward 5. used to choose if the call is going to be rewarded by the contract owner, to avoid a block by contract owner
      */
     function requestAnalytics(
         uint256 _periodId,
         PeriodRegistry.PeriodType _periodType,
-        bytes32 _networkName
+        bytes32 _networkName,
+        bool _ownerApproval,
+        bool _callerReward
     ) public {
         require(isValidNetwork(_networkName), "Invalid network name");
         bool periodIsFinished =
             periodRegistry.periodIsFinished(_periodType, _periodId);
         require(periodIsFinished == true, "Period has not finished yet");
         require(
-            periodAnalytics[_networkName][_periodType][_periodId] == "",
-            "Analytics object already published"
+            periodAnalyticsRequested[_networkName][_periodType][_periodId] ==
+                false,
+            "Analytics already requested"
         );
+        if (_ownerApproval) {
+            ERC20(chainlinkTokenAddress()).safeTransferFrom(
+                owner(),
+                address(this),
+                fee
+            );
+        } else {
+            ERC20(chainlinkTokenAddress()).safeTransferFrom(
+                msg.sender,
+                address(this),
+                fee
+            );
+        }
+
+        if (_callerReward) {
+            address dslaTokenAddress = stakeRegistry.DSLATokenAddress();
+            ERC20(dslaTokenAddress).safeTransferFrom(
+                owner(),
+                msg.sender,
+                callerReward
+            );
+        }
 
         Chainlink.Request memory request =
             buildChainlinkRequest(
@@ -128,7 +208,6 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         request.add("sla_monitoring_start", _uintToStr(start));
         request.add("sla_monitoring_end", _uintToStr(end));
 
-        // Sends the request with 0.1 LINK to the oracle contract
         bytes32 requestId = sendChainlinkRequestTo(oracle, request, fee);
         requests.push(requestId);
         requestIdToAnalyticsRequest[requestId] = AnalyticsRequest({
@@ -136,6 +215,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
             periodId: _periodId,
             periodType: _periodType
         });
+        periodAnalyticsRequested[_networkName][_periodType][_periodId] = true;
     }
 
     /**
@@ -161,5 +241,31 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         periodAnalytics[request.networkName][request.periodType][
             request.periodId
         ] = _chainlinkResponse;
+    }
+
+    /**
+     * @dev sets a new jobId, which is a agreement Id of a PreCoordinator contract
+     * @param _jobId the id of the PreCoordinator agreement
+     * @param _feeMultiplier how many Chainlink nodes would be paid on the agreement id, to set the fee value
+     */
+    function setChainlinkJobID(bytes32 _jobId, uint256 _feeMultiplier)
+        public
+        onlyOwner
+    {
+        jobId = _jobId;
+        fee = _feeMultiplier * baseFee;
+        emit JobIdModified(msg.sender, _jobId, fee);
+    }
+
+    /**
+     * @param _callerReward 1. uint256 new caller reward
+     */
+    function setCallerReward(uint256 _callerReward) public onlyOwner {
+        callerReward = _callerReward;
+        emit CallerRewardModified(msg.sender, _callerReward);
+    }
+
+    function getNetworkNames() public view returns (bytes32[] memory networks) {
+        networks = networkNames;
     }
 }

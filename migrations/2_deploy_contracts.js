@@ -33,6 +33,11 @@ module.exports = (deployer, network) => {
 
       const chainlinkJobId = !needsGetJobId ? env.chainlinkJobId : await getChainlinkJobId();
 
+      const stakeRegistry = await deployer.deploy(
+        StakeRegistry,
+        dslaTokenAddress,
+      );
+
       const preCoordinator = await deployer.deploy(
         PreCoordinator,
         env.chainlinkTokenAddress,
@@ -53,6 +58,8 @@ module.exports = (deployer, network) => {
         env.chainlinkTokenAddress,
         saId,
         periodRegistry.address,
+        stakeRegistry.address,
+        payments.length,
       );
 
       const seMessenger = await deployer.deploy(
@@ -61,11 +68,7 @@ module.exports = (deployer, network) => {
         env.chainlinkTokenAddress,
         saId,
         networkAnalytics.address,
-      );
-
-      const stakeRegistry = await deployer.deploy(
-        StakeRegistry,
-        dslaTokenAddress,
+        payments.length,
       );
 
       const slaRegistry = await deployer.deploy(

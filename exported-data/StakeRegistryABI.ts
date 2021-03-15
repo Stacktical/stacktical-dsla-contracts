@@ -51,6 +51,12 @@ export const StakeRegistryABI: AbiItem[] = [
       {
         indexed: false,
         internalType: 'uint256',
+        name: 'dslaMessengerReward',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
         name: 'dslaUserReward',
         type: 'uint256',
       },
@@ -84,6 +90,12 @@ export const StakeRegistryABI: AbiItem[] = [
         indexed: false,
         internalType: 'uint256',
         name: 'platformReward',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'messengerReward',
         type: 'uint256',
       },
       {
@@ -135,6 +147,7 @@ export const StakeRegistryABI: AbiItem[] = [
       { internalType: 'uint256', name: 'slaPeriodIdsLength', type: 'uint256' },
       { internalType: 'uint256', name: 'dslaDepositByPeriod', type: 'uint256' },
       { internalType: 'uint256', name: 'dslaPlatformReward', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaMessengerReward', type: 'uint256' },
       { internalType: 'uint256', name: 'dslaUserReward', type: 'uint256' },
       {
         internalType: 'uint256',
@@ -286,6 +299,7 @@ export const StakeRegistryABI: AbiItem[] = [
       { internalType: 'uint256', name: 'DSLAburnRate', type: 'uint256' },
       { internalType: 'uint256', name: 'dslaDepositByPeriod', type: 'uint256' },
       { internalType: 'uint256', name: 'dslaPlatformReward', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaMessengerReward', type: 'uint256' },
       { internalType: 'uint256', name: 'dslaUserReward', type: 'uint256' },
       {
         internalType: 'uint256',
@@ -305,6 +319,7 @@ export const StakeRegistryABI: AbiItem[] = [
       { internalType: 'uint256', name: 'DSLAburnRate', type: 'uint256' },
       { internalType: 'uint256', name: 'dslaDepositByPeriod', type: 'uint256' },
       { internalType: 'uint256', name: 'dslaPlatformReward', type: 'uint256' },
+      { internalType: 'uint256', name: 'dslaMessengerReward', type: 'uint256' },
       { internalType: 'uint256', name: 'dslaUserReward', type: 'uint256' },
       {
         internalType: 'uint256',
