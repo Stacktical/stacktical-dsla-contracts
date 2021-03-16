@@ -250,15 +250,8 @@ contract Staking is Ownable {
             uint256 usersStake = usersPool[tokenAddress];
             uint256 reward = usersStake.mul(_rewardPercentage).div(_precision);
 
-            // Subtract before burn to match balances
             usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
 
-            if (tokenAddress == dslaTokenAddress) {
-                uint256 fees = _burnDSLATokens(reward);
-                reward = reward.sub(fees);
-            }
-
-            // Add after burn to match balances
             providerPool[tokenAddress] = providerPool[tokenAddress].add(reward);
 
             emit ProviderRewardGenerated(
@@ -280,17 +273,10 @@ contract Staking is Ownable {
             address tokenAddress = allowedTokens[index];
             uint256 usersStake = usersPool[tokenAddress];
             uint256 compensation = usersStake;
-            // Subtract before burn to match balances
             providerPool[tokenAddress] = providerPool[tokenAddress].sub(
                 compensation
             );
 
-            if (tokenAddress == dslaTokenAddress) {
-                uint256 fees = _burnDSLATokens(compensation);
-                compensation = compensation.sub(fees);
-            }
-
-            // Add after burn to match balances
             usersPool[tokenAddress] = usersPool[tokenAddress].add(compensation);
         }
     }
@@ -346,14 +332,6 @@ contract Staking is Ownable {
         duToken.burnFrom(msg.sender, burnedDUTokens);
         usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
         ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
-    }
-
-    function _burnDSLATokens(uint256 _amount) internal returns (uint256 fees) {
-        bytes4 BURN_SELECTOR = bytes4(keccak256(bytes("burn(uint256)")));
-        fees = _amount.mul(DSLAburnRate).div(1000);
-        (bool _success, ) =
-            dslaTokenAddress.call(abi.encodeWithSelector(BURN_SELECTOR, fees));
-        require(_success, "DSLA burn process was not successful");
     }
 
     /**
