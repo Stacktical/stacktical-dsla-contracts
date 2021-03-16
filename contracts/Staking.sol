@@ -18,7 +18,7 @@ contract Staking is Ownable {
     /// @dev SLARegistry contract
     PeriodRegistry private periodRegistry;
     /// @dev current SLA id
-    uint256 public slaID;
+    uint128 public slaID;
 
     /// @dev (tokenAddress=>uint256) total pooled token balance
     mapping(address => uint256) public providerPool;
@@ -42,8 +42,6 @@ contract Staking is Ownable {
 
     /// @dev PeriodRegistry period type of the SLA contract
     PeriodRegistry.PeriodType private periodType;
-    /// @dev length of the _periodIds array, to state effective APY
-    uint256 public slaPeriodsLength;
 
     /// @dev boolean to declare if contract is whitelisted
     bool public whitelistedContract;
@@ -84,25 +82,19 @@ contract Staking is Ownable {
     );
 
     /**
-     *@param _stakeRegistry 1. address of the stake registry
-     *@param _periodRegistry 2. address of the period registry
      *@param _periodType 3. period type of the SLA
-     *@param _slaPeriodsLength 4. length of the SLA periodsId stored on the sla contract
      *@param _whitelistedContract 5. enables the white list feature
      *@param _slaID 6. identifies the SLA to uniquely to emit dTokens
      */
     constructor(
-        address _stakeRegistry,
-        address _periodRegistry,
+        SLARegistry _slaRegistryAddress,
         PeriodRegistry.PeriodType _periodType,
-        uint256 _slaPeriodsLength,
         bool _whitelistedContract,
-        uint256 _slaID
+        uint128 _slaID
     ) public {
-        stakeRegistry = StakeRegistry(_stakeRegistry);
-        periodRegistry = PeriodRegistry(_periodRegistry);
+        stakeRegistry = _slaRegistryAddress.stakeRegistry();
+        periodRegistry = _slaRegistryAddress.periodRegistry();
         periodType = _periodType;
-        slaPeriodsLength = _slaPeriodsLength;
         whitelistedContract = _whitelistedContract;
         (uint256 _DSLAburnRate, , , , , ) =
             stakeRegistry.getStakingParameters();
@@ -369,6 +361,7 @@ contract Staking is Ownable {
      *@param _staker 1. staker address
      *@return true if address is staker
      */
+    // check loop
     function isStaker(address _staker) public view returns (bool) {
         for (uint256 index = 0; index < stakers.length; index++) {
             if (stakers[index] == _staker) return true;
@@ -417,6 +410,7 @@ contract Staking is Ownable {
      *@param _tokenAddress 1. token address to check exixtence
      *@return true if _tokenAddress exists in the allowedTokens array
      */
+    // check loop
     function isAllowedToken(address _tokenAddress) public view returns (bool) {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {

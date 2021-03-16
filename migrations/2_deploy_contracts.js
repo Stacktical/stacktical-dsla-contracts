@@ -44,11 +44,24 @@ module.exports = (deployer, network) => {
       );
 
       const minResponses = 1;
-      const oracles = [env.chainlinkOracleAddress];
-      const jobIds = [chainlinkJobId];
-      const payments = [toWei('0.1')];
+      const preCoordinatorConfiguration = /mainnet/i.test(network)
+        ? {
+          oracles: ['mainnet_oracle_1', 'mainnet_oracle_2', 'mainnet_oracle_3', 'mainnet_oracle4'],
+          jobIds: ['mainnet_jobid_1', 'mainnet_jobid_2', 'mainnet_jobid_3', 'mainnet_jobid4'],
+          payments: ['mainnet_payment_1', 'mainnet_payment_2', 'mainnet_payment_3', 'mainnet_payment4'],
+        }
+        : {
+          oracles: [env.chainlinkOracleAddress],
+          jobIds: [chainlinkJobId],
+          payments: [toWei('0.1')],
+        };
+
       preCoordinator.createServiceAgreement(
-        minResponses, oracles, jobIds, payments,
+        minResponses,
+        preCoordinatorConfiguration.oracles,
+        preCoordinatorConfiguration.jobIds,
+        preCoordinatorConfiguration.payments,
+
       );
       const { values: { saId } } = await eventListener(preCoordinator, 'NewServiceAgreement');
 
@@ -59,7 +72,7 @@ module.exports = (deployer, network) => {
         saId,
         periodRegistry.address,
         stakeRegistry.address,
-        payments.length,
+        preCoordinatorConfiguration.payments.length,
       );
 
       const seMessenger = await deployer.deploy(
@@ -68,7 +81,7 @@ module.exports = (deployer, network) => {
         env.chainlinkTokenAddress,
         saId,
         networkAnalytics.address,
-        payments.length,
+        preCoordinatorConfiguration.payments.length,
       );
 
       const slaRegistry = await deployer.deploy(
@@ -79,8 +92,11 @@ module.exports = (deployer, network) => {
         stakeRegistry.address,
       );
 
-      return slaRegistry.setMessengerSLARegistryAddress(
+      return slaRegistry.registerMessenger(
         seMessenger.address,
+        '',
+        '',
+        '',
       );
     });
   }

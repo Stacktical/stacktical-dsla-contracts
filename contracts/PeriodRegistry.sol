@@ -136,7 +136,6 @@ contract PeriodRegistry is Ownable {
             periodDefinition.initialized,
             "Period type not initialized yet"
         );
-        // check if _periodId is smaller or equal to the last periodId value
         valid = periodDefinition.starts.length.sub(1) >= _periodId;
     }
 

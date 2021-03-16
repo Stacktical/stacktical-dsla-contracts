@@ -138,15 +138,16 @@ export const SLARegistryABI: AbiItem[] = [
   {
     inputs: [
       { internalType: 'contract SLO', name: '_SLO', type: 'address' },
-      { internalType: 'string', name: '_ipfsHash', type: 'string' },
+      { internalType: 'bool', name: '_whitelisted', type: 'bool' },
+      { internalType: 'address', name: '_messengerAddress', type: 'address' },
       {
         internalType: 'enum PeriodRegistry.PeriodType',
         name: '_periodType',
         type: 'uint8',
       },
-      { internalType: 'uint256[]', name: '_periodIds', type: 'uint256[]' },
-      { internalType: 'address', name: '_messengerAddress', type: 'address' },
-      { internalType: 'bool', name: '_whitelisted', type: 'bool' },
+      { internalType: 'uint128', name: '_initialPeriodId', type: 'uint128' },
+      { internalType: 'uint128', name: '_finalPeriodId', type: 'uint128' },
+      { internalType: 'string', name: '_ipfsHash', type: 'string' },
       { internalType: 'bytes32[]', name: '_extraData', type: 'bytes32[]' },
     ],
     name: 'createSLA',
@@ -175,8 +176,19 @@ export const SLARegistryABI: AbiItem[] = [
   {
     inputs: [
       { internalType: 'address', name: '_messengerAddress', type: 'address' },
+      { internalType: 'string', name: '_messengerBaseURL', type: 'string' },
+      {
+        internalType: 'string',
+        name: '_messengerOwnershipURL',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: '_messengerSpecificationURL',
+        type: 'string',
+      },
     ],
-    name: 'setMessengerSLARegistryAddress',
+    name: 'registerMessenger',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',

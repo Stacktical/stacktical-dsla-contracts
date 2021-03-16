@@ -19,7 +19,7 @@ const SEMessenger = artifacts.require('SEMessenger');
 const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
-const initialTokenSupply = '1000000';
+const initialTokenSupply = '10000000';
 const stakeAmount = initialTokenSupply / 100;
 const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
 
@@ -97,19 +97,22 @@ module.exports = (deployer, network) => {
       };
       const ipfsHash = await getIPFSHash(serviceMetadata);
       const slaRegistry = await SLARegistry.deployed();
-      const periodIds = [0, 1, 2];
+      const initialPeriodId = 0;
+      const finalPeriodId = 51;
       const dslaDepositByPeriod = 20000;
-      const dslaDeposit = toWei(String(dslaDepositByPeriod * periodIds.length));
+      const dslaDeposit = toWei(
+        String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1)),
+      );
       await bdslaToken.approve(stakeRegistry.address, dslaDeposit);
       const whitelisted = false;
-      // revert to last snapshot
       await slaRegistry.createSLA(
         slo,
-        ipfsHash,
-        periodType,
-        periodIds,
-        seMessenger.address,
         whitelisted,
+        seMessenger.address,
+        periodType,
+        initialPeriodId,
+        finalPeriodId,
+        ipfsHash,
         [slaNetworkBytes32],
       );
 

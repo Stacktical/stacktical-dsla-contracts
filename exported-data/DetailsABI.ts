@@ -22,13 +22,13 @@ export const DetailsABI: AbiItem[] = [
     name: 'getSLAStaticDetails',
     outputs: [
       { internalType: 'address', name: 'slaOwner', type: 'address' },
-      { internalType: 'address', name: 'sloAddress', type: 'address' },
       { internalType: 'bool', name: 'whiteListed', type: 'bool' },
       {
         internalType: 'enum PeriodRegistry.PeriodType',
         name: 'periodType',
         type: 'uint8',
       },
+      { internalType: 'address', name: 'sloAddress', type: 'address' },
       {
         internalType: 'enum SLORegistry.SLOType',
         name: 'sloType',
@@ -37,6 +37,8 @@ export const DetailsABI: AbiItem[] = [
       { internalType: 'uint256', name: 'sloValue', type: 'uint256' },
       { internalType: 'uint256', name: 'creationBlockNumber', type: 'uint256' },
       { internalType: 'uint256', name: 'slaId', type: 'uint256' },
+      { internalType: 'uint128', name: 'initialPeriodId', type: 'uint128' },
+      { internalType: 'uint128', name: 'finalPeriodId', type: 'uint128' },
       { internalType: 'string', name: 'ipfsHash', type: 'string' },
     ],
     stateMutability: 'view',
@@ -47,7 +49,6 @@ export const DetailsABI: AbiItem[] = [
     inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
     name: 'getSLADetailsArrays',
     outputs: [
-      { internalType: 'uint256[]', name: 'periodIDs', type: 'uint256[]' },
       {
         components: [
           { internalType: 'uint256', name: 'timestamp', type: 'uint256' },

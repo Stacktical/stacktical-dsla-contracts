@@ -55,30 +55,20 @@ contract Details {
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
     }
 
-    /**
-     * @dev external view function that returns all static agreement information
-     * @return slaOwner 1. address  owner
-     * @return sloAddress 5. addresses of the SLO
-     * @return whiteListed 4. breached contract
-     * @return periodType 2. periodType of the sla contract
-     * @return sloType 6. slo type
-     * @return sloValue 7. slo value
-     * @return creationBlockNumber 8. addresses of the SLO
-     * @return slaId 11. -
-     * @return ipfsHash 14. string  ipfsHash
-     */
     function getSLAStaticDetails(address _slaAddress)
         external
         view
         returns (
             address slaOwner,
-            address sloAddress,
             bool whiteListed,
             PeriodRegistry.PeriodType periodType,
+            address sloAddress,
             SLORegistry.SLOType sloType,
             uint256 sloValue,
             uint256 creationBlockNumber,
             uint256 slaId,
+            uint128 initialPeriodId,
+            uint128 finalPeriodId,
             string memory ipfsHash
         )
     {
@@ -93,23 +83,25 @@ contract Details {
         creationBlockNumber = sla.creationBlockNumber();
         slaId = sla.slaID();
         ipfsHash = sla.ipfsHash();
+        initialPeriodId = sla.initialPeriodId();
+        finalPeriodId = sla.finalPeriodId();
     }
 
     function getSLADetailsArrays(address _slaAddress)
         external
         view
         returns (
-            uint256[] memory periodIDs,
             SLA.PeriodSLI[] memory periodSLIs,
             TokenStake[] memory tokensStake
         )
     {
         SLA sla = SLA(_slaAddress);
-        uint256 periodIdsLength = sla.getPeriodIdsLength();
+        uint256 initialPeriodId = sla.initialPeriodId();
+        uint256 finalPeriodId = sla.finalPeriodId();
+        uint256 periodIdsLength = finalPeriodId - initialPeriodId + 1;
         periodSLIs = new SLA.PeriodSLI[](periodIdsLength);
-        periodIDs = new uint256[](periodIdsLength);
         for (uint256 index = 0; index < periodIdsLength; index++) {
-            uint256 periodId = sla.periodIds(index);
+            uint256 periodId = initialPeriodId + index;
             (uint256 timestamp, uint256 sli, SLA.Status status) =
                 sla.periodSLIs(periodId);
             periodSLIs[index] = SLA.PeriodSLI({
@@ -117,7 +109,6 @@ contract Details {
                 sli: sli,
                 timestamp: timestamp
             });
-            periodIDs[index] = sla.periodIds(index);
         }
         uint256 allowedTokensLength = sla.getAllowedTokensLength();
         tokensStake = new TokenStake[](allowedTokensLength);
@@ -178,6 +169,17 @@ contract Details {
             });
         }
     }
+
+    // function getStakeRegistryDetails(StakeRegistry stakeRegistry) public view returns (
+    //     uint256 DSLAburnRate,
+    //         uint256 dslaDepositByPeriod,
+    //         uint256 dslaPlatformReward,
+    //         uint256 dslaMessengerReward,
+    //         uint256 dslaUserReward,
+    //         uint256 dslaBurnedByVerification
+    // ){
+    //     stakeRegistry.getStakingParameters();
+    // }
 
     function _addressToString(address _address)
         internal
