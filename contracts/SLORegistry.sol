@@ -54,6 +54,7 @@ contract SLORegistry {
      * @dev checks is the _sloAddress is registered as deployed
      * @param _sloAddress 1. the value to check against
      */
+    // check loop
     function isRegisteredSLO(address _sloAddress) public view returns (bool) {
         for (uint256 index = 0; index < registeredSLOs.length; index++) {
             if (registeredSLOs[index] == _sloAddress) {

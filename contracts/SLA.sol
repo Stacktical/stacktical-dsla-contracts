@@ -37,10 +37,10 @@ contract SLA is Staking {
     /// @dev uint8 of the period type
     PeriodRegistry.PeriodType public periodType;
 
-    PeriodRegistry public periodRegistry;
+    PeriodRegistry private periodRegistry;
 
-    /// @dev array of he allowed canonical period ids
-    uint256[] public periodIds;
+    uint128 public initialPeriodId;
+    uint128 public finalPeriodId;
 
     /// @dev The address of the slaRegistry contract
     SLARegistry public slaRegistry;
@@ -104,48 +104,41 @@ contract SLA is Staking {
      * @param _owner 1. address of the owner of the service level agreement
      * @param _SLO 2. address of the SLO
      * @param _ipfsHash 3. string with the ipfs hash that contains SLA information
-     * @param _periodIds 4. id of the allowed canonical periods
+     * @param _messengerAddress 3. -
+     * @param _initialPeriodId 4. -
+     * @param _finalPeriodId 4. -
      * @param _periodType 5. period type of the SLA contract
-     * @param _stakeRegistry 6. stakeRegistry address
-     * @param _periodRegistry 7. periodRegistry address
      * @param _whitelisted 8. boolean to declare whitelisted contracts
      * @param _extraData 9. array of bytes32 to store extra data on deployment time
      * @param _slaID 10. identifies the SLA to uniquely to emit dTokens
      */
     constructor(
         address _owner,
-        SLO _SLO,
-        string memory _ipfsHash,
-        address _messengerAddress,
-        uint256[] memory _periodIds,
-        PeriodRegistry.PeriodType _periodType,
-        address _stakeRegistry,
-        address _periodRegistry,
         bool _whitelisted,
-        bytes32[] memory _extraData,
-        uint256 _slaID
+        SLO _SLO,
+        PeriodRegistry.PeriodType _periodType,
+        address _messengerAddress,
+        uint128 _initialPeriodId,
+        uint128 _finalPeriodId,
+        uint128 _slaID,
+        string memory _ipfsHash,
+        bytes32[] memory _extraData
     )
         public
-        Staking(
-            _stakeRegistry,
-            _periodRegistry,
-            _periodType,
-            _periodIds.length,
-            _whitelisted,
-            _slaID
-        )
+        Staking(SLARegistry(msg.sender), _periodType, _whitelisted, _slaID)
     {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;
         messengerAddress = _messengerAddress;
         slaRegistry = SLARegistry(msg.sender);
-        periodRegistry = PeriodRegistry(_periodRegistry);
+        periodRegistry = slaRegistry.periodRegistry();
         creationBlockNumber = block.number;
-        periodIds = _periodIds;
+        initialPeriodId = _initialPeriodId;
+        finalPeriodId = _finalPeriodId;
         periodType = _periodType;
         slo = _SLO;
         extraData = _extraData;
-        nextVerifiablePeriod = _periodIds[0];
+        nextVerifiablePeriod = _initialPeriodId;
     }
 
     /**
@@ -174,14 +167,16 @@ contract SLA is Staking {
             // to get the reward formula, we get the periodId but respecting to the SLA
             // because _periodId is the periodId of the platform
             // e.g. if periodIds = 7,8,9,10, normalized periods are = 1,2,3,4
-            uint256 normalizedPeriodId = _periodId.sub(periodIds[0]).add(1);
+            uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
             // if is the last period, then deliver the whole usersStake to the provider
             // uint256 rewardPercentage =
             //     _periodId != periodIds[periodIds.length - 1] &&
             //         ? deviation.mul(normalizedPeriodId).div(periodIds.length)
             //         : uint256(1).mul(precision);
             uint256 rewardPercentage =
-                deviation.mul(normalizedPeriodId).div(periodIds.length);
+                deviation.mul(normalizedPeriodId).div(
+                    finalPeriodId - initialPeriodId + 1
+                );
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
             periodSLI.status = Status.NotRespected;
@@ -192,12 +187,18 @@ contract SLA is Staking {
     }
 
     function isAllowedPeriod(uint256 _periodId) public view returns (bool) {
-        for (uint256 index = 0; index < periodIds.length; index++) {
-            if (periodIds[index] == _periodId) {
-                return true;
-            }
-        }
-        return false;
+        if (_periodId < initialPeriodId) return false;
+        if (_periodId > finalPeriodId) return false;
+        return true;
+    }
+
+    function contractFinished() public view returns (bool) {
+        (, uint256 endOfLastValidPeriod) =
+            periodRegistry.getPeriodStartAndEnd(periodType, finalPeriodId);
+        return
+            _breachedContract == true ||
+            (block.timestamp >= endOfLastValidPeriod &&
+                periodSLIs[finalPeriodId].status != Status.NotVerified);
     }
 
     /**
@@ -208,15 +209,9 @@ contract SLA is Staking {
 
     function stakeTokens(uint256 _amount, address _token) public {
         require(_amount > 0, "amount cannot be 0");
-        uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
-        (, uint256 endOfLastValidPeriod) =
-            periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
-        bool contractFinished =
-            _breachedContract == true ||
-                (block.timestamp >= endOfLastValidPeriod &&
-                    periodSLIs[lastValidPeriodId].status != Status.NotVerified);
+        bool isContractFinished = contractFinished();
         require(
-            contractFinished == false,
+            isContractFinished == false,
             "Can only stake on not finished contracts"
         );
         _stake(_amount, _token);
@@ -228,15 +223,8 @@ contract SLA is Staking {
         public
     {
         require(_amount > 0, "amount cannot be 0");
-        uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
-        (, uint256 endOfLastValidPeriod) =
-            periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
-        // contract is finished if is breached or if the last period is finished and verified
-        bool contractFinished =
-            _breachedContract == true ||
-                (block.timestamp >= endOfLastValidPeriod &&
-                    periodSLIs[lastValidPeriodId].status != Status.NotVerified);
-        _withdrawProviderTokens(_amount, _tokenAddress, contractFinished);
+        bool isContractFinished = contractFinished();
+        _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
     }
 
     /**
@@ -247,25 +235,11 @@ contract SLA is Staking {
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress) public {
         require(_amount > 0, "amount cannot be 0");
-        uint256 lastValidPeriodId = periodIds[periodIds.length - 1];
-        (, uint256 endOfLastValidPeriod) =
-            periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
-        // users tokens can be withdrawn only if the contract is breached
-        // or if the last period is finished and the period status was verified
         if (msg.sender != owner()) {
-            require(
-                _breachedContract == true ||
-                    (block.timestamp >= endOfLastValidPeriod &&
-                        periodSLIs[lastValidPeriodId].status !=
-                        Status.NotVerified),
-                "Can only withdraw stake after the final period is finished or if the contract is breached"
-            );
+            bool isContractFinished = contractFinished();
+            require(isContractFinished == true, "Only for finished contract");
         }
         _withdrawUserTokens(_amount, _tokenAddress);
-    }
-
-    function getPeriodIdsLength() public view returns (uint256) {
-        return periodIds.length;
     }
 
     function getStakersLength() public view returns (uint256) {

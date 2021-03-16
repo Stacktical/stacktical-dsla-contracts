@@ -9,7 +9,7 @@ import moment from 'moment';
 function generateWeeklyPeriods(amountOfPeriods, expiredPeriods) {
   const periodStarts = [];
   const periodEnds = [];
-  for (let index = -expiredPeriods + 1; index < amountOfPeriods - expiredPeriods; index += 1) {
+  for (let index = -expiredPeriods + 1; index < amountOfPeriods - expiredPeriods + 1; index += 1) {
     const start = moment().utc(0).startOf('isoWeek')
       .add(index, 'week')
       .unix();
