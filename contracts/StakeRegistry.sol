@@ -149,7 +149,6 @@ contract StakeRegistry is Ownable, StringUtils {
         allowedTokens.push(_tokenAddress);
     }
 
-    // check loop
     function isAllowedToken(address _tokenAddress) public view returns (bool) {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {
@@ -165,7 +164,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@param _sla 2. sla to check
      *@return bool, true if _sla was staked by _user
      */
-    // check loop
+
     function slaWasStakedByUser(address _user, address _sla)
         public
         view
@@ -360,6 +359,11 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 dslaBurnedByVerification
     ) public onlyOwner {
         _DSLAburnRate = DSLAburnRate;
+        _dslaDepositByPeriod = dslaDepositByPeriod;
+        _dslaPlatformReward = dslaPlatformReward;
+        _dslaMessengerReward = dslaMessengerReward;
+        _dslaUserReward = dslaUserReward;
+        _dslaBurnedByVerification = dslaBurnedByVerification;
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
@@ -368,11 +372,6 @@ contract StakeRegistry is Ownable, StringUtils {
                     .add(_dslaBurnedByVerification),
             "Staking parameters should match on summation"
         );
-        _dslaDepositByPeriod = dslaDepositByPeriod;
-        _dslaPlatformReward = dslaPlatformReward;
-        _dslaMessengerReward = dslaMessengerReward;
-        _dslaUserReward = dslaUserReward;
-        _dslaBurnedByVerification = dslaBurnedByVerification;
         emit StakingParametersModified(
             DSLAburnRate,
             dslaDepositByPeriod,

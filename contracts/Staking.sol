@@ -32,6 +32,8 @@ contract Staking is Ownable {
 
     /// @dev address[] of the stakers of the SLA contract
     address[] public stakers;
+    /// @dev (slaOwner=>bool)
+    mapping(address => bool) public registeredStakers;
     /// @dev DSLA token address to burn fees
     address public dslaTokenAddress;
     /// @dev array with the allowed tokens addresses for the current SLA
@@ -228,7 +230,8 @@ contract Staking is Ownable {
             );
         }
 
-        if (!isStaker(msg.sender)) {
+        if (registeredStakers[msg.sender] == false) {
+            registeredStakers[msg.sender] = true;
             stakers.push(msg.sender);
         }
     }
@@ -335,19 +338,6 @@ contract Staking is Ownable {
     }
 
     /**
-     *@dev returns true if the _staker address is registered as staker
-     *@param _staker 1. staker address
-     *@return true if address is staker
-     */
-    // check loop
-    function isStaker(address _staker) public view returns (bool) {
-        for (uint256 index = 0; index < stakers.length; index++) {
-            if (stakers[index] == _staker) return true;
-        }
-        return false;
-    }
-
-    /**
      *@dev use this function to evaluate the length of the allowed tokens length
      *@return allowedTokens.length
      */
@@ -388,7 +378,6 @@ contract Staking is Ownable {
      *@param _tokenAddress 1. token address to check exixtence
      *@return true if _tokenAddress exists in the allowedTokens array
      */
-    // check loop
     function isAllowedToken(address _tokenAddress) public view returns (bool) {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {

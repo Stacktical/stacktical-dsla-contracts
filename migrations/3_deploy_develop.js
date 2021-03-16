@@ -14,6 +14,7 @@ const IERC20 = artifacts.require('IERC20');
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const SLARegistry = artifacts.require('SLARegistry');
+const MessengerRegistry = artifacts.require('MessengerRegistry');
 const SLA = artifacts.require('SLA');
 const SEMessenger = artifacts.require('SEMessenger');
 const bDSLA = artifacts.require('bDSLA');
