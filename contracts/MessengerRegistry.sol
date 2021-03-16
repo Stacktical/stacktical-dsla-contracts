@@ -124,4 +124,8 @@ contract MessengerRegistry {
     function getMessengers() public view returns (Messenger[] memory) {
         return messengers;
     }
+
+    function getMessengersLength() public view returns (uint256) {
+        return messengers.length;
+    }
 }
