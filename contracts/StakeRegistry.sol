@@ -361,10 +361,11 @@ contract StakeRegistry is Ownable, StringUtils {
     ) public onlyOwner {
         _DSLAburnRate = DSLAburnRate;
         require(
-            dslaDepositByPeriod ==
-                dslaPlatformReward.add(dslaUserReward).add(
-                    dslaBurnedByVerification
-                ),
+            _dslaDepositByPeriod ==
+                _dslaPlatformReward
+                    .add(_dslaMessengerReward)
+                    .add(_dslaUserReward)
+                    .add(_dslaBurnedByVerification),
             "Staking parameters should match on summation"
         );
         _dslaDepositByPeriod = dslaDepositByPeriod;
