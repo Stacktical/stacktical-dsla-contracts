@@ -2,9 +2,9 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "./SLO.sol";
 import "./SLA.sol";
 import "./SLARegistry.sol";
+import "./SLORegistry.sol";
 import "./StakeRegistry.sol";
 import "./PeriodRegistry.sol";
 import "./MessengerRegistry.sol";
@@ -55,14 +55,13 @@ contract Details {
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
     }
 
-    function getSLAStaticDetails(address _slaAddress)
+    function getSLAStaticDetails(address _slaAddress, SLORegistry _sloRegistry)
         external
         view
         returns (
             address slaOwner,
             bool whiteListed,
             PeriodRegistry.PeriodType periodType,
-            address sloAddress,
             SLORegistry.SLOType sloType,
             uint256 sloValue,
             uint256 creationBlockNumber,
@@ -73,13 +72,10 @@ contract Details {
         )
     {
         SLA sla = SLA(_slaAddress);
-        SLO slo = sla.slo();
         slaOwner = sla.owner();
-        sloAddress = address(slo);
         whiteListed = sla.whitelistedContract();
         periodType = sla.periodType();
-        sloType = slo.sloType();
-        sloValue = slo.value();
+        (sloValue, sloType) = _sloRegistry.registeredSLO(_slaAddress);
         creationBlockNumber = sla.creationBlockNumber();
         slaId = sla.slaID();
         ipfsHash = sla.ipfsHash();

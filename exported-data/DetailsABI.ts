@@ -18,7 +18,14 @@ export const DetailsABI: AbiItem[] = [
     constant: true,
   },
   {
-    inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
+    inputs: [
+      { internalType: 'address', name: '_slaAddress', type: 'address' },
+      {
+        internalType: 'contract SLORegistry',
+        name: '_sloRegistry',
+        type: 'address',
+      },
+    ],
     name: 'getSLAStaticDetails',
     outputs: [
       { internalType: 'address', name: 'slaOwner', type: 'address' },
@@ -28,7 +35,6 @@ export const DetailsABI: AbiItem[] = [
         name: 'periodType',
         type: 'uint8',
       },
-      { internalType: 'address', name: 'sloAddress', type: 'address' },
       {
         internalType: 'enum SLORegistry.SLOType',
         name: 'sloType',

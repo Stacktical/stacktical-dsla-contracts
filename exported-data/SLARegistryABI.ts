@@ -137,7 +137,12 @@ export const SLARegistryABI: AbiItem[] = [
   },
   {
     inputs: [
-      { internalType: 'contract SLO', name: '_SLO', type: 'address' },
+      { internalType: 'uint256', name: '_sloValue', type: 'uint256' },
+      {
+        internalType: 'enum SLORegistry.SLOType',
+        name: '_sloType',
+        type: 'uint8',
+      },
       { internalType: 'bool', name: '_whitelisted', type: 'bool' },
       { internalType: 'address', name: '_messengerAddress', type: 'address' },
       {

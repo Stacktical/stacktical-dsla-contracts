@@ -14,7 +14,6 @@ const IERC20 = artifacts.require('IERC20');
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const SLARegistry = artifacts.require('SLARegistry');
-const MessengerRegistry = artifacts.require('MessengerRegistry');
 const SLA = artifacts.require('SLA');
 const SEMessenger = artifacts.require('SEMessenger');
 const bDSLA = artifacts.require('bDSLA');
@@ -80,12 +79,6 @@ module.exports = (deployer, network) => {
         web3.utils.toWei('10'),
       );
 
-      // deploy sla contract
-      console.log('Starting automated job 6: Creating SLO');
-      const sloRegistry = await SLORegistry.deployed();
-      await sloRegistry.createSLO(sloValue, sloType);
-      const slo = await sloRegistry.sloAddresses.call(sloValue, sloType);
-
       console.log('Starting automated job 7: Creating SLA');
       const serviceMetadata = {
         serviceName: networks[slaNetwork].validators[0],
@@ -107,7 +100,8 @@ module.exports = (deployer, network) => {
       await bdslaToken.approve(stakeRegistry.address, dslaDeposit);
       const whitelisted = false;
       await slaRegistry.createSLA(
-        slo,
+        sloValue,
+        sloType,
         whitelisted,
         seMessenger.address,
         periodType,

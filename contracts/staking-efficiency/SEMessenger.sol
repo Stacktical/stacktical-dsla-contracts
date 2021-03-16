@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 
 import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
 import "../SLA.sol";
-import "../SLO.sol";
 import "../PeriodRegistry.sol";
 import "../StringUtils.sol";
 import "./NetworkAnalytics.sol";
