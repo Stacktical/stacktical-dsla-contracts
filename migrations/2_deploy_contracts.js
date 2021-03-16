@@ -46,7 +46,7 @@ module.exports = (deployer, network) => {
       const minResponses = 1;
       const preCoordinatorConfiguration = /mainnet/i.test(network)
         ? {
-          oracles: ['mainnet_oracle_1', 'mainnet_oracle_2', 'mainnet_oracle_3', 'mainnet_oracle4'],
+          oracles: ['mainnet_oracle_1', 'mainnet_oracle_2', 'mainnet_oracle_3', 'mainnet_oracle_4'],
           jobIds: ['mainnet_jobid_1', 'mainnet_jobid_2', 'mainnet_jobid_3', 'mainnet_jobid4'],
           payments: ['mainnet_payment_1', 'mainnet_payment_2', 'mainnet_payment_3', 'mainnet_payment4'],
         }

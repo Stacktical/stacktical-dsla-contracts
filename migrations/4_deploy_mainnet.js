@@ -17,14 +17,6 @@ const [periodStarts, periodEnds] = generateWeeklyPeriods(periods);
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
-    console.log('Remember to:');
-    console.log('- uncomment the periodHasFinished check at SLARegistry.createSLA');
-    console.log('- set the correct values for StakeRegistry');
-    console.log('- set the correct value for callerReward on NetworkAnalytics');
-    console.log('- fund the deployer account with LINK (the funds are used through allowance)');
-    console.log('- deploy the jobs and the Oracles for Chainlink nodes');
-    console.log('- set the values for chainlink on 2_deploy_contracts');
-    process.exit(0);
     if (/mainnet/i.test(network)) {
       if (!!process.env.ONLY_DETAILS === true) return;
       console.log('Starting automated jobs to bootstrap protocol correctly');
