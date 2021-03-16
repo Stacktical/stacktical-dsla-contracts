@@ -43,7 +43,8 @@ abstract contract IMessenger is Ownable {
     function requestSLI(
         uint256 _periodId,
         address _slaAddress,
-        bool _ownerApproval
+        bool _ownerApproval,
+        address _callerAddress
     ) external virtual;
 
     /**

@@ -175,7 +175,8 @@ contract SLARegistry is Ownable {
         IMessenger(slaMessenger).requestSLI(
             _periodId,
             address(_sla),
-            _ownerApproval
+            _ownerApproval,
+            msg.sender
         );
         stakeRegistry.distributeVerificationRewards(
             address(_sla),

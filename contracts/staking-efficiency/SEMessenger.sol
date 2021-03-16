@@ -39,6 +39,9 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /// @dev to multiply the SLI value and get better precision. Useful to deploy SLO correctly
     uint256 private _messengerPrecision = 10**3;
 
+    uint256 public requestsCounter;
+    uint256 public fulfillsCounter;
+
     /**
      * @dev parameterize the variables according to network
      * @notice sets the Chainlink parameters (oracle address, token address, jobId) and sets the SLARegistry to 0x0 address
@@ -98,12 +101,13 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.
      * @param _periodId 1. value of the period id
      * @param _slaAddress 2. SLA Address
-     * @param _ownerApproval 3. if approval by owner or msg sender
+     * @param _messengerOwnerApproval 3. if approval by owner or msg sender
      */
     function requestSLI(
         uint256 _periodId,
         address _slaAddress,
-        bool _ownerApproval
+        bool _messengerOwnerApproval,
+        address _callerAddress
     ) public override onlySLARegistry {
         SLA sla = SLA(_slaAddress);
         PeriodRegistry.PeriodType periodType = sla.periodType();
@@ -119,7 +123,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             ipfsAnalytics != 0,
             "Network analytics object is not assigned yet"
         );
-        if (_ownerApproval) {
+        if (_messengerOwnerApproval) {
             ERC20(chainlinkTokenAddress()).safeTransferFrom(
                 owner(),
                 address(this),
@@ -127,7 +131,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             );
         } else {
             ERC20(chainlinkTokenAddress()).safeTransferFrom(
-                msg.sender,
+                _callerAddress,
                 address(this),
                 _fee
             );
@@ -155,6 +159,8 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             slaAddress: _slaAddress,
             periodId: _periodId
         });
+
+        requestsCounter++;
     }
 
     /**
@@ -184,6 +190,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             stakingEfficiency,
             request.periodId
         );
+        fulfillsCounter++;
     }
 
     /**
