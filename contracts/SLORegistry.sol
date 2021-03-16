@@ -21,10 +21,13 @@ contract SLORegistry {
     }
 
     /// @dev array of deployed SLOs
-    address[] public registeredSLOs;
+    address[] public SLOs;
 
     /// @dev (sloValue=>SLOType=>SLOAddress)
     mapping(uint256 => mapping(SLOType => address)) public sloAddresses;
+
+    /// @dev (sloAddress=>bool)
+    mapping(address => bool) public registeredSLOs;
 
     /**
      * @dev event for service level objective creation logging
@@ -45,29 +48,16 @@ contract SLORegistry {
             "SLO already deployed"
         );
         SLO slo = new SLO(_value, _sloType);
-        registeredSLOs.push(address(slo));
+        SLOs.push(address(slo));
         sloAddresses[_value][_sloType] = address(slo);
+        registeredSLOs[address(slo)] = true;
         emit SLOCreated(slo, _value, _sloType);
-    }
-
-    /**
-     * @dev checks is the _sloAddress is registered as deployed
-     * @param _sloAddress 1. the value to check against
-     */
-    // check loop
-    function isRegisteredSLO(address _sloAddress) public view returns (bool) {
-        for (uint256 index = 0; index < registeredSLOs.length; index++) {
-            if (registeredSLOs[index] == _sloAddress) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
      * @dev function to get all the SLOs addresses
      */
     function getAllSLOs() public view returns (address[] memory) {
-        return registeredSLOs;
+        return SLOs;
     }
 }

@@ -85,7 +85,7 @@ contract SLARegistry is Ownable {
         bytes32[] memory _extraData
     ) public {
         require(
-            sloRegistry.isRegisteredSLO(address(_SLO)) == true,
+            sloRegistry.registeredSLOs(address(_SLO)) == true,
             "SLO not registered on SLORegistry"
         );
         bool validPeriod =

@@ -34,7 +34,7 @@
           "type": "uint256"
         }
       ],
-      "name": "registeredSLOs",
+      "name": "SLOs",
       "outputs": [
         {
           "internalType": "address",
@@ -43,8 +43,26 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "registeredSLOs",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "inputs": [
@@ -68,8 +86,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -90,26 +107,6 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_sloAddress",
-          "type": "address"
-        }
-      ],
-      "name": "isRegisteredSLO",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
       "inputs": [],
       "name": "getAllSLOs",
       "outputs": [
@@ -120,30 +117,29 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract SLO\",\"name\":\"slo\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"enum SLORegistry.SLOType\",\"name\":\"sloType\",\"type\":\"uint8\"}],\"name\":\"SLOCreated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"},{\"internalType\":\"enum SLORegistry.SLOType\",\"name\":\"_sloType\",\"type\":\"uint8\"}],\"name\":\"createSLO\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllSLOs\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_sloAddress\",\"type\":\"address\"}],\"name\":\"isRegisteredSLO\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"registeredSLOs\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"enum SLORegistry.SLOType\",\"name\":\"\",\"type\":\"uint8\"}],\"name\":\"sloAddresses\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"SLORegistry is a contract for handling creation of service level objectives and querying those service level objectives\",\"methods\":{\"createSLO(uint256,uint8)\":{\"details\":\"public function for creating service level objectives\",\"params\":{\"_sloType\":\"2. type of check\",\"_value\":\"1. the value to check against\"}},\"getAllSLOs()\":{\"details\":\"function to get all the SLOs addresses\"},\"isRegisteredSLO(address)\":{\"details\":\"checks is the _sloAddress is registered as deployed\",\"params\":{\"_sloAddress\":\"1. the value to check against\"}}},\"title\":\"SLORegistry\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol\":\"SLORegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLO.sol\":{\"keccak256\":\"0x0e7919abb97ffc5d0542eb829a10c3e059a05796c4f0a2908b636fee6c43f907\",\"urls\":[\"bzz-raw://7187c6eaefa6b945188a5a607bc83b67d5c21dd1aa742e18153790c39885c985\",\"dweb:/ipfs/QmWxhYHfyXiqk9kUijrKuB65Bu8X2sEQyDSbWBMfNR2Pm2\"]},\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol\":{\"keccak256\":\"0x466d73cff2df0c01b5712826bb65c7b6e7f26a811d1f1ff879ff746be2e6c53b\",\"urls\":[\"bzz-raw://54c76cd3332a83243f0afa5ea5c7810cb1598810ad900316580726667f1670c1\",\"dweb:/ipfs/QmaXJqgHB5M73Zmy3Fxa83Zfa6m4Q1mqrkMZzvEtHFFsEb\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b506107d7806100206000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c806330cb27391461005c57806364ad69d91461007a578063749b422c1461009a57806378488ba3146100ad578063d12250da146100c2575b600080fd5b6100646100e2565b6040516100719190610401565b60405180910390f35b61008d6100883660046103a3565b610144565b60405161007191906103ed565b61008d6100a83660046103bb565b61016b565b6100c06100bb3660046103bb565b610191565b005b6100d56100d0366004610375565b61030b565b604051610071919061044e565b6060600080548060200260200160405190810160405280929190818152602001828054801561013a57602002820191906000526020600020905b81546001600160a01b0316815260019091019060200180831161011c575b5050505050905090565b6000818154811061015157fe5b6000918252602090912001546001600160a01b0316905081565b60016020908152600092835260408084209091529082529020546001600160a01b031681565b6000828152600160205260408120818360058111156101ac57fe5b60058111156101b757fe5b81526020810191909152604001600020546001600160a01b0316146101f75760405162461bcd60e51b81526004016101ee90610459565b60405180910390fd5b6000828260405161020790610368565b610212929190610487565b604051809103906000f08015801561022e573d6000803e3d6000fd5b5060008054600180820183557f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e56390910180546001600160a01b0319166001600160a01b0385161790558582526020526040812091925082919084600581111561029357fe5b600581111561029e57fe5b81526020810191909152604090810160002080546001600160a01b0319166001600160a01b0393841617905551908216907fb3ffce2cb6f1173cb955e4fd03b9965a5fa1eea29d0343ee46c3b4b907c77d29906102fe9086908690610487565b60405180910390a2505050565b6000805b60005481101561035d57826001600160a01b03166000828154811061033057fe5b6000918252602090912001546001600160a01b03161415610355576001915050610363565b60010161030f565b50600090505b919050565b6102fc806104a683390190565b600060208284031215610386578081fd5b81356001600160a01b038116811461039c578182fd5b9392505050565b6000602082840312156103b4578081fd5b5035919050565b600080604083850312156103cd578081fd5b823591506020830135600681106103e2578182fd5b809150509250929050565b6001600160a01b0391909116815260200190565b6020808252825182820181905260009190848201906040850190845b818110156104425783516001600160a01b03168352928401929184019160010161041d565b50909695505050505050565b901515815260200190565b60208082526014908201527314d313c8185b1c9958591e4819195c1b1bde595960621b604082015260600190565b828152604081016006831061049857fe5b826020830152939250505056fe608060405234801561001057600080fd5b506040516102fc3803806102fc8339818101604052604081101561003357600080fd5b508051602090910151600182815560008054839260ff199091169083600581111561005a57fe5b0217905550505061028c806100706000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c80630f23cb8c146100515780632cd54e2e146100825780633fa4f245146100ae578063fbbf93a0146100c8575b600080fd5b61006e6004803603602081101561006757600080fd5b50356100fb565b604080519115158252519081900360200190f35b61008a610213565b6040518082600581111561009a57fe5b60ff16815260200191505060405180910390f35b6100b661021c565b60408051918252519081900360200190f35b6100d0610222565b604051808381526020018260058111156100e657fe5b60ff1681526020019250505060405180910390f35b60008060005460ff16600581111561010f57fe5b14156101205750600154811461020e565b600160005460ff16600581111561013357fe5b1415610145575060015481141561020e565b600260005460ff16600581111561015857fe5b14156101695750600154811061020e565b600360005460ff16600581111561017c57fe5b141561018e575060015481111561020e565b600460005460ff1660058111156101a157fe5b14156101b25750600154811161020e565b600560005460ff1660058111156101c557fe5b14156101d7575060015481101561020e565b60405162461bcd60e51b81526004018080602001828103825260248152602001806102336024913960400191505060405180910390fd5b919050565b60005460ff1681565b60015481565b600154600054909160ff9091169056fe6973526573706563746564207761736e27742065786563757465642070726f7065726c79a264697066735822122009cc3004d4a75e2e7ebbcb32e31420ad98a17dfcf2c83476a3e12ec465fc1b7064736f6c63430006060033a2646970667358221220cdfae84acc437ef8e5c814f29e5c390c4728b94db8adeb265ba17769b37aae3464736f6c63430006060033",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c806330cb27391461005c57806364ad69d91461007a578063749b422c1461009a57806378488ba3146100ad578063d12250da146100c2575b600080fd5b6100646100e2565b6040516100719190610401565b60405180910390f35b61008d6100883660046103a3565b610144565b60405161007191906103ed565b61008d6100a83660046103bb565b61016b565b6100c06100bb3660046103bb565b610191565b005b6100d56100d0366004610375565b61030b565b604051610071919061044e565b6060600080548060200260200160405190810160405280929190818152602001828054801561013a57602002820191906000526020600020905b81546001600160a01b0316815260019091019060200180831161011c575b5050505050905090565b6000818154811061015157fe5b6000918252602090912001546001600160a01b0316905081565b60016020908152600092835260408084209091529082529020546001600160a01b031681565b6000828152600160205260408120818360058111156101ac57fe5b60058111156101b757fe5b81526020810191909152604001600020546001600160a01b0316146101f75760405162461bcd60e51b81526004016101ee90610459565b60405180910390fd5b6000828260405161020790610368565b610212929190610487565b604051809103906000f08015801561022e573d6000803e3d6000fd5b5060008054600180820183557f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e56390910180546001600160a01b0319166001600160a01b0385161790558582526020526040812091925082919084600581111561029357fe5b600581111561029e57fe5b81526020810191909152604090810160002080546001600160a01b0319166001600160a01b0393841617905551908216907fb3ffce2cb6f1173cb955e4fd03b9965a5fa1eea29d0343ee46c3b4b907c77d29906102fe9086908690610487565b60405180910390a2505050565b6000805b60005481101561035d57826001600160a01b03166000828154811061033057fe5b6000918252602090912001546001600160a01b03161415610355576001915050610363565b60010161030f565b50600090505b919050565b6102fc806104a683390190565b600060208284031215610386578081fd5b81356001600160a01b038116811461039c578182fd5b9392505050565b6000602082840312156103b4578081fd5b5035919050565b600080604083850312156103cd578081fd5b823591506020830135600681106103e2578182fd5b809150509250929050565b6001600160a01b0391909116815260200190565b6020808252825182820181905260009190848201906040850190845b818110156104425783516001600160a01b03168352928401929184019160010161041d565b50909695505050505050565b901515815260200190565b60208082526014908201527314d313c8185b1c9958591e4819195c1b1bde595960621b604082015260600190565b828152604081016006831061049857fe5b826020830152939250505056fe608060405234801561001057600080fd5b506040516102fc3803806102fc8339818101604052604081101561003357600080fd5b508051602090910151600182815560008054839260ff199091169083600581111561005a57fe5b0217905550505061028c806100706000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c80630f23cb8c146100515780632cd54e2e146100825780633fa4f245146100ae578063fbbf93a0146100c8575b600080fd5b61006e6004803603602081101561006757600080fd5b50356100fb565b604080519115158252519081900360200190f35b61008a610213565b6040518082600581111561009a57fe5b60ff16815260200191505060405180910390f35b6100b661021c565b60408051918252519081900360200190f35b6100d0610222565b604051808381526020018260058111156100e657fe5b60ff1681526020019250505060405180910390f35b60008060005460ff16600581111561010f57fe5b14156101205750600154811461020e565b600160005460ff16600581111561013357fe5b1415610145575060015481141561020e565b600260005460ff16600581111561015857fe5b14156101695750600154811061020e565b600360005460ff16600581111561017c57fe5b141561018e575060015481111561020e565b600460005460ff1660058111156101a157fe5b14156101b25750600154811161020e565b600560005460ff1660058111156101c557fe5b14156101d7575060015481101561020e565b60405162461bcd60e51b81526004018080602001828103825260248152602001806102336024913960400191505060405180910390fd5b919050565b60005460ff1681565b60015481565b600154600054909160ff9091169056fe6973526573706563746564207761736e27742065786563757465642070726f7065726c79a264697066735822122009cc3004d4a75e2e7ebbcb32e31420ad98a17dfcf2c83476a3e12ec465fc1b7064736f6c63430006060033a2646970667358221220cdfae84acc437ef8e5c814f29e5c390c4728b94db8adeb265ba17769b37aae3464736f6c63430006060033",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract SLO\",\"name\":\"slo\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"enum SLORegistry.SLOType\",\"name\":\"sloType\",\"type\":\"uint8\"}],\"name\":\"SLOCreated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"SLOs\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"},{\"internalType\":\"enum SLORegistry.SLOType\",\"name\":\"_sloType\",\"type\":\"uint8\"}],\"name\":\"createSLO\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllSLOs\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"registeredSLOs\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"enum SLORegistry.SLOType\",\"name\":\"\",\"type\":\"uint8\"}],\"name\":\"sloAddresses\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"SLORegistry is a contract for handling creation of service level objectives and querying those service level objectives\",\"methods\":{\"createSLO(uint256,uint8)\":{\"details\":\"public function for creating service level objectives\",\"params\":{\"_sloType\":\"2. type of check\",\"_value\":\"1. the value to check against\"}},\"getAllSLOs()\":{\"details\":\"function to get all the SLOs addresses\"}},\"title\":\"SLORegistry\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol\":\"SLORegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLO.sol\":{\"keccak256\":\"0x0e7919abb97ffc5d0542eb829a10c3e059a05796c4f0a2908b636fee6c43f907\",\"urls\":[\"bzz-raw://7187c6eaefa6b945188a5a607bc83b67d5c21dd1aa742e18153790c39885c985\",\"dweb:/ipfs/QmWxhYHfyXiqk9kUijrKuB65Bu8X2sEQyDSbWBMfNR2Pm2\"]},\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol\":{\"keccak256\":\"0xcbae0ba918ab55e980e8d6a04b8449f4d5d0de079c913713ed4db9997953acc3\",\"urls\":[\"bzz-raw://d05ee82aa3b01670125d959b30fa24c7cfa037d49e0204c0dca1613df961c0cf\",\"dweb:/ipfs/QmWsX9QWqRG4ZCrPa99KkT39waVpZ7aAZnAYnd91o1wQLn\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506107a9806100206000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c80632af1c01d1461005c57806330cb273914610085578063749b422c1461009a57806378488ba3146100ba578063b443a89f146100cf575b600080fd5b61006f61006a366004610347565b6100e2565b60405161007c9190610420565b60405180910390f35b61008d6100f7565b60405161007c91906103d3565b6100ad6100a836600461038d565b610159565b60405161007c91906103bf565b6100cd6100c836600461038d565b61017f565b005b6100ad6100dd366004610375565b610313565b60026020526000908152604090205460ff1681565b6060600080548060200260200160405190810160405280929190818152602001828054801561014f57602002820191906000526020600020905b81546001600160a01b03168152600190910190602001808311610131575b5050505050905090565b60016020908152600092835260408084209091529082529020546001600160a01b031681565b60008281526001602052604081208183600581111561019a57fe5b60058111156101a557fe5b81526020810191909152604001600020546001600160a01b0316146101e55760405162461bcd60e51b81526004016101dc9061042b565b60405180910390fd5b600082826040516101f59061033a565b610200929190610459565b604051809103906000f08015801561021c573d6000803e3d6000fd5b5060008054600180820183557f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e56390910180546001600160a01b0319166001600160a01b0385161790558582526020526040812091925082919084600581111561028157fe5b600581111561028c57fe5b81526020808201929092526040908101600090812080546001600160a01b0319166001600160a01b03958616179055928416808452600290925291829020805460ff1916600117905590517fb3ffce2cb6f1173cb955e4fd03b9965a5fa1eea29d0343ee46c3b4b907c77d29906103069086908690610459565b60405180910390a2505050565b6000818154811061032057fe5b6000918252602090912001546001600160a01b0316905081565b6102fc8061047883390190565b600060208284031215610358578081fd5b81356001600160a01b038116811461036e578182fd5b9392505050565b600060208284031215610386578081fd5b5035919050565b6000806040838503121561039f578081fd5b823591506020830135600681106103b4578182fd5b809150509250929050565b6001600160a01b0391909116815260200190565b6020808252825182820181905260009190848201906040850190845b818110156104145783516001600160a01b0316835292840192918401916001016103ef565b50909695505050505050565b901515815260200190565b60208082526014908201527314d313c8185b1c9958591e4819195c1b1bde595960621b604082015260600190565b828152604081016006831061046a57fe5b826020830152939250505056fe608060405234801561001057600080fd5b506040516102fc3803806102fc8339818101604052604081101561003357600080fd5b508051602090910151600182815560008054839260ff199091169083600581111561005a57fe5b0217905550505061028c806100706000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c80630f23cb8c146100515780632cd54e2e146100825780633fa4f245146100ae578063fbbf93a0146100c8575b600080fd5b61006e6004803603602081101561006757600080fd5b50356100fb565b604080519115158252519081900360200190f35b61008a610213565b6040518082600581111561009a57fe5b60ff16815260200191505060405180910390f35b6100b661021c565b60408051918252519081900360200190f35b6100d0610222565b604051808381526020018260058111156100e657fe5b60ff1681526020019250505060405180910390f35b60008060005460ff16600581111561010f57fe5b14156101205750600154811461020e565b600160005460ff16600581111561013357fe5b1415610145575060015481141561020e565b600260005460ff16600581111561015857fe5b14156101695750600154811061020e565b600360005460ff16600581111561017c57fe5b141561018e575060015481111561020e565b600460005460ff1660058111156101a157fe5b14156101b25750600154811161020e565b600560005460ff1660058111156101c557fe5b14156101d7575060015481101561020e565b60405162461bcd60e51b81526004018080602001828103825260248152602001806102336024913960400191505060405180910390fd5b919050565b60005460ff1681565b60015481565b600154600054909160ff9091169056fe6973526573706563746564207761736e27742065786563757465642070726f7065726c79a26469706673582212206b20650c60f346dbd84825f90393046fe8cf67787dbef4d5014b6fc61fc6b71164736f6c63430006060033a26469706673582212204d94709e1d6e0e4051702853668f0b618104200595cf62ece50fcd8bc6e5d1c564736f6c63430006060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c80632af1c01d1461005c57806330cb273914610085578063749b422c1461009a57806378488ba3146100ba578063b443a89f146100cf575b600080fd5b61006f61006a366004610347565b6100e2565b60405161007c9190610420565b60405180910390f35b61008d6100f7565b60405161007c91906103d3565b6100ad6100a836600461038d565b610159565b60405161007c91906103bf565b6100cd6100c836600461038d565b61017f565b005b6100ad6100dd366004610375565b610313565b60026020526000908152604090205460ff1681565b6060600080548060200260200160405190810160405280929190818152602001828054801561014f57602002820191906000526020600020905b81546001600160a01b03168152600190910190602001808311610131575b5050505050905090565b60016020908152600092835260408084209091529082529020546001600160a01b031681565b60008281526001602052604081208183600581111561019a57fe5b60058111156101a557fe5b81526020810191909152604001600020546001600160a01b0316146101e55760405162461bcd60e51b81526004016101dc9061042b565b60405180910390fd5b600082826040516101f59061033a565b610200929190610459565b604051809103906000f08015801561021c573d6000803e3d6000fd5b5060008054600180820183557f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e56390910180546001600160a01b0319166001600160a01b0385161790558582526020526040812091925082919084600581111561028157fe5b600581111561028c57fe5b81526020808201929092526040908101600090812080546001600160a01b0319166001600160a01b03958616179055928416808452600290925291829020805460ff1916600117905590517fb3ffce2cb6f1173cb955e4fd03b9965a5fa1eea29d0343ee46c3b4b907c77d29906103069086908690610459565b60405180910390a2505050565b6000818154811061032057fe5b6000918252602090912001546001600160a01b0316905081565b6102fc8061047883390190565b600060208284031215610358578081fd5b81356001600160a01b038116811461036e578182fd5b9392505050565b600060208284031215610386578081fd5b5035919050565b6000806040838503121561039f578081fd5b823591506020830135600681106103b4578182fd5b809150509250929050565b6001600160a01b0391909116815260200190565b6020808252825182820181905260009190848201906040850190845b818110156104145783516001600160a01b0316835292840192918401916001016103ef565b50909695505050505050565b901515815260200190565b60208082526014908201527314d313c8185b1c9958591e4819195c1b1bde595960621b604082015260600190565b828152604081016006831061046a57fe5b826020830152939250505056fe608060405234801561001057600080fd5b506040516102fc3803806102fc8339818101604052604081101561003357600080fd5b508051602090910151600182815560008054839260ff199091169083600581111561005a57fe5b0217905550505061028c806100706000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c80630f23cb8c146100515780632cd54e2e146100825780633fa4f245146100ae578063fbbf93a0146100c8575b600080fd5b61006e6004803603602081101561006757600080fd5b50356100fb565b604080519115158252519081900360200190f35b61008a610213565b6040518082600581111561009a57fe5b60ff16815260200191505060405180910390f35b6100b661021c565b60408051918252519081900360200190f35b6100d0610222565b604051808381526020018260058111156100e657fe5b60ff1681526020019250505060405180910390f35b60008060005460ff16600581111561010f57fe5b14156101205750600154811461020e565b600160005460ff16600581111561013357fe5b1415610145575060015481141561020e565b600260005460ff16600581111561015857fe5b14156101695750600154811061020e565b600360005460ff16600581111561017c57fe5b141561018e575060015481111561020e565b600460005460ff1660058111156101a157fe5b14156101b25750600154811161020e565b600560005460ff1660058111156101c557fe5b14156101d7575060015481101561020e565b60405162461bcd60e51b81526004018080602001828103825260248152602001806102336024913960400191505060405180910390fd5b919050565b60005460ff1681565b60015481565b600154600054909160ff9091169056fe6973526573706563746564207761736e27742065786563757465642070726f7065726c79a26469706673582212206b20650c60f346dbd84825f90393046fe8cf67787dbef4d5014b6fc61fc6b71164736f6c63430006060033a26469706673582212204d94709e1d6e0e4051702853668f0b618104200595cf62ece50fcd8bc6e5d1c564736f6c63430006060033",
   "immutableReferences": {},
-  "sourceMap": "272:1936:6:-:0;;;;5:9:-1;2:2;;;27:1;24;17:12;2:2;272:1936:6;;;;;;;",
-  "deployedSourceMap": "272:1936:6:-:0;;;;5:9:-1;2:2;;;27:1;24;17:12;2:2;272:1936:6;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;12:1:-1;9;2:12;2107:99:6;;;:::i;:::-;;;;;;;;;;;;;;;;556:31;;;;;;;;;:::i;:::-;;;;;;;;639:67;;;;;;;;;:::i;1210:379::-;;;;;;;;;:::i;:::-;;1749:285;;;;;;;;;:::i;:::-;;;;;;;;2107:99;2150:16;2185:14;2178:21;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;2178:21:6;;;;;;;;;;;;;;;;;;;;;;;2107:99;:::o;556:31::-;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;556:31:6;;-1:-1:-1;556:31:6;:::o;639:67::-;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;639:67:6;;:::o;1210:379::-;1343:1;1301:20;;;:12;:20;;;;;1343:1;1322:8;1301:30;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1301:30:6;;-1:-1:-1;;;;;1301:30:6;:44;1280:111;;;;-1:-1:-1;;;1280:111:6;;;;;;;;;;;;;;;;;1401:7;1419:6;1427:8;1411:25;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;-1:-1;1446:14:6;27:10:-1;;39:1;23:18;;;45:23;;1446:33:6;;;;;;-1:-1:-1;;;;;;1446:33:6;-1:-1:-1;;;;;1446:33:6;;;;;1489:20;;;1446:33;1489:20;;;;1446:33;;-1:-1:-1;1446:33:6;;1489:20;1510:8;1489:30;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1489:30:6;:45;;-1:-1:-1;;;;;;1489:45:6;-1:-1:-1;;;;;1489:45:6;;;;;;1549:33;;;;;;;;;1565:6;;1573:8;;1549:33;;;;;;;;;;1210:379;;;:::o;1749:285::-;1816:4;;1832:174;1864:14;:21;1856:29;;1832:174;;;1939:11;-1:-1:-1;;;;;1914:36:6;:14;1929:5;1914:21;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1914:21:6;:36;1910:86;;;1977:4;1970:11;;;;;1910:86;1887:7;;1832:174;;;;2022:5;2015:12;;1749:285;;;;:::o;272:1936::-;;;;;;;;:::o;440:241:-1:-;;544:2;532:9;523:7;519:23;515:32;512:2;;;-1:-1;;550:12;512:2;72:20;;-1:-1;;;;;5913:54;;6364:35;;6354:2;;-1:-1;;6403:12;6354:2;602:63;506:175;-1:-1;;;506:175;688:241;;792:2;780:9;771:7;767:23;763:32;760:2;;;-1:-1;;798:12;760:2;-1:-1;370:20;;754:175;-1:-1;754:175;936:390;;;1069:2;1057:9;1048:7;1044:23;1040:32;1037:2;;;-1:-1;;1075:12;1037:2;1158:22;370:20;1127:63;;1227:2;1282:9;1278:22;221:20;6510:1;6503:5;6500:12;6490:2;;-1:-1;;6516:12;6490:2;1235:75;;;;1031:295;;;;;;3187:213;-1:-1;;;;;5913:54;;;;1576:37;;3305:2;3290:18;;3276:124;3407:361;3575:2;3589:47;;;5009:12;;3560:18;;;5284:19;;;3407:361;;3575:2;4863:14;;;;5324;;;;3407:361;2184:260;2209:6;2206:1;2203:13;2184:260;;;2270:13;;-1:-1;;;;;5913:54;1576:37;;5139:14;;;;1487;;;;5924:42;2224:9;2184:260;;;-1:-1;3642:116;;3546:222;-1:-1;;;;;;3546:222;3775:201;5688:13;;5681:21;2539:34;;3887:2;3872:18;;3858:118;3983:407;4174:2;4188:47;;;2963:2;4159:18;;;5284:19;-1:-1;;;5324:14;;;2979:43;3041:12;;;4145:245;4397:344;3138:37;;;4553:2;4538:18;;6276:1;6266:12;;6256:2;;6282:9;6256:2;6147:36;4727:2;4716:9;4712:18;2666:60;4524:217;;;;;",
-  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.6.6;\npragma experimental ABIEncoderV2;\n\nimport \"./SLO.sol\";\n\n/**\n * @title SLORegistry\n * @dev SLORegistry is a contract for handling creation of service level\n * objectives and querying those service level objectives\n */\ncontract SLORegistry {\n    /// @dev checking types to check if a SLA was honored or not\n    enum SLOType {\n        EqualTo,\n        NotEqualTo,\n        SmallerThan,\n        SmallerOrEqualTo,\n        GreaterThan,\n        GreaterOrEqualTo\n    }\n\n    /// @dev array of deployed SLOs\n    address[] public registeredSLOs;\n\n    /// @dev (sloValue=>SLOType=>SLOAddress)\n    mapping(uint256 => mapping(SLOType => address)) public sloAddresses;\n\n    /**\n     * @dev event for service level objective creation logging\n     * @param slo 1.  the address of the created service level objective contract\n     * @param value 2.  the value of the SLO\n     * @param sloType 3.  the type of the SLO\n     */\n    event SLOCreated(SLO indexed slo, uint256 value, SLOType sloType);\n\n    /**\n     * @dev public function for creating service level objectives\n     * @param _value 1. the value to check against\n     * @param _sloType 2. type of check\n     */\n    function createSLO(uint256 _value, SLOType _sloType) public {\n        require(\n            sloAddresses[_value][_sloType] == address(0),\n            \"SLO already deployed\"\n        );\n        SLO slo = new SLO(_value, _sloType);\n        registeredSLOs.push(address(slo));\n        sloAddresses[_value][_sloType] = address(slo);\n        emit SLOCreated(slo, _value, _sloType);\n    }\n\n    /**\n     * @dev checks is the _sloAddress is registered as deployed\n     * @param _sloAddress 1. the value to check against\n     */\n    // check loop\n    function isRegisteredSLO(address _sloAddress) public view returns (bool) {\n        for (uint256 index = 0; index < registeredSLOs.length; index++) {\n            if (registeredSLOs[index] == _sloAddress) {\n                return true;\n            }\n        }\n        return false;\n    }\n\n    /**\n     * @dev function to get all the SLOs addresses\n     */\n    function getAllSLOs() public view returns (address[] memory) {\n        return registeredSLOs;\n    }\n}\n",
+  "sourceMap": "272:1591:6:-:0;;;;5:9:-1;2:2;;;27:1;24;17:12;2:2;272:1591:6;;;;;;;",
+  "deployedSourceMap": "272:1591:6:-:0;;;;5:9:-1;2:2;;;27:1;24;17:12;2:2;272:1591:6;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;12:1:-1;9;2:12;735:46:6;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;1772:89;;;:::i;:::-;;;;;;;;629:67;;;;;;;;;:::i;:::-;;;;;;;;1285:414;;;;;;;;;:::i;:::-;;556:21;;;;;;;;;:::i;735:46::-;;;;;;;;;;;;;;;:::o;1772:89::-;1815:16;1850:4;1843:11;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1843:11:6;;;;;;;;;;;;;;;;;;;;;;;1772:89;:::o;629:67::-;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;629:67:6;;:::o;1285:414::-;1418:1;1376:20;;;:12;:20;;;;;1418:1;1397:8;1376:30;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1376:30:6;;-1:-1:-1;;;;;1376:30:6;:44;1355:111;;;;-1:-1:-1;;;1355:111:6;;;;;;;;;;;;;;;;;1476:7;1494:6;1502:8;1486:25;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;-1:-1;1521:4:6;27:10:-1;;39:1;23:18;;;45:23;;1521::6;;;;;;-1:-1:-1;;;;;;1521:23:6;-1:-1:-1;;;;;1521:23:6;;;;;1554:20;;;1521:23;1554:20;;;;1521:23;;-1:-1:-1;1521:23:6;;1554:20;1575:8;1554:30;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1554:30:6;;;:45;;-1:-1:-1;;;;;;1554:45:6;-1:-1:-1;;;;;1554:45:6;;;;;;1609:28;;;;;;:14;:28;;;;;;;:35;;-1:-1:-1;;1609:35:6;-1:-1:-1;1609:35:6;;;1659:33;;;;;;1675:6;;1683:8;;1659:33;;;;;;;;;;1285:414;;;:::o;556:21::-;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;556:21:6;;-1:-1:-1;556:21:6;:::o;272:1591::-;;;;;;;;:::o;440:241:-1:-;;544:2;532:9;523:7;519:23;515:32;512:2;;;-1:-1;;550:12;512:2;72:20;;-1:-1;;;;;5913:54;;6364:35;;6354:2;;-1:-1;;6403:12;6354:2;602:63;506:175;-1:-1;;;506:175;688:241;;792:2;780:9;771:7;767:23;763:32;760:2;;;-1:-1;;798:12;760:2;-1:-1;370:20;;754:175;-1:-1;754:175;936:390;;;1069:2;1057:9;1048:7;1044:23;1040:32;1037:2;;;-1:-1;;1075:12;1037:2;1158:22;370:20;1127:63;;1227:2;1282:9;1278:22;221:20;6510:1;6503:5;6500:12;6490:2;;-1:-1;;6516:12;6490:2;1235:75;;;;1031:295;;;;;;3187:213;-1:-1;;;;;5913:54;;;;1576:37;;3305:2;3290:18;;3276:124;3407:361;3575:2;3589:47;;;5009:12;;3560:18;;;5284:19;;;3407:361;;3575:2;4863:14;;;;5324;;;;3407:361;2184:260;2209:6;2206:1;2203:13;2184:260;;;2270:13;;-1:-1;;;;;5913:54;1576:37;;5139:14;;;;1487;;;;5924:42;2224:9;2184:260;;;-1:-1;3642:116;;3546:222;-1:-1;;;;;;3546:222;3775:201;5688:13;;5681:21;2539:34;;3887:2;3872:18;;3858:118;3983:407;4174:2;4188:47;;;2963:2;4159:18;;;5284:19;-1:-1;;;5324:14;;;2979:43;3041:12;;;4145:245;4397:344;3138:37;;;4553:2;4538:18;;6276:1;6266:12;;6256:2;;6282:9;6256:2;6147:36;4727:2;4716:9;4712:18;2666:60;4524:217;;;;;",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.6.6;\npragma experimental ABIEncoderV2;\n\nimport \"./SLO.sol\";\n\n/**\n * @title SLORegistry\n * @dev SLORegistry is a contract for handling creation of service level\n * objectives and querying those service level objectives\n */\ncontract SLORegistry {\n    /// @dev checking types to check if a SLA was honored or not\n    enum SLOType {\n        EqualTo,\n        NotEqualTo,\n        SmallerThan,\n        SmallerOrEqualTo,\n        GreaterThan,\n        GreaterOrEqualTo\n    }\n\n    /// @dev array of deployed SLOs\n    address[] public SLOs;\n\n    /// @dev (sloValue=>SLOType=>SLOAddress)\n    mapping(uint256 => mapping(SLOType => address)) public sloAddresses;\n\n    /// @dev (sloAddress=>bool)\n    mapping(address => bool) public registeredSLOs;\n\n    /**\n     * @dev event for service level objective creation logging\n     * @param slo 1.  the address of the created service level objective contract\n     * @param value 2.  the value of the SLO\n     * @param sloType 3.  the type of the SLO\n     */\n    event SLOCreated(SLO indexed slo, uint256 value, SLOType sloType);\n\n    /**\n     * @dev public function for creating service level objectives\n     * @param _value 1. the value to check against\n     * @param _sloType 2. type of check\n     */\n    function createSLO(uint256 _value, SLOType _sloType) public {\n        require(\n            sloAddresses[_value][_sloType] == address(0),\n            \"SLO already deployed\"\n        );\n        SLO slo = new SLO(_value, _sloType);\n        SLOs.push(address(slo));\n        sloAddresses[_value][_sloType] = address(slo);\n        registeredSLOs[address(slo)] = true;\n        emit SLOCreated(slo, _value, _sloType);\n    }\n\n    /**\n     * @dev function to get all the SLOs addresses\n     */\n    function getAllSLOs() public view returns (address[] memory) {\n        return SLOs;\n    }\n}\n",
   "sourcePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol",
   "ast": {
     "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol",
     "exportedSymbols": {
       "SLORegistry": [
-        2680
+        2639
       ]
     },
-    "id": 2681,
+    "id": 2640,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2551,
+        "id": 2530,
         "literals": [
           "solidity",
           "0.6",
@@ -153,7 +149,7 @@
         "src": "32:22:6"
       },
       {
-        "id": 2552,
+        "id": 2531,
         "literals": [
           "experimental",
           "ABIEncoderV2"
@@ -164,10 +160,10 @@
       {
         "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLO.sol",
         "file": "./SLO.sol",
-        "id": 2553,
+        "id": 2532,
         "nodeType": "ImportDirective",
-        "scope": 2681,
-        "sourceUnit": 2550,
+        "scope": 2640,
+        "sourceUnit": 2529,
         "src": "90:19:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -176,59 +172,59 @@
         "abstract": false,
         "baseContracts": [],
         "contractDependencies": [
-          2549
+          2528
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 2554,
+          "id": 2533,
           "nodeType": "StructuredDocumentation",
           "src": "111:160:6",
           "text": "@title SLORegistry\n@dev SLORegistry is a contract for handling creation of service level\nobjectives and querying those service level objectives"
         },
         "fullyImplemented": true,
-        "id": 2680,
+        "id": 2639,
         "linearizedBaseContracts": [
-          2680
+          2639
         ],
         "name": "SLORegistry",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "canonicalName": "SLORegistry.SLOType",
-            "id": 2561,
+            "id": 2540,
             "members": [
               {
-                "id": 2555,
+                "id": 2534,
                 "name": "EqualTo",
                 "nodeType": "EnumValue",
                 "src": "387:7:6"
               },
               {
-                "id": 2556,
+                "id": 2535,
                 "name": "NotEqualTo",
                 "nodeType": "EnumValue",
                 "src": "404:10:6"
               },
               {
-                "id": 2557,
+                "id": 2536,
                 "name": "SmallerThan",
                 "nodeType": "EnumValue",
                 "src": "424:11:6"
               },
               {
-                "id": 2558,
+                "id": 2537,
                 "name": "SmallerOrEqualTo",
                 "nodeType": "EnumValue",
                 "src": "445:16:6"
               },
               {
-                "id": 2559,
+                "id": 2538,
                 "name": "GreaterThan",
                 "nodeType": "EnumValue",
                 "src": "471:11:6"
               },
               {
-                "id": 2560,
+                "id": 2539,
                 "name": "GreaterOrEqualTo",
                 "nodeType": "EnumValue",
                 "src": "492:16:6"
@@ -240,14 +236,14 @@
           },
           {
             "constant": false,
-            "functionSelector": "64ad69d9",
-            "id": 2564,
+            "functionSelector": "b443a89f",
+            "id": 2543,
             "mutability": "mutable",
-            "name": "registeredSLOs",
+            "name": "SLOs",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 2680,
-            "src": "556:31:6",
+            "scope": 2639,
+            "src": "556:21:6",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -256,7 +252,7 @@
             },
             "typeName": {
               "baseType": {
-                "id": 2562,
+                "id": 2541,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
                 "src": "556:7:6",
@@ -266,7 +262,7 @@
                   "typeString": "address"
                 }
               },
-              "id": 2563,
+              "id": 2542,
               "length": null,
               "nodeType": "ArrayTypeName",
               "src": "556:9:6",
@@ -281,62 +277,62 @@
           {
             "constant": false,
             "functionSelector": "749b422c",
-            "id": 2570,
+            "id": 2549,
             "mutability": "mutable",
             "name": "sloAddresses",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 2680,
-            "src": "639:67:6",
+            "scope": 2639,
+            "src": "629:67:6",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_uint256_$_t_mapping$_t_enum$_SLOType_$2561_$_t_address_$_$",
+              "typeIdentifier": "t_mapping$_t_uint256_$_t_mapping$_t_enum$_SLOType_$2540_$_t_address_$_$",
               "typeString": "mapping(uint256 => mapping(enum SLORegistry.SLOType => address))"
             },
             "typeName": {
-              "id": 2569,
+              "id": 2548,
               "keyType": {
-                "id": 2565,
+                "id": 2544,
                 "name": "uint256",
                 "nodeType": "ElementaryTypeName",
-                "src": "647:7:6",
+                "src": "637:7:6",
                 "typeDescriptions": {
                   "typeIdentifier": "t_uint256",
                   "typeString": "uint256"
                 }
               },
               "nodeType": "Mapping",
-              "src": "639:47:6",
+              "src": "629:47:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_uint256_$_t_mapping$_t_enum$_SLOType_$2561_$_t_address_$_$",
+                "typeIdentifier": "t_mapping$_t_uint256_$_t_mapping$_t_enum$_SLOType_$2540_$_t_address_$_$",
                 "typeString": "mapping(uint256 => mapping(enum SLORegistry.SLOType => address))"
               },
               "valueType": {
-                "id": 2568,
+                "id": 2547,
                 "keyType": {
                   "contractScope": null,
-                  "id": 2566,
+                  "id": 2545,
                   "name": "SLOType",
                   "nodeType": "UserDefinedTypeName",
-                  "referencedDeclaration": 2561,
-                  "src": "666:7:6",
+                  "referencedDeclaration": 2540,
+                  "src": "656:7:6",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_SLOType_$2561",
+                    "typeIdentifier": "t_enum$_SLOType_$2540",
                     "typeString": "enum SLORegistry.SLOType"
                   }
                 },
                 "nodeType": "Mapping",
-                "src": "658:27:6",
+                "src": "648:27:6",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_mapping$_t_enum$_SLOType_$2561_$_t_address_$",
+                  "typeIdentifier": "t_mapping$_t_enum$_SLOType_$2540_$_t_address_$",
                   "typeString": "mapping(enum SLORegistry.SLOType => address)"
                 },
                 "valueType": {
-                  "id": 2567,
+                  "id": 2546,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "677:7:6",
+                  "src": "667:7:6",
                   "stateMutability": "nonpayable",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address",
@@ -349,45 +345,93 @@
             "visibility": "public"
           },
           {
+            "constant": false,
+            "functionSelector": "2af1c01d",
+            "id": 2553,
+            "mutability": "mutable",
+            "name": "registeredSLOs",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 2639,
+            "src": "735:46:6",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+              "typeString": "mapping(address => bool)"
+            },
+            "typeName": {
+              "id": 2552,
+              "keyType": {
+                "id": 2550,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "743:7:6",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "735:24:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                "typeString": "mapping(address => bool)"
+              },
+              "valueType": {
+                "id": 2551,
+                "name": "bool",
+                "nodeType": "ElementaryTypeName",
+                "src": "754:4:6",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                }
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
             "anonymous": false,
             "documentation": {
-              "id": 2571,
+              "id": 2554,
               "nodeType": "StructuredDocumentation",
-              "src": "713:247:6",
+              "src": "788:247:6",
               "text": "@dev event for service level objective creation logging\n@param slo 1.  the address of the created service level objective contract\n@param value 2.  the value of the SLO\n@param sloType 3.  the type of the SLO"
             },
-            "id": 2579,
+            "id": 2562,
             "name": "SLOCreated",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 2578,
+              "id": 2561,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2573,
+                  "id": 2556,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "slo",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2579,
-                  "src": "982:15:6",
+                  "scope": 2562,
+                  "src": "1057:15:6",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_SLO_$2549",
+                    "typeIdentifier": "t_contract$_SLO_$2528",
                     "typeString": "contract SLO"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 2572,
+                    "id": 2555,
                     "name": "SLO",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 2549,
-                    "src": "982:3:6",
+                    "referencedDeclaration": 2528,
+                    "src": "1057:3:6",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_SLO_$2549",
+                      "typeIdentifier": "t_contract$_SLO_$2528",
                       "typeString": "contract SLO"
                     }
                   },
@@ -396,14 +440,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 2575,
+                  "id": 2558,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "value",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2579,
-                  "src": "999:13:6",
+                  "scope": 2562,
+                  "src": "1074:13:6",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -411,10 +455,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2574,
+                    "id": 2557,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "999:7:6",
+                    "src": "1074:7:6",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -425,29 +469,29 @@
                 },
                 {
                   "constant": false,
-                  "id": 2577,
+                  "id": 2560,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "sloType",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2579,
-                  "src": "1014:15:6",
+                  "scope": 2562,
+                  "src": "1089:15:6",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_SLOType_$2561",
+                    "typeIdentifier": "t_enum$_SLOType_$2540",
                     "typeString": "enum SLORegistry.SLOType"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 2576,
+                    "id": 2559,
                     "name": "SLOType",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 2561,
-                    "src": "1014:7:6",
+                    "referencedDeclaration": 2540,
+                    "src": "1089:7:6",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOType_$2561",
+                      "typeIdentifier": "t_enum$_SLOType_$2540",
                       "typeString": "enum SLORegistry.SLOType"
                     }
                   },
@@ -455,15 +499,15 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "981:49:6"
+              "src": "1056:49:6"
             },
-            "src": "965:66:6"
+            "src": "1040:66:6"
           },
           {
             "body": {
-              "id": 2635,
+              "id": 2627,
               "nodeType": "Block",
-              "src": "1270:319:6",
+              "src": "1345:354:6",
               "statements": [
                 {
                   "expression": {
@@ -475,7 +519,7 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 2597,
+                        "id": 2580,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -486,26 +530,26 @@
                             "argumentTypes": null,
                             "baseExpression": {
                               "argumentTypes": null,
-                              "id": 2588,
+                              "id": 2571,
                               "name": "sloAddresses",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 2570,
-                              "src": "1301:12:6",
+                              "referencedDeclaration": 2549,
+                              "src": "1376:12:6",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_uint256_$_t_mapping$_t_enum$_SLOType_$2561_$_t_address_$_$",
+                                "typeIdentifier": "t_mapping$_t_uint256_$_t_mapping$_t_enum$_SLOType_$2540_$_t_address_$_$",
                                 "typeString": "mapping(uint256 => mapping(enum SLORegistry.SLOType => address))"
                               }
                             },
-                            "id": 2590,
+                            "id": 2573,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 2589,
+                              "id": 2572,
                               "name": "_value",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 2582,
-                              "src": "1314:6:6",
+                              "referencedDeclaration": 2565,
+                              "src": "1389:6:6",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_uint256",
                                 "typeString": "uint256"
@@ -516,23 +560,23 @@
                             "isPure": false,
                             "lValueRequested": false,
                             "nodeType": "IndexAccess",
-                            "src": "1301:20:6",
+                            "src": "1376:20:6",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_enum$_SLOType_$2561_$_t_address_$",
+                              "typeIdentifier": "t_mapping$_t_enum$_SLOType_$2540_$_t_address_$",
                               "typeString": "mapping(enum SLORegistry.SLOType => address)"
                             }
                           },
-                          "id": 2592,
+                          "id": 2575,
                           "indexExpression": {
                             "argumentTypes": null,
-                            "id": 2591,
+                            "id": 2574,
                             "name": "_sloType",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 2584,
-                            "src": "1322:8:6",
+                            "referencedDeclaration": 2567,
+                            "src": "1397:8:6",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_enum$_SLOType_$2561",
+                              "typeIdentifier": "t_enum$_SLOType_$2540",
                               "typeString": "enum SLORegistry.SLOType"
                             }
                           },
@@ -541,7 +585,7 @@
                           "isPure": false,
                           "lValueRequested": false,
                           "nodeType": "IndexAccess",
-                          "src": "1301:30:6",
+                          "src": "1376:30:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
@@ -555,14 +599,14 @@
                             {
                               "argumentTypes": null,
                               "hexValue": "30",
-                              "id": 2595,
+                              "id": 2578,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
                               "kind": "number",
                               "lValueRequested": false,
                               "nodeType": "Literal",
-                              "src": "1343:1:6",
+                              "src": "1418:1:6",
                               "subdenomination": null,
                               "typeDescriptions": {
                                 "typeIdentifier": "t_rational_0_by_1",
@@ -578,29 +622,29 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 2594,
+                            "id": 2577,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "nodeType": "ElementaryTypeNameExpression",
-                            "src": "1335:7:6",
+                            "src": "1410:7:6",
                             "typeDescriptions": {
                               "typeIdentifier": "t_type$_t_address_$",
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 2593,
+                              "id": 2576,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "1335:7:6",
+                              "src": "1410:7:6",
                               "typeDescriptions": {
                                 "typeIdentifier": null,
                                 "typeString": null
                               }
                             }
                           },
-                          "id": 2596,
+                          "id": 2579,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -608,14 +652,14 @@
                           "lValueRequested": false,
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "1335:10:6",
+                          "src": "1410:10:6",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_address_payable",
                             "typeString": "address payable"
                           }
                         },
-                        "src": "1301:44:6",
+                        "src": "1376:44:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -624,14 +668,14 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "534c4f20616c7265616479206465706c6f796564",
-                        "id": 2598,
+                        "id": 2581,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "1359:22:6",
+                        "src": "1434:22:6",
                         "subdenomination": null,
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_3a53b7bf5c1c1c7490be4fa4d86bb75c66a5cac0b1dbb8a521f78254da566faa",
@@ -651,7 +695,7 @@
                           "typeString": "literal_string \"SLO already deployed\""
                         }
                       ],
-                      "id": 2587,
+                      "id": 2570,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -659,13 +703,13 @@
                         -18
                       ],
                       "referencedDeclaration": -18,
-                      "src": "1280:7:6",
+                      "src": "1355:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 2599,
+                    "id": 2582,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -673,46 +717,46 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1280:111:6",
+                    "src": "1355:111:6",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2600,
+                  "id": 2583,
                   "nodeType": "ExpressionStatement",
-                  "src": "1280:111:6"
+                  "src": "1355:111:6"
                 },
                 {
                   "assignments": [
-                    2602
+                    2585
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2602,
+                      "id": 2585,
                       "mutability": "mutable",
                       "name": "slo",
                       "nodeType": "VariableDeclaration",
                       "overrides": null,
-                      "scope": 2635,
-                      "src": "1401:7:6",
+                      "scope": 2627,
+                      "src": "1476:7:6",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_SLO_$2549",
+                        "typeIdentifier": "t_contract$_SLO_$2528",
                         "typeString": "contract SLO"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 2601,
+                        "id": 2584,
                         "name": "SLO",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 2549,
-                        "src": "1401:3:6",
+                        "referencedDeclaration": 2528,
+                        "src": "1476:3:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$2549",
+                          "typeIdentifier": "t_contract$_SLO_$2528",
                           "typeString": "contract SLO"
                         }
                       },
@@ -720,18 +764,18 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2608,
+                  "id": 2591,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 2605,
+                        "id": 2588,
                         "name": "_value",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2582,
-                        "src": "1419:6:6",
+                        "referencedDeclaration": 2565,
+                        "src": "1494:6:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -739,14 +783,14 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2606,
+                        "id": 2589,
                         "name": "_sloType",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2584,
-                        "src": "1427:8:6",
+                        "referencedDeclaration": 2567,
+                        "src": "1502:8:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_SLOType_$2561",
+                          "typeIdentifier": "t_enum$_SLOType_$2540",
                           "typeString": "enum SLORegistry.SLOType"
                         }
                       }
@@ -758,35 +802,35 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_enum$_SLOType_$2561",
+                          "typeIdentifier": "t_enum$_SLOType_$2540",
                           "typeString": "enum SLORegistry.SLOType"
                         }
                       ],
-                      "id": 2604,
+                      "id": 2587,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "NewExpression",
-                      "src": "1411:7:6",
+                      "src": "1486:7:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_enum$_SLOType_$2561_$returns$_t_contract$_SLO_$2549_$",
+                        "typeIdentifier": "t_function_creation_nonpayable$_t_uint256_$_t_enum$_SLOType_$2540_$returns$_t_contract$_SLO_$2528_$",
                         "typeString": "function (uint256,enum SLORegistry.SLOType) returns (contract SLO)"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 2603,
+                        "id": 2586,
                         "name": "SLO",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 2549,
-                        "src": "1415:3:6",
+                        "referencedDeclaration": 2528,
+                        "src": "1490:3:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$2549",
+                          "typeIdentifier": "t_contract$_SLO_$2528",
                           "typeString": "contract SLO"
                         }
                       }
                     },
-                    "id": 2607,
+                    "id": 2590,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -794,15 +838,15 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1411:25:6",
+                    "src": "1486:25:6",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_SLO_$2549",
+                      "typeIdentifier": "t_contract$_SLO_$2528",
                       "typeString": "contract SLO"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1401:35:6"
+                  "src": "1476:35:6"
                 },
                 {
                   "expression": {
@@ -813,14 +857,14 @@
                         "arguments": [
                           {
                             "argumentTypes": null,
-                            "id": 2614,
+                            "id": 2597,
                             "name": "slo",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 2602,
-                            "src": "1474:3:6",
+                            "referencedDeclaration": 2585,
+                            "src": "1539:3:6",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_SLO_$2549",
+                              "typeIdentifier": "t_contract$_SLO_$2528",
                               "typeString": "contract SLO"
                             }
                           }
@@ -828,33 +872,33 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_SLO_$2549",
+                              "typeIdentifier": "t_contract$_SLO_$2528",
                               "typeString": "contract SLO"
                             }
                           ],
-                          "id": 2613,
+                          "id": 2596,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "lValueRequested": false,
                           "nodeType": "ElementaryTypeNameExpression",
-                          "src": "1466:7:6",
+                          "src": "1531:7:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_type$_t_address_$",
                             "typeString": "type(address)"
                           },
                           "typeName": {
-                            "id": 2612,
+                            "id": 2595,
                             "name": "address",
                             "nodeType": "ElementaryTypeName",
-                            "src": "1466:7:6",
+                            "src": "1531:7:6",
                             "typeDescriptions": {
                               "typeIdentifier": null,
                               "typeString": null
                             }
                           }
                         },
-                        "id": 2615,
+                        "id": 2598,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -862,7 +906,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "1466:12:6",
+                        "src": "1531:12:6",
                         "tryCall": false,
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -879,18 +923,18 @@
                       ],
                       "expression": {
                         "argumentTypes": null,
-                        "id": 2609,
-                        "name": "registeredSLOs",
+                        "id": 2592,
+                        "name": "SLOs",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2564,
-                        "src": "1446:14:6",
+                        "referencedDeclaration": 2543,
+                        "src": "1521:4:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_array$_t_address_$dyn_storage",
                           "typeString": "address[] storage ref"
                         }
                       },
-                      "id": 2611,
+                      "id": 2594,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -898,13 +942,13 @@
                       "memberName": "push",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "1446:19:6",
+                      "src": "1521:9:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_arraypush_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 2616,
+                    "id": 2599,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -912,21 +956,21 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1446:33:6",
+                    "src": "1521:23:6",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2617,
+                  "id": 2600,
                   "nodeType": "ExpressionStatement",
-                  "src": "1446:33:6"
+                  "src": "1521:23:6"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 2627,
+                    "id": 2610,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -937,26 +981,26 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 2618,
+                          "id": 2601,
                           "name": "sloAddresses",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 2570,
-                          "src": "1489:12:6",
+                          "referencedDeclaration": 2549,
+                          "src": "1554:12:6",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_uint256_$_t_mapping$_t_enum$_SLOType_$2561_$_t_address_$_$",
+                            "typeIdentifier": "t_mapping$_t_uint256_$_t_mapping$_t_enum$_SLOType_$2540_$_t_address_$_$",
                             "typeString": "mapping(uint256 => mapping(enum SLORegistry.SLOType => address))"
                           }
                         },
-                        "id": 2621,
+                        "id": 2604,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 2619,
+                          "id": 2602,
                           "name": "_value",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 2582,
-                          "src": "1502:6:6",
+                          "referencedDeclaration": 2565,
+                          "src": "1567:6:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
@@ -967,23 +1011,23 @@
                         "isPure": false,
                         "lValueRequested": false,
                         "nodeType": "IndexAccess",
-                        "src": "1489:20:6",
+                        "src": "1554:20:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_enum$_SLOType_$2561_$_t_address_$",
+                          "typeIdentifier": "t_mapping$_t_enum$_SLOType_$2540_$_t_address_$",
                           "typeString": "mapping(enum SLORegistry.SLOType => address)"
                         }
                       },
-                      "id": 2622,
+                      "id": 2605,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 2620,
+                        "id": 2603,
                         "name": "_sloType",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2584,
-                        "src": "1510:8:6",
+                        "referencedDeclaration": 2567,
+                        "src": "1575:8:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_SLOType_$2561",
+                          "typeIdentifier": "t_enum$_SLOType_$2540",
                           "typeString": "enum SLORegistry.SLOType"
                         }
                       },
@@ -992,7 +1036,7 @@
                       "isPure": false,
                       "lValueRequested": true,
                       "nodeType": "IndexAccess",
-                      "src": "1489:30:6",
+                      "src": "1554:30:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
@@ -1005,14 +1049,14 @@
                       "arguments": [
                         {
                           "argumentTypes": null,
-                          "id": 2625,
+                          "id": 2608,
                           "name": "slo",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 2602,
-                          "src": "1530:3:6",
+                          "referencedDeclaration": 2585,
+                          "src": "1595:3:6",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_SLO_$2549",
+                            "typeIdentifier": "t_contract$_SLO_$2528",
                             "typeString": "contract SLO"
                           }
                         }
@@ -1020,33 +1064,33 @@
                       "expression": {
                         "argumentTypes": [
                           {
-                            "typeIdentifier": "t_contract$_SLO_$2549",
+                            "typeIdentifier": "t_contract$_SLO_$2528",
                             "typeString": "contract SLO"
                           }
                         ],
-                        "id": 2624,
+                        "id": 2607,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "lValueRequested": false,
                         "nodeType": "ElementaryTypeNameExpression",
-                        "src": "1522:7:6",
+                        "src": "1587:7:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_type$_t_address_$",
                           "typeString": "type(address)"
                         },
                         "typeName": {
-                          "id": 2623,
+                          "id": 2606,
                           "name": "address",
                           "nodeType": "ElementaryTypeName",
-                          "src": "1522:7:6",
+                          "src": "1587:7:6",
                           "typeDescriptions": {
                             "typeIdentifier": null,
                             "typeString": null
                           }
                         }
                       },
-                      "id": 2626,
+                      "id": 2609,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -1054,22 +1098,148 @@
                       "lValueRequested": false,
                       "names": [],
                       "nodeType": "FunctionCall",
-                      "src": "1522:12:6",
+                      "src": "1587:12:6",
                       "tryCall": false,
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "src": "1489:45:6",
+                    "src": "1554:45:6",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 2628,
+                  "id": 2611,
                   "nodeType": "ExpressionStatement",
-                  "src": "1489:45:6"
+                  "src": "1554:45:6"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 2619,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "baseExpression": {
+                        "argumentTypes": null,
+                        "id": 2612,
+                        "name": "registeredSLOs",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2553,
+                        "src": "1609:14:6",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                          "typeString": "mapping(address => bool)"
+                        }
+                      },
+                      "id": 2617,
+                      "indexExpression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 2615,
+                            "name": "slo",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2585,
+                            "src": "1632:3:6",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_SLO_$2528",
+                              "typeString": "contract SLO"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_SLO_$2528",
+                              "typeString": "contract SLO"
+                            }
+                          ],
+                          "id": 2614,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "nodeType": "ElementaryTypeNameExpression",
+                          "src": "1624:7:6",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_address_$",
+                            "typeString": "type(address)"
+                          },
+                          "typeName": {
+                            "id": 2613,
+                            "name": "address",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "1624:7:6",
+                            "typeDescriptions": {
+                              "typeIdentifier": null,
+                              "typeString": null
+                            }
+                          }
+                        },
+                        "id": 2616,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1624:12:6",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "1609:28:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "hexValue": "74727565",
+                      "id": 2618,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "bool",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1640:4:6",
+                      "subdenomination": null,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "value": "true"
+                    },
+                    "src": "1609:35:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 2620,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1609:35:6"
                 },
                 {
                   "eventCall": {
@@ -1077,25 +1247,25 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 2630,
+                        "id": 2622,
                         "name": "slo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2602,
-                        "src": "1560:3:6",
+                        "referencedDeclaration": 2585,
+                        "src": "1670:3:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SLO_$2549",
+                          "typeIdentifier": "t_contract$_SLO_$2528",
                           "typeString": "contract SLO"
                         }
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2631,
+                        "id": 2623,
                         "name": "_value",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2582,
-                        "src": "1565:6:6",
+                        "referencedDeclaration": 2565,
+                        "src": "1675:6:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1103,14 +1273,14 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2632,
+                        "id": 2624,
                         "name": "_sloType",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2584,
-                        "src": "1573:8:6",
+                        "referencedDeclaration": 2567,
+                        "src": "1683:8:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_SLOType_$2561",
+                          "typeIdentifier": "t_enum$_SLOType_$2540",
                           "typeString": "enum SLORegistry.SLOType"
                         }
                       }
@@ -1118,7 +1288,7 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_SLO_$2549",
+                          "typeIdentifier": "t_contract$_SLO_$2528",
                           "typeString": "contract SLO"
                         },
                         {
@@ -1126,22 +1296,22 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_enum$_SLOType_$2561",
+                          "typeIdentifier": "t_enum$_SLOType_$2540",
                           "typeString": "enum SLORegistry.SLOType"
                         }
                       ],
-                      "id": 2629,
+                      "id": 2621,
                       "name": "SLOCreated",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2579,
-                      "src": "1549:10:6",
+                      "referencedDeclaration": 2562,
+                      "src": "1659:10:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_SLO_$2549_$_t_uint256_$_t_enum$_SLOType_$2561_$returns$__$",
+                        "typeIdentifier": "t_function_event_nonpayable$_t_contract$_SLO_$2528_$_t_uint256_$_t_enum$_SLOType_$2540_$returns$__$",
                         "typeString": "function (contract SLO,uint256,enum SLORegistry.SLOType)"
                       }
                     },
-                    "id": 2633,
+                    "id": 2625,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1149,27 +1319,27 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1549:33:6",
+                    "src": "1659:33:6",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2634,
+                  "id": 2626,
                   "nodeType": "EmitStatement",
-                  "src": "1544:38:6"
+                  "src": "1654:38:6"
                 }
               ]
             },
             "documentation": {
-              "id": 2580,
+              "id": 2563,
               "nodeType": "StructuredDocumentation",
-              "src": "1037:168:6",
+              "src": "1112:168:6",
               "text": "@dev public function for creating service level objectives\n@param _value 1. the value to check against\n@param _sloType 2. type of check"
             },
             "functionSelector": "78488ba3",
-            "id": 2636,
+            "id": 2628,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -1177,18 +1347,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 2585,
+              "id": 2568,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2582,
+                  "id": 2565,
                   "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2636,
-                  "src": "1229:14:6",
+                  "scope": 2628,
+                  "src": "1304:14:6",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1196,10 +1366,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2581,
+                    "id": 2564,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1229:7:6",
+                    "src": "1304:7:6",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1210,28 +1380,28 @@
                 },
                 {
                   "constant": false,
-                  "id": 2584,
+                  "id": 2567,
                   "mutability": "mutable",
                   "name": "_sloType",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2636,
-                  "src": "1245:16:6",
+                  "scope": 2628,
+                  "src": "1320:16:6",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_SLOType_$2561",
+                    "typeIdentifier": "t_enum$_SLOType_$2540",
                     "typeString": "enum SLORegistry.SLOType"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 2583,
+                    "id": 2566,
                     "name": "SLOType",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 2561,
-                    "src": "1245:7:6",
+                    "referencedDeclaration": 2540,
+                    "src": "1320:7:6",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_SLOType_$2561",
+                      "typeIdentifier": "t_enum$_SLOType_$2540",
                       "typeString": "enum SLORegistry.SLOType"
                     }
                   },
@@ -1239,450 +1409,55 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1228:34:6"
+              "src": "1303:34:6"
             },
             "returnParameters": {
-              "id": 2586,
+              "id": 2569,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1270:0:6"
+              "src": "1345:0:6"
             },
-            "scope": 2680,
-            "src": "1210:379:6",
+            "scope": 2639,
+            "src": "1285:414:6",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 2668,
-              "nodeType": "Block",
-              "src": "1822:212:6",
-              "statements": [
-                {
-                  "body": {
-                    "id": 2664,
-                    "nodeType": "Block",
-                    "src": "1896:110:6",
-                    "statements": [
-                      {
-                        "condition": {
-                          "argumentTypes": null,
-                          "commonType": {
-                            "typeIdentifier": "t_address",
-                            "typeString": "address"
-                          },
-                          "id": 2659,
-                          "isConstant": false,
-                          "isLValue": false,
-                          "isPure": false,
-                          "lValueRequested": false,
-                          "leftExpression": {
-                            "argumentTypes": null,
-                            "baseExpression": {
-                              "argumentTypes": null,
-                              "id": 2655,
-                              "name": "registeredSLOs",
-                              "nodeType": "Identifier",
-                              "overloadedDeclarations": [],
-                              "referencedDeclaration": 2564,
-                              "src": "1914:14:6",
-                              "typeDescriptions": {
-                                "typeIdentifier": "t_array$_t_address_$dyn_storage",
-                                "typeString": "address[] storage ref"
-                              }
-                            },
-                            "id": 2657,
-                            "indexExpression": {
-                              "argumentTypes": null,
-                              "id": 2656,
-                              "name": "index",
-                              "nodeType": "Identifier",
-                              "overloadedDeclarations": [],
-                              "referencedDeclaration": 2645,
-                              "src": "1929:5:6",
-                              "typeDescriptions": {
-                                "typeIdentifier": "t_uint256",
-                                "typeString": "uint256"
-                              }
-                            },
-                            "isConstant": false,
-                            "isLValue": true,
-                            "isPure": false,
-                            "lValueRequested": false,
-                            "nodeType": "IndexAccess",
-                            "src": "1914:21:6",
-                            "typeDescriptions": {
-                              "typeIdentifier": "t_address",
-                              "typeString": "address"
-                            }
-                          },
-                          "nodeType": "BinaryOperation",
-                          "operator": "==",
-                          "rightExpression": {
-                            "argumentTypes": null,
-                            "id": 2658,
-                            "name": "_sloAddress",
-                            "nodeType": "Identifier",
-                            "overloadedDeclarations": [],
-                            "referencedDeclaration": 2639,
-                            "src": "1939:11:6",
-                            "typeDescriptions": {
-                              "typeIdentifier": "t_address",
-                              "typeString": "address"
-                            }
-                          },
-                          "src": "1914:36:6",
-                          "typeDescriptions": {
-                            "typeIdentifier": "t_bool",
-                            "typeString": "bool"
-                          }
-                        },
-                        "falseBody": null,
-                        "id": 2663,
-                        "nodeType": "IfStatement",
-                        "src": "1910:86:6",
-                        "trueBody": {
-                          "id": 2662,
-                          "nodeType": "Block",
-                          "src": "1952:44:6",
-                          "statements": [
-                            {
-                              "expression": {
-                                "argumentTypes": null,
-                                "hexValue": "74727565",
-                                "id": 2660,
-                                "isConstant": false,
-                                "isLValue": false,
-                                "isPure": true,
-                                "kind": "bool",
-                                "lValueRequested": false,
-                                "nodeType": "Literal",
-                                "src": "1977:4:6",
-                                "subdenomination": null,
-                                "typeDescriptions": {
-                                  "typeIdentifier": "t_bool",
-                                  "typeString": "bool"
-                                },
-                                "value": "true"
-                              },
-                              "functionReturnParameters": 2643,
-                              "id": 2661,
-                              "nodeType": "Return",
-                              "src": "1970:11:6"
-                            }
-                          ]
-                        }
-                      }
-                    ]
-                  },
-                  "condition": {
-                    "argumentTypes": null,
-                    "commonType": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    },
-                    "id": 2651,
-                    "isConstant": false,
-                    "isLValue": false,
-                    "isPure": false,
-                    "lValueRequested": false,
-                    "leftExpression": {
-                      "argumentTypes": null,
-                      "id": 2648,
-                      "name": "index",
-                      "nodeType": "Identifier",
-                      "overloadedDeclarations": [],
-                      "referencedDeclaration": 2645,
-                      "src": "1856:5:6",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_uint256",
-                        "typeString": "uint256"
-                      }
-                    },
-                    "nodeType": "BinaryOperation",
-                    "operator": "<",
-                    "rightExpression": {
-                      "argumentTypes": null,
-                      "expression": {
-                        "argumentTypes": null,
-                        "id": 2649,
-                        "name": "registeredSLOs",
-                        "nodeType": "Identifier",
-                        "overloadedDeclarations": [],
-                        "referencedDeclaration": 2564,
-                        "src": "1864:14:6",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_array$_t_address_$dyn_storage",
-                          "typeString": "address[] storage ref"
-                        }
-                      },
-                      "id": 2650,
-                      "isConstant": false,
-                      "isLValue": false,
-                      "isPure": false,
-                      "lValueRequested": false,
-                      "memberName": "length",
-                      "nodeType": "MemberAccess",
-                      "referencedDeclaration": null,
-                      "src": "1864:21:6",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_uint256",
-                        "typeString": "uint256"
-                      }
-                    },
-                    "src": "1856:29:6",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_bool",
-                      "typeString": "bool"
-                    }
-                  },
-                  "id": 2665,
-                  "initializationExpression": {
-                    "assignments": [
-                      2645
-                    ],
-                    "declarations": [
-                      {
-                        "constant": false,
-                        "id": 2645,
-                        "mutability": "mutable",
-                        "name": "index",
-                        "nodeType": "VariableDeclaration",
-                        "overrides": null,
-                        "scope": 2665,
-                        "src": "1837:13:6",
-                        "stateVariable": false,
-                        "storageLocation": "default",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_uint256",
-                          "typeString": "uint256"
-                        },
-                        "typeName": {
-                          "id": 2644,
-                          "name": "uint256",
-                          "nodeType": "ElementaryTypeName",
-                          "src": "1837:7:6",
-                          "typeDescriptions": {
-                            "typeIdentifier": "t_uint256",
-                            "typeString": "uint256"
-                          }
-                        },
-                        "value": null,
-                        "visibility": "internal"
-                      }
-                    ],
-                    "id": 2647,
-                    "initialValue": {
-                      "argumentTypes": null,
-                      "hexValue": "30",
-                      "id": 2646,
-                      "isConstant": false,
-                      "isLValue": false,
-                      "isPure": true,
-                      "kind": "number",
-                      "lValueRequested": false,
-                      "nodeType": "Literal",
-                      "src": "1853:1:6",
-                      "subdenomination": null,
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_rational_0_by_1",
-                        "typeString": "int_const 0"
-                      },
-                      "value": "0"
-                    },
-                    "nodeType": "VariableDeclarationStatement",
-                    "src": "1837:17:6"
-                  },
-                  "loopExpression": {
-                    "expression": {
-                      "argumentTypes": null,
-                      "id": 2653,
-                      "isConstant": false,
-                      "isLValue": false,
-                      "isPure": false,
-                      "lValueRequested": false,
-                      "nodeType": "UnaryOperation",
-                      "operator": "++",
-                      "prefix": false,
-                      "src": "1887:7:6",
-                      "subExpression": {
-                        "argumentTypes": null,
-                        "id": 2652,
-                        "name": "index",
-                        "nodeType": "Identifier",
-                        "overloadedDeclarations": [],
-                        "referencedDeclaration": 2645,
-                        "src": "1887:5:6",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_uint256",
-                          "typeString": "uint256"
-                        }
-                      },
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_uint256",
-                        "typeString": "uint256"
-                      }
-                    },
-                    "id": 2654,
-                    "nodeType": "ExpressionStatement",
-                    "src": "1887:7:6"
-                  },
-                  "nodeType": "ForStatement",
-                  "src": "1832:174:6"
-                },
-                {
-                  "expression": {
-                    "argumentTypes": null,
-                    "hexValue": "66616c7365",
-                    "id": 2666,
-                    "isConstant": false,
-                    "isLValue": false,
-                    "isPure": true,
-                    "kind": "bool",
-                    "lValueRequested": false,
-                    "nodeType": "Literal",
-                    "src": "2022:5:6",
-                    "subdenomination": null,
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_bool",
-                      "typeString": "bool"
-                    },
-                    "value": "false"
-                  },
-                  "functionReturnParameters": 2643,
-                  "id": 2667,
-                  "nodeType": "Return",
-                  "src": "2015:12:6"
-                }
-              ]
-            },
-            "documentation": {
               "id": 2637,
-              "nodeType": "StructuredDocumentation",
-              "src": "1595:131:6",
-              "text": "@dev checks is the _sloAddress is registered as deployed\n@param _sloAddress 1. the value to check against"
-            },
-            "functionSelector": "d12250da",
-            "id": 2669,
-            "implemented": true,
-            "kind": "function",
-            "modifiers": [],
-            "name": "isRegisteredSLO",
-            "nodeType": "FunctionDefinition",
-            "overrides": null,
-            "parameters": {
-              "id": 2640,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 2639,
-                  "mutability": "mutable",
-                  "name": "_sloAddress",
-                  "nodeType": "VariableDeclaration",
-                  "overrides": null,
-                  "scope": 2669,
-                  "src": "1774:19:6",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
-                  },
-                  "typeName": {
-                    "id": 2638,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1774:7:6",
-                    "stateMutability": "nonpayable",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1773:21:6"
-            },
-            "returnParameters": {
-              "id": 2643,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 2642,
-                  "mutability": "mutable",
-                  "name": "",
-                  "nodeType": "VariableDeclaration",
-                  "overrides": null,
-                  "scope": 2669,
-                  "src": "1816:4:6",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_bool",
-                    "typeString": "bool"
-                  },
-                  "typeName": {
-                    "id": 2641,
-                    "name": "bool",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1816:4:6",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_bool",
-                      "typeString": "bool"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1815:6:6"
-            },
-            "scope": 2680,
-            "src": "1749:285:6",
-            "stateMutability": "view",
-            "virtual": false,
-            "visibility": "public"
-          },
-          {
-            "body": {
-              "id": 2678,
               "nodeType": "Block",
-              "src": "2168:38:6",
+              "src": "1833:28:6",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 2676,
-                    "name": "registeredSLOs",
+                    "id": 2635,
+                    "name": "SLOs",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 2564,
-                    "src": "2185:14:6",
+                    "referencedDeclaration": 2543,
+                    "src": "1850:4:6",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage",
                       "typeString": "address[] storage ref"
                     }
                   },
-                  "functionReturnParameters": 2675,
-                  "id": 2677,
+                  "functionReturnParameters": 2634,
+                  "id": 2636,
                   "nodeType": "Return",
-                  "src": "2178:21:6"
+                  "src": "1843:11:6"
                 }
               ]
             },
             "documentation": {
-              "id": 2670,
+              "id": 2629,
               "nodeType": "StructuredDocumentation",
-              "src": "2040:62:6",
+              "src": "1705:62:6",
               "text": "@dev function to get all the SLOs addresses"
             },
             "functionSelector": "30cb2739",
-            "id": 2679,
+            "id": 2638,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -1690,24 +1465,24 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 2671,
+              "id": 2630,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "2126:2:6"
+              "src": "1791:2:6"
             },
             "returnParameters": {
-              "id": 2675,
+              "id": 2634,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2674,
+                  "id": 2633,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2679,
-                  "src": "2150:16:6",
+                  "scope": 2638,
+                  "src": "1815:16:6",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1716,20 +1491,20 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 2672,
+                      "id": 2631,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "2150:7:6",
+                      "src": "1815:7:6",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 2673,
+                    "id": 2632,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "2150:9:6",
+                    "src": "1815:9:6",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -1739,27 +1514,27 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2149:18:6"
+              "src": "1814:18:6"
             },
-            "scope": 2680,
-            "src": "2107:99:6",
+            "scope": 2639,
+            "src": "1772:89:6",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 2681,
-        "src": "272:1936:6"
+        "scope": 2640,
+        "src": "272:1591:6"
       }
     ],
-    "src": "32:2177:6"
+    "src": "32:1832:6"
   },
   "legacyAST": {
     "attributes": {
       "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLORegistry.sol",
       "exportedSymbols": {
         "SLORegistry": [
-          2680
+          2639
         ]
       }
     },
@@ -1772,7 +1547,7 @@
             ".6"
           ]
         },
-        "id": 2551,
+        "id": 2530,
         "name": "PragmaDirective",
         "src": "32:22:6"
       },
@@ -1783,22 +1558,22 @@
             "ABIEncoderV2"
           ]
         },
-        "id": 2552,
+        "id": 2531,
         "name": "PragmaDirective",
         "src": "55:33:6"
       },
       {
         "attributes": {
-          "SourceUnit": 2550,
+          "SourceUnit": 2529,
           "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/SLO.sol",
           "file": "./SLO.sol",
-          "scope": 2681,
+          "scope": 2640,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2553,
+        "id": 2532,
         "name": "ImportDirective",
         "src": "90:19:6"
       },
@@ -1809,22 +1584,22 @@
             null
           ],
           "contractDependencies": [
-            2549
+            2528
           ],
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            2680
+            2639
           ],
           "name": "SLORegistry",
-          "scope": 2681
+          "scope": 2640
         },
         "children": [
           {
             "attributes": {
               "text": "@title SLORegistry\n@dev SLORegistry is a contract for handling creation of service level\nobjectives and querying those service level objectives"
             },
-            "id": 2554,
+            "id": 2533,
             "name": "StructuredDocumentation",
             "src": "111:160:6"
           },
@@ -1838,7 +1613,7 @@
                 "attributes": {
                   "name": "EqualTo"
                 },
-                "id": 2555,
+                "id": 2534,
                 "name": "EnumValue",
                 "src": "387:7:6"
               },
@@ -1846,7 +1621,7 @@
                 "attributes": {
                   "name": "NotEqualTo"
                 },
-                "id": 2556,
+                "id": 2535,
                 "name": "EnumValue",
                 "src": "404:10:6"
               },
@@ -1854,7 +1629,7 @@
                 "attributes": {
                   "name": "SmallerThan"
                 },
-                "id": 2557,
+                "id": 2536,
                 "name": "EnumValue",
                 "src": "424:11:6"
               },
@@ -1862,7 +1637,7 @@
                 "attributes": {
                   "name": "SmallerOrEqualTo"
                 },
-                "id": 2558,
+                "id": 2537,
                 "name": "EnumValue",
                 "src": "445:16:6"
               },
@@ -1870,7 +1645,7 @@
                 "attributes": {
                   "name": "GreaterThan"
                 },
-                "id": 2559,
+                "id": 2538,
                 "name": "EnumValue",
                 "src": "471:11:6"
               },
@@ -1878,23 +1653,23 @@
                 "attributes": {
                   "name": "GreaterOrEqualTo"
                 },
-                "id": 2560,
+                "id": 2539,
                 "name": "EnumValue",
                 "src": "492:16:6"
               }
             ],
-            "id": 2561,
+            "id": 2540,
             "name": "EnumDefinition",
             "src": "364:150:6"
           },
           {
             "attributes": {
               "constant": false,
-              "functionSelector": "64ad69d9",
+              "functionSelector": "b443a89f",
               "mutability": "mutable",
-              "name": "registeredSLOs",
+              "name": "SLOs",
               "overrides": null,
-              "scope": 2680,
+              "scope": 2639,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address[]",
@@ -1914,19 +1689,19 @@
                       "stateMutability": "nonpayable",
                       "type": "address"
                     },
-                    "id": 2562,
+                    "id": 2541,
                     "name": "ElementaryTypeName",
                     "src": "556:7:6"
                   }
                 ],
-                "id": 2563,
+                "id": 2542,
                 "name": "ArrayTypeName",
                 "src": "556:9:6"
               }
             ],
-            "id": 2564,
+            "id": 2543,
             "name": "VariableDeclaration",
-            "src": "556:31:6"
+            "src": "556:21:6"
           },
           {
             "attributes": {
@@ -1935,7 +1710,7 @@
               "mutability": "mutable",
               "name": "sloAddresses",
               "overrides": null,
-              "scope": 2680,
+              "scope": 2639,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "mapping(uint256 => mapping(enum SLORegistry.SLOType => address))",
@@ -1953,9 +1728,9 @@
                       "name": "uint256",
                       "type": "uint256"
                     },
-                    "id": 2565,
+                    "id": 2544,
                     "name": "ElementaryTypeName",
-                    "src": "647:7:6"
+                    "src": "637:7:6"
                   },
                   {
                     "attributes": {
@@ -1966,12 +1741,12 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "SLOType",
-                          "referencedDeclaration": 2561,
+                          "referencedDeclaration": 2540,
                           "type": "enum SLORegistry.SLOType"
                         },
-                        "id": 2566,
+                        "id": 2545,
                         "name": "UserDefinedTypeName",
-                        "src": "666:7:6"
+                        "src": "656:7:6"
                       },
                       {
                         "attributes": {
@@ -1979,24 +1754,72 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2567,
+                        "id": 2546,
                         "name": "ElementaryTypeName",
-                        "src": "677:7:6"
+                        "src": "667:7:6"
                       }
                     ],
-                    "id": 2568,
+                    "id": 2547,
                     "name": "Mapping",
-                    "src": "658:27:6"
+                    "src": "648:27:6"
                   }
                 ],
-                "id": 2569,
+                "id": 2548,
                 "name": "Mapping",
-                "src": "639:47:6"
+                "src": "629:47:6"
               }
             ],
-            "id": 2570,
+            "id": 2549,
             "name": "VariableDeclaration",
-            "src": "639:67:6"
+            "src": "629:67:6"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "functionSelector": "2af1c01d",
+              "mutability": "mutable",
+              "name": "registeredSLOs",
+              "overrides": null,
+              "scope": 2639,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(address => bool)",
+              "value": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(address => bool)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "type": "address"
+                    },
+                    "id": 2550,
+                    "name": "ElementaryTypeName",
+                    "src": "743:7:6"
+                  },
+                  {
+                    "attributes": {
+                      "name": "bool",
+                      "type": "bool"
+                    },
+                    "id": 2551,
+                    "name": "ElementaryTypeName",
+                    "src": "754:4:6"
+                  }
+                ],
+                "id": 2552,
+                "name": "Mapping",
+                "src": "735:24:6"
+              }
+            ],
+            "id": 2553,
+            "name": "VariableDeclaration",
+            "src": "735:46:6"
           },
           {
             "attributes": {
@@ -2008,9 +1831,9 @@
                 "attributes": {
                   "text": "@dev event for service level objective creation logging\n@param slo 1.  the address of the created service level objective contract\n@param value 2.  the value of the SLO\n@param sloType 3.  the type of the SLO"
                 },
-                "id": 2571,
+                "id": 2554,
                 "name": "StructuredDocumentation",
-                "src": "713:247:6"
+                "src": "788:247:6"
               },
               {
                 "children": [
@@ -2021,7 +1844,7 @@
                       "mutability": "mutable",
                       "name": "slo",
                       "overrides": null,
-                      "scope": 2579,
+                      "scope": 2562,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "contract SLO",
@@ -2033,17 +1856,17 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "SLO",
-                          "referencedDeclaration": 2549,
+                          "referencedDeclaration": 2528,
                           "type": "contract SLO"
                         },
-                        "id": 2572,
+                        "id": 2555,
                         "name": "UserDefinedTypeName",
-                        "src": "982:3:6"
+                        "src": "1057:3:6"
                       }
                     ],
-                    "id": 2573,
+                    "id": 2556,
                     "name": "VariableDeclaration",
-                    "src": "982:15:6"
+                    "src": "1057:15:6"
                   },
                   {
                     "attributes": {
@@ -2052,7 +1875,7 @@
                       "mutability": "mutable",
                       "name": "value",
                       "overrides": null,
-                      "scope": 2579,
+                      "scope": 2562,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2065,14 +1888,14 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2574,
+                        "id": 2557,
                         "name": "ElementaryTypeName",
-                        "src": "999:7:6"
+                        "src": "1074:7:6"
                       }
                     ],
-                    "id": 2575,
+                    "id": 2558,
                     "name": "VariableDeclaration",
-                    "src": "999:13:6"
+                    "src": "1074:13:6"
                   },
                   {
                     "attributes": {
@@ -2081,7 +1904,7 @@
                       "mutability": "mutable",
                       "name": "sloType",
                       "overrides": null,
-                      "scope": 2579,
+                      "scope": 2562,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "enum SLORegistry.SLOType",
@@ -2093,27 +1916,27 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "SLOType",
-                          "referencedDeclaration": 2561,
+                          "referencedDeclaration": 2540,
                           "type": "enum SLORegistry.SLOType"
                         },
-                        "id": 2576,
+                        "id": 2559,
                         "name": "UserDefinedTypeName",
-                        "src": "1014:7:6"
+                        "src": "1089:7:6"
                       }
                     ],
-                    "id": 2577,
+                    "id": 2560,
                     "name": "VariableDeclaration",
-                    "src": "1014:15:6"
+                    "src": "1089:15:6"
                   }
                 ],
-                "id": 2578,
+                "id": 2561,
                 "name": "ParameterList",
-                "src": "981:49:6"
+                "src": "1056:49:6"
               }
             ],
-            "id": 2579,
+            "id": 2562,
             "name": "EventDefinition",
-            "src": "965:66:6"
+            "src": "1040:66:6"
           },
           {
             "attributes": {
@@ -2126,7 +1949,7 @@
               ],
               "name": "createSLO",
               "overrides": null,
-              "scope": 2680,
+              "scope": 2639,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "public"
@@ -2136,9 +1959,9 @@
                 "attributes": {
                   "text": "@dev public function for creating service level objectives\n@param _value 1. the value to check against\n@param _sloType 2. type of check"
                 },
-                "id": 2580,
+                "id": 2563,
                 "name": "StructuredDocumentation",
-                "src": "1037:168:6"
+                "src": "1112:168:6"
               },
               {
                 "children": [
@@ -2148,7 +1971,7 @@
                       "mutability": "mutable",
                       "name": "_value",
                       "overrides": null,
-                      "scope": 2636,
+                      "scope": 2628,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2161,14 +1984,14 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2581,
+                        "id": 2564,
                         "name": "ElementaryTypeName",
-                        "src": "1229:7:6"
+                        "src": "1304:7:6"
                       }
                     ],
-                    "id": 2582,
+                    "id": 2565,
                     "name": "VariableDeclaration",
-                    "src": "1229:14:6"
+                    "src": "1304:14:6"
                   },
                   {
                     "attributes": {
@@ -2176,7 +1999,7 @@
                       "mutability": "mutable",
                       "name": "_sloType",
                       "overrides": null,
-                      "scope": 2636,
+                      "scope": 2628,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "enum SLORegistry.SLOType",
@@ -2188,22 +2011,22 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "SLOType",
-                          "referencedDeclaration": 2561,
+                          "referencedDeclaration": 2540,
                           "type": "enum SLORegistry.SLOType"
                         },
-                        "id": 2583,
+                        "id": 2566,
                         "name": "UserDefinedTypeName",
-                        "src": "1245:7:6"
+                        "src": "1320:7:6"
                       }
                     ],
-                    "id": 2584,
+                    "id": 2567,
                     "name": "VariableDeclaration",
-                    "src": "1245:16:6"
+                    "src": "1320:16:6"
                   }
                 ],
-                "id": 2585,
+                "id": 2568,
                 "name": "ParameterList",
-                "src": "1228:34:6"
+                "src": "1303:34:6"
               },
               {
                 "attributes": {
@@ -2212,9 +2035,9 @@
                   ]
                 },
                 "children": [],
-                "id": 2586,
+                "id": 2569,
                 "name": "ParameterList",
-                "src": "1270:0:6"
+                "src": "1345:0:6"
               },
               {
                 "children": [
@@ -2256,9 +2079,9 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 2587,
+                            "id": 2570,
                             "name": "Identifier",
-                            "src": "1280:7:6"
+                            "src": "1355:7:6"
                           },
                           {
                             "attributes": {
@@ -2301,13 +2124,13 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 2570,
+                                          "referencedDeclaration": 2549,
                                           "type": "mapping(uint256 => mapping(enum SLORegistry.SLOType => address))",
                                           "value": "sloAddresses"
                                         },
-                                        "id": 2588,
+                                        "id": 2571,
                                         "name": "Identifier",
-                                        "src": "1301:12:6"
+                                        "src": "1376:12:6"
                                       },
                                       {
                                         "attributes": {
@@ -2315,18 +2138,18 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 2582,
+                                          "referencedDeclaration": 2565,
                                           "type": "uint256",
                                           "value": "_value"
                                         },
-                                        "id": 2589,
+                                        "id": 2572,
                                         "name": "Identifier",
-                                        "src": "1314:6:6"
+                                        "src": "1389:6:6"
                                       }
                                     ],
-                                    "id": 2590,
+                                    "id": 2573,
                                     "name": "IndexAccess",
-                                    "src": "1301:20:6"
+                                    "src": "1376:20:6"
                                   },
                                   {
                                     "attributes": {
@@ -2334,18 +2157,18 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2584,
+                                      "referencedDeclaration": 2567,
                                       "type": "enum SLORegistry.SLOType",
                                       "value": "_sloType"
                                     },
-                                    "id": 2591,
+                                    "id": 2574,
                                     "name": "Identifier",
-                                    "src": "1322:8:6"
+                                    "src": "1397:8:6"
                                   }
                                 ],
-                                "id": 2592,
+                                "id": 2575,
                                 "name": "IndexAccess",
-                                "src": "1301:30:6"
+                                "src": "1376:30:6"
                               },
                               {
                                 "attributes": {
@@ -2383,14 +2206,14 @@
                                           "name": "address",
                                           "type": null
                                         },
-                                        "id": 2593,
+                                        "id": 2576,
                                         "name": "ElementaryTypeName",
-                                        "src": "1335:7:6"
+                                        "src": "1410:7:6"
                                       }
                                     ],
-                                    "id": 2594,
+                                    "id": 2577,
                                     "name": "ElementaryTypeNameExpression",
-                                    "src": "1335:7:6"
+                                    "src": "1410:7:6"
                                   },
                                   {
                                     "attributes": {
@@ -2405,19 +2228,19 @@
                                       "type": "int_const 0",
                                       "value": "0"
                                     },
-                                    "id": 2595,
+                                    "id": 2578,
                                     "name": "Literal",
-                                    "src": "1343:1:6"
+                                    "src": "1418:1:6"
                                   }
                                 ],
-                                "id": 2596,
+                                "id": 2579,
                                 "name": "FunctionCall",
-                                "src": "1335:10:6"
+                                "src": "1410:10:6"
                               }
                             ],
-                            "id": 2597,
+                            "id": 2580,
                             "name": "BinaryOperation",
-                            "src": "1301:44:6"
+                            "src": "1376:44:6"
                           },
                           {
                             "attributes": {
@@ -2432,24 +2255,24 @@
                               "type": "literal_string \"SLO already deployed\"",
                               "value": "SLO already deployed"
                             },
-                            "id": 2598,
+                            "id": 2581,
                             "name": "Literal",
-                            "src": "1359:22:6"
+                            "src": "1434:22:6"
                           }
                         ],
-                        "id": 2599,
+                        "id": 2582,
                         "name": "FunctionCall",
-                        "src": "1280:111:6"
+                        "src": "1355:111:6"
                       }
                     ],
-                    "id": 2600,
+                    "id": 2583,
                     "name": "ExpressionStatement",
-                    "src": "1280:111:6"
+                    "src": "1355:111:6"
                   },
                   {
                     "attributes": {
                       "assignments": [
-                        2602
+                        2585
                       ]
                     },
                     "children": [
@@ -2459,7 +2282,7 @@
                           "mutability": "mutable",
                           "name": "slo",
                           "overrides": null,
-                          "scope": 2635,
+                          "scope": 2627,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "contract SLO",
@@ -2471,17 +2294,17 @@
                             "attributes": {
                               "contractScope": null,
                               "name": "SLO",
-                              "referencedDeclaration": 2549,
+                              "referencedDeclaration": 2528,
                               "type": "contract SLO"
                             },
-                            "id": 2601,
+                            "id": 2584,
                             "name": "UserDefinedTypeName",
-                            "src": "1401:3:6"
+                            "src": "1476:3:6"
                           }
                         ],
-                        "id": 2602,
+                        "id": 2585,
                         "name": "VariableDeclaration",
-                        "src": "1401:7:6"
+                        "src": "1476:7:6"
                       },
                       {
                         "attributes": {
@@ -2507,7 +2330,7 @@
                                   "typeString": "uint256"
                                 },
                                 {
-                                  "typeIdentifier": "t_enum$_SLOType_$2561",
+                                  "typeIdentifier": "t_enum$_SLOType_$2540",
                                   "typeString": "enum SLORegistry.SLOType"
                                 }
                               ],
@@ -2522,17 +2345,17 @@
                                 "attributes": {
                                   "contractScope": null,
                                   "name": "SLO",
-                                  "referencedDeclaration": 2549,
+                                  "referencedDeclaration": 2528,
                                   "type": "contract SLO"
                                 },
-                                "id": 2603,
+                                "id": 2586,
                                 "name": "UserDefinedTypeName",
-                                "src": "1415:3:6"
+                                "src": "1490:3:6"
                               }
                             ],
-                            "id": 2604,
+                            "id": 2587,
                             "name": "NewExpression",
-                            "src": "1411:7:6"
+                            "src": "1486:7:6"
                           },
                           {
                             "attributes": {
@@ -2540,13 +2363,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2582,
+                              "referencedDeclaration": 2565,
                               "type": "uint256",
                               "value": "_value"
                             },
-                            "id": 2605,
+                            "id": 2588,
                             "name": "Identifier",
-                            "src": "1419:6:6"
+                            "src": "1494:6:6"
                           },
                           {
                             "attributes": {
@@ -2554,23 +2377,23 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2584,
+                              "referencedDeclaration": 2567,
                               "type": "enum SLORegistry.SLOType",
                               "value": "_sloType"
                             },
-                            "id": 2606,
+                            "id": 2589,
                             "name": "Identifier",
-                            "src": "1427:8:6"
+                            "src": "1502:8:6"
                           }
                         ],
-                        "id": 2607,
+                        "id": 2590,
                         "name": "FunctionCall",
-                        "src": "1411:25:6"
+                        "src": "1486:25:6"
                       }
                     ],
-                    "id": 2608,
+                    "id": 2591,
                     "name": "VariableDeclarationStatement",
-                    "src": "1401:35:6"
+                    "src": "1476:35:6"
                   },
                   {
                     "children": [
@@ -2613,18 +2436,18 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2564,
+                                  "referencedDeclaration": 2543,
                                   "type": "address[] storage ref",
-                                  "value": "registeredSLOs"
+                                  "value": "SLOs"
                                 },
-                                "id": 2609,
+                                "id": 2592,
                                 "name": "Identifier",
-                                "src": "1446:14:6"
+                                "src": "1521:4:6"
                               }
                             ],
-                            "id": 2611,
+                            "id": 2594,
                             "name": "MemberAccess",
-                            "src": "1446:19:6"
+                            "src": "1521:9:6"
                           },
                           {
                             "attributes": {
@@ -2646,7 +2469,7 @@
                                 "attributes": {
                                   "argumentTypes": [
                                     {
-                                      "typeIdentifier": "t_contract$_SLO_$2549",
+                                      "typeIdentifier": "t_contract$_SLO_$2528",
                                       "typeString": "contract SLO"
                                     }
                                   ],
@@ -2662,14 +2485,14 @@
                                       "name": "address",
                                       "type": null
                                     },
-                                    "id": 2612,
+                                    "id": 2595,
                                     "name": "ElementaryTypeName",
-                                    "src": "1466:7:6"
+                                    "src": "1531:7:6"
                                   }
                                 ],
-                                "id": 2613,
+                                "id": 2596,
                                 "name": "ElementaryTypeNameExpression",
-                                "src": "1466:7:6"
+                                "src": "1531:7:6"
                               },
                               {
                                 "attributes": {
@@ -2677,28 +2500,28 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2602,
+                                  "referencedDeclaration": 2585,
                                   "type": "contract SLO",
                                   "value": "slo"
                                 },
-                                "id": 2614,
+                                "id": 2597,
                                 "name": "Identifier",
-                                "src": "1474:3:6"
+                                "src": "1539:3:6"
                               }
                             ],
-                            "id": 2615,
+                            "id": 2598,
                             "name": "FunctionCall",
-                            "src": "1466:12:6"
+                            "src": "1531:12:6"
                           }
                         ],
-                        "id": 2616,
+                        "id": 2599,
                         "name": "FunctionCall",
-                        "src": "1446:33:6"
+                        "src": "1521:23:6"
                       }
                     ],
-                    "id": 2617,
+                    "id": 2600,
                     "name": "ExpressionStatement",
-                    "src": "1446:33:6"
+                    "src": "1521:23:6"
                   },
                   {
                     "children": [
@@ -2739,13 +2562,13 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2570,
+                                      "referencedDeclaration": 2549,
                                       "type": "mapping(uint256 => mapping(enum SLORegistry.SLOType => address))",
                                       "value": "sloAddresses"
                                     },
-                                    "id": 2618,
+                                    "id": 2601,
                                     "name": "Identifier",
-                                    "src": "1489:12:6"
+                                    "src": "1554:12:6"
                                   },
                                   {
                                     "attributes": {
@@ -2753,18 +2576,18 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2582,
+                                      "referencedDeclaration": 2565,
                                       "type": "uint256",
                                       "value": "_value"
                                     },
-                                    "id": 2619,
+                                    "id": 2602,
                                     "name": "Identifier",
-                                    "src": "1502:6:6"
+                                    "src": "1567:6:6"
                                   }
                                 ],
-                                "id": 2621,
+                                "id": 2604,
                                 "name": "IndexAccess",
-                                "src": "1489:20:6"
+                                "src": "1554:20:6"
                               },
                               {
                                 "attributes": {
@@ -2772,18 +2595,18 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2584,
+                                  "referencedDeclaration": 2567,
                                   "type": "enum SLORegistry.SLOType",
                                   "value": "_sloType"
                                 },
-                                "id": 2620,
+                                "id": 2603,
                                 "name": "Identifier",
-                                "src": "1510:8:6"
+                                "src": "1575:8:6"
                               }
                             ],
-                            "id": 2622,
+                            "id": 2605,
                             "name": "IndexAccess",
-                            "src": "1489:30:6"
+                            "src": "1554:30:6"
                           },
                           {
                             "attributes": {
@@ -2805,7 +2628,7 @@
                                 "attributes": {
                                   "argumentTypes": [
                                     {
-                                      "typeIdentifier": "t_contract$_SLO_$2549",
+                                      "typeIdentifier": "t_contract$_SLO_$2528",
                                       "typeString": "contract SLO"
                                     }
                                   ],
@@ -2821,14 +2644,14 @@
                                       "name": "address",
                                       "type": null
                                     },
-                                    "id": 2623,
+                                    "id": 2606,
                                     "name": "ElementaryTypeName",
-                                    "src": "1522:7:6"
+                                    "src": "1587:7:6"
                                   }
                                 ],
-                                "id": 2624,
+                                "id": 2607,
                                 "name": "ElementaryTypeNameExpression",
-                                "src": "1522:7:6"
+                                "src": "1587:7:6"
                               },
                               {
                                 "attributes": {
@@ -2836,28 +2659,161 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2602,
+                                  "referencedDeclaration": 2585,
                                   "type": "contract SLO",
                                   "value": "slo"
                                 },
-                                "id": 2625,
+                                "id": 2608,
                                 "name": "Identifier",
-                                "src": "1530:3:6"
+                                "src": "1595:3:6"
                               }
                             ],
-                            "id": 2626,
+                            "id": 2609,
                             "name": "FunctionCall",
-                            "src": "1522:12:6"
+                            "src": "1587:12:6"
                           }
                         ],
-                        "id": 2627,
+                        "id": 2610,
                         "name": "Assignment",
-                        "src": "1489:45:6"
+                        "src": "1554:45:6"
                       }
                     ],
-                    "id": 2628,
+                    "id": 2611,
                     "name": "ExpressionStatement",
-                    "src": "1489:45:6"
+                    "src": "1554:45:6"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "bool"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": true,
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2553,
+                                  "type": "mapping(address => bool)",
+                                  "value": "registeredSLOs"
+                                },
+                                "id": 2612,
+                                "name": "Identifier",
+                                "src": "1609:14:6"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "isStructConstructorCall": false,
+                                  "lValueRequested": false,
+                                  "names": [
+                                    null
+                                  ],
+                                  "tryCall": false,
+                                  "type": "address",
+                                  "type_conversion": true
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_contract$_SLO_$2528",
+                                          "typeString": "contract SLO"
+                                        }
+                                      ],
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": true,
+                                      "lValueRequested": false,
+                                      "type": "type(address)"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "name": "address",
+                                          "type": null
+                                        },
+                                        "id": 2613,
+                                        "name": "ElementaryTypeName",
+                                        "src": "1624:7:6"
+                                      }
+                                    ],
+                                    "id": 2614,
+                                    "name": "ElementaryTypeNameExpression",
+                                    "src": "1624:7:6"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 2585,
+                                      "type": "contract SLO",
+                                      "value": "slo"
+                                    },
+                                    "id": 2615,
+                                    "name": "Identifier",
+                                    "src": "1632:3:6"
+                                  }
+                                ],
+                                "id": 2616,
+                                "name": "FunctionCall",
+                                "src": "1624:12:6"
+                              }
+                            ],
+                            "id": 2617,
+                            "name": "IndexAccess",
+                            "src": "1609:28:6"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "74727565",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "bool",
+                              "type": "bool",
+                              "value": "true"
+                            },
+                            "id": 2618,
+                            "name": "Literal",
+                            "src": "1640:4:6"
+                          }
+                        ],
+                        "id": 2619,
+                        "name": "Assignment",
+                        "src": "1609:35:6"
+                      }
+                    ],
+                    "id": 2620,
+                    "name": "ExpressionStatement",
+                    "src": "1609:35:6"
                   },
                   {
                     "children": [
@@ -2881,7 +2837,7 @@
                             "attributes": {
                               "argumentTypes": [
                                 {
-                                  "typeIdentifier": "t_contract$_SLO_$2549",
+                                  "typeIdentifier": "t_contract$_SLO_$2528",
                                   "typeString": "contract SLO"
                                 },
                                 {
@@ -2889,20 +2845,20 @@
                                   "typeString": "uint256"
                                 },
                                 {
-                                  "typeIdentifier": "t_enum$_SLOType_$2561",
+                                  "typeIdentifier": "t_enum$_SLOType_$2540",
                                   "typeString": "enum SLORegistry.SLOType"
                                 }
                               ],
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2579,
+                              "referencedDeclaration": 2562,
                               "type": "function (contract SLO,uint256,enum SLORegistry.SLOType)",
                               "value": "SLOCreated"
                             },
-                            "id": 2629,
+                            "id": 2621,
                             "name": "Identifier",
-                            "src": "1549:10:6"
+                            "src": "1659:10:6"
                           },
                           {
                             "attributes": {
@@ -2910,13 +2866,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2602,
+                              "referencedDeclaration": 2585,
                               "type": "contract SLO",
                               "value": "slo"
                             },
-                            "id": 2630,
+                            "id": 2622,
                             "name": "Identifier",
-                            "src": "1560:3:6"
+                            "src": "1670:3:6"
                           },
                           {
                             "attributes": {
@@ -2924,13 +2880,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2582,
+                              "referencedDeclaration": 2565,
                               "type": "uint256",
                               "value": "_value"
                             },
-                            "id": 2631,
+                            "id": 2623,
                             "name": "Identifier",
-                            "src": "1565:6:6"
+                            "src": "1675:6:6"
                           },
                           {
                             "attributes": {
@@ -2938,463 +2894,33 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2584,
+                              "referencedDeclaration": 2567,
                               "type": "enum SLORegistry.SLOType",
                               "value": "_sloType"
                             },
-                            "id": 2632,
+                            "id": 2624,
                             "name": "Identifier",
-                            "src": "1573:8:6"
+                            "src": "1683:8:6"
                           }
                         ],
-                        "id": 2633,
+                        "id": 2625,
                         "name": "FunctionCall",
-                        "src": "1549:33:6"
+                        "src": "1659:33:6"
                       }
                     ],
-                    "id": 2634,
+                    "id": 2626,
                     "name": "EmitStatement",
-                    "src": "1544:38:6"
+                    "src": "1654:38:6"
                   }
                 ],
-                "id": 2635,
+                "id": 2627,
                 "name": "Block",
-                "src": "1270:319:6"
+                "src": "1345:354:6"
               }
             ],
-            "id": 2636,
+            "id": 2628,
             "name": "FunctionDefinition",
-            "src": "1210:379:6"
-          },
-          {
-            "attributes": {
-              "functionSelector": "d12250da",
-              "implemented": true,
-              "isConstructor": false,
-              "kind": "function",
-              "modifiers": [
-                null
-              ],
-              "name": "isRegisteredSLO",
-              "overrides": null,
-              "scope": 2680,
-              "stateMutability": "view",
-              "virtual": false,
-              "visibility": "public"
-            },
-            "children": [
-              {
-                "attributes": {
-                  "text": "@dev checks is the _sloAddress is registered as deployed\n@param _sloAddress 1. the value to check against"
-                },
-                "id": 2637,
-                "name": "StructuredDocumentation",
-                "src": "1595:131:6"
-              },
-              {
-                "children": [
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "mutability": "mutable",
-                      "name": "_sloAddress",
-                      "overrides": null,
-                      "scope": 2669,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "address",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "address",
-                          "stateMutability": "nonpayable",
-                          "type": "address"
-                        },
-                        "id": 2638,
-                        "name": "ElementaryTypeName",
-                        "src": "1774:7:6"
-                      }
-                    ],
-                    "id": 2639,
-                    "name": "VariableDeclaration",
-                    "src": "1774:19:6"
-                  }
-                ],
-                "id": 2640,
-                "name": "ParameterList",
-                "src": "1773:21:6"
-              },
-              {
-                "children": [
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "mutability": "mutable",
-                      "name": "",
-                      "overrides": null,
-                      "scope": 2669,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "bool",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "bool",
-                          "type": "bool"
-                        },
-                        "id": 2641,
-                        "name": "ElementaryTypeName",
-                        "src": "1816:4:6"
-                      }
-                    ],
-                    "id": 2642,
-                    "name": "VariableDeclaration",
-                    "src": "1816:4:6"
-                  }
-                ],
-                "id": 2643,
-                "name": "ParameterList",
-                "src": "1815:6:6"
-              },
-              {
-                "children": [
-                  {
-                    "children": [
-                      {
-                        "attributes": {
-                          "assignments": [
-                            2645
-                          ]
-                        },
-                        "children": [
-                          {
-                            "attributes": {
-                              "constant": false,
-                              "mutability": "mutable",
-                              "name": "index",
-                              "overrides": null,
-                              "scope": 2665,
-                              "stateVariable": false,
-                              "storageLocation": "default",
-                              "type": "uint256",
-                              "value": null,
-                              "visibility": "internal"
-                            },
-                            "children": [
-                              {
-                                "attributes": {
-                                  "name": "uint256",
-                                  "type": "uint256"
-                                },
-                                "id": 2644,
-                                "name": "ElementaryTypeName",
-                                "src": "1837:7:6"
-                              }
-                            ],
-                            "id": 2645,
-                            "name": "VariableDeclaration",
-                            "src": "1837:13:6"
-                          },
-                          {
-                            "attributes": {
-                              "argumentTypes": null,
-                              "hexvalue": "30",
-                              "isConstant": false,
-                              "isLValue": false,
-                              "isPure": true,
-                              "lValueRequested": false,
-                              "subdenomination": null,
-                              "token": "number",
-                              "type": "int_const 0",
-                              "value": "0"
-                            },
-                            "id": 2646,
-                            "name": "Literal",
-                            "src": "1853:1:6"
-                          }
-                        ],
-                        "id": 2647,
-                        "name": "VariableDeclarationStatement",
-                        "src": "1837:17:6"
-                      },
-                      {
-                        "attributes": {
-                          "argumentTypes": null,
-                          "commonType": {
-                            "typeIdentifier": "t_uint256",
-                            "typeString": "uint256"
-                          },
-                          "isConstant": false,
-                          "isLValue": false,
-                          "isPure": false,
-                          "lValueRequested": false,
-                          "operator": "<",
-                          "type": "bool"
-                        },
-                        "children": [
-                          {
-                            "attributes": {
-                              "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
-                              "referencedDeclaration": 2645,
-                              "type": "uint256",
-                              "value": "index"
-                            },
-                            "id": 2648,
-                            "name": "Identifier",
-                            "src": "1856:5:6"
-                          },
-                          {
-                            "attributes": {
-                              "argumentTypes": null,
-                              "isConstant": false,
-                              "isLValue": false,
-                              "isPure": false,
-                              "lValueRequested": false,
-                              "member_name": "length",
-                              "referencedDeclaration": null,
-                              "type": "uint256"
-                            },
-                            "children": [
-                              {
-                                "attributes": {
-                                  "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
-                                  "referencedDeclaration": 2564,
-                                  "type": "address[] storage ref",
-                                  "value": "registeredSLOs"
-                                },
-                                "id": 2649,
-                                "name": "Identifier",
-                                "src": "1864:14:6"
-                              }
-                            ],
-                            "id": 2650,
-                            "name": "MemberAccess",
-                            "src": "1864:21:6"
-                          }
-                        ],
-                        "id": 2651,
-                        "name": "BinaryOperation",
-                        "src": "1856:29:6"
-                      },
-                      {
-                        "children": [
-                          {
-                            "attributes": {
-                              "argumentTypes": null,
-                              "isConstant": false,
-                              "isLValue": false,
-                              "isPure": false,
-                              "lValueRequested": false,
-                              "operator": "++",
-                              "prefix": false,
-                              "type": "uint256"
-                            },
-                            "children": [
-                              {
-                                "attributes": {
-                                  "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
-                                  "referencedDeclaration": 2645,
-                                  "type": "uint256",
-                                  "value": "index"
-                                },
-                                "id": 2652,
-                                "name": "Identifier",
-                                "src": "1887:5:6"
-                              }
-                            ],
-                            "id": 2653,
-                            "name": "UnaryOperation",
-                            "src": "1887:7:6"
-                          }
-                        ],
-                        "id": 2654,
-                        "name": "ExpressionStatement",
-                        "src": "1887:7:6"
-                      },
-                      {
-                        "children": [
-                          {
-                            "attributes": {
-                              "falseBody": null
-                            },
-                            "children": [
-                              {
-                                "attributes": {
-                                  "argumentTypes": null,
-                                  "commonType": {
-                                    "typeIdentifier": "t_address",
-                                    "typeString": "address"
-                                  },
-                                  "isConstant": false,
-                                  "isLValue": false,
-                                  "isPure": false,
-                                  "lValueRequested": false,
-                                  "operator": "==",
-                                  "type": "bool"
-                                },
-                                "children": [
-                                  {
-                                    "attributes": {
-                                      "argumentTypes": null,
-                                      "isConstant": false,
-                                      "isLValue": true,
-                                      "isPure": false,
-                                      "lValueRequested": false,
-                                      "type": "address"
-                                    },
-                                    "children": [
-                                      {
-                                        "attributes": {
-                                          "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
-                                          "referencedDeclaration": 2564,
-                                          "type": "address[] storage ref",
-                                          "value": "registeredSLOs"
-                                        },
-                                        "id": 2655,
-                                        "name": "Identifier",
-                                        "src": "1914:14:6"
-                                      },
-                                      {
-                                        "attributes": {
-                                          "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
-                                          "referencedDeclaration": 2645,
-                                          "type": "uint256",
-                                          "value": "index"
-                                        },
-                                        "id": 2656,
-                                        "name": "Identifier",
-                                        "src": "1929:5:6"
-                                      }
-                                    ],
-                                    "id": 2657,
-                                    "name": "IndexAccess",
-                                    "src": "1914:21:6"
-                                  },
-                                  {
-                                    "attributes": {
-                                      "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
-                                      "referencedDeclaration": 2639,
-                                      "type": "address",
-                                      "value": "_sloAddress"
-                                    },
-                                    "id": 2658,
-                                    "name": "Identifier",
-                                    "src": "1939:11:6"
-                                  }
-                                ],
-                                "id": 2659,
-                                "name": "BinaryOperation",
-                                "src": "1914:36:6"
-                              },
-                              {
-                                "children": [
-                                  {
-                                    "attributes": {
-                                      "functionReturnParameters": 2643
-                                    },
-                                    "children": [
-                                      {
-                                        "attributes": {
-                                          "argumentTypes": null,
-                                          "hexvalue": "74727565",
-                                          "isConstant": false,
-                                          "isLValue": false,
-                                          "isPure": true,
-                                          "lValueRequested": false,
-                                          "subdenomination": null,
-                                          "token": "bool",
-                                          "type": "bool",
-                                          "value": "true"
-                                        },
-                                        "id": 2660,
-                                        "name": "Literal",
-                                        "src": "1977:4:6"
-                                      }
-                                    ],
-                                    "id": 2661,
-                                    "name": "Return",
-                                    "src": "1970:11:6"
-                                  }
-                                ],
-                                "id": 2662,
-                                "name": "Block",
-                                "src": "1952:44:6"
-                              }
-                            ],
-                            "id": 2663,
-                            "name": "IfStatement",
-                            "src": "1910:86:6"
-                          }
-                        ],
-                        "id": 2664,
-                        "name": "Block",
-                        "src": "1896:110:6"
-                      }
-                    ],
-                    "id": 2665,
-                    "name": "ForStatement",
-                    "src": "1832:174:6"
-                  },
-                  {
-                    "attributes": {
-                      "functionReturnParameters": 2643
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "argumentTypes": null,
-                          "hexvalue": "66616c7365",
-                          "isConstant": false,
-                          "isLValue": false,
-                          "isPure": true,
-                          "lValueRequested": false,
-                          "subdenomination": null,
-                          "token": "bool",
-                          "type": "bool",
-                          "value": "false"
-                        },
-                        "id": 2666,
-                        "name": "Literal",
-                        "src": "2022:5:6"
-                      }
-                    ],
-                    "id": 2667,
-                    "name": "Return",
-                    "src": "2015:12:6"
-                  }
-                ],
-                "id": 2668,
-                "name": "Block",
-                "src": "1822:212:6"
-              }
-            ],
-            "id": 2669,
-            "name": "FunctionDefinition",
-            "src": "1749:285:6"
+            "src": "1285:414:6"
           },
           {
             "attributes": {
@@ -3407,7 +2933,7 @@
               ],
               "name": "getAllSLOs",
               "overrides": null,
-              "scope": 2680,
+              "scope": 2639,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "public"
@@ -3417,9 +2943,9 @@
                 "attributes": {
                   "text": "@dev function to get all the SLOs addresses"
                 },
-                "id": 2670,
+                "id": 2629,
                 "name": "StructuredDocumentation",
-                "src": "2040:62:6"
+                "src": "1705:62:6"
               },
               {
                 "attributes": {
@@ -3428,9 +2954,9 @@
                   ]
                 },
                 "children": [],
-                "id": 2671,
+                "id": 2630,
                 "name": "ParameterList",
-                "src": "2126:2:6"
+                "src": "1791:2:6"
               },
               {
                 "children": [
@@ -3440,7 +2966,7 @@
                       "mutability": "mutable",
                       "name": "",
                       "overrides": null,
-                      "scope": 2679,
+                      "scope": 2638,
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "type": "address[]",
@@ -3460,30 +2986,30 @@
                               "stateMutability": "nonpayable",
                               "type": "address"
                             },
-                            "id": 2672,
+                            "id": 2631,
                             "name": "ElementaryTypeName",
-                            "src": "2150:7:6"
+                            "src": "1815:7:6"
                           }
                         ],
-                        "id": 2673,
+                        "id": 2632,
                         "name": "ArrayTypeName",
-                        "src": "2150:9:6"
+                        "src": "1815:9:6"
                       }
                     ],
-                    "id": 2674,
+                    "id": 2633,
                     "name": "VariableDeclaration",
-                    "src": "2150:16:6"
+                    "src": "1815:16:6"
                   }
                 ],
-                "id": 2675,
+                "id": 2634,
                 "name": "ParameterList",
-                "src": "2149:18:6"
+                "src": "1814:18:6"
               },
               {
                 "children": [
                   {
                     "attributes": {
-                      "functionReturnParameters": 2675
+                      "functionReturnParameters": 2634
                     },
                     "children": [
                       {
@@ -3492,38 +3018,38 @@
                           "overloadedDeclarations": [
                             null
                           ],
-                          "referencedDeclaration": 2564,
+                          "referencedDeclaration": 2543,
                           "type": "address[] storage ref",
-                          "value": "registeredSLOs"
+                          "value": "SLOs"
                         },
-                        "id": 2676,
+                        "id": 2635,
                         "name": "Identifier",
-                        "src": "2185:14:6"
+                        "src": "1850:4:6"
                       }
                     ],
-                    "id": 2677,
+                    "id": 2636,
                     "name": "Return",
-                    "src": "2178:21:6"
+                    "src": "1843:11:6"
                   }
                 ],
-                "id": 2678,
+                "id": 2637,
                 "name": "Block",
-                "src": "2168:38:6"
+                "src": "1833:28:6"
               }
             ],
-            "id": 2679,
+            "id": 2638,
             "name": "FunctionDefinition",
-            "src": "2107:99:6"
+            "src": "1772:89:6"
           }
         ],
-        "id": 2680,
+        "id": 2639,
         "name": "ContractDefinition",
-        "src": "272:1936:6"
+        "src": "272:1591:6"
       }
     ],
-    "id": 2681,
+    "id": 2640,
     "name": "SourceUnit",
-    "src": "32:2177:6"
+    "src": "32:1832:6"
   },
   "compiler": {
     "name": "solc",
@@ -3559,13 +3085,12 @@
         }
       },
       "links": {},
-      "address": "0x63F565Ba734FAcA4da752050B61357aC2B61D030",
-      "transactionHash": "0xcc7b248b418bcfe4a9fbb8b8f95dc5c00233bed86b9afdf46c648c8ffa9583be"
+      "address": "0xbA465b9b7859eec9De880991bBdEB2CB4a41D9a6",
+      "transactionHash": "0x6518eee57cf423d95980607d09f2cc8848318d5f935dab8a6f5660db21d962ec"
     }
   },
   "schemaVersion": "3.3.3",
-  "updatedAt": "2021-03-15T23:40:23.564Z",
-  "networkType": "ethereum",
+  "updatedAt": "2021-03-16T16:03:02.312Z",
   "devdoc": {
     "details": "SLORegistry is a contract for handling creation of service level objectives and querying those service level objectives",
     "methods": {
@@ -3578,12 +3103,6 @@
       },
       "getAllSLOs()": {
         "details": "function to get all the SLOs addresses"
-      },
-      "isRegisteredSLO(address)": {
-        "details": "checks is the _sloAddress is registered as deployed",
-        "params": {
-          "_sloAddress": "1. the value to check against"
-        }
       }
     },
     "title": "SLORegistry"

@@ -5,7 +5,7 @@ const Migrations = artifacts.require('./Migrations.sol');
 const { generateWeeklyPeriods } = require('../utils');
 
 module.exports = (deployer, network) => {
-  if (!/mainnet/i.test(network)) {
+  if (/mainnet/i.test(network)) {
     console.log('Remember to:');
     console.log('- uncomment the periodHasFinished check at SLARegistry.createSLA');
     console.log('- set the correct values for StakeRegistry');
