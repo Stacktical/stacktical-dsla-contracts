@@ -63,6 +63,7 @@ contract Details {
             bool whiteListed,
             PeriodRegistry.PeriodType periodType,
             SLORegistry.SLOType sloType,
+            address messengerAddress,
             uint256 sloValue,
             uint256 creationBlockNumber,
             uint256 slaId,
@@ -73,6 +74,7 @@ contract Details {
     {
         SLA sla = SLA(_slaAddress);
         slaOwner = sla.owner();
+        messengerAddress = sla.messengerAddress();
         whiteListed = sla.whitelistedContract();
         periodType = sla.periodType();
         (sloValue, sloType) = _sloRegistry.registeredSLO(_slaAddress);
