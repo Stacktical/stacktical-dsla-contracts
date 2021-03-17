@@ -181,17 +181,7 @@ export const SLARegistryABI: AbiItem[] = [
   {
     inputs: [
       { internalType: 'address', name: '_messengerAddress', type: 'address' },
-      { internalType: 'string', name: '_messengerBaseURL', type: 'string' },
-      {
-        internalType: 'string',
-        name: '_messengerOwnershipURL',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_messengerSpecificationURL',
-        type: 'string',
-      },
+      { internalType: 'string', name: '_specificationUrl', type: 'string' },
     ],
     name: 'registerMessenger',
     outputs: [],

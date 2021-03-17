@@ -81,4 +81,14 @@ abstract contract IMessenger is Ownable {
      * @dev gets the fee amount of LINK token
      */
     function fee() external view virtual returns (uint256);
+
+    /**
+     * @dev returns the requestsCounter
+     */
+    function requestsCounter() external view virtual returns (uint256);
+
+    /**
+     * @dev returns the fulfillsCounter
+     */
+    function fulfillsCounter() external view virtual returns (uint256);
 }

@@ -201,44 +201,70 @@
       ],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "requestsCounter",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fulfillsCounter",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"slaAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"periodId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"requestId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"chainlinkResponse\",\"type\":\"bytes32\"}],\"name\":\"SLIReceived\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"fee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_requestId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_chainlinkResponseUint256\",\"type\":\"uint256\"}],\"name\":\"fulfillSLI\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"jobId\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"messengerPrecision\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"oracle\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_slaAddress\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_ownerApproval\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_callerAddress\",\"type\":\"address\"}],\"name\":\"requestSLI\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"setSLARegistry\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"slaRegistryAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Interface to create new Messenger contract to add lo Messenger lists\",\"methods\":{\"fee()\":{\"details\":\"gets the fee amount of LINK token\"},\"fulfillSLI(bytes32,uint256)\":{\"details\":\"callback function for the Chainlink SLI request which stores the SLI in the SLA contract\",\"params\":{\"_chainlinkResponseUint256\":\"response object from Chainlink Oracles\",\"_requestId\":\"the ID of the ChainLink request\"}},\"jobId()\":{\"details\":\"gets the chainlink job id\"},\"messengerPrecision()\":{\"details\":\"gets the messenger precision\"},\"oracle()\":{\"details\":\"gets the chainlink oracle contract address\"},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"requestSLI(uint256,address,bool,address)\":{\"details\":\"creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.\",\"params\":{\"_periodId\":\"1. id of the period to be queried\",\"_slaAddress\":\"2. if approval by owner or msg.sender\"}},\"setSLARegistry()\":{\"details\":\"sets the SLARegistry contract address and can only be called once\"},\"slaRegistryAddress()\":{\"details\":\"gets the slaRegistryAddress\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"title\":\"IMessenger\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/messenger/IMessenger.sol\":\"IMessenger\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/messenger/IMessenger.sol\":{\"keccak256\":\"0xf1bc497b3ab4a50a95488054510792fea62820b62bede5d64408ffa69fe931c2\",\"urls\":[\"bzz-raw://10d5c6cf2918b8f105ae2eb99cd8413c9525610ef53d292b7fe30353eb7a1732\",\"dweb:/ipfs/QmXpL3J3BEPdxjqa6UuiLnpibGK1q1xAReuysSkLhXjt6r\"]},\"@openzeppelin/contracts/GSN/Context.sol\":{\"keccak256\":\"0xdb26cbf4d028490f49831a7865c2fe1b28db44b535ca8d343785a3b768aae183\",\"urls\":[\"bzz-raw://840b14ce0315c47d49ba328f1f9fa7654ded1c9e1559e6c5e777a7b2dc28bf0a\",\"dweb:/ipfs/QmTLLabn4wcfGro9LEmUXUN2nwKqZSotXMvjDCLXEnLtZP\"]},\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0x4bd6402ca6b3419008c2b482aff54e66836e8cb4eba2680e42ac5884ae6424fc\",\"urls\":[\"bzz-raw://8f9f711fb8d0d92aeea1c327e3845d13ca1fa8f142e47f8723cd5b3106fb29a3\",\"dweb:/ipfs/QmVQUReDW9f4zGqhizwHnyU8EntMs95tbASdqkGncnikba\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"slaAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"periodId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"requestId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"chainlinkResponse\",\"type\":\"bytes32\"}],\"name\":\"SLIReceived\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"fee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_requestId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_chainlinkResponseUint256\",\"type\":\"uint256\"}],\"name\":\"fulfillSLI\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"fulfillsCounter\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"jobId\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"messengerPrecision\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"oracle\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_periodId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_slaAddress\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_ownerApproval\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_callerAddress\",\"type\":\"address\"}],\"name\":\"requestSLI\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"requestsCounter\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"setSLARegistry\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"slaRegistryAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Interface to create new Messenger contract to add lo Messenger lists\",\"methods\":{\"fee()\":{\"details\":\"gets the fee amount of LINK token\"},\"fulfillSLI(bytes32,uint256)\":{\"details\":\"callback function for the Chainlink SLI request which stores the SLI in the SLA contract\",\"params\":{\"_chainlinkResponseUint256\":\"response object from Chainlink Oracles\",\"_requestId\":\"the ID of the ChainLink request\"}},\"fulfillsCounter()\":{\"details\":\"returns the fulfillsCounter\"},\"jobId()\":{\"details\":\"gets the chainlink job id\"},\"messengerPrecision()\":{\"details\":\"gets the messenger precision\"},\"oracle()\":{\"details\":\"gets the chainlink oracle contract address\"},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"requestSLI(uint256,address,bool,address)\":{\"details\":\"creates a ChainLink request to get a new SLI value for the given params. Can only be called by the SLARegistry contract or Chainlink Oracle.\",\"params\":{\"_periodId\":\"1. id of the period to be queried\",\"_slaAddress\":\"2. if approval by owner or msg.sender\"}},\"requestsCounter()\":{\"details\":\"returns the requestsCounter\"},\"setSLARegistry()\":{\"details\":\"sets the SLARegistry contract address and can only be called once\"},\"slaRegistryAddress()\":{\"details\":\"gets the slaRegistryAddress\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"title\":\"IMessenger\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/messenger/IMessenger.sol\":\"IMessenger\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/messenger/IMessenger.sol\":{\"keccak256\":\"0xe711959ccf804e2402fccaf250f6fd261076a04dc13f65f1bbc26263f1300c21\",\"urls\":[\"bzz-raw://1256b72f5286af681cc7eb06b81bf4941a7802f1bcd5e971a7b7a0f58b1225f9\",\"dweb:/ipfs/QmUq4RV5BAsksxNYVZBMAgkvbS6d46e87TvdTA2VXJMzNe\"]},\"@openzeppelin/contracts/GSN/Context.sol\":{\"keccak256\":\"0xdb26cbf4d028490f49831a7865c2fe1b28db44b535ca8d343785a3b768aae183\",\"urls\":[\"bzz-raw://840b14ce0315c47d49ba328f1f9fa7654ded1c9e1559e6c5e777a7b2dc28bf0a\",\"dweb:/ipfs/QmTLLabn4wcfGro9LEmUXUN2nwKqZSotXMvjDCLXEnLtZP\"]},\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0x4bd6402ca6b3419008c2b482aff54e66836e8cb4eba2680e42ac5884ae6424fc\",\"urls\":[\"bzz-raw://8f9f711fb8d0d92aeea1c327e3845d13ca1fa8f142e47f8723cd5b3106fb29a3\",\"dweb:/ipfs/QmVQUReDW9f4zGqhizwHnyU8EntMs95tbASdqkGncnikba\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity 0.6.6;\n\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\n\n/**\n * @title IMessenger\n * @dev Interface to create new Messenger contract to add lo Messenger lists\n */\n\nabstract contract IMessenger is Ownable {\n    struct SLIRequest {\n        address slaAddress;\n        uint256 periodId;\n    }\n\n    /**\n     * @dev event emitted when having a response from Chainlink with the SLI\n     * @param slaAddress 1. SLA address to store the SLI\n     * @param periodId 2. id of the Chainlink request\n     * @param requestId 3. id of the Chainlink request\n     * @param chainlinkResponse 4. response from Chainlink\n     */\n    event SLIReceived(\n        address indexed slaAddress,\n        uint256 periodId,\n        bytes32 indexed requestId,\n        bytes32 chainlinkResponse\n    );\n\n    /**\n     * @dev sets the SLARegistry contract address and can only be called once\n     */\n    function setSLARegistry() external virtual;\n\n    /**\n     * @dev creates a ChainLink request to get a new SLI value for the\n     * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.\n     * @param _periodId 1. id of the period to be queried\n     * @param _slaAddress 2. address of the receiver SLA\n     * @param _slaAddress 2. if approval by owner or msg.sender\n     */\n\n    function requestSLI(\n        uint256 _periodId,\n        address _slaAddress,\n        bool _ownerApproval,\n        address _callerAddress\n    ) external virtual;\n\n    /**\n     * @dev callback function for the Chainlink SLI request which stores\n     * the SLI in the SLA contract\n     * @param _requestId the ID of the ChainLink request\n     * @param _chainlinkResponseUint256 response object from Chainlink Oracles\n     */\n    function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponseUint256)\n        external\n        virtual;\n\n    /**\n     * @dev gets the messenger precision\n     */\n    function messengerPrecision() external view virtual returns (uint256);\n\n    /**\n     * @dev gets the slaRegistryAddress\n     */\n    function slaRegistryAddress() external view virtual returns (address);\n\n    /**\n     * @dev gets the chainlink oracle contract address\n     */\n    function oracle() external view virtual returns (address);\n\n    /**\n     * @dev gets the chainlink job id\n     */\n    function jobId() external view virtual returns (bytes32);\n\n    /**\n     * @dev gets the fee amount of LINK token\n     */\n    function fee() external view virtual returns (uint256);\n}\n",
+  "source": "pragma solidity 0.6.6;\n\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\n\n/**\n * @title IMessenger\n * @dev Interface to create new Messenger contract to add lo Messenger lists\n */\n\nabstract contract IMessenger is Ownable {\n    struct SLIRequest {\n        address slaAddress;\n        uint256 periodId;\n    }\n\n    /**\n     * @dev event emitted when having a response from Chainlink with the SLI\n     * @param slaAddress 1. SLA address to store the SLI\n     * @param periodId 2. id of the Chainlink request\n     * @param requestId 3. id of the Chainlink request\n     * @param chainlinkResponse 4. response from Chainlink\n     */\n    event SLIReceived(\n        address indexed slaAddress,\n        uint256 periodId,\n        bytes32 indexed requestId,\n        bytes32 chainlinkResponse\n    );\n\n    /**\n     * @dev sets the SLARegistry contract address and can only be called once\n     */\n    function setSLARegistry() external virtual;\n\n    /**\n     * @dev creates a ChainLink request to get a new SLI value for the\n     * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.\n     * @param _periodId 1. id of the period to be queried\n     * @param _slaAddress 2. address of the receiver SLA\n     * @param _slaAddress 2. if approval by owner or msg.sender\n     */\n\n    function requestSLI(\n        uint256 _periodId,\n        address _slaAddress,\n        bool _ownerApproval,\n        address _callerAddress\n    ) external virtual;\n\n    /**\n     * @dev callback function for the Chainlink SLI request which stores\n     * the SLI in the SLA contract\n     * @param _requestId the ID of the ChainLink request\n     * @param _chainlinkResponseUint256 response object from Chainlink Oracles\n     */\n    function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponseUint256)\n        external\n        virtual;\n\n    /**\n     * @dev gets the messenger precision\n     */\n    function messengerPrecision() external view virtual returns (uint256);\n\n    /**\n     * @dev gets the slaRegistryAddress\n     */\n    function slaRegistryAddress() external view virtual returns (address);\n\n    /**\n     * @dev gets the chainlink oracle contract address\n     */\n    function oracle() external view virtual returns (address);\n\n    /**\n     * @dev gets the chainlink job id\n     */\n    function jobId() external view virtual returns (bytes32);\n\n    /**\n     * @dev gets the fee amount of LINK token\n     */\n    function fee() external view virtual returns (uint256);\n\n    /**\n     * @dev returns the requestsCounter\n     */\n    function requestsCounter() external view virtual returns (uint256);\n\n    /**\n     * @dev returns the fulfillsCounter\n     */\n    function fulfillsCounter() external view virtual returns (uint256);\n}\n",
   "sourcePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/messenger/IMessenger.sol",
   "ast": {
     "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/messenger/IMessenger.sol",
     "exportedSymbols": {
       "IMessenger": [
-        5051
+        5043
       ]
     },
-    "id": 5052,
+    "id": 5044,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 4976,
+        "id": 4956,
         "literals": [
           "solidity",
           "0.6",
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:22:10"
+        "src": "0:22:9"
       },
       {
         "absolutePath": "@openzeppelin/contracts/access/Ownable.sol",
         "file": "@openzeppelin/contracts/access/Ownable.sol",
-        "id": 4977,
+        "id": 4957,
         "nodeType": "ImportDirective",
-        "scope": 5052,
-        "sourceUnit": 11203,
-        "src": "24:52:10",
+        "scope": 5044,
+        "sourceUnit": 10624,
+        "src": "24:52:9",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -249,55 +275,55 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 4979,
+              "id": 4959,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 11202,
-              "src": "217:7:10",
+              "referencedDeclaration": 10623,
+              "src": "217:7:9",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$11202",
+                "typeIdentifier": "t_contract$_Ownable_$10623",
                 "typeString": "contract Ownable"
               }
             },
-            "id": 4980,
+            "id": 4960,
             "nodeType": "InheritanceSpecifier",
-            "src": "217:7:10"
+            "src": "217:7:9"
           }
         ],
         "contractDependencies": [
-          10810,
-          11202
+          10231,
+          10623
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 4978,
+          "id": 4958,
           "nodeType": "StructuredDocumentation",
-          "src": "78:105:10",
+          "src": "78:105:9",
           "text": "@title IMessenger\n@dev Interface to create new Messenger contract to add lo Messenger lists"
         },
         "fullyImplemented": false,
-        "id": 5051,
+        "id": 5043,
         "linearizedBaseContracts": [
-          5051,
-          11202,
-          10810
+          5043,
+          10623,
+          10231
         ],
         "name": "IMessenger",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "canonicalName": "IMessenger.SLIRequest",
-            "id": 4985,
+            "id": 4965,
             "members": [
               {
                 "constant": false,
-                "id": 4982,
+                "id": 4962,
                 "mutability": "mutable",
                 "name": "slaAddress",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 4985,
-                "src": "259:18:10",
+                "scope": 4965,
+                "src": "259:18:9",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -305,10 +331,10 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 4981,
+                  "id": 4961,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "259:7:10",
+                  "src": "259:7:9",
                   "stateMutability": "nonpayable",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address",
@@ -320,13 +346,13 @@
               },
               {
                 "constant": false,
-                "id": 4984,
+                "id": 4964,
                 "mutability": "mutable",
                 "name": "periodId",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 4985,
-                "src": "287:16:10",
+                "scope": 4965,
+                "src": "287:16:9",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -334,10 +360,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 4983,
+                  "id": 4963,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
-                  "src": "287:7:10",
+                  "src": "287:7:9",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -349,35 +375,35 @@
             ],
             "name": "SLIRequest",
             "nodeType": "StructDefinition",
-            "scope": 5051,
-            "src": "231:79:10",
+            "scope": 5043,
+            "src": "231:79:9",
             "visibility": "public"
           },
           {
             "anonymous": false,
             "documentation": {
-              "id": 4986,
+              "id": 4966,
               "nodeType": "StructuredDocumentation",
-              "src": "316:313:10",
+              "src": "316:313:9",
               "text": "@dev event emitted when having a response from Chainlink with the SLI\n@param slaAddress 1. SLA address to store the SLI\n@param periodId 2. id of the Chainlink request\n@param requestId 3. id of the Chainlink request\n@param chainlinkResponse 4. response from Chainlink"
             },
-            "id": 4996,
+            "id": 4976,
             "name": "SLIReceived",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 4995,
+              "id": 4975,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4988,
+                  "id": 4968,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "slaAddress",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 4996,
-                  "src": "661:26:10",
+                  "scope": 4976,
+                  "src": "661:26:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -385,10 +411,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 4987,
+                    "id": 4967,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "661:7:10",
+                    "src": "661:7:9",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -400,14 +426,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 4990,
+                  "id": 4970,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "periodId",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 4996,
-                  "src": "697:16:10",
+                  "scope": 4976,
+                  "src": "697:16:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -415,10 +441,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4989,
+                    "id": 4969,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "697:7:10",
+                    "src": "697:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -429,14 +455,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 4992,
+                  "id": 4972,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "requestId",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 4996,
-                  "src": "723:25:10",
+                  "scope": 4976,
+                  "src": "723:25:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -444,10 +470,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 4991,
+                    "id": 4971,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "723:7:10",
+                    "src": "723:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -458,14 +484,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 4994,
+                  "id": 4974,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "chainlinkResponse",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 4996,
-                  "src": "758:25:10",
+                  "scope": 4976,
+                  "src": "758:25:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -473,10 +499,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 4993,
+                    "id": 4973,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "758:7:10",
+                    "src": "758:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -486,20 +512,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "651:138:10"
+              "src": "651:138:9"
             },
-            "src": "634:156:10"
+            "src": "634:156:9"
           },
           {
             "body": null,
             "documentation": {
-              "id": 4997,
+              "id": 4977,
               "nodeType": "StructuredDocumentation",
-              "src": "796:89:10",
+              "src": "796:89:9",
               "text": "@dev sets the SLARegistry contract address and can only be called once"
             },
             "functionSelector": "f3881589",
-            "id": 5000,
+            "id": 4980,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -507,19 +533,19 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 4998,
+              "id": 4978,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "913:2:10"
+              "src": "913:2:9"
             },
             "returnParameters": {
-              "id": 4999,
+              "id": 4979,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "932:0:10"
+              "src": "932:0:9"
             },
-            "scope": 5051,
-            "src": "890:43:10",
+            "scope": 5043,
+            "src": "890:43:9",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "external"
@@ -527,13 +553,13 @@
           {
             "body": null,
             "documentation": {
-              "id": 5001,
+              "id": 4981,
               "nodeType": "StructuredDocumentation",
-              "src": "939:350:10",
+              "src": "939:350:9",
               "text": "@dev creates a ChainLink request to get a new SLI value for the\ngiven params. Can only be called by the SLARegistry contract or Chainlink Oracle.\n@param _periodId 1. id of the period to be queried\n@param _slaAddress 2. address of the receiver SLA\n@param _slaAddress 2. if approval by owner or msg.sender"
             },
             "functionSelector": "97a82192",
-            "id": 5012,
+            "id": 4992,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -541,18 +567,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5010,
+              "id": 4990,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5003,
+                  "id": 4983,
                   "mutability": "mutable",
                   "name": "_periodId",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5012,
-                  "src": "1324:17:10",
+                  "scope": 4992,
+                  "src": "1324:17:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -560,10 +586,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5002,
+                    "id": 4982,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1324:7:10",
+                    "src": "1324:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -574,13 +600,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 5005,
+                  "id": 4985,
                   "mutability": "mutable",
                   "name": "_slaAddress",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5012,
-                  "src": "1351:19:10",
+                  "scope": 4992,
+                  "src": "1351:19:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -588,10 +614,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5004,
+                    "id": 4984,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1351:7:10",
+                    "src": "1351:7:9",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -603,13 +629,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 5007,
+                  "id": 4987,
                   "mutability": "mutable",
                   "name": "_ownerApproval",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5012,
-                  "src": "1380:19:10",
+                  "scope": 4992,
+                  "src": "1380:19:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -617,10 +643,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 5006,
+                    "id": 4986,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1380:4:10",
+                    "src": "1380:4:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -631,13 +657,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 5009,
+                  "id": 4989,
                   "mutability": "mutable",
                   "name": "_callerAddress",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5012,
-                  "src": "1409:22:10",
+                  "scope": 4992,
+                  "src": "1409:22:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -645,10 +671,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5008,
+                    "id": 4988,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1409:7:10",
+                    "src": "1409:7:9",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -659,16 +685,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1314:123:10"
+              "src": "1314:123:9"
             },
             "returnParameters": {
-              "id": 5011,
+              "id": 4991,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1454:0:10"
+              "src": "1454:0:9"
             },
-            "scope": 5051,
-            "src": "1295:160:10",
+            "scope": 5043,
+            "src": "1295:160:9",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "external"
@@ -676,13 +702,13 @@
           {
             "body": null,
             "documentation": {
-              "id": 5013,
+              "id": 4993,
               "nodeType": "StructuredDocumentation",
-              "src": "1461:255:10",
+              "src": "1461:255:9",
               "text": "@dev callback function for the Chainlink SLI request which stores\nthe SLI in the SLA contract\n@param _requestId the ID of the ChainLink request\n@param _chainlinkResponseUint256 response object from Chainlink Oracles"
             },
             "functionSelector": "bc0bfc00",
-            "id": 5020,
+            "id": 5000,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -690,18 +716,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5018,
+              "id": 4998,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5015,
+                  "id": 4995,
                   "mutability": "mutable",
                   "name": "_requestId",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5020,
-                  "src": "1741:18:10",
+                  "scope": 5000,
+                  "src": "1741:18:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -709,10 +735,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 5014,
+                    "id": 4994,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1741:7:10",
+                    "src": "1741:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -723,13 +749,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 5017,
+                  "id": 4997,
                   "mutability": "mutable",
                   "name": "_chainlinkResponseUint256",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5020,
-                  "src": "1761:33:10",
+                  "scope": 5000,
+                  "src": "1761:33:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -737,10 +763,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5016,
+                    "id": 4996,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1761:7:10",
+                    "src": "1761:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -750,16 +776,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1740:55:10"
+              "src": "1740:55:9"
             },
             "returnParameters": {
-              "id": 5019,
+              "id": 4999,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1828:0:10"
+              "src": "1828:0:9"
             },
-            "scope": 5051,
-            "src": "1721:108:10",
+            "scope": 5043,
+            "src": "1721:108:9",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "external"
@@ -767,13 +793,13 @@
           {
             "body": null,
             "documentation": {
-              "id": 5021,
+              "id": 5001,
               "nodeType": "StructuredDocumentation",
-              "src": "1835:52:10",
+              "src": "1835:52:9",
               "text": "@dev gets the messenger precision"
             },
             "functionSelector": "c9b0cb22",
-            "id": 5026,
+            "id": 5006,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -781,24 +807,24 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5022,
+              "id": 5002,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1919:2:10"
+              "src": "1919:2:9"
             },
             "returnParameters": {
-              "id": 5025,
+              "id": 5005,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5024,
+                  "id": 5004,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5026,
-                  "src": "1953:7:10",
+                  "scope": 5006,
+                  "src": "1953:7:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -806,10 +832,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5023,
+                    "id": 5003,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1953:7:10",
+                    "src": "1953:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -819,10 +845,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1952:9:10"
+              "src": "1952:9:9"
             },
-            "scope": 5051,
-            "src": "1892:70:10",
+            "scope": 5043,
+            "src": "1892:70:9",
             "stateMutability": "view",
             "virtual": true,
             "visibility": "external"
@@ -830,13 +856,13 @@
           {
             "body": null,
             "documentation": {
-              "id": 5027,
+              "id": 5007,
               "nodeType": "StructuredDocumentation",
-              "src": "1968:51:10",
+              "src": "1968:51:9",
               "text": "@dev gets the slaRegistryAddress"
             },
             "functionSelector": "6e71890d",
-            "id": 5032,
+            "id": 5012,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -844,24 +870,24 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5028,
+              "id": 5008,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "2051:2:10"
+              "src": "2051:2:9"
             },
             "returnParameters": {
-              "id": 5031,
+              "id": 5011,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5030,
+                  "id": 5010,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5032,
-                  "src": "2085:7:10",
+                  "scope": 5012,
+                  "src": "2085:7:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -869,10 +895,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5029,
+                    "id": 5009,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2085:7:10",
+                    "src": "2085:7:9",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -883,10 +909,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2084:9:10"
+              "src": "2084:9:9"
             },
-            "scope": 5051,
-            "src": "2024:70:10",
+            "scope": 5043,
+            "src": "2024:70:9",
             "stateMutability": "view",
             "virtual": true,
             "visibility": "external"
@@ -894,13 +920,13 @@
           {
             "body": null,
             "documentation": {
-              "id": 5033,
+              "id": 5013,
               "nodeType": "StructuredDocumentation",
-              "src": "2100:66:10",
+              "src": "2100:66:9",
               "text": "@dev gets the chainlink oracle contract address"
             },
             "functionSelector": "7dc0d1d0",
-            "id": 5038,
+            "id": 5018,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -908,24 +934,24 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5034,
+              "id": 5014,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "2186:2:10"
+              "src": "2186:2:9"
             },
             "returnParameters": {
-              "id": 5037,
+              "id": 5017,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5036,
+                  "id": 5016,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5038,
-                  "src": "2220:7:10",
+                  "scope": 5018,
+                  "src": "2220:7:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -933,10 +959,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5035,
+                    "id": 5015,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2220:7:10",
+                    "src": "2220:7:9",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -947,10 +973,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2219:9:10"
+              "src": "2219:9:9"
             },
-            "scope": 5051,
-            "src": "2171:58:10",
+            "scope": 5043,
+            "src": "2171:58:9",
             "stateMutability": "view",
             "virtual": true,
             "visibility": "external"
@@ -958,13 +984,13 @@
           {
             "body": null,
             "documentation": {
-              "id": 5039,
+              "id": 5019,
               "nodeType": "StructuredDocumentation",
-              "src": "2235:49:10",
+              "src": "2235:49:9",
               "text": "@dev gets the chainlink job id"
             },
             "functionSelector": "c2939d97",
-            "id": 5044,
+            "id": 5024,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -972,24 +998,24 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5040,
+              "id": 5020,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "2303:2:10"
+              "src": "2303:2:9"
             },
             "returnParameters": {
-              "id": 5043,
+              "id": 5023,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5042,
+                  "id": 5022,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5044,
-                  "src": "2337:7:10",
+                  "scope": 5024,
+                  "src": "2337:7:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -997,10 +1023,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 5041,
+                    "id": 5021,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2337:7:10",
+                    "src": "2337:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1010,10 +1036,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2336:9:10"
+              "src": "2336:9:9"
             },
-            "scope": 5051,
-            "src": "2289:57:10",
+            "scope": 5043,
+            "src": "2289:57:9",
             "stateMutability": "view",
             "virtual": true,
             "visibility": "external"
@@ -1021,13 +1047,13 @@
           {
             "body": null,
             "documentation": {
-              "id": 5045,
+              "id": 5025,
               "nodeType": "StructuredDocumentation",
-              "src": "2352:57:10",
+              "src": "2352:57:9",
               "text": "@dev gets the fee amount of LINK token"
             },
             "functionSelector": "ddca3f43",
-            "id": 5050,
+            "id": 5030,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -1035,24 +1061,24 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5046,
+              "id": 5026,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "2426:2:10"
+              "src": "2426:2:9"
             },
             "returnParameters": {
-              "id": 5049,
+              "id": 5029,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5048,
+                  "id": 5028,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5050,
-                  "src": "2460:7:10",
+                  "scope": 5030,
+                  "src": "2460:7:9",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1060,10 +1086,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5047,
+                    "id": 5027,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2460:7:10",
+                    "src": "2460:7:9",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1073,27 +1099,153 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2459:9:10"
+              "src": "2459:9:9"
             },
-            "scope": 5051,
-            "src": "2414:55:10",
+            "scope": 5043,
+            "src": "2414:55:9",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": {
+              "id": 5031,
+              "nodeType": "StructuredDocumentation",
+              "src": "2475:51:9",
+              "text": "@dev returns the requestsCounter"
+            },
+            "functionSelector": "663c2269",
+            "id": 5036,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "requestsCounter",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5032,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2555:2:9"
+            },
+            "returnParameters": {
+              "id": 5035,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5034,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5036,
+                  "src": "2589:7:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5033,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2589:7:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2588:9:9"
+            },
+            "scope": 5043,
+            "src": "2531:67:9",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": {
+              "id": 5037,
+              "nodeType": "StructuredDocumentation",
+              "src": "2604:51:9",
+              "text": "@dev returns the fulfillsCounter"
+            },
+            "functionSelector": "a50c5425",
+            "id": 5042,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "fulfillsCounter",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5038,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2684:2:9"
+            },
+            "returnParameters": {
+              "id": 5041,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5040,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5042,
+                  "src": "2718:7:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5039,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2718:7:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2717:9:9"
+            },
+            "scope": 5043,
+            "src": "2660:67:9",
             "stateMutability": "view",
             "virtual": true,
             "visibility": "external"
           }
         ],
-        "scope": 5052,
-        "src": "185:2286:10"
+        "scope": 5044,
+        "src": "185:2544:9"
       }
     ],
-    "src": "0:2472:10"
+    "src": "0:2730:9"
   },
   "legacyAST": {
     "attributes": {
       "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/messenger/IMessenger.sol",
       "exportedSymbols": {
         "IMessenger": [
-          5051
+          5043
         ]
       }
     },
@@ -1106,50 +1258,50 @@
             ".6"
           ]
         },
-        "id": 4976,
+        "id": 4956,
         "name": "PragmaDirective",
-        "src": "0:22:10"
+        "src": "0:22:9"
       },
       {
         "attributes": {
-          "SourceUnit": 11203,
+          "SourceUnit": 10624,
           "absolutePath": "@openzeppelin/contracts/access/Ownable.sol",
           "file": "@openzeppelin/contracts/access/Ownable.sol",
-          "scope": 5052,
+          "scope": 5044,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 4977,
+        "id": 4957,
         "name": "ImportDirective",
-        "src": "24:52:10"
+        "src": "24:52:9"
       },
       {
         "attributes": {
           "abstract": true,
           "contractDependencies": [
-            10810,
-            11202
+            10231,
+            10623
           ],
           "contractKind": "contract",
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            5051,
-            11202,
-            10810
+            5043,
+            10623,
+            10231
           ],
           "name": "IMessenger",
-          "scope": 5052
+          "scope": 5044
         },
         "children": [
           {
             "attributes": {
               "text": "@title IMessenger\n@dev Interface to create new Messenger contract to add lo Messenger lists"
             },
-            "id": 4978,
+            "id": 4958,
             "name": "StructuredDocumentation",
-            "src": "78:105:10"
+            "src": "78:105:9"
           },
           {
             "attributes": {
@@ -1160,23 +1312,23 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "Ownable",
-                  "referencedDeclaration": 11202,
+                  "referencedDeclaration": 10623,
                   "type": "contract Ownable"
                 },
-                "id": 4979,
+                "id": 4959,
                 "name": "UserDefinedTypeName",
-                "src": "217:7:10"
+                "src": "217:7:9"
               }
             ],
-            "id": 4980,
+            "id": 4960,
             "name": "InheritanceSpecifier",
-            "src": "217:7:10"
+            "src": "217:7:9"
           },
           {
             "attributes": {
               "canonicalName": "IMessenger.SLIRequest",
               "name": "SLIRequest",
-              "scope": 5051,
+              "scope": 5043,
               "visibility": "public"
             },
             "children": [
@@ -1186,7 +1338,7 @@
                   "mutability": "mutable",
                   "name": "slaAddress",
                   "overrides": null,
-                  "scope": 4985,
+                  "scope": 4965,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "address",
@@ -1200,14 +1352,14 @@
                       "stateMutability": "nonpayable",
                       "type": "address"
                     },
-                    "id": 4981,
+                    "id": 4961,
                     "name": "ElementaryTypeName",
-                    "src": "259:7:10"
+                    "src": "259:7:9"
                   }
                 ],
-                "id": 4982,
+                "id": 4962,
                 "name": "VariableDeclaration",
-                "src": "259:18:10"
+                "src": "259:18:9"
               },
               {
                 "attributes": {
@@ -1215,7 +1367,7 @@
                   "mutability": "mutable",
                   "name": "periodId",
                   "overrides": null,
-                  "scope": 4985,
+                  "scope": 4965,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "uint256",
@@ -1228,19 +1380,19 @@
                       "name": "uint256",
                       "type": "uint256"
                     },
-                    "id": 4983,
+                    "id": 4963,
                     "name": "ElementaryTypeName",
-                    "src": "287:7:10"
+                    "src": "287:7:9"
                   }
                 ],
-                "id": 4984,
+                "id": 4964,
                 "name": "VariableDeclaration",
-                "src": "287:16:10"
+                "src": "287:16:9"
               }
             ],
-            "id": 4985,
+            "id": 4965,
             "name": "StructDefinition",
-            "src": "231:79:10"
+            "src": "231:79:9"
           },
           {
             "attributes": {
@@ -1252,9 +1404,9 @@
                 "attributes": {
                   "text": "@dev event emitted when having a response from Chainlink with the SLI\n@param slaAddress 1. SLA address to store the SLI\n@param periodId 2. id of the Chainlink request\n@param requestId 3. id of the Chainlink request\n@param chainlinkResponse 4. response from Chainlink"
                 },
-                "id": 4986,
+                "id": 4966,
                 "name": "StructuredDocumentation",
-                "src": "316:313:10"
+                "src": "316:313:9"
               },
               {
                 "children": [
@@ -1265,7 +1417,7 @@
                       "mutability": "mutable",
                       "name": "slaAddress",
                       "overrides": null,
-                      "scope": 4996,
+                      "scope": 4976,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1279,14 +1431,14 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 4987,
+                        "id": 4967,
                         "name": "ElementaryTypeName",
-                        "src": "661:7:10"
+                        "src": "661:7:9"
                       }
                     ],
-                    "id": 4988,
+                    "id": 4968,
                     "name": "VariableDeclaration",
-                    "src": "661:26:10"
+                    "src": "661:26:9"
                   },
                   {
                     "attributes": {
@@ -1295,7 +1447,7 @@
                       "mutability": "mutable",
                       "name": "periodId",
                       "overrides": null,
-                      "scope": 4996,
+                      "scope": 4976,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -1308,14 +1460,14 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 4989,
+                        "id": 4969,
                         "name": "ElementaryTypeName",
-                        "src": "697:7:10"
+                        "src": "697:7:9"
                       }
                     ],
-                    "id": 4990,
+                    "id": 4970,
                     "name": "VariableDeclaration",
-                    "src": "697:16:10"
+                    "src": "697:16:9"
                   },
                   {
                     "attributes": {
@@ -1324,7 +1476,7 @@
                       "mutability": "mutable",
                       "name": "requestId",
                       "overrides": null,
-                      "scope": 4996,
+                      "scope": 4976,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -1337,14 +1489,14 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 4991,
+                        "id": 4971,
                         "name": "ElementaryTypeName",
-                        "src": "723:7:10"
+                        "src": "723:7:9"
                       }
                     ],
-                    "id": 4992,
+                    "id": 4972,
                     "name": "VariableDeclaration",
-                    "src": "723:25:10"
+                    "src": "723:25:9"
                   },
                   {
                     "attributes": {
@@ -1353,7 +1505,7 @@
                       "mutability": "mutable",
                       "name": "chainlinkResponse",
                       "overrides": null,
-                      "scope": 4996,
+                      "scope": 4976,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -1366,24 +1518,24 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 4993,
+                        "id": 4973,
                         "name": "ElementaryTypeName",
-                        "src": "758:7:10"
+                        "src": "758:7:9"
                       }
                     ],
-                    "id": 4994,
+                    "id": 4974,
                     "name": "VariableDeclaration",
-                    "src": "758:25:10"
+                    "src": "758:25:9"
                   }
                 ],
-                "id": 4995,
+                "id": 4975,
                 "name": "ParameterList",
-                "src": "651:138:10"
+                "src": "651:138:9"
               }
             ],
-            "id": 4996,
+            "id": 4976,
             "name": "EventDefinition",
-            "src": "634:156:10"
+            "src": "634:156:9"
           },
           {
             "attributes": {
@@ -1397,7 +1549,7 @@
               ],
               "name": "setSLARegistry",
               "overrides": null,
-              "scope": 5051,
+              "scope": 5043,
               "stateMutability": "nonpayable",
               "virtual": true,
               "visibility": "external"
@@ -1407,9 +1559,9 @@
                 "attributes": {
                   "text": "@dev sets the SLARegistry contract address and can only be called once"
                 },
-                "id": 4997,
+                "id": 4977,
                 "name": "StructuredDocumentation",
-                "src": "796:89:10"
+                "src": "796:89:9"
               },
               {
                 "attributes": {
@@ -1418,9 +1570,9 @@
                   ]
                 },
                 "children": [],
-                "id": 4998,
+                "id": 4978,
                 "name": "ParameterList",
-                "src": "913:2:10"
+                "src": "913:2:9"
               },
               {
                 "attributes": {
@@ -1429,14 +1581,14 @@
                   ]
                 },
                 "children": [],
-                "id": 4999,
+                "id": 4979,
                 "name": "ParameterList",
-                "src": "932:0:10"
+                "src": "932:0:9"
               }
             ],
-            "id": 5000,
+            "id": 4980,
             "name": "FunctionDefinition",
-            "src": "890:43:10"
+            "src": "890:43:9"
           },
           {
             "attributes": {
@@ -1450,7 +1602,7 @@
               ],
               "name": "requestSLI",
               "overrides": null,
-              "scope": 5051,
+              "scope": 5043,
               "stateMutability": "nonpayable",
               "virtual": true,
               "visibility": "external"
@@ -1460,9 +1612,9 @@
                 "attributes": {
                   "text": "@dev creates a ChainLink request to get a new SLI value for the\ngiven params. Can only be called by the SLARegistry contract or Chainlink Oracle.\n@param _periodId 1. id of the period to be queried\n@param _slaAddress 2. address of the receiver SLA\n@param _slaAddress 2. if approval by owner or msg.sender"
                 },
-                "id": 5001,
+                "id": 4981,
                 "name": "StructuredDocumentation",
-                "src": "939:350:10"
+                "src": "939:350:9"
               },
               {
                 "children": [
@@ -1472,7 +1624,7 @@
                       "mutability": "mutable",
                       "name": "_periodId",
                       "overrides": null,
-                      "scope": 5012,
+                      "scope": 4992,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -1485,14 +1637,14 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 5002,
+                        "id": 4982,
                         "name": "ElementaryTypeName",
-                        "src": "1324:7:10"
+                        "src": "1324:7:9"
                       }
                     ],
-                    "id": 5003,
+                    "id": 4983,
                     "name": "VariableDeclaration",
-                    "src": "1324:17:10"
+                    "src": "1324:17:9"
                   },
                   {
                     "attributes": {
@@ -1500,7 +1652,7 @@
                       "mutability": "mutable",
                       "name": "_slaAddress",
                       "overrides": null,
-                      "scope": 5012,
+                      "scope": 4992,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1514,14 +1666,14 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 5004,
+                        "id": 4984,
                         "name": "ElementaryTypeName",
-                        "src": "1351:7:10"
+                        "src": "1351:7:9"
                       }
                     ],
-                    "id": 5005,
+                    "id": 4985,
                     "name": "VariableDeclaration",
-                    "src": "1351:19:10"
+                    "src": "1351:19:9"
                   },
                   {
                     "attributes": {
@@ -1529,7 +1681,7 @@
                       "mutability": "mutable",
                       "name": "_ownerApproval",
                       "overrides": null,
-                      "scope": 5012,
+                      "scope": 4992,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -1542,14 +1694,14 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 5006,
+                        "id": 4986,
                         "name": "ElementaryTypeName",
-                        "src": "1380:4:10"
+                        "src": "1380:4:9"
                       }
                     ],
-                    "id": 5007,
+                    "id": 4987,
                     "name": "VariableDeclaration",
-                    "src": "1380:19:10"
+                    "src": "1380:19:9"
                   },
                   {
                     "attributes": {
@@ -1557,7 +1709,7 @@
                       "mutability": "mutable",
                       "name": "_callerAddress",
                       "overrides": null,
-                      "scope": 5012,
+                      "scope": 4992,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1571,19 +1723,19 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 5008,
+                        "id": 4988,
                         "name": "ElementaryTypeName",
-                        "src": "1409:7:10"
+                        "src": "1409:7:9"
                       }
                     ],
-                    "id": 5009,
+                    "id": 4989,
                     "name": "VariableDeclaration",
-                    "src": "1409:22:10"
+                    "src": "1409:22:9"
                   }
                 ],
-                "id": 5010,
+                "id": 4990,
                 "name": "ParameterList",
-                "src": "1314:123:10"
+                "src": "1314:123:9"
               },
               {
                 "attributes": {
@@ -1592,14 +1744,14 @@
                   ]
                 },
                 "children": [],
-                "id": 5011,
+                "id": 4991,
                 "name": "ParameterList",
-                "src": "1454:0:10"
+                "src": "1454:0:9"
               }
             ],
-            "id": 5012,
+            "id": 4992,
             "name": "FunctionDefinition",
-            "src": "1295:160:10"
+            "src": "1295:160:9"
           },
           {
             "attributes": {
@@ -1613,7 +1765,7 @@
               ],
               "name": "fulfillSLI",
               "overrides": null,
-              "scope": 5051,
+              "scope": 5043,
               "stateMutability": "nonpayable",
               "virtual": true,
               "visibility": "external"
@@ -1623,9 +1775,9 @@
                 "attributes": {
                   "text": "@dev callback function for the Chainlink SLI request which stores\nthe SLI in the SLA contract\n@param _requestId the ID of the ChainLink request\n@param _chainlinkResponseUint256 response object from Chainlink Oracles"
                 },
-                "id": 5013,
+                "id": 4993,
                 "name": "StructuredDocumentation",
-                "src": "1461:255:10"
+                "src": "1461:255:9"
               },
               {
                 "children": [
@@ -1635,7 +1787,7 @@
                       "mutability": "mutable",
                       "name": "_requestId",
                       "overrides": null,
-                      "scope": 5020,
+                      "scope": 5000,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -1648,14 +1800,14 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 5014,
+                        "id": 4994,
                         "name": "ElementaryTypeName",
-                        "src": "1741:7:10"
+                        "src": "1741:7:9"
                       }
                     ],
-                    "id": 5015,
+                    "id": 4995,
                     "name": "VariableDeclaration",
-                    "src": "1741:18:10"
+                    "src": "1741:18:9"
                   },
                   {
                     "attributes": {
@@ -1663,7 +1815,7 @@
                       "mutability": "mutable",
                       "name": "_chainlinkResponseUint256",
                       "overrides": null,
-                      "scope": 5020,
+                      "scope": 5000,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -1676,19 +1828,19 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 5016,
+                        "id": 4996,
                         "name": "ElementaryTypeName",
-                        "src": "1761:7:10"
+                        "src": "1761:7:9"
                       }
                     ],
-                    "id": 5017,
+                    "id": 4997,
                     "name": "VariableDeclaration",
-                    "src": "1761:33:10"
+                    "src": "1761:33:9"
                   }
                 ],
-                "id": 5018,
+                "id": 4998,
                 "name": "ParameterList",
-                "src": "1740:55:10"
+                "src": "1740:55:9"
               },
               {
                 "attributes": {
@@ -1697,14 +1849,14 @@
                   ]
                 },
                 "children": [],
-                "id": 5019,
+                "id": 4999,
                 "name": "ParameterList",
-                "src": "1828:0:10"
+                "src": "1828:0:9"
               }
             ],
-            "id": 5020,
+            "id": 5000,
             "name": "FunctionDefinition",
-            "src": "1721:108:10"
+            "src": "1721:108:9"
           },
           {
             "attributes": {
@@ -1718,7 +1870,7 @@
               ],
               "name": "messengerPrecision",
               "overrides": null,
-              "scope": 5051,
+              "scope": 5043,
               "stateMutability": "view",
               "virtual": true,
               "visibility": "external"
@@ -1728,9 +1880,9 @@
                 "attributes": {
                   "text": "@dev gets the messenger precision"
                 },
-                "id": 5021,
+                "id": 5001,
                 "name": "StructuredDocumentation",
-                "src": "1835:52:10"
+                "src": "1835:52:9"
               },
               {
                 "attributes": {
@@ -1739,9 +1891,9 @@
                   ]
                 },
                 "children": [],
-                "id": 5022,
+                "id": 5002,
                 "name": "ParameterList",
-                "src": "1919:2:10"
+                "src": "1919:2:9"
               },
               {
                 "children": [
@@ -1751,7 +1903,7 @@
                       "mutability": "mutable",
                       "name": "",
                       "overrides": null,
-                      "scope": 5026,
+                      "scope": 5006,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -1764,24 +1916,24 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 5023,
+                        "id": 5003,
                         "name": "ElementaryTypeName",
-                        "src": "1953:7:10"
+                        "src": "1953:7:9"
                       }
                     ],
-                    "id": 5024,
+                    "id": 5004,
                     "name": "VariableDeclaration",
-                    "src": "1953:7:10"
+                    "src": "1953:7:9"
                   }
                 ],
-                "id": 5025,
+                "id": 5005,
                 "name": "ParameterList",
-                "src": "1952:9:10"
+                "src": "1952:9:9"
               }
             ],
-            "id": 5026,
+            "id": 5006,
             "name": "FunctionDefinition",
-            "src": "1892:70:10"
+            "src": "1892:70:9"
           },
           {
             "attributes": {
@@ -1795,7 +1947,7 @@
               ],
               "name": "slaRegistryAddress",
               "overrides": null,
-              "scope": 5051,
+              "scope": 5043,
               "stateMutability": "view",
               "virtual": true,
               "visibility": "external"
@@ -1805,9 +1957,9 @@
                 "attributes": {
                   "text": "@dev gets the slaRegistryAddress"
                 },
-                "id": 5027,
+                "id": 5007,
                 "name": "StructuredDocumentation",
-                "src": "1968:51:10"
+                "src": "1968:51:9"
               },
               {
                 "attributes": {
@@ -1816,9 +1968,9 @@
                   ]
                 },
                 "children": [],
-                "id": 5028,
+                "id": 5008,
                 "name": "ParameterList",
-                "src": "2051:2:10"
+                "src": "2051:2:9"
               },
               {
                 "children": [
@@ -1828,7 +1980,7 @@
                       "mutability": "mutable",
                       "name": "",
                       "overrides": null,
-                      "scope": 5032,
+                      "scope": 5012,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1842,24 +1994,24 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 5029,
+                        "id": 5009,
                         "name": "ElementaryTypeName",
-                        "src": "2085:7:10"
+                        "src": "2085:7:9"
                       }
                     ],
-                    "id": 5030,
+                    "id": 5010,
                     "name": "VariableDeclaration",
-                    "src": "2085:7:10"
+                    "src": "2085:7:9"
                   }
                 ],
-                "id": 5031,
+                "id": 5011,
                 "name": "ParameterList",
-                "src": "2084:9:10"
+                "src": "2084:9:9"
               }
             ],
-            "id": 5032,
+            "id": 5012,
             "name": "FunctionDefinition",
-            "src": "2024:70:10"
+            "src": "2024:70:9"
           },
           {
             "attributes": {
@@ -1873,7 +2025,7 @@
               ],
               "name": "oracle",
               "overrides": null,
-              "scope": 5051,
+              "scope": 5043,
               "stateMutability": "view",
               "virtual": true,
               "visibility": "external"
@@ -1883,9 +2035,9 @@
                 "attributes": {
                   "text": "@dev gets the chainlink oracle contract address"
                 },
-                "id": 5033,
+                "id": 5013,
                 "name": "StructuredDocumentation",
-                "src": "2100:66:10"
+                "src": "2100:66:9"
               },
               {
                 "attributes": {
@@ -1894,9 +2046,9 @@
                   ]
                 },
                 "children": [],
-                "id": 5034,
+                "id": 5014,
                 "name": "ParameterList",
-                "src": "2186:2:10"
+                "src": "2186:2:9"
               },
               {
                 "children": [
@@ -1906,7 +2058,7 @@
                       "mutability": "mutable",
                       "name": "",
                       "overrides": null,
-                      "scope": 5038,
+                      "scope": 5018,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1920,24 +2072,24 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 5035,
+                        "id": 5015,
                         "name": "ElementaryTypeName",
-                        "src": "2220:7:10"
+                        "src": "2220:7:9"
                       }
                     ],
-                    "id": 5036,
+                    "id": 5016,
                     "name": "VariableDeclaration",
-                    "src": "2220:7:10"
+                    "src": "2220:7:9"
                   }
                 ],
-                "id": 5037,
+                "id": 5017,
                 "name": "ParameterList",
-                "src": "2219:9:10"
+                "src": "2219:9:9"
               }
             ],
-            "id": 5038,
+            "id": 5018,
             "name": "FunctionDefinition",
-            "src": "2171:58:10"
+            "src": "2171:58:9"
           },
           {
             "attributes": {
@@ -1951,7 +2103,7 @@
               ],
               "name": "jobId",
               "overrides": null,
-              "scope": 5051,
+              "scope": 5043,
               "stateMutability": "view",
               "virtual": true,
               "visibility": "external"
@@ -1961,9 +2113,9 @@
                 "attributes": {
                   "text": "@dev gets the chainlink job id"
                 },
-                "id": 5039,
+                "id": 5019,
                 "name": "StructuredDocumentation",
-                "src": "2235:49:10"
+                "src": "2235:49:9"
               },
               {
                 "attributes": {
@@ -1972,9 +2124,9 @@
                   ]
                 },
                 "children": [],
-                "id": 5040,
+                "id": 5020,
                 "name": "ParameterList",
-                "src": "2303:2:10"
+                "src": "2303:2:9"
               },
               {
                 "children": [
@@ -1984,7 +2136,7 @@
                       "mutability": "mutable",
                       "name": "",
                       "overrides": null,
-                      "scope": 5044,
+                      "scope": 5024,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -1997,24 +2149,24 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 5041,
+                        "id": 5021,
                         "name": "ElementaryTypeName",
-                        "src": "2337:7:10"
+                        "src": "2337:7:9"
                       }
                     ],
-                    "id": 5042,
+                    "id": 5022,
                     "name": "VariableDeclaration",
-                    "src": "2337:7:10"
+                    "src": "2337:7:9"
                   }
                 ],
-                "id": 5043,
+                "id": 5023,
                 "name": "ParameterList",
-                "src": "2336:9:10"
+                "src": "2336:9:9"
               }
             ],
-            "id": 5044,
+            "id": 5024,
             "name": "FunctionDefinition",
-            "src": "2289:57:10"
+            "src": "2289:57:9"
           },
           {
             "attributes": {
@@ -2028,7 +2180,7 @@
               ],
               "name": "fee",
               "overrides": null,
-              "scope": 5051,
+              "scope": 5043,
               "stateMutability": "view",
               "virtual": true,
               "visibility": "external"
@@ -2038,9 +2190,9 @@
                 "attributes": {
                   "text": "@dev gets the fee amount of LINK token"
                 },
-                "id": 5045,
+                "id": 5025,
                 "name": "StructuredDocumentation",
-                "src": "2352:57:10"
+                "src": "2352:57:9"
               },
               {
                 "attributes": {
@@ -2049,9 +2201,9 @@
                   ]
                 },
                 "children": [],
-                "id": 5046,
+                "id": 5026,
                 "name": "ParameterList",
-                "src": "2426:2:10"
+                "src": "2426:2:9"
               },
               {
                 "children": [
@@ -2061,7 +2213,7 @@
                       "mutability": "mutable",
                       "name": "",
                       "overrides": null,
-                      "scope": 5050,
+                      "scope": 5030,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2074,34 +2226,188 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 5047,
+                        "id": 5027,
                         "name": "ElementaryTypeName",
-                        "src": "2460:7:10"
+                        "src": "2460:7:9"
                       }
                     ],
-                    "id": 5048,
+                    "id": 5028,
                     "name": "VariableDeclaration",
-                    "src": "2460:7:10"
+                    "src": "2460:7:9"
                   }
                 ],
-                "id": 5049,
+                "id": 5029,
                 "name": "ParameterList",
-                "src": "2459:9:10"
+                "src": "2459:9:9"
               }
             ],
-            "id": 5050,
+            "id": 5030,
             "name": "FunctionDefinition",
-            "src": "2414:55:10"
+            "src": "2414:55:9"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "functionSelector": "663c2269",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "requestsCounter",
+              "overrides": null,
+              "scope": 5043,
+              "stateMutability": "view",
+              "virtual": true,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev returns the requestsCounter"
+                },
+                "id": 5031,
+                "name": "StructuredDocumentation",
+                "src": "2475:51:9"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5032,
+                "name": "ParameterList",
+                "src": "2555:2:9"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5036,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 5033,
+                        "name": "ElementaryTypeName",
+                        "src": "2589:7:9"
+                      }
+                    ],
+                    "id": 5034,
+                    "name": "VariableDeclaration",
+                    "src": "2589:7:9"
+                  }
+                ],
+                "id": 5035,
+                "name": "ParameterList",
+                "src": "2588:9:9"
+              }
+            ],
+            "id": 5036,
+            "name": "FunctionDefinition",
+            "src": "2531:67:9"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "functionSelector": "a50c5425",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "fulfillsCounter",
+              "overrides": null,
+              "scope": 5043,
+              "stateMutability": "view",
+              "virtual": true,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev returns the fulfillsCounter"
+                },
+                "id": 5037,
+                "name": "StructuredDocumentation",
+                "src": "2604:51:9"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5038,
+                "name": "ParameterList",
+                "src": "2684:2:9"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5042,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 5039,
+                        "name": "ElementaryTypeName",
+                        "src": "2718:7:9"
+                      }
+                    ],
+                    "id": 5040,
+                    "name": "VariableDeclaration",
+                    "src": "2718:7:9"
+                  }
+                ],
+                "id": 5041,
+                "name": "ParameterList",
+                "src": "2717:9:9"
+              }
+            ],
+            "id": 5042,
+            "name": "FunctionDefinition",
+            "src": "2660:67:9"
           }
         ],
-        "id": 5051,
+        "id": 5043,
         "name": "ContractDefinition",
-        "src": "185:2286:10"
+        "src": "185:2544:9"
       }
     ],
-    "id": 5052,
+    "id": 5044,
     "name": "SourceUnit",
-    "src": "0:2472:10"
+    "src": "0:2730:9"
   },
   "compiler": {
     "name": "solc",
@@ -2109,7 +2415,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.3",
-  "updatedAt": "2021-03-16T21:21:39.558Z",
+  "updatedAt": "2021-03-17T22:14:55.431Z",
   "devdoc": {
     "details": "Interface to create new Messenger contract to add lo Messenger lists",
     "methods": {
@@ -2122,6 +2428,9 @@
           "_chainlinkResponseUint256": "response object from Chainlink Oracles",
           "_requestId": "the ID of the ChainLink request"
         }
+      },
+      "fulfillsCounter()": {
+        "details": "returns the fulfillsCounter"
       },
       "jobId()": {
         "details": "gets the chainlink job id"
@@ -2144,6 +2453,9 @@
           "_periodId": "1. id of the period to be queried",
           "_slaAddress": "2. if approval by owner or msg.sender"
         }
+      },
+      "requestsCounter()": {
+        "details": "returns the requestsCounter"
       },
       "setSLARegistry()": {
         "details": "sets the SLARegistry contract address and can only be called once"

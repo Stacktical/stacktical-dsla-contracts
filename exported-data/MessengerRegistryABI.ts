@@ -7,7 +7,7 @@ export const MessengerRegistryABI: AbiItem[] = [
       {
         indexed: true,
         internalType: 'address',
-        name: 'messengerOwner',
+        name: 'ownerAddress',
         type: 'address',
       },
       {
@@ -19,20 +19,14 @@ export const MessengerRegistryABI: AbiItem[] = [
       {
         indexed: false,
         internalType: 'string',
-        name: 'messengerBaseURL',
+        name: 'specificationUrl',
         type: 'string',
       },
       {
         indexed: false,
-        internalType: 'string',
-        name: 'messengerOwnershipURL',
-        type: 'string',
-      },
-      {
-        indexed: false,
-        internalType: 'string',
-        name: 'messengerSpecificationURL',
-        type: 'string',
+        internalType: 'uint256',
+        name: 'precision',
+        type: 'uint256',
       },
     ],
     name: 'MessengerModified',
@@ -44,7 +38,7 @@ export const MessengerRegistryABI: AbiItem[] = [
       {
         indexed: true,
         internalType: 'address',
-        name: 'messengerOwner',
+        name: 'ownerAddress',
         type: 'address',
       },
       {
@@ -56,20 +50,14 @@ export const MessengerRegistryABI: AbiItem[] = [
       {
         indexed: false,
         internalType: 'string',
-        name: 'messengerBaseURL',
+        name: 'specificationUrl',
         type: 'string',
       },
       {
         indexed: false,
-        internalType: 'string',
-        name: 'messengerOwnershipURL',
-        type: 'string',
-      },
-      {
-        indexed: false,
-        internalType: 'string',
-        name: 'messengerSpecificationURL',
-        type: 'string',
+        internalType: 'uint256',
+        name: 'precision',
+        type: 'uint256',
       },
     ],
     name: 'MessengerRegistered',
@@ -79,15 +67,12 @@ export const MessengerRegistryABI: AbiItem[] = [
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     name: 'messengers',
     outputs: [
-      { internalType: 'address', name: 'messengerOwner', type: 'address' },
+      { internalType: 'address', name: 'ownerAddress', type: 'address' },
       { internalType: 'address', name: 'messengerAddress', type: 'address' },
-      { internalType: 'string', name: 'messengerBaseURL', type: 'string' },
-      { internalType: 'string', name: 'messengerOwnershipURL', type: 'string' },
-      {
-        internalType: 'string',
-        name: 'messengerSpecificationURL',
-        type: 'string',
-      },
+      { internalType: 'string', name: 'specificationUrl', type: 'string' },
+      { internalType: 'uint256', name: 'precision', type: 'uint256' },
+      { internalType: 'uint256', name: 'requestsCounter', type: 'uint256' },
+      { internalType: 'uint256', name: 'fulfillsCounter', type: 'uint256' },
     ],
     stateMutability: 'view',
     type: 'function',
@@ -129,18 +114,9 @@ export const MessengerRegistryABI: AbiItem[] = [
   },
   {
     inputs: [
+      { internalType: 'address', name: '_callerAddress', type: 'address' },
       { internalType: 'address', name: '_messengerAddress', type: 'address' },
-      { internalType: 'string', name: '_messengerBaseURL', type: 'string' },
-      {
-        internalType: 'string',
-        name: '_messengerOwnershipURL',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_messengerSpecificationURL',
-        type: 'string',
-      },
+      { internalType: 'string', name: '_specificationUrl', type: 'string' },
     ],
     name: 'registerMessenger',
     outputs: [],
@@ -149,17 +125,7 @@ export const MessengerRegistryABI: AbiItem[] = [
   },
   {
     inputs: [
-      { internalType: 'string', name: '_messengerBaseURL', type: 'string' },
-      {
-        internalType: 'string',
-        name: '_messengerOwnershipURL',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_messengerSpecificationURL',
-        type: 'string',
-      },
+      { internalType: 'string', name: '_specificationUrl', type: 'string' },
       { internalType: 'uint256', name: 'messengerId', type: 'uint256' },
     ],
     name: 'modifyMessenger',
@@ -173,23 +139,16 @@ export const MessengerRegistryABI: AbiItem[] = [
     outputs: [
       {
         components: [
-          { internalType: 'address', name: 'messengerOwner', type: 'address' },
+          { internalType: 'address', name: 'ownerAddress', type: 'address' },
           {
             internalType: 'address',
             name: 'messengerAddress',
             type: 'address',
           },
-          { internalType: 'string', name: 'messengerBaseURL', type: 'string' },
-          {
-            internalType: 'string',
-            name: 'messengerOwnershipURL',
-            type: 'string',
-          },
-          {
-            internalType: 'string',
-            name: 'messengerSpecificationURL',
-            type: 'string',
-          },
+          { internalType: 'string', name: 'specificationUrl', type: 'string' },
+          { internalType: 'uint256', name: 'precision', type: 'uint256' },
+          { internalType: 'uint256', name: 'requestsCounter', type: 'uint256' },
+          { internalType: 'uint256', name: 'fulfillsCounter', type: 'uint256' },
         ],
         internalType: 'struct MessengerRegistry.Messenger[]',
         name: '',

@@ -75,7 +75,7 @@ module.exports = (deployer, network) => {
         preCoordinatorConfiguration.payments.length,
       );
 
-      const seMessenger = await deployer.deploy(
+      await deployer.deploy(
         SEMessenger,
         preCoordinator.address,
         env.chainlinkTokenAddress,
@@ -84,19 +84,12 @@ module.exports = (deployer, network) => {
         preCoordinatorConfiguration.payments.length,
       );
 
-      const slaRegistry = await deployer.deploy(
+      return deployer.deploy(
         SLARegistry,
         sloRegistry.address,
         periodRegistry.address,
         messengerRegistry.address,
         stakeRegistry.address,
-      );
-
-      return slaRegistry.registerMessenger(
-        seMessenger.address,
-        '',
-        '',
-        '',
       );
     });
   }

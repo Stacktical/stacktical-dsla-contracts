@@ -9,6 +9,7 @@ const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const IERC20 = artifacts.require('IERC20');
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
+const SLARegistry = artifacts.require('SLARegistry');
 const SEMessenger = artifacts.require('SEMessenger');
 
 const periodType = 2;
@@ -52,6 +53,13 @@ module.exports = (deployer, network) => {
       await linkToken.approve(
         seMessenger.address,
         web3.utils.toWei('100'),
+      );
+
+      console.log('Starting automated job 6: Registering the SEMessenger');
+      const slaRegistry = await SLARegistry.deployed();
+      await slaRegistry.registerMessenger(
+        seMessenger.address,
+        '',
       );
 
       console.log('Bootstrap process completed');

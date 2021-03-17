@@ -14,6 +14,8 @@ contract MessengerRegistry {
         address messengerAddress;
         string specificationUrl;
         uint256 precision;
+        uint256 requestsCounter;
+        uint256 fulfillsCounter;
     }
 
     /// @dev array to store the messengers
@@ -69,18 +71,24 @@ contract MessengerRegistry {
             registeredMessengers[_messengerAddress] == false,
             "messenger already registered"
         );
-        address messengerOwner = IMessenger(_messengerAddress).owner();
+
+        IMessenger messenger = IMessenger(_messengerAddress);
+        address messengerOwner = messenger.owner();
         require(
             messengerOwner == _callerAddress,
             "Should only be called by the messenger owner"
         );
-        uint256 precision = IMessenger(_messengerAddress).messengerPrecision();
+        uint256 precision = messenger.messengerPrecision();
+        uint256 requestsCounter = messenger.requestsCounter();
+        uint256 fulfillsCounter = messenger.fulfillsCounter();
         messengers.push(
             Messenger({
                 ownerAddress: messengerOwner,
                 messengerAddress: _messengerAddress,
                 specificationUrl: _specificationUrl,
-                precision: precision
+                precision: precision,
+                requestsCounter: requestsCounter,
+                fulfillsCounter: fulfillsCounter
             })
         );
 

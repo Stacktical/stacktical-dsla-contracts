@@ -1,6 +1,8 @@
 require('babel-polyfill');
 require('babel-register');
 
+const fs = require('fs');
+const path = require('path');
 const { getIPFSHash, eventListener } = require('../test/helpers');
 const { networks, networkNames, networkNamesBytes32 } = require('../constants');
 const { envParameters } = require('../environments');
@@ -9,7 +11,6 @@ const { generateWeeklyPeriods } = require('../utils');
 const { toWei } = web3.utils;
 
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
-const SLORegistry = artifacts.require('SLORegistry');
 const IERC20 = artifacts.require('IERC20');
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
@@ -22,13 +23,13 @@ const USDC = artifacts.require('USDC');
 const initialTokenSupply = '10000000';
 const stakeAmount = initialTokenSupply / 100;
 const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
-
 const sloValue = 50000;
 const sloType = 4;
 const periodType = 2;
 const [periodStarts, periodEnds] = generateWeeklyPeriods(52, 7);
 const slaNetworkBytes32 = networkNamesBytes32[0];
 const slaNetwork = networkNames[0];
+const seMessengerSpec = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../semessenger.spec.json')));
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
@@ -79,6 +80,20 @@ module.exports = (deployer, network) => {
         web3.utils.toWei('10'),
       );
 
+      console.log('Starting automated job 6: Registering messenger on the SLARegistry');
+      const slaRegistry = await SLARegistry.deployed();
+      const updatedSpec = {
+        ...seMessengerSpec,
+        timestamp: new Date().toISOString(),
+      };
+      const seMessengerSpecIPFS = await getIPFSHash(updatedSpec);
+
+      await slaRegistry.registerMessenger(
+        seMessenger.address,
+        `https://ipfs.dsla.network/ipfs/${seMessengerSpecIPFS}`,
+      );
+
+      // Next steps are optional and not required for production (review before copy/paste)
       console.log('Starting automated job 7: Creating SLA');
       const serviceMetadata = {
         serviceName: networks[slaNetwork].validators[0],
@@ -90,7 +105,6 @@ module.exports = (deployer, network) => {
         serviceTicker: slaNetwork,
       };
       const ipfsHash = await getIPFSHash(serviceMetadata);
-      const slaRegistry = await SLARegistry.deployed();
       const initialPeriodId = 0;
       const finalPeriodId = 51;
       const dslaDepositByPeriod = 20000;
@@ -149,7 +163,6 @@ module.exports = (deployer, network) => {
       await slaRegistry.requestSLI(0, sla.address, ownerApproval);
       await eventListener(sla, 'SLICreated');
 
-      // period 1 is already finished
       console.log('Starting automated job 11: Request Analytics and SLI for period 1');
       networkAnalytics.requestAnalytics(
         1, periodType, slaNetworkBytes32, ownerApproval, callerReward,
@@ -158,28 +171,24 @@ module.exports = (deployer, network) => {
       await slaRegistry.requestSLI(1, sla.address, callerReward);
       await eventListener(sla, 'SLICreated');
 
-      // period 2 is already finished
       console.log('Starting automated job 12: Request Analytics for period 2');
       networkAnalytics.requestAnalytics(
         2, periodType, slaNetworkBytes32, ownerApproval, callerReward,
       );
       await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-      // period 3 is already finished
       console.log('Starting automated job 13: Request Analytics for period 3');
       networkAnalytics.requestAnalytics(
         3, periodType, slaNetworkBytes32, ownerApproval, callerReward,
       );
       await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-      // period 4 is already finished
       console.log('Starting automated job 14: Request Analytics for period 4');
       networkAnalytics.requestAnalytics(
         4, periodType, slaNetworkBytes32, ownerApproval, callerReward,
       );
       await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-      // period 5 is already finished
       console.log('Starting automated job 15: Request Analytics for period 5');
       networkAnalytics.requestAnalytics(
         5, periodType, slaNetworkBytes32, ownerApproval, callerReward,

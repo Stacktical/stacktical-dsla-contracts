@@ -14,6 +14,7 @@ module.exports = (deployer, network) => {
     console.log('- deploy the jobs and the Oracles for Chainlink nodes');
     console.log('- set the values for chainlink on 2_deploy_contracts');
     console.log('- test the change values functions');
+    console.log('- publish the SEMessenger specification to IPFS');
     process.exit(0);
   }
   deployer.deploy(Migrations);

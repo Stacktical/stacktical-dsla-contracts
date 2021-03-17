@@ -38,8 +38,8 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /// @dev to multiply the SLI value and get better precision. Useful to deploy SLO correctly
     uint256 private _messengerPrecision = 10**3;
 
-    uint256 public requestsCounter;
-    uint256 public fulfillsCounter;
+    uint256 private _requestsCounter;
+    uint256 private _fulfillsCounter;
 
     /**
      * @dev parameterize the variables according to network
@@ -159,7 +159,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             periodId: _periodId
         });
 
-        requestsCounter++;
+        _requestsCounter++;
     }
 
     /**
@@ -189,7 +189,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             stakingEfficiency,
             request.periodId
         );
-        fulfillsCounter++;
+        _fulfillsCounter++;
     }
 
     /**
@@ -271,5 +271,19 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      */
     function fee() public view override returns (uint256) {
         return _fee;
+    }
+
+    /**
+     * @dev returns the requestsCounter
+     */
+    function requestsCounter() public view override returns (uint256) {
+        return _requestsCounter;
+    }
+
+    /**
+     * @dev returns the fulfillsCounter
+     */
+    function fulfillsCounter() public view override returns (uint256) {
+        return _fulfillsCounter;
     }
 }
