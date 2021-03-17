@@ -91,6 +91,9 @@ contract SLARegistry is Ownable {
         require(validPeriod, "First period id not valid");
         validPeriod = periodRegistry.isValidPeriod(_periodType, _finalPeriodId);
         require(validPeriod, "Final period id not valid");
+        bool initializedPeriod =
+            periodRegistry.isInitializedPeriod(_periodType);
+        require(initializedPeriod, "Period type not initialized yet");
         require(
             _finalPeriodId >= _initialPeriodId,
             "finalPeriodId should be greater than or equal to initialPeriodId"

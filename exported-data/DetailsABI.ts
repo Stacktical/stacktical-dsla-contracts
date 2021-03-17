@@ -40,6 +40,7 @@ export const DetailsABI: AbiItem[] = [
         name: 'sloType',
         type: 'uint8',
       },
+      { internalType: 'address', name: 'messengerAddress', type: 'address' },
       { internalType: 'uint256', name: 'sloValue', type: 'uint256' },
       { internalType: 'uint256', name: 'creationBlockNumber', type: 'uint256' },
       { internalType: 'uint256', name: 'slaId', type: 'uint256' },

@@ -121,6 +121,20 @@ contract PeriodRegistry is Ownable {
     }
 
     /**
+     * @dev public function to check if a periodType id is initialized
+     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
+     */
+    function isInitializedPeriod(PeriodType _periodType)
+        public
+        view
+        returns (bool initialized)
+    {
+        PeriodDefinition memory periodDefinition =
+            periodDefinitions[_periodType];
+        initialized = periodDefinition.initialized;
+    }
+
+    /**
      * @dev public function to check if a period id is valid i.e. it belongs to the added id array
      *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      *@param _periodId 2. period id to get start and end
@@ -132,10 +146,6 @@ contract PeriodRegistry is Ownable {
     {
         PeriodDefinition memory periodDefinition =
             periodDefinitions[_periodType];
-        require(
-            periodDefinition.initialized,
-            "Period type not initialized yet"
-        );
         valid = periodDefinition.starts.length.sub(1) >= _periodId;
     }
 
