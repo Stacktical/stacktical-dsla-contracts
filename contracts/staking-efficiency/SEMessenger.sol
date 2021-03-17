@@ -159,7 +159,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             periodId: _periodId
         });
 
-        _requestsCounter++;
+        _requestsCounter += 1;
     }
 
     /**
@@ -189,7 +189,8 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             stakingEfficiency,
             request.periodId
         );
-        _fulfillsCounter++;
+
+        _fulfillsCounter += 1;
     }
 
     /**
