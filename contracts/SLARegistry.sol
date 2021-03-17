@@ -214,16 +214,13 @@ contract SLARegistry is Ownable {
 
     function registerMessenger(
         address _messengerAddress,
-        string memory _messengerBaseURL,
-        string memory _messengerOwnershipURL,
-        string memory _messengerSpecificationURL
+        string memory _specificationUrl
     ) public {
         IMessenger(_messengerAddress).setSLARegistry();
         messengerRegistry.registerMessenger(
+            msg.sender,
             _messengerAddress,
-            _messengerBaseURL,
-            _messengerOwnershipURL,
-            _messengerSpecificationURL
+            _specificationUrl
         );
     }
 

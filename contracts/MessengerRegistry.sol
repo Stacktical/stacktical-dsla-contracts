@@ -10,11 +10,10 @@ import "./messenger/IMessenger.sol";
  */
 contract MessengerRegistry {
     struct Messenger {
-        address messengerOwner;
+        address ownerAddress;
         address messengerAddress;
-        string messengerBaseURL;
-        string messengerOwnershipURL;
-        string messengerSpecificationURL;
+        string specificationUrl;
+        uint256 precision;
     }
 
     /// @dev array to store the messengers
@@ -27,19 +26,17 @@ contract MessengerRegistry {
     address public slaRegistry;
 
     event MessengerRegistered(
-        address indexed messengerOwner,
+        address indexed ownerAddress,
         address indexed messengerAddress,
-        string messengerBaseURL,
-        string messengerOwnershipURL,
-        string messengerSpecificationURL
+        string specificationUrl,
+        uint256 precision
     );
 
     event MessengerModified(
-        address indexed messengerOwner,
+        address indexed ownerAddress,
         address indexed messengerAddress,
-        string messengerBaseURL,
-        string messengerOwnershipURL,
-        string messengerSpecificationURL
+        string specificationUrl,
+        uint256 precision
     );
 
     /**
@@ -60,10 +57,9 @@ contract MessengerRegistry {
      * @dev function to register a new Messenger
      */
     function registerMessenger(
+        address _callerAddress,
         address _messengerAddress,
-        string memory _messengerBaseURL,
-        string memory _messengerOwnershipURL,
-        string memory _messengerSpecificationURL
+        string memory _specificationUrl
     ) public {
         require(
             msg.sender == slaRegistry,
@@ -74,24 +70,29 @@ contract MessengerRegistry {
             "messenger already registered"
         );
         address messengerOwner = IMessenger(_messengerAddress).owner();
-        registeredMessengers[_messengerAddress] = true;
+        require(
+            messengerOwner == _callerAddress,
+            "Should only be called by the messenger owner"
+        );
+        uint256 precision = IMessenger(_messengerAddress).messengerPrecision();
         messengers.push(
             Messenger({
-                messengerBaseURL: _messengerBaseURL,
-                messengerOwnershipURL: _messengerOwnershipURL,
-                messengerSpecificationURL: _messengerSpecificationURL,
-                messengerOwner: messengerOwner,
-                messengerAddress: _messengerAddress
+                ownerAddress: messengerOwner,
+                messengerAddress: _messengerAddress,
+                specificationUrl: _specificationUrl,
+                precision: precision
             })
         );
+
+        registeredMessengers[_messengerAddress] = true;
         uint256 index = messengers.length - 1;
         ownerMessengers[messengerOwner].push(index);
+
         emit MessengerRegistered(
             messengerOwner,
             _messengerAddress,
-            _messengerBaseURL,
-            _messengerOwnershipURL,
-            _messengerSpecificationURL
+            _specificationUrl,
+            precision
         );
     }
 
@@ -99,25 +100,20 @@ contract MessengerRegistry {
      * @dev function to modifyMessenger a new Messenger
      */
     function modifyMessenger(
-        string memory _messengerBaseURL,
-        string memory _messengerOwnershipURL,
-        string memory _messengerSpecificationURL,
+        string memory _specificationUrl,
         uint256 messengerId
     ) public {
         Messenger storage messenger = messengers[messengerId];
         require(
-            msg.sender == messenger.messengerOwner,
+            msg.sender == messenger.ownerAddress,
             "Can only be modified by the owner"
         );
-        messenger.messengerBaseURL = _messengerBaseURL;
-        messenger.messengerOwnershipURL = _messengerOwnershipURL;
-        messenger.messengerSpecificationURL = _messengerSpecificationURL;
+        messenger.specificationUrl = _specificationUrl;
         emit MessengerModified(
-            messenger.messengerOwner,
+            messenger.ownerAddress,
             messenger.messengerAddress,
-            messenger.messengerBaseURL,
-            messenger.messengerOwnershipURL,
-            messenger.messengerSpecificationURL
+            messenger.specificationUrl,
+            messenger.precision
         );
     }
 
