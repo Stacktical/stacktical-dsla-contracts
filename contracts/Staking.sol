@@ -98,7 +98,7 @@ contract Staking is Ownable {
         periodRegistry = _slaRegistryAddress.periodRegistry();
         periodType = _periodType;
         whitelistedContract = _whitelistedContract;
-        (uint256 _DSLAburnRate, , , , , ) =
+        (uint256 _DSLAburnRate, , , , , , ) =
             stakeRegistry.getStakingParameters();
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
@@ -143,12 +143,18 @@ contract Staking is Ownable {
      *@param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) public onlyOwner {
+        (, , , , , , uint256 maxTokenLength) =
+            stakeRegistry.getStakingParameters();
         require(isAllowedToken(_tokenAddress) == false, "Token already added");
         require(
             stakeRegistry.isAllowedToken(_tokenAddress) == true,
             "Token not allowed by the SLARegistry contract"
         );
         allowedTokens.push(_tokenAddress);
+        require(
+            maxTokenLength >= allowedTokens.length,
+            "Allowed tokens length greater than max token length"
+        );
         string memory dTokenID = _uintToStr(slaID);
         string memory symbol = ERC20(_tokenAddress).symbol();
         string memory duTokenName =

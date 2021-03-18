@@ -15,6 +15,7 @@ module.exports = (deployer, network) => {
     console.log('- set the values for chainlink on 2_deploy_contracts');
     console.log('- test the change values functions');
     console.log('- publish the SEMessenger specification to IPFS');
+    console.log('- single pool asset');
     process.exit(0);
   }
   deployer.deploy(Migrations);

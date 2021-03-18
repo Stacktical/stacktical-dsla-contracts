@@ -125,31 +125,29 @@ module.exports = (deployer, network) => {
         [slaNetworkBytes32],
       );
 
-      console.log('Starting automated job 8: Adding bDSLA, DAI and USDC tokens as allowed to SLA contract');
+      console.log('Starting automated job 8: Adding bDSLA as allowed to SLA contract');
       const slaAddresses = await slaRegistry.userSLAs(owner);
       const sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);
       await sla.addAllowedTokens(bdslaToken.address);
-      await sla.addAllowedTokens(daiToken.address);
-      await sla.addAllowedTokens(usdcToken.address);
 
       console.log('Starting automated job 9: Stake on owner and notOwner pools');
-      console.log('Starting automated job 9.1: owner: 30000 bDSLA, 30000 DAI, 30000 USDC');
+      console.log('Starting automated job 9.1: owner: 30000 bDSLA');
       // Owner
       // 3 * bsdla + 3 * dai + 3 usdc
       await bdslaToken.approve(sla.address, stakeAmountTimesWei(3));
       await sla.stakeTokens(stakeAmountTimesWei(3), bdslaToken.address);
-      await daiToken.approve(sla.address, stakeAmountTimesWei(3));
-      await sla.stakeTokens(stakeAmountTimesWei(3), daiToken.address);
-      await usdcToken.approve(sla.address, stakeAmountTimesWei(3));
-      await sla.stakeTokens(stakeAmountTimesWei(3), usdcToken.address);
+      // await daiToken.approve(sla.address, stakeAmountTimesWei(3));
+      // await sla.stakeTokens(stakeAmountTimesWei(3), daiToken.address);
+      // await usdcToken.approve(sla.address, stakeAmountTimesWei(3));
+      // await sla.stakeTokens(stakeAmountTimesWei(3), usdcToken.address);
 
       // NotOwner
       // 3 * bdsla + 2 * dai
-      console.log('Starting automated job 9.2: notOwner: 0 bDSLA, 20000 DAI, 30000 USDC');
-      await bdslaToken.approve(sla.address, stakeAmountTimesWei(3), { from: notOwner });
-      await sla.stakeTokens(stakeAmountTimesWei(3), bdslaToken.address, { from: notOwner });
-      await daiToken.approve(sla.address, stakeAmountTimesWei(2), { from: notOwner });
-      await sla.stakeTokens(stakeAmountTimesWei(2), daiToken.address, { from: notOwner });
+      console.log('Starting automated job 9.2: notOwner: 2000 bDSLA');
+      await bdslaToken.approve(sla.address, stakeAmountTimesWei(2), { from: notOwner });
+      await sla.stakeTokens(stakeAmountTimesWei(2), bdslaToken.address, { from: notOwner });
+      // await daiToken.approve(sla.address, stakeAmountTimesWei(2), { from: notOwner });
+      // await sla.stakeTokens(stakeAmountTimesWei(2), daiToken.address, { from: notOwner });
 
       // period 0 is already finished
       console.log('Starting automated job 10: Request Analytics and SLI for period 0');

@@ -16,6 +16,7 @@ contract MessengerRegistry {
         uint256 precision;
         uint256 requestsCounter;
         uint256 fulfillsCounter;
+        uint256 id;
     }
 
     /// @dev array to store the messengers
@@ -31,14 +32,16 @@ contract MessengerRegistry {
         address indexed ownerAddress,
         address indexed messengerAddress,
         string specificationUrl,
-        uint256 precision
+        uint256 precision,
+        uint256 id
     );
 
     event MessengerModified(
         address indexed ownerAddress,
         address indexed messengerAddress,
         string specificationUrl,
-        uint256 precision
+        uint256 precision,
+        uint256 id
     );
 
     /**
@@ -81,6 +84,10 @@ contract MessengerRegistry {
         uint256 precision = messenger.messengerPrecision();
         uint256 requestsCounter = messenger.requestsCounter();
         uint256 fulfillsCounter = messenger.fulfillsCounter();
+        registeredMessengers[_messengerAddress] = true;
+        uint256 id = messengers.length - 1;
+        ownerMessengers[messengerOwner].push(id);
+
         messengers.push(
             Messenger({
                 ownerAddress: messengerOwner,
@@ -88,19 +95,17 @@ contract MessengerRegistry {
                 specificationUrl: _specificationUrl,
                 precision: precision,
                 requestsCounter: requestsCounter,
-                fulfillsCounter: fulfillsCounter
+                fulfillsCounter: fulfillsCounter,
+                id: id
             })
         );
-
-        registeredMessengers[_messengerAddress] = true;
-        uint256 index = messengers.length - 1;
-        ownerMessengers[messengerOwner].push(index);
 
         emit MessengerRegistered(
             messengerOwner,
             _messengerAddress,
             _specificationUrl,
-            precision
+            precision,
+            id
         );
     }
 
@@ -123,7 +128,8 @@ contract MessengerRegistry {
             storedMessenger.ownerAddress,
             storedMessenger.messengerAddress,
             storedMessenger.specificationUrl,
-            storedMessenger.precision
+            storedMessenger.precision,
+            storedMessenger.id
         );
     }
 
@@ -141,7 +147,8 @@ contract MessengerRegistry {
                 specificationUrl: messengers[index].specificationUrl,
                 precision: messengers[index].precision,
                 requestsCounter: requestsCounter,
-                fulfillsCounter: fulfillsCounter
+                fulfillsCounter: fulfillsCounter,
+                id: messengers[index].id
             });
         }
         return returnMessengers;

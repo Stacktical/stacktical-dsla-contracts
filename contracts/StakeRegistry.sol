@@ -59,6 +59,8 @@ contract StakeRegistry is Ownable, StringUtils {
     uint256 private _dslaUserReward = 9940 ether;
     /// @dev DSLA burned after every period verification
     uint256 private _dslaBurnedByVerification = 60 ether;
+    /// @dev DSLA burned after every period verification
+    uint256 private _maxTokenLength = 1;
 
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
@@ -98,7 +100,8 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 dslaPlatformReward,
         uint256 dslaMessengerReward,
         uint256 dslaUserReward,
-        uint256 dslaBurnedByVerification
+        uint256 dslaBurnedByVerification,
+        uint256 maxTokenLength
     );
 
     /**
@@ -356,7 +359,8 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 dslaPlatformReward,
         uint256 dslaMessengerReward,
         uint256 dslaUserReward,
-        uint256 dslaBurnedByVerification
+        uint256 dslaBurnedByVerification,
+        uint256 maxTokenLength
     ) public onlyOwner {
         _DSLAburnRate = DSLAburnRate;
         _dslaDepositByPeriod = dslaDepositByPeriod;
@@ -364,6 +368,7 @@ contract StakeRegistry is Ownable, StringUtils {
         _dslaMessengerReward = dslaMessengerReward;
         _dslaUserReward = dslaUserReward;
         _dslaBurnedByVerification = dslaBurnedByVerification;
+        _maxTokenLength = maxTokenLength;
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
@@ -378,7 +383,8 @@ contract StakeRegistry is Ownable, StringUtils {
             dslaPlatformReward,
             dslaMessengerReward,
             dslaUserReward,
-            dslaBurnedByVerification
+            dslaBurnedByVerification,
+            maxTokenLength
         );
     }
 
@@ -391,7 +397,8 @@ contract StakeRegistry is Ownable, StringUtils {
             uint256 dslaPlatformReward,
             uint256 dslaMessengerReward,
             uint256 dslaUserReward,
-            uint256 dslaBurnedByVerification
+            uint256 dslaBurnedByVerification,
+            uint256 maxTokenLength
         )
     {
         DSLAburnRate = _DSLAburnRate;
@@ -400,6 +407,7 @@ contract StakeRegistry is Ownable, StringUtils {
         dslaMessengerReward = _dslaMessengerReward;
         dslaUserReward = _dslaUserReward;
         dslaBurnedByVerification = _dslaBurnedByVerification;
+        maxTokenLength = _maxTokenLength;
     }
 
     function periodIsVerified(address _sla, uint256 _periodId)
