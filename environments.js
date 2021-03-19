@@ -13,24 +13,25 @@ const environments = {
   kovan: {
     web3WebsocketProviderUrl:
       'wss://kovan.infura.io/ws/v3/ba374d41ee3f4c65ab05c31c4dd452f6',
+    preCoordinatorConfiguration: {
+      oracles: ['mainnet_oracle_1', 'mainnet_oracle_2', 'mainnet_oracle_3', 'mainnet_oracle_4'],
+      jobIds: ['mainnet_jobid_1', 'mainnet_jobid_2', 'mainnet_jobid_3', 'mainnet_jobid4'],
+      payments: ['mainnet_payment_1', 'mainnet_payment_2', 'mainnet_payment_3', 'mainnet_payment4'],
+    },
     chainlinkOracleAddress: '0x2f90A6D021db21e1B2A077c5a37B3C7E75D15b7e',
     chainlinkTokenAddress: '0xa36085F69e2889c224210F603D836748e7dC0088',
     chainlinkJobId: '0x' + '29fa9aa13bf1468788b7cc4a500a45b8',
-    dslaTokenAddress: null,
-    daiTokenAddress: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa',
-    usdcTokenAddress: null,
-  },
-  staging: {
-    web3WebsocketProviderUrl: `ws://${process.env.STAGING_IP}:8545`,
-    chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
-    chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
-    chainlinkNodeUrl: `http://${process.env.STAGING_IP}:6688`,
     dslaTokenAddress: null,
     daiTokenAddress: null,
     usdcTokenAddress: null,
   },
   develop: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
+    preCoordinatorConfiguration: {
+      oracles: 'obtained on deployment time',
+      jobIds: 'obtained on deployment time',
+      payments: 'obtained on deployment time',
+    },
     chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
     chainlinkNodeUrl: 'http://localhost:6688',

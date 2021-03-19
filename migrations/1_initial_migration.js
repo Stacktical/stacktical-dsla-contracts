@@ -16,6 +16,9 @@ module.exports = (deployer, network) => {
     console.log('- test the change values functions');
     console.log('- publish the SEMessenger specification to IPFS');
     console.log('- single pool asset');
+    console.log('- check if the extra data is correctly configured on FE');
+    console.log('- use validator address on external adapter');
+    console.log('- review addresses of environments.js');
     process.exit(0);
   }
   deployer.deploy(Migrations);

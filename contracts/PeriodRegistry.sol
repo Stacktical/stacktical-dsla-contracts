@@ -161,7 +161,7 @@ contract PeriodRegistry is Ownable {
     {
         require(
             isValidPeriod(_periodType, _periodId) == true,
-            "Period type is not valid"
+            "Period data is not valid"
         );
         finished =
             periodDefinitions[_periodType].ends[_periodId] < block.timestamp;
@@ -179,7 +179,7 @@ contract PeriodRegistry is Ownable {
     {
         require(
             isValidPeriod(_periodType, _periodId) == true,
-            "Period type is not valid"
+            "Period data is not valid"
         );
         started =
             periodDefinitions[_periodType].starts[_periodId] < block.timestamp;

@@ -29,11 +29,11 @@ const periodType = 2;
 const [periodStarts, periodEnds] = generateWeeklyPeriods(52, 7);
 const slaNetworkBytes32 = networkNamesBytes32[0];
 const slaNetwork = networkNames[0];
-const seMessengerSpec = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../semessenger.spec.json')));
+const seMessengerSpec = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../semessenger.develop.spec.json')));
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
-    if (/develop/i.test(network)) {
+    if (/kovan/i.test(network)) {
       if (!!process.env.ONLY_DETAILS === true) return;
       console.log('Starting automated jobs to bootstrap protocol correctly');
       const [owner, notOwner] = await web3.eth.getAccounts();
