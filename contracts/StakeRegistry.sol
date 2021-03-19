@@ -59,6 +59,8 @@ contract StakeRegistry is Ownable, StringUtils {
     uint256 private _dslaUserReward = 9940 ether;
     /// @dev DSLA burned after every period verification
     uint256 private _dslaBurnedByVerification = 60 ether;
+    /// @dev DSLA burned after every period verification
+    uint256 private _maxTokenLength = 1;
 
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
@@ -98,7 +100,8 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 dslaPlatformReward,
         uint256 dslaMessengerReward,
         uint256 dslaUserReward,
-        uint256 dslaBurnedByVerification
+        uint256 dslaBurnedByVerification,
+        uint256 maxTokenLength
     );
 
     /**
@@ -149,7 +152,6 @@ contract StakeRegistry is Ownable, StringUtils {
         allowedTokens.push(_tokenAddress);
     }
 
-    // check loop
     function isAllowedToken(address _tokenAddress) public view returns (bool) {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {
@@ -165,7 +167,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@param _sla 2. sla to check
      *@return bool, true if _sla was staked by _user
      */
-    // check loop
+
     function slaWasStakedByUser(address _user, address _sla)
         public
         view
@@ -357,28 +359,32 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 dslaPlatformReward,
         uint256 dslaMessengerReward,
         uint256 dslaUserReward,
-        uint256 dslaBurnedByVerification
+        uint256 dslaBurnedByVerification,
+        uint256 maxTokenLength
     ) public onlyOwner {
         _DSLAburnRate = DSLAburnRate;
-        require(
-            dslaDepositByPeriod ==
-                dslaPlatformReward.add(dslaUserReward).add(
-                    dslaBurnedByVerification
-                ),
-            "Staking parameters should match on summation"
-        );
         _dslaDepositByPeriod = dslaDepositByPeriod;
         _dslaPlatformReward = dslaPlatformReward;
         _dslaMessengerReward = dslaMessengerReward;
         _dslaUserReward = dslaUserReward;
         _dslaBurnedByVerification = dslaBurnedByVerification;
+        _maxTokenLength = maxTokenLength;
+        require(
+            _dslaDepositByPeriod ==
+                _dslaPlatformReward
+                    .add(_dslaMessengerReward)
+                    .add(_dslaUserReward)
+                    .add(_dslaBurnedByVerification),
+            "Staking parameters should match on summation"
+        );
         emit StakingParametersModified(
             DSLAburnRate,
             dslaDepositByPeriod,
             dslaPlatformReward,
             dslaMessengerReward,
             dslaUserReward,
-            dslaBurnedByVerification
+            dslaBurnedByVerification,
+            maxTokenLength
         );
     }
 
@@ -391,7 +397,8 @@ contract StakeRegistry is Ownable, StringUtils {
             uint256 dslaPlatformReward,
             uint256 dslaMessengerReward,
             uint256 dslaUserReward,
-            uint256 dslaBurnedByVerification
+            uint256 dslaBurnedByVerification,
+            uint256 maxTokenLength
         )
     {
         DSLAburnRate = _DSLAburnRate;
@@ -400,6 +407,7 @@ contract StakeRegistry is Ownable, StringUtils {
         dslaMessengerReward = _dslaMessengerReward;
         dslaUserReward = _dslaUserReward;
         dslaBurnedByVerification = _dslaBurnedByVerification;
+        maxTokenLength = _maxTokenLength;
     }
 
     function periodIsVerified(address _sla, uint256 _periodId)

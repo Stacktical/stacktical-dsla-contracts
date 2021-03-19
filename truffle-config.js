@@ -53,18 +53,22 @@ module.exports = {
         );
       },
       network_id: '1',
-      gas: 4612388,
+      gas: 12000000,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true,
     },
     kovan: {
       provider() {
         return new HDWalletProvider(
           mnemonic,
-          `https://kovan.infura.io/v3/${infura_project_id}`,
+          'http://kovan.dsla.network:8542',
+          0,
+          10,
         );
       },
       network_id: '42',
       gas: 12000000,
-      confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true,
     },

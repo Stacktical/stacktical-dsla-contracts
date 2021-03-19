@@ -5,7 +5,6 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./SLA.sol";
-import "./SLO.sol";
 import "./SLORegistry.sol";
 import "./PeriodRegistry.sol";
 import "./MessengerRegistry.sol";
@@ -56,6 +55,7 @@ contract SLARegistry is Ownable {
         StakeRegistry _stakeRegistry
     ) public {
         sloRegistry = _sloRegistry;
+        sloRegistry.setSLARegistry();
         periodRegistry = _periodRegistry;
         stakeRegistry = _stakeRegistry;
         stakeRegistry.setSLARegistry();
@@ -65,17 +65,19 @@ contract SLARegistry is Ownable {
 
     /**
      * @dev public function for creating canonical service level agreements
-     * @param _SLO 1. SLO
-     * @param _ipfsHash 2. string with the ipfs hash that contains extra information about the service level agreement
-     * @param _periodType 3. period type
-     * @param _initialPeriodId 4. -
-     * @param _finalPeriodId 5. -
-     * @param _messengerAddress 6. -
-     * @param _whitelisted 7. -
-     * @param _extraData 8. -
+     * @param _sloValue 1. -
+     * @param _sloType 2. -
+     * @param _ipfsHash 3. -
+     * @param _periodType 4. -
+     * @param _initialPeriodId 5. -
+     * @param _finalPeriodId 6. -
+     * @param _messengerAddress 7. -
+     * @param _whitelisted 8. -
+     * @param _extraData 9. -
      */
     function createSLA(
-        SLO _SLO,
+        uint256 _sloValue,
+        SLORegistry.SLOType _sloType,
         bool _whitelisted,
         address _messengerAddress,
         PeriodRegistry.PeriodType _periodType,
@@ -84,15 +86,14 @@ contract SLARegistry is Ownable {
         string memory _ipfsHash,
         bytes32[] memory _extraData
     ) public {
-        require(
-            sloRegistry.isRegisteredSLO(address(_SLO)) == true,
-            "SLO not registered on SLORegistry"
-        );
         bool validPeriod =
             periodRegistry.isValidPeriod(_periodType, _initialPeriodId);
         require(validPeriod, "First period id not valid");
         validPeriod = periodRegistry.isValidPeriod(_periodType, _finalPeriodId);
         require(validPeriod, "Final period id not valid");
+        bool initializedPeriod =
+            periodRegistry.isInitializedPeriod(_periodType);
+        require(initializedPeriod, "Period type not initialized yet");
         require(
             _finalPeriodId >= _initialPeriodId,
             "finalPeriodId should be greater than or equal to initialPeriodId"
@@ -111,8 +112,8 @@ contract SLARegistry is Ownable {
         SLA sla =
             new SLA(
                 msg.sender,
+                address(sloRegistry),
                 _whitelisted,
-                _SLO,
                 _periodType,
                 _messengerAddress,
                 _initialPeriodId,
@@ -122,6 +123,7 @@ contract SLARegistry is Ownable {
                 _extraData
             );
 
+        sloRegistry.registerSLO(_sloValue, _sloType, address(sla));
         stakeRegistry.lockDSLAValue(
             msg.sender,
             address(sla),
@@ -175,7 +177,8 @@ contract SLARegistry is Ownable {
         IMessenger(slaMessenger).requestSLI(
             _periodId,
             address(_sla),
-            _ownerApproval
+            _ownerApproval,
+            msg.sender
         );
         stakeRegistry.distributeVerificationRewards(
             address(_sla),
@@ -211,16 +214,13 @@ contract SLARegistry is Ownable {
 
     function registerMessenger(
         address _messengerAddress,
-        string memory _messengerBaseURL,
-        string memory _messengerOwnershipURL,
-        string memory _messengerSpecificationURL
+        string memory _specificationUrl
     ) public {
         IMessenger(_messengerAddress).setSLARegistry();
         messengerRegistry.registerMessenger(
+            msg.sender,
             _messengerAddress,
-            _messengerBaseURL,
-            _messengerOwnershipURL,
-            _messengerSpecificationURL
+            _specificationUrl
         );
     }
 

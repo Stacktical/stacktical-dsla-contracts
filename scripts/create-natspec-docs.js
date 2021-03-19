@@ -3,7 +3,6 @@ const path = require('path');
 
 const documentedContracts = [
   'SLA',
-  'SLO',
   'SLORegistry',
   'SLARegistry',
   'bDSLA',

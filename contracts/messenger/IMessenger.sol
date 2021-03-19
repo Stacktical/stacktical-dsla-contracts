@@ -43,7 +43,8 @@ abstract contract IMessenger is Ownable {
     function requestSLI(
         uint256 _periodId,
         address _slaAddress,
-        bool _ownerApproval
+        bool _ownerApproval,
+        address _callerAddress
     ) external virtual;
 
     /**
@@ -80,4 +81,14 @@ abstract contract IMessenger is Ownable {
      * @dev gets the fee amount of LINK token
      */
     function fee() external view virtual returns (uint256);
+
+    /**
+     * @dev returns the requestsCounter
+     */
+    function requestsCounter() external view virtual returns (uint256);
+
+    /**
+     * @dev returns the fulfillsCounter
+     */
+    function fulfillsCounter() external view virtual returns (uint256);
 }
