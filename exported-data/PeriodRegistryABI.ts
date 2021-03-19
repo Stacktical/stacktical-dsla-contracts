@@ -130,6 +130,20 @@ export const PeriodRegistryABI: AbiItem[] = [
         name: '_periodType',
         type: 'uint8',
       },
+    ],
+    name: 'isInitializedPeriod',
+    outputs: [{ internalType: 'bool', name: 'initialized', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [
+      {
+        internalType: 'enum PeriodRegistry.PeriodType',
+        name: '_periodType',
+        type: 'uint8',
+      },
       { internalType: 'uint256', name: '_periodId', type: 'uint256' },
     ],
     name: 'isValidPeriod',

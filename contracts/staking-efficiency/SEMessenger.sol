@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 
 import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
 import "../SLA.sol";
-import "../SLO.sol";
 import "../PeriodRegistry.sol";
 import "../StringUtils.sol";
 import "./NetworkAnalytics.sol";
@@ -38,6 +37,9 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     uint256 private _fee;
     /// @dev to multiply the SLI value and get better precision. Useful to deploy SLO correctly
     uint256 private _messengerPrecision = 10**3;
+
+    uint256 private _requestsCounter;
+    uint256 private _fulfillsCounter;
 
     /**
      * @dev parameterize the variables according to network
@@ -98,12 +100,13 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * given params. Can only be called by the SLARegistry contract or Chainlink Oracle.
      * @param _periodId 1. value of the period id
      * @param _slaAddress 2. SLA Address
-     * @param _ownerApproval 3. if approval by owner or msg sender
+     * @param _messengerOwnerApproval 3. if approval by owner or msg sender
      */
     function requestSLI(
         uint256 _periodId,
         address _slaAddress,
-        bool _ownerApproval
+        bool _messengerOwnerApproval,
+        address _callerAddress
     ) public override onlySLARegistry {
         SLA sla = SLA(_slaAddress);
         PeriodRegistry.PeriodType periodType = sla.periodType();
@@ -119,7 +122,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             ipfsAnalytics != 0,
             "Network analytics object is not assigned yet"
         );
-        if (_ownerApproval) {
+        if (_messengerOwnerApproval) {
             ERC20(chainlinkTokenAddress()).safeTransferFrom(
                 owner(),
                 address(this),
@@ -127,7 +130,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             );
         } else {
             ERC20(chainlinkTokenAddress()).safeTransferFrom(
-                msg.sender,
+                _callerAddress,
                 address(this),
                 _fee
             );
@@ -155,6 +158,8 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             slaAddress: _slaAddress,
             periodId: _periodId
         });
+
+        _requestsCounter += 1;
     }
 
     /**
@@ -184,6 +189,8 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
             stakingEfficiency,
             request.periodId
         );
+
+        _fulfillsCounter += 1;
     }
 
     /**
@@ -265,5 +272,19 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      */
     function fee() public view override returns (uint256) {
         return _fee;
+    }
+
+    /**
+     * @dev returns the requestsCounter
+     */
+    function requestsCounter() public view override returns (uint256) {
+        return _requestsCounter;
+    }
+
+    /**
+     * @dev returns the fulfillsCounter
+     */
+    function fulfillsCounter() public view override returns (uint256) {
+        return _fulfillsCounter;
     }
 }

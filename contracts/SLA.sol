@@ -5,8 +5,8 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "./SLO.sol";
 import "./SLARegistry.sol";
+import "./SLORegistry.sol";
 import "./StakeRegistry.sol";
 import "./PeriodRegistry.sol";
 import "./Staking.sol";
@@ -28,9 +28,6 @@ contract SLA is Staking {
         Status status;
     }
 
-    /// @dev address of the SLO
-    SLO public slo;
-
     /// @dev The ipfs hash that stores extra information about the agreement
     string public ipfsHash;
 
@@ -38,6 +35,7 @@ contract SLA is Staking {
     PeriodRegistry.PeriodType public periodType;
 
     PeriodRegistry private periodRegistry;
+    SLORegistry private sloRegistry;
 
     uint128 public initialPeriodId;
     uint128 public finalPeriodId;
@@ -101,21 +99,21 @@ contract SLA is Staking {
     }
 
     /**
-     * @param _owner 1. address of the owner of the service level agreement
-     * @param _SLO 2. address of the SLO
-     * @param _ipfsHash 3. string with the ipfs hash that contains SLA information
+     * @param _owner 1. -
+     * @param _sloRegistryAddress 2. -
+     * @param _ipfsHash 3. -
      * @param _messengerAddress 3. -
      * @param _initialPeriodId 4. -
      * @param _finalPeriodId 4. -
-     * @param _periodType 5. period type of the SLA contract
-     * @param _whitelisted 8. boolean to declare whitelisted contracts
-     * @param _extraData 9. array of bytes32 to store extra data on deployment time
-     * @param _slaID 10. identifies the SLA to uniquely to emit dTokens
+     * @param _periodType 5. -
+     * @param _whitelisted 8. -
+     * @param _extraData 9. -
+     * @param _slaID 10. -
      */
     constructor(
         address _owner,
+        address _sloRegistryAddress,
         bool _whitelisted,
-        SLO _SLO,
         PeriodRegistry.PeriodType _periodType,
         address _messengerAddress,
         uint128 _initialPeriodId,
@@ -136,13 +134,13 @@ contract SLA is Staking {
         initialPeriodId = _initialPeriodId;
         finalPeriodId = _finalPeriodId;
         periodType = _periodType;
-        slo = _SLO;
         extraData = _extraData;
         nextVerifiablePeriod = _initialPeriodId;
+        sloRegistry = SLORegistry(_sloRegistryAddress);
     }
 
     /**
-     * @dev external function to register SLI's and check them against the SLO's
+     * @dev external function to register SLI's and check them against the SLORegistry
      * @param _sli 1. the value of the SLI to check
      * @param _periodId 2. the id of the given period
      */
@@ -155,8 +153,8 @@ contract SLA is Staking {
         PeriodSLI storage periodSLI = periodSLIs[_periodId];
         periodSLI.sli = _sli;
         periodSLI.timestamp = block.timestamp;
-        uint256 sloValue = slo.value();
-        if (slo.isRespected(_sli)) {
+        (uint256 sloValue, ) = sloRegistry.registeredSLO(address(this));
+        if (sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
             uint256 precision = 10000;
             // deviation = (sli-slo)*precision/((sli+slo)/2)

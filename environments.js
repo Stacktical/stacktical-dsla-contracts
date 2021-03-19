@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const environments = {
   mainnet: {
-    web3WebsocketProviderUrl: 'wss://mainnet.infura.io/ws/v3/ba374d41ee3f4c65ab05c31c4dd452f6',
+    web3WebsocketProviderUrl: 'wss://mainnet.infura.io/ws/v3/e8dc03e5684a4dd5872f4e0da2187dca',
     chainlinkOracleAddress: null,
     chainlinkTokenAddress: '0x514910771af9ca656af840dff83e8264ecf986ca',
     chainlinkJobId: null,
@@ -12,31 +12,24 @@ const environments = {
   },
   kovan: {
     web3WebsocketProviderUrl:
-      'wss://kovan.infura.io/ws/v3/ba374d41ee3f4c65ab05c31c4dd452f6',
-    chainlinkOracleAddress: '0x2f90A6D021db21e1B2A077c5a37B3C7E75D15b7e',
+      'wss://kovan.infura.io/ws/v3/96c18cecbaf04c0794f059d2ca1bab82',
+    preCoordinatorConfiguration: {
+      oracles: ['0x182DCdA18Da4aB8E7eC8dC6B0F7cE517805c3779', '0x182DCdA18Da4aB8E7eC8dC6B0F7cE517805c3779', '0x182DCdA18Da4aB8E7eC8dC6B0F7cE517805c3779'],
+      jobIds: ['0x27a07a356eb74913ac1da081846954c4', '0xc1b73e42706a464090884bf9928007f3', '0xdfaa2ce3b5284634ad8c010fe848870b'],
+      payments: [String(0.1 * 10 ** 18), String(0.1 * 10 ** 18), String(0.1 * 10 ** 18)],
+    },
     chainlinkTokenAddress: '0xa36085F69e2889c224210F603D836748e7dC0088',
-    chainlinkJobId: '0x' + '29fa9aa13bf1468788b7cc4a500a45b8',
-    dslaTokenAddress: null,
-    daiTokenAddress: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa',
-    usdcTokenAddress: null,
-  },
-  staging: {
-    web3WebsocketProviderUrl: `ws://${process.env.STAGING_IP}:8545`,
-    chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
-    chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
-    chainlinkNodeUrl: `http://${process.env.STAGING_IP}:6688`,
-    dslaTokenAddress: null,
-    daiTokenAddress: null,
-    usdcTokenAddress: null,
   },
   develop: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
+    preCoordinatorConfiguration: {
+      oracles: 'obtained on deployment time',
+      jobIds: 'obtained on deployment time',
+      payments: 'obtained on deployment time',
+    },
     chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
     chainlinkNodeUrl: 'http://localhost:6688',
-    dslaTokenAddress: null,
-    daiTokenAddress: null,
-    usdcTokenAddress: null,
   },
 };
 

@@ -1,6 +1,5 @@
 const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
-const SLO = artifacts.require('SLO');
 const SLORegistry = artifacts.require('SLORegistry');
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const MessengerRegistry = artifacts.require('MessengerRegistry');
@@ -21,11 +20,6 @@ const files = {
     constName: 'export const SLARegistryABI: AbiItem[] =',
     tsFileName: 'SLARegistryABI.ts',
     abi: SLARegistry.abi,
-  },
-  SLO: {
-    constName: 'export const SLOABI: AbiItem[] =',
-    tsFileName: 'SLOABI.ts',
-    abi: SLO.abi,
   },
   SLORegistry: {
     constName: 'export const SLORegistryABI: AbiItem[] =',

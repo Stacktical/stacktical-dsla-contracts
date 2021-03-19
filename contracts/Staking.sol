@@ -32,6 +32,8 @@ contract Staking is Ownable {
 
     /// @dev address[] of the stakers of the SLA contract
     address[] public stakers;
+    /// @dev (slaOwner=>bool)
+    mapping(address => bool) public registeredStakers;
     /// @dev DSLA token address to burn fees
     address public dslaTokenAddress;
     /// @dev array with the allowed tokens addresses for the current SLA
@@ -96,7 +98,7 @@ contract Staking is Ownable {
         periodRegistry = _slaRegistryAddress.periodRegistry();
         periodType = _periodType;
         whitelistedContract = _whitelistedContract;
-        (uint256 _DSLAburnRate, , , , , ) =
+        (uint256 _DSLAburnRate, , , , , , ) =
             stakeRegistry.getStakingParameters();
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
@@ -141,12 +143,18 @@ contract Staking is Ownable {
      *@param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) public onlyOwner {
+        (, , , , , , uint256 maxTokenLength) =
+            stakeRegistry.getStakingParameters();
         require(isAllowedToken(_tokenAddress) == false, "Token already added");
         require(
             stakeRegistry.isAllowedToken(_tokenAddress) == true,
             "Token not allowed by the SLARegistry contract"
         );
         allowedTokens.push(_tokenAddress);
+        require(
+            maxTokenLength >= allowedTokens.length,
+            "Allowed tokens length greater than max token length"
+        );
         string memory dTokenID = _uintToStr(slaID);
         string memory symbol = ERC20(_tokenAddress).symbol();
         string memory duTokenName =
@@ -228,7 +236,8 @@ contract Staking is Ownable {
             );
         }
 
-        if (!isStaker(msg.sender)) {
+        if (registeredStakers[msg.sender] == false) {
+            registeredStakers[msg.sender] = true;
             stakers.push(msg.sender);
         }
     }
@@ -250,15 +259,8 @@ contract Staking is Ownable {
             uint256 usersStake = usersPool[tokenAddress];
             uint256 reward = usersStake.mul(_rewardPercentage).div(_precision);
 
-            // Subtract before burn to match balances
             usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
 
-            if (tokenAddress == dslaTokenAddress) {
-                uint256 fees = _burnDSLATokens(reward);
-                reward = reward.sub(fees);
-            }
-
-            // Add after burn to match balances
             providerPool[tokenAddress] = providerPool[tokenAddress].add(reward);
 
             emit ProviderRewardGenerated(
@@ -280,17 +282,10 @@ contract Staking is Ownable {
             address tokenAddress = allowedTokens[index];
             uint256 usersStake = usersPool[tokenAddress];
             uint256 compensation = usersStake;
-            // Subtract before burn to match balances
             providerPool[tokenAddress] = providerPool[tokenAddress].sub(
                 compensation
             );
 
-            if (tokenAddress == dslaTokenAddress) {
-                uint256 fees = _burnDSLATokens(compensation);
-                compensation = compensation.sub(fees);
-            }
-
-            // Add after burn to match balances
             usersPool[tokenAddress] = usersPool[tokenAddress].add(compensation);
         }
     }
@@ -348,27 +343,6 @@ contract Staking is Ownable {
         ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
 
-    function _burnDSLATokens(uint256 _amount) internal returns (uint256 fees) {
-        bytes4 BURN_SELECTOR = bytes4(keccak256(bytes("burn(uint256)")));
-        fees = _amount.mul(DSLAburnRate).div(1000);
-        (bool _success, ) =
-            dslaTokenAddress.call(abi.encodeWithSelector(BURN_SELECTOR, fees));
-        require(_success, "DSLA burn process was not successful");
-    }
-
-    /**
-     *@dev returns true if the _staker address is registered as staker
-     *@param _staker 1. staker address
-     *@return true if address is staker
-     */
-    // check loop
-    function isStaker(address _staker) public view returns (bool) {
-        for (uint256 index = 0; index < stakers.length; index++) {
-            if (stakers[index] == _staker) return true;
-        }
-        return false;
-    }
-
     /**
      *@dev use this function to evaluate the length of the allowed tokens length
      *@return allowedTokens.length
@@ -410,7 +384,6 @@ contract Staking is Ownable {
      *@param _tokenAddress 1. token address to check exixtence
      *@return true if _tokenAddress exists in the allowedTokens array
      */
-    // check loop
     function isAllowedToken(address _tokenAddress) public view returns (bool) {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {

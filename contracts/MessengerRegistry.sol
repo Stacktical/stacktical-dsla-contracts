@@ -10,11 +10,13 @@ import "./messenger/IMessenger.sol";
  */
 contract MessengerRegistry {
     struct Messenger {
-        address messengerOwner;
+        address ownerAddress;
         address messengerAddress;
-        string messengerBaseURL;
-        string messengerOwnershipURL;
-        string messengerSpecificationURL;
+        string specificationUrl;
+        uint256 precision;
+        uint256 requestsCounter;
+        uint256 fulfillsCounter;
+        uint256 id;
     }
 
     /// @dev array to store the messengers
@@ -27,19 +29,19 @@ contract MessengerRegistry {
     address public slaRegistry;
 
     event MessengerRegistered(
-        address indexed messengerOwner,
+        address indexed ownerAddress,
         address indexed messengerAddress,
-        string messengerBaseURL,
-        string messengerOwnershipURL,
-        string messengerSpecificationURL
+        string specificationUrl,
+        uint256 precision,
+        uint256 id
     );
 
     event MessengerModified(
-        address indexed messengerOwner,
+        address indexed ownerAddress,
         address indexed messengerAddress,
-        string messengerBaseURL,
-        string messengerOwnershipURL,
-        string messengerSpecificationURL
+        string specificationUrl,
+        uint256 precision,
+        uint256 id
     );
 
     /**
@@ -60,10 +62,9 @@ contract MessengerRegistry {
      * @dev function to register a new Messenger
      */
     function registerMessenger(
+        address _callerAddress,
         address _messengerAddress,
-        string memory _messengerBaseURL,
-        string memory _messengerOwnershipURL,
-        string memory _messengerSpecificationURL
+        string memory _specificationUrl
     ) public {
         require(
             msg.sender == slaRegistry,
@@ -73,55 +74,87 @@ contract MessengerRegistry {
             registeredMessengers[_messengerAddress] == false,
             "messenger already registered"
         );
-        address messengerOwner = IMessenger(_messengerAddress).owner();
+
+        IMessenger messenger = IMessenger(_messengerAddress);
+        address messengerOwner = messenger.owner();
+        require(
+            messengerOwner == _callerAddress,
+            "Should only be called by the messenger owner"
+        );
+        uint256 precision = messenger.messengerPrecision();
+        uint256 requestsCounter = messenger.requestsCounter();
+        uint256 fulfillsCounter = messenger.fulfillsCounter();
         registeredMessengers[_messengerAddress] = true;
+        uint256 id = messengers.length - 1;
+        ownerMessengers[messengerOwner].push(id);
+
         messengers.push(
             Messenger({
-                messengerBaseURL: _messengerBaseURL,
-                messengerOwnershipURL: _messengerOwnershipURL,
-                messengerSpecificationURL: _messengerSpecificationURL,
-                messengerOwner: messengerOwner,
-                messengerAddress: _messengerAddress
+                ownerAddress: messengerOwner,
+                messengerAddress: _messengerAddress,
+                specificationUrl: _specificationUrl,
+                precision: precision,
+                requestsCounter: requestsCounter,
+                fulfillsCounter: fulfillsCounter,
+                id: id
             })
         );
-        uint256 index = messengers.length - 1;
-        ownerMessengers[messengerOwner].push(index);
+
         emit MessengerRegistered(
             messengerOwner,
             _messengerAddress,
-            _messengerBaseURL,
-            _messengerOwnershipURL,
-            _messengerSpecificationURL
+            _specificationUrl,
+            precision,
+            id
         );
     }
 
     /**
-     * @dev function to modifyMessenger a new Messenger
+     * @dev function to modifyMessenger a Messenger
      */
     function modifyMessenger(
-        string memory _messengerBaseURL,
-        string memory _messengerOwnershipURL,
-        string memory _messengerSpecificationURL,
-        uint256 messengerId
+        string memory _specificationUrl,
+        uint256 _messengerId
     ) public {
-        Messenger storage messenger = messengers[messengerId];
+        Messenger storage storedMessenger = messengers[_messengerId];
+        IMessenger messenger = IMessenger(storedMessenger.messengerAddress);
         require(
-            msg.sender == messenger.messengerOwner,
+            msg.sender == messenger.owner(),
             "Can only be modified by the owner"
         );
-        messenger.messengerBaseURL = _messengerBaseURL;
-        messenger.messengerOwnershipURL = _messengerOwnershipURL;
-        messenger.messengerSpecificationURL = _messengerSpecificationURL;
+        storedMessenger.specificationUrl = _specificationUrl;
+        storedMessenger.ownerAddress = msg.sender;
         emit MessengerModified(
-            messenger.messengerOwner,
-            messenger.messengerAddress,
-            messenger.messengerBaseURL,
-            messenger.messengerOwnershipURL,
-            messenger.messengerSpecificationURL
+            storedMessenger.ownerAddress,
+            storedMessenger.messengerAddress,
+            storedMessenger.specificationUrl,
+            storedMessenger.precision,
+            storedMessenger.id
         );
     }
 
     function getMessengers() public view returns (Messenger[] memory) {
-        return messengers;
+        Messenger[] memory returnMessengers =
+            new Messenger[](messengers.length);
+        for (uint256 index = 0; index < messengers.length; index++) {
+            IMessenger messenger =
+                IMessenger(messengers[index].messengerAddress);
+            uint256 requestsCounter = messenger.requestsCounter();
+            uint256 fulfillsCounter = messenger.fulfillsCounter();
+            returnMessengers[index] = Messenger({
+                ownerAddress: messengers[index].ownerAddress,
+                messengerAddress: messengers[index].messengerAddress,
+                specificationUrl: messengers[index].specificationUrl,
+                precision: messengers[index].precision,
+                requestsCounter: requestsCounter,
+                fulfillsCounter: fulfillsCounter,
+                id: messengers[index].id
+            });
+        }
+        return returnMessengers;
+    }
+
+    function getMessengersLength() public view returns (uint256) {
+        return messengers.length;
     }
 }
