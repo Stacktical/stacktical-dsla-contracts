@@ -19,6 +19,8 @@ module.exports = (deployer, network) => {
     console.log('- check if the extra data is correctly configured on FE');
     console.log('- use validator address on external adapter');
     console.log('- review addresses of environments.js');
+    console.log('- 1 oracle or multiple oracles?');
+    console.log('- add network tickers to array');
     process.exit(0);
   }
   deployer.deploy(Migrations);

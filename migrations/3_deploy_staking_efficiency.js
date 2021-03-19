@@ -19,7 +19,7 @@ module.exports = (deployer, network) => {
       const periodRegistry = await PeriodRegistry.deployed();
       const stakeRegistry = await StakeRegistry.deployed();
 
-      const chainlinkJobId = await getChainlinkJobId();
+      const chainlinkJobId = (/develop/i.test(network) && await getChainlinkJobId()) || null;
 
       const preCoordinator = await deployer.deploy(
         PreCoordinator,

@@ -133,21 +133,15 @@ module.exports = (deployer, network) => {
       console.log('Starting automated job 9: Stake on owner and notOwner pools');
       console.log('Starting automated job 9.1: owner: 30000 bDSLA');
       // Owner
-      // 3 * bsdla + 3 * dai + 3 usdc
+      // 3 * bsdla
       await bdslaToken.approve(sla.address, stakeAmountTimesWei(3));
       await sla.stakeTokens(stakeAmountTimesWei(3), bdslaToken.address);
-      // await daiToken.approve(sla.address, stakeAmountTimesWei(3));
-      // await sla.stakeTokens(stakeAmountTimesWei(3), daiToken.address);
-      // await usdcToken.approve(sla.address, stakeAmountTimesWei(3));
-      // await sla.stakeTokens(stakeAmountTimesWei(3), usdcToken.address);
 
       // NotOwner
-      // 3 * bdsla + 2 * dai
+      // 3 * bdsla
       console.log('Starting automated job 9.2: notOwner: 2000 bDSLA');
       await bdslaToken.approve(sla.address, stakeAmountTimesWei(2), { from: notOwner });
       await sla.stakeTokens(stakeAmountTimesWei(2), bdslaToken.address, { from: notOwner });
-      // await daiToken.approve(sla.address, stakeAmountTimesWei(2), { from: notOwner });
-      // await sla.stakeTokens(stakeAmountTimesWei(2), daiToken.address, { from: notOwner });
 
       // period 0 is already finished
       console.log('Starting automated job 10: Request Analytics and SLI for period 0');

@@ -26,7 +26,7 @@ const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
 const sloValue = 50000;
 const sloType = 4;
 const periodType = 2;
-const [periodStarts, periodEnds] = generateWeeklyPeriods(52, 5);
+const [periodStarts, periodEnds] = generateWeeklyPeriods(52, 7);
 const slaNetworkBytes32 = networkNamesBytes32[0];
 const slaNetwork = networkNames[0];
 const seMessengerSpec = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../semessenger.develop.spec.json')));
