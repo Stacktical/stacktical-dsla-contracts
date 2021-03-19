@@ -31,7 +31,7 @@ module.exports = (deployer, network) => {
         dslaTokenAddress,
       );
 
-      await deployer.deploy(
+      return deployer.deploy(
         SLARegistry,
         sloRegistry.address,
         periodRegistry.address,

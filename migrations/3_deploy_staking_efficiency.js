@@ -16,11 +16,10 @@ module.exports = (deployer, network) => {
     deployer.then(async () => {
       if (!!process.env.ONLY_DETAILS === true) return;
       const env = getEnvFromNetwork(network);
-      const periodRegistry = await deployer.deploy(PeriodRegistry);
+      const periodRegistry = await PeriodRegistry.deployed();
+      const stakeRegistry = await StakeRegistry.deployed();
 
       const chainlinkJobId = await getChainlinkJobId();
-
-      const stakeRegistry = await StakeRegistry.deployed();
 
       const preCoordinator = await deployer.deploy(
         PreCoordinator,
