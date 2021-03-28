@@ -209,7 +209,7 @@ contract SLA is Staking {
         require(_amount > 0, "amount cannot be 0");
         bool isContractFinished = contractFinished();
         require(
-            isContractFinished == false,
+            !isContractFinished,
             "Can only stake on not finished contracts"
         );
         _stake(_amount, _token);
@@ -235,7 +235,7 @@ contract SLA is Staking {
         require(_amount > 0, "amount cannot be 0");
         if (msg.sender != owner()) {
             bool isContractFinished = contractFinished();
-            require(isContractFinished == true, "Only for finished contract");
+            require(isContractFinished, "Only for finished contract");
         }
         _withdrawUserTokens(_amount, _tokenAddress);
     }
