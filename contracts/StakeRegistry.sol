@@ -148,7 +148,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) public onlyOwner {
-        require(isAllowedToken(_tokenAddress) == false, "token already added");
+        require(!isAllowedToken(_tokenAddress), "token already added");
         allowedTokens.push(_tokenAddress);
     }
 
@@ -187,10 +187,10 @@ contract StakeRegistry is Ownable, StringUtils {
      */
     function registerStakedSla(address _owner) public returns (bool) {
         require(
-            slaRegistry.isRegisteredSLA(msg.sender) == true,
+            slaRegistry.isRegisteredSLA(msg.sender),
             "Only for registered SLAs"
         );
-        if (slaWasStakedByUser(_owner, msg.sender) == false) {
+        if (!slaWasStakedByUser(_owner, msg.sender)) {
             userStakedSlas[_owner].push(SLA(msg.sender));
         }
         return true;
@@ -206,7 +206,7 @@ contract StakeRegistry is Ownable, StringUtils {
         returns (address)
     {
         require(
-            slaRegistry.isRegisteredSLA(msg.sender) == true,
+            slaRegistry.isRegisteredSLA(msg.sender),
             "Only for registered SLAs"
         );
         ERC20PresetMinterPauser dToken =
@@ -244,7 +244,7 @@ contract StakeRegistry is Ownable, StringUtils {
     ) public onlySLARegistry {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         require(
-            _lockedValue.verifiedPeriods[_periodId] == false,
+            !_lockedValue.verifiedPeriods[_periodId],
             "Period rewards already distributed"
         );
         _lockedValue.verifiedPeriods[_periodId] = true;
