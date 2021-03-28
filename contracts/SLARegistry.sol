@@ -147,6 +147,9 @@ contract SLARegistry is Ownable {
         SLA _sla,
         bool _ownerApproval
     ) public {
+        require(isRegisteredSLA(address(_sla)),
+            "SLA contract should be valid"
+        );
         require(
             _periodId == _sla.nextVerifiablePeriod(),
             "Should only verify next period"
