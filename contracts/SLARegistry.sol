@@ -191,6 +191,9 @@ contract SLARegistry is Ownable {
     }
 
     function returnLockedValue(SLA _sla) public {
+        require(isRegisteredSLA(address(_sla)),
+            "SLA contract should be valid"
+        );
         require(
             msg.sender == _sla.owner(),
             "Only SLA owner can claim locked value"
