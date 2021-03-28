@@ -161,19 +161,19 @@ contract SLARegistry is Ownable {
         );
         bool breachedContract = _sla.breachedContract();
         require(
-            breachedContract == false,
+            !breachedContract,
             "Should only be called for not breached contracts"
         );
         bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
         require(
-            slaAllowedPeriodId == true,
+            slaAllowedPeriodId,
             "Period ID not registered in the SLA contract"
         );
         PeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
         bool periodFinished =
             periodRegistry.periodIsFinished(slaPeriodType, _periodId);
         require(
-            periodFinished == true,
+            periodFinished,
             "SLA contract period has not finished yet"
         );
         address slaMessenger = _sla.messengerAddress();
@@ -202,7 +202,7 @@ contract SLARegistry is Ownable {
 
         (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(lastValidPeriodId);
         require(
-            _sla.breachedContract() == true ||
+            _sla.breachedContract() ||
                 (block.timestamp >= endOfLastValidPeriod &&
                     lastPeriodStatus != SLA.Status.NotVerified),
             "Can only withdraw locked DSLA after the final period is verified or if the contract is breached"
