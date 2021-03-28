@@ -145,9 +145,9 @@ contract Staking is Ownable {
     function addAllowedTokens(address _tokenAddress) public onlyOwner {
         (, , , , , , uint256 maxTokenLength) =
             stakeRegistry.getStakingParameters();
-        require(isAllowedToken(_tokenAddress) == false, "Token already added");
+        require(!isAllowedToken(_tokenAddress), "Token already added");
         require(
-            stakeRegistry.isAllowedToken(_tokenAddress) == true,
+            stakeRegistry.isAllowedToken(_tokenAddress),
             "Token not allowed by the SLARegistry contract"
         );
         allowedTokens.push(_tokenAddress);
