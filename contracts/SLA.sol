@@ -167,20 +167,11 @@ contract SLA is Staking {
         if (sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
             uint256 precision = 10000;
-            // deviation = (sli-slo)*precision/((sli+slo)/2)
             uint256 deviation =
                 _sli.sub(sloValue).mul(precision).div(
                     _sli.add(sloValue).div(2)
                 );
-            // to get the reward formula, we get the periodId but respecting to the SLA
-            // because _periodId is the periodId of the platform
-            // e.g. if periodIds = 7,8,9,10, normalized periods are = 1,2,3,4
             uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
-            // if is the last period, then deliver the whole usersStake to the provider
-            // uint256 rewardPercentage =
-            //     _periodId != periodIds[periodIds.length - 1] &&
-            //         ? deviation.mul(normalizedPeriodId).div(periodIds.length)
-            //         : uint256(1).mul(precision);
             uint256 rewardPercentage =
                 deviation.mul(normalizedPeriodId).div(
                     finalPeriodId - initialPeriodId + 1
