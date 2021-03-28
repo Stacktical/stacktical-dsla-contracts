@@ -71,7 +71,7 @@ contract MessengerRegistry {
             "Should only be called using the SLARegistry contract"
         );
         require(
-            registeredMessengers[_messengerAddress] == false,
+            !registeredMessengers[_messengerAddress],
             "messenger already registered"
         );
 
