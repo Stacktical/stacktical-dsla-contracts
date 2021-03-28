@@ -46,7 +46,7 @@ contract PeriodRegistry is Ownable {
         PeriodDefinition storage periodDefinition =
             periodDefinitions[_periodType];
         require(
-            periodDefinition.initialized == false,
+            !periodDefinition.initialized,
             "Period type already initialized"
         );
         require(
@@ -87,7 +87,7 @@ contract PeriodRegistry is Ownable {
         PeriodDefinition storage periodDefinition =
             periodDefinitions[_periodType];
         require(
-            periodDefinition.initialized == true,
+            periodDefinition.initialized,
             "Period was not initialized yet"
         );
         for (uint256 index = 0; index < _periodStarts.length; index++) {
@@ -160,7 +160,7 @@ contract PeriodRegistry is Ownable {
         returns (bool finished)
     {
         require(
-            isValidPeriod(_periodType, _periodId) == true,
+            isValidPeriod(_periodType, _periodId),
             "Period data is not valid"
         );
         finished =
@@ -178,7 +178,7 @@ contract PeriodRegistry is Ownable {
         returns (bool started)
     {
         require(
-            isValidPeriod(_periodType, _periodId) == true,
+            isValidPeriod(_periodType, _periodId),
             "Period data is not valid"
         );
         started =
