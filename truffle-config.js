@@ -62,7 +62,7 @@ module.exports = {
       provider() {
         return new HDWalletProvider(
           mnemonic,
-          'https://kovan.infura.io/v3/96c18cecbaf04c0794f059d2ca1bab82',
+          `https://kovan.infura.io/v3/${infura_project_id}`,
           0,
           10,
         );
