@@ -158,13 +158,13 @@ contract Staking is Ownable {
         string memory dTokenID = _uintToStr(slaID);
         string memory symbol = ERC20(_tokenAddress).symbol();
         string memory duTokenName =
-            string(abi.encodePacked("DSLA-USER-", symbol, "-", dTokenID));
+            string(abi.encodePacked("DSLA-SHORT-", dTokenID));
         string memory duTokenSymbol =
-            string(abi.encodePacked("du", symbol, "-", dTokenID));
+            string(abi.encodePacked("DSLA-SP-", dTokenID));
         string memory dpTokenName =
-            string(abi.encodePacked("DSLA-PROVIDER-", symbol, "-", dTokenID));
+            string(abi.encodePacked("DSLA-LONG-", dTokenID));
         string memory dpTokenSymbol =
-            string(abi.encodePacked("dp", symbol, "-", dTokenID));
+            string(abi.encodePacked("DSLA-LP-", dTokenID));
 
         ERC20PresetMinterPauser duToken =
             ERC20PresetMinterPauser(
