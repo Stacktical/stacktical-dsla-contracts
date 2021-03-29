@@ -5,9 +5,9 @@ import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "../StringUtils.sol";
-import "../PeriodRegistry.sol";
-import "../StakeRegistry.sol";
+import "../../StringUtils.sol";
+import "../../PeriodRegistry.sol";
+import "../../StakeRegistry.sol";
 
 /**
  * @title NetworkAnalytics
