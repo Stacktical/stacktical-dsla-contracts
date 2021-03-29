@@ -168,17 +168,6 @@ contract Details {
         }
     }
 
-    // function getStakeRegistryDetails(StakeRegistry stakeRegistry) public view returns (
-    //     uint256 DSLAburnRate,
-    //         uint256 dslaDepositByPeriod,
-    //         uint256 dslaPlatformReward,
-    //         uint256 dslaMessengerReward,
-    //         uint256 dslaUserReward,
-    //         uint256 dslaBurnedByVerification
-    // ){
-    //     stakeRegistry.getStakingParameters();
-    // }
-
     function _addressToString(address _address)
         internal
         pure

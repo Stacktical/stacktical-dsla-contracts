@@ -99,6 +99,16 @@ contract SLA is Staking {
     }
 
     /**
+     * @dev throws if called with an amount less or equal to zero.
+     */
+    modifier notZero(uint256 _amount) {
+        require(
+            _amount > 0, 
+            "amount cannot be 0"
+        );
+        _;
+    }
+    /**
      * @param _owner 1. -
      * @param _sloRegistryAddress 2. -
      * @param _ipfsHash 3. -
@@ -157,20 +167,11 @@ contract SLA is Staking {
         if (sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
             uint256 precision = 10000;
-            // deviation = (sli-slo)*precision/((sli+slo)/2)
             uint256 deviation =
                 _sli.sub(sloValue).mul(precision).div(
                     _sli.add(sloValue).div(2)
                 );
-            // to get the reward formula, we get the periodId but respecting to the SLA
-            // because _periodId is the periodId of the platform
-            // e.g. if periodIds = 7,8,9,10, normalized periods are = 1,2,3,4
             uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
-            // if is the last period, then deliver the whole usersStake to the provider
-            // uint256 rewardPercentage =
-            //     _periodId != periodIds[periodIds.length - 1] &&
-            //         ? deviation.mul(normalizedPeriodId).div(periodIds.length)
-            //         : uint256(1).mul(precision);
             uint256 rewardPercentage =
                 deviation.mul(normalizedPeriodId).div(
                     finalPeriodId - initialPeriodId + 1
@@ -205,11 +206,10 @@ contract SLA is Staking {
      *@param _token 2. address of the ERC to be staked
      */
 
-    function stakeTokens(uint256 _amount, address _token) public {
-        require(_amount > 0, "amount cannot be 0");
+    function stakeTokens(uint256 _amount, address _token) public notZero(_amount){
         bool isContractFinished = contractFinished();
         require(
-            isContractFinished == false,
+            !isContractFinished,
             "Can only stake on not finished contracts"
         );
         _stake(_amount, _token);
@@ -218,9 +218,8 @@ contract SLA is Staking {
     }
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
-        public
+        public notZero(_amount)
     {
-        require(_amount > 0, "amount cannot be 0");
         bool isContractFinished = contractFinished();
         _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
     }
@@ -231,11 +230,10 @@ contract SLA is Staking {
      *@param _tokenAddress 2. address of the ERC to be staked
      */
 
-    function withdrawUserTokens(uint256 _amount, address _tokenAddress) public {
-        require(_amount > 0, "amount cannot be 0");
+    function withdrawUserTokens(uint256 _amount, address _tokenAddress) public notZero(_amount){
         if (msg.sender != owner()) {
             bool isContractFinished = contractFinished();
-            require(isContractFinished == true, "Only for finished contract");
+            require(isContractFinished, "Only for finished contract");
         }
         _withdrawUserTokens(_amount, _tokenAddress);
     }
