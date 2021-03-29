@@ -3,11 +3,11 @@ pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
-import "../SLA.sol";
-import "../PeriodRegistry.sol";
-import "../StringUtils.sol";
+import "../../SLA.sol";
+import "../../PeriodRegistry.sol";
+import "../../StringUtils.sol";
 import "./NetworkAnalytics.sol";
-import "../messenger/IMessenger.sol";
+import "../../messenger/IMessenger.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
