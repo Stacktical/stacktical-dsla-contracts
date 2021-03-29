@@ -156,7 +156,6 @@ contract Staking is Ownable {
             "Allowed tokens length greater than max token length"
         );
         string memory dTokenID = _uintToStr(slaID);
-        string memory symbol = ERC20(_tokenAddress).symbol();
         string memory duTokenName =
             string(abi.encodePacked("DSLA-SHORT-", dTokenID));
         string memory duTokenSymbol =
