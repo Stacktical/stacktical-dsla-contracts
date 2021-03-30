@@ -68,6 +68,7 @@ module.exports = {
         );
       },
       network_id: '42',
+      networkCheckTimeout: '99999',
       gas: 12000000,
       timeoutBlocks: 200,
       skipDryRun: true,

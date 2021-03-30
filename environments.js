@@ -19,6 +19,7 @@ const environments = {
       payments: [String(0.1 * 10 ** 18), String(0.1 * 10 ** 18), String(0.1 * 10 ** 18)],
     },
     chainlinkTokenAddress: '0xa36085F69e2889c224210F603D836748e7dC0088',
+    chainlinkNodeUrl: 'http://berlin.chainlink.kovan.node.dsla.network:6688',
   },
   develop: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
