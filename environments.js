@@ -12,7 +12,7 @@ const environments = {
   },
   kovan: {
     web3WebsocketProviderUrl:
-      'wss://kovan.infura.io/ws/v3/96c18cecbaf04c0794f059d2ca1bab82',
+      'wss://kovan.infura.io/ws/v3/56d60df059d141f2a80f4ff98fc8a461',
     preCoordinatorConfiguration: {
       oracles: ['0x182DCdA18Da4aB8E7eC8dC6B0F7cE517805c3779', '0x182DCdA18Da4aB8E7eC8dC6B0F7cE517805c3779', '0x182DCdA18Da4aB8E7eC8dC6B0F7cE517805c3779'],
       jobIds: ['0x27a07a356eb74913ac1da081846954c4', '0xc1b73e42706a464090884bf9928007f3', '0xdfaa2ce3b5284634ad8c010fe848870b'],

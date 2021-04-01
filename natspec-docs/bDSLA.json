@@ -1,5 +1,5 @@
 {
-  "details": "{bDSLA} token, including: *  - ability for holders to burn (destroy) their tokens - a minter role that allows for token minting (creation) - a pauser role that allows to stop all token transfers - a claim procces for DSLA owners * This contract uses {AccessControl} to lock permissioned functions using the different roles. * The account that deploys the contract will be granted the minter and pauser roles, as well as the default admin role, which will let it grant both minter and pauser roles to other accounts.",
+  "details": "{bDSLA} Dummy test token, for development purposes only",
   "methods": {
     "allowance(address,address)": { "details": "See {IERC20-allowance}." },
     "approve(address,uint256)": {
@@ -11,12 +11,6 @@
     },
     "burnFrom(address,uint256)": {
       "details": "Destroys `amount` tokens from `account`, deducting from the caller's allowance.     * See {ERC20-_burn} and {ERC20-allowance}.     * Requirements:     * - the caller must have allowance for ``accounts``'s tokens of at least `amount`."
-    },
-    "claim(address)": {
-      "details": "creates new 'bDSLA' tokens for the `_claimer`.",
-      "params": {
-        "_claimer": "1. address of the claimer     * Requirements:     * - the caller must have the `(MINTER_ROLE)`. - the claimer should have an allowed balance - the claim can be done just once"
-      }
     },
     "constructor": {
       "details": "Sets the values for {name} and {symbol}, {decimals} have a default value of 18."
@@ -61,20 +55,6 @@
     },
     "revokeRole(bytes32,address)": {
       "details": "Revokes `role` from `account`.     * If `account` had been granted `role`, emits a {RoleRevoked} event.     * Requirements:     * - the caller must have ``role``'s admin role."
-    },
-    "setAllowedAmount(uint256,address)": {
-      "details": "allows the claim of `_amount` for `_claimer`.",
-      "params": {
-        "_amount": "1. uint the equivalent amount of DSLA tokens on the mainnet",
-        "_claimer": "2. address of the claimer     * Requirements:     * - the caller must have the `(DEFAULT_ADMIN_ROLE)`."
-      }
-    },
-    "setAllowedAmounts(uint256[],address[])": {
-      "details": "allows the claim of `_amounts` for `_claimers`.",
-      "params": {
-        "_amounts": "1. an array of amounts to be claimed",
-        "_claimers": "2. an array of addresses of the claimers     * Requirements:     * - the caller must have the `(DEFAULT_ADMIN_ROLE)`."
-      }
     },
     "symbol()": {
       "details": "Returns the symbol of the token, usually a shorter version of the name."
