@@ -136,14 +136,6 @@ export const NetworkAnalyticsABI: AbiItem[] = [
   },
   {
     inputs: [],
-    name: 'callerReward',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
-    inputs: [],
     name: 'fee',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
@@ -274,7 +266,6 @@ export const NetworkAnalyticsABI: AbiItem[] = [
       },
       { internalType: 'bytes32', name: '_networkName', type: 'bytes32' },
       { internalType: 'bool', name: '_ownerApproval', type: 'bool' },
-      { internalType: 'bool', name: '_callerReward', type: 'bool' },
     ],
     name: 'requestAnalytics',
     outputs: [],
@@ -297,15 +288,6 @@ export const NetworkAnalyticsABI: AbiItem[] = [
       { internalType: 'uint256', name: '_feeMultiplier', type: 'uint256' },
     ],
     name: 'setChainlinkJobID',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'uint256', name: '_callerReward', type: 'uint256' },
-    ],
-    name: 'setCallerReward',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
