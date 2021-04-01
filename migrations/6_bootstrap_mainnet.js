@@ -20,7 +20,7 @@ const seMessengerSpec = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../s
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
-    if (/kovan/i.test(network)) {
+    if (/mainnet/i.test(network)) {
       if (!!process.env.ONLY_DETAILS === true) return;
       console.log('Starting automated jobs to bootstrap protocol correctly');
 

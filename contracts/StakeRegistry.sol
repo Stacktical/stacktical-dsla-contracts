@@ -50,15 +50,15 @@ contract StakeRegistry is Ownable, StringUtils {
     /// @dev (ownerAddress => slaAddress => LockedValue) stores the locked value by the staker
     mapping(address => LockedValue) public slaLockedValue;
     /// @dev DSLA deposit by period to create SLA
-    uint256 private _dslaDepositByPeriod = 20000 ether;
-    /// @dev DSLA rewarded to Stacktical team
-    uint256 private _dslaPlatformReward = 5000 ether;
+    uint256 private _dslaDepositByPeriod = 1000 ether;
+    /// @dev DSLA rewarded to the foundation
+    uint256 private _dslaPlatformReward = 250 ether;
     /// @dev DSLA rewarded to the Messenger creator
-    uint256 private _dslaMessengerReward = 5000 ether;
+    uint256 private _dslaMessengerReward = 250 ether;
     /// @dev DSLA rewarded to user calling the period verification
-    uint256 private _dslaUserReward = 9940 ether;
+    uint256 private _dslaUserReward = 250 ether;
     /// @dev DSLA burned after every period verification
-    uint256 private _dslaBurnedByVerification = 60 ether;
+    uint256 private _dslaBurnedByVerification = 250 ether;
     /// @dev DSLA burned after every period verification
     uint256 private _maxTokenLength = 1;
 
