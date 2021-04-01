@@ -86,10 +86,7 @@ contract PeriodRegistry is Ownable {
         require(_periodStarts.length > 0, "Period length can't be 0");
         PeriodDefinition storage periodDefinition =
             periodDefinitions[_periodType];
-        require(
-            periodDefinition.initialized,
-            "Period was not initialized yet"
-        );
+        require(periodDefinition.initialized, "Period was not initialized yet");
         for (uint256 index = 0; index < _periodStarts.length; index++) {
             require(
                 _periodStarts[index] < _periodEnds[index],

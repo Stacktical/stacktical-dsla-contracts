@@ -7,25 +7,6 @@ export const erc20ABI: AbiItem[] = [
     inputs: [
       {
         indexed: true,
-        internalType: 'uint256',
-        name: '_amount',
-        type: 'uint256',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: '_claimer',
-        type: 'address',
-      },
-    ],
-    name: 'Allowed',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
         internalType: 'address',
         name: 'owner',
         type: 'address',
@@ -376,33 +357,6 @@ export const erc20ABI: AbiItem[] = [
   {
     inputs: [],
     name: 'unpause',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'uint256', name: '_amount', type: 'uint256' },
-      { internalType: 'address', name: '_claimer', type: 'address' },
-    ],
-    name: 'setAllowedAmount',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'uint256[]', name: '_amounts', type: 'uint256[]' },
-      { internalType: 'address[]', name: '_claimers', type: 'address[]' },
-    ],
-    name: 'setAllowedAmounts',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: '_claimer', type: 'address' }],
-    name: 'claim',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',

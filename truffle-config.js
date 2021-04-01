@@ -8,6 +8,8 @@ const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 const mnemonic = process.env.DSLA_MNEMONIC;
 const test_mnemonic = process.env.TEST_MNEMONIC;
 const stagingIP = process.env.STAGING_IP;
+const kovan_project_id = process.env.KOVAN_PROJECT_ID;
+const kovan_mnemonic = process.env.KOVAN_MNEMONIC;
 
 module.exports = {
   networks: {
@@ -61,8 +63,8 @@ module.exports = {
     kovan: {
       provider() {
         return new HDWalletProvider(
-          mnemonic,
-          'https://kovan.infura.io/v3/96c18cecbaf04c0794f059d2ca1bab82',
+          kovan_mnemonic,
+          `https://kovan.infura.io/v3/${kovan_project_id}`,
           0,
           10,
         );
