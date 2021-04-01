@@ -98,10 +98,9 @@ contract SLARegistry is Ownable {
             _finalPeriodId >= _initialPeriodId,
             "finalPeriodId should be greater than or equal to initialPeriodId"
         );
-        // UNCOMMENT THE NEXT 3 LINES BEFORE MAINNET
-        // bool periodHasStarted =
-        //     periodRegistry.periodHasStarted(_periodType, _initialPeriodId);
-        // require(!periodHasStarted, "Period has started");
+        bool periodHasStarted =
+            periodRegistry.periodHasStarted(_periodType, _initialPeriodId);
+        require(!periodHasStarted, "Period has started");
         bool registeredMessenger =
             messengerRegistry.registeredMessengers(_messengerAddress);
         require(
