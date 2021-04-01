@@ -4,7 +4,7 @@ npx prettier --write 'contracts/**/*.sol'
 
 truffle deploy --reset --network kovan
 
-./scripts/export-data-kovan.sh
+./scripts/export-data.sh
 
 # copy abis and addresses to frontend, depends on relative roots
 rm -rf ../stacktical-dsla-frontend/src/contracts/**
