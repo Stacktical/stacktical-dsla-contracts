@@ -175,18 +175,6 @@ module.exports = (deployer, network) => {
       );
       await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-      console.log('Starting automated job 14: Request Analytics for period 4');
-      networkAnalytics.requestAnalytics(
-        4, periodType, slaNetworkBytes32, ownerApproval, callerReward,
-      );
-      await eventListener(networkAnalytics, 'AnalyticsReceived');
-
-      console.log('Starting automated job 15: Request Analytics for period 5');
-      networkAnalytics.requestAnalytics(
-        5, periodType, slaNetworkBytes32, ownerApproval, callerReward,
-      );
-      await eventListener(networkAnalytics, 'AnalyticsReceived');
-
       console.log('Bootstrap process completed');
     }
   });
