@@ -49,8 +49,6 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
     uint256 private baseFee = 0.1 ether;
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
     uint256 public fee;
-    /// @dev fee for Chainlink querys. Currently 0.1 LINK
-    uint256 public callerReward = 0 ether;
 
     /**
      * @dev event emitted when modifying the callerReward
@@ -150,14 +148,12 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @param _periodType 2. type of period to be queried
      * @param _networkName 3. network name to publish analytics
      * @param _ownerApproval 4. used to choose if the call is going to be funded by the contract owner, to avoid a block by contract owner
-     * @param _callerReward 5. used to choose if the call is going to be rewarded by the contract owner, to avoid a block by contract owner
      */
     function requestAnalytics(
         uint256 _periodId,
         PeriodRegistry.PeriodType _periodType,
         bytes32 _networkName,
-        bool _ownerApproval,
-        bool _callerReward
+        bool _ownerApproval
     ) public {
         require(isValidNetwork(_networkName), "Invalid network name");
         bool periodIsFinished =
@@ -179,15 +175,6 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
                 msg.sender,
                 address(this),
                 fee
-            );
-        }
-
-        if (_callerReward) {
-            address dslaTokenAddress = stakeRegistry.DSLATokenAddress();
-            ERC20(dslaTokenAddress).safeTransferFrom(
-                owner(),
-                msg.sender,
-                callerReward
             );
         }
 
@@ -255,14 +242,6 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         jobId = _jobId;
         fee = _feeMultiplier * baseFee;
         emit JobIdModified(msg.sender, _jobId, fee);
-    }
-
-    /**
-     * @param _callerReward 1. uint256 new caller reward
-     */
-    function setCallerReward(uint256 _callerReward) public onlyOwner {
-        callerReward = _callerReward;
-        emit CallerRewardModified(msg.sender, _callerReward);
     }
 
     function getNetworkNames() public view returns (bytes32[] memory networks) {

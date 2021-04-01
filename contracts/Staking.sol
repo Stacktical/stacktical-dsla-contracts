@@ -84,6 +84,7 @@ contract Staking is Ownable {
     );
 
     /**
+     *@param _slaRegistryAddress 1. period type of the SLA
      *@param _periodType 3. period type of the SLA
      *@param _whitelistedContract 5. enables the white list feature
      *@param _slaID 6. identifies the SLA to uniquely to emit dTokens

@@ -2,10 +2,13 @@ require('dotenv').config();
 
 const environments = {
   mainnet: {
-    web3WebsocketProviderUrl: 'wss://mainnet.infura.io/ws/v3/e8dc03e5684a4dd5872f4e0da2187dca',
-    chainlinkOracleAddress: null,
+    web3WebsocketProviderUrl: 'wss://mainnet.infura.io/ws/v3/56d60df059d141f2a80f4ff98fc8a461',
+    preCoordinatorConfiguration: {
+      oracles: [null],
+      jobIds: [null],
+      payments: [null],
+    },
     chainlinkTokenAddress: '0x514910771af9ca656af840dff83e8264ecf986ca',
-    chainlinkJobId: null,
     dslaTokenAddress: '0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe',
     daiTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
     usdcTokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
