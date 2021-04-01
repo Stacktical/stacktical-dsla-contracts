@@ -367,14 +367,11 @@ contract Staking is Ownable {
                 return (allowedTokenAddress, 0);
             }
             uint256 dTokenBalance = dToken.balanceOf(_staker);
-            uint256 precision = 10000;
-            uint256 userCompensationPercentage =
-                dTokenBalance.mul(precision).div(dTokenSupply);
             return (
                 allowedTokenAddress,
-                usersPool[allowedTokenAddress]
-                    .mul(userCompensationPercentage)
-                    .div(precision)
+                usersPool[allowedTokenAddress].mul(dTokenBalance).div(
+                    dTokenSupply
+                )
             );
         }
     }
