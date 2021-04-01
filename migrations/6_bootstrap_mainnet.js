@@ -1,6 +1,9 @@
 require('babel-polyfill');
 require('babel-register');
 
+const fs = require('fs');
+const path = require('path');
+const { getIPFSHash } = require('../test/helpers');
 const { networkNamesBytes32 } = require('../constants');
 const { envParameters } = require('../environments');
 const { generateWeeklyPeriods } = require('../utils');
@@ -11,18 +14,15 @@ const PeriodRegistry = artifacts.require('PeriodRegistry');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const SLARegistry = artifacts.require('SLARegistry');
 const SEMessenger = artifacts.require('SEMessenger');
-
 const periodType = 2;
-const periods = 52;
-const [periodStarts, periodEnds] = generateWeeklyPeriods(periods);
+const [periodStarts, periodEnds] = generateWeeklyPeriods(52, 0);
+const seMessengerSpec = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../semessenger.mainnet.spec.json')));
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
-    if (/mainnet/i.test(network)) {
+    if (/kovan/i.test(network)) {
       if (!!process.env.ONLY_DETAILS === true) return;
       console.log('Starting automated jobs to bootstrap protocol correctly');
-      const daiToken = await IERC20.at(envParameters.dslaTokenAddress);
-      const usdcToken = await IERC20.at(envParameters.daiTokenAddress);
 
       console.log('Starting automated job 1: weekly period initialization');
       const periodRegistry = await PeriodRegistry.deployed();
@@ -34,32 +34,36 @@ module.exports = (deployer, network) => {
 
       console.log('Starting automated job 2: allowing DAI and USDC on StakeRegistry');
       const stakeRegistry = await StakeRegistry.deployed();
-      await stakeRegistry.addAllowedTokens(daiToken.address);
-      await stakeRegistry.addAllowedTokens(usdcToken.address);
+      await stakeRegistry.addAllowedTokens(envParameters.daiTokenAddress);
+      await stakeRegistry.addAllowedTokens(envParameters.usdcTokenAddress);
 
-      console.log('Starting automated job 3: adding network names to NetworkAnalytics contract');
+      console.log('Starting automated job 3: Adding the network names to the NetworkAnalytics contract');
       const networkAnalytics = await NetworkAnalytics.deployed();
       await networkAnalytics.addMultipleNetworks(networkNamesBytes32);
 
-      console.log('Starting automated job 4: Increasing allowance of NetworkAnalytics contract to 100 LINK');
+      console.log('Starting automated job 4: Increasing allowance for NetworkAnalytics and SEMessenger with 25 link tokens');
+      const seMessenger = await SEMessenger.deployed();
       const linkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
       await linkToken.approve(
         networkAnalytics.address,
-        web3.utils.toWei('100'),
+        web3.utils.toWei('25'),
       );
-
-      console.log('Starting automated job 5: Increasing allowance of SEMessenger contract to 100 LINK');
-      const seMessenger = await SEMessenger.deployed();
       await linkToken.approve(
         seMessenger.address,
-        web3.utils.toWei('100'),
+        web3.utils.toWei('25'),
       );
 
-      console.log('Starting automated job 6: Registering the SEMessenger');
+      console.log('Starting automated job 5: Registering messenger on the SLARegistry');
       const slaRegistry = await SLARegistry.deployed();
+      const updatedSpec = {
+        ...seMessengerSpec,
+        timestamp: new Date().toISOString(),
+      };
+      const seMessengerSpecIPFS = await getIPFSHash(updatedSpec);
+
       await slaRegistry.registerMessenger(
         seMessenger.address,
-        '',
+        `https://ipfs.dsla.network/ipfs/${seMessengerSpecIPFS}`,
       );
 
       console.log('Bootstrap process completed');

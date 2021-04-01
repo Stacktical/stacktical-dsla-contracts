@@ -18,11 +18,16 @@ export const sloTypesNames = {
   GreaterOrEqualTo: sloTypes[5],
 };
 
+// validators values not used for production, only networkNames
 export const networks = {
   ONE: { validators: ['P-OPS', 'Chainode', 'Everstake'] },
   DOT: { validators: ['Everstake', 'Figment', 'stakefish'] },
   ATOM: { validators: ['Everstake', 'Figment', 'stakefish'] },
   BAND: { validators: ['Chainode'] },
+  eGLD: { },
+  XTZ: { },
+  AVAX: { },
+  ROSE: { },
 };
 
 export const networkNames = Object.keys(networks);
