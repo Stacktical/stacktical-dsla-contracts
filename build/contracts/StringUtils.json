@@ -1,28 +1,16 @@
 {
   "contractName": "StringUtils",
   "abi": [],
-<<<<<<< HEAD
-  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/silversurfer/Development/stacktical-dsla-contracts/contracts/StringUtils.sol\":\"StringUtils\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/home/silversurfer/Development/stacktical-dsla-contracts/contracts/StringUtils.sol\":{\"keccak256\":\"0x1d09ebc44ff8870d04bcc69fca7344ec8a72a8c5f163501e8c88f80afaa21165\",\"urls\":[\"bzz-raw://b8160d10712039787898099febde561e8d505791a7abf252526f4768cfa23d09\",\"dweb:/ipfs/QmSdeqCLLAuJA75S5fEDiCALRVWZwUvNM9131bw6ksgikc\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212202333c31d27b6f8a82a41677c7ab3ee7b9a98f7d4722f01d2ab18155a0e4ae66064736f6c63430006060033",
-  "deployedBytecode": "0x6080604052600080fdfea26469706673582212202333c31d27b6f8a82a41677c7ab3ee7b9a98f7d4722f01d2ab18155a0e4ae66064736f6c63430006060033",
-=======
   "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/StringUtils.sol\":\"StringUtils\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/StringUtils.sol\":{\"keccak256\":\"0x1d09ebc44ff8870d04bcc69fca7344ec8a72a8c5f163501e8c88f80afaa21165\",\"urls\":[\"bzz-raw://b8160d10712039787898099febde561e8d505791a7abf252526f4768cfa23d09\",\"dweb:/ipfs/QmSdeqCLLAuJA75S5fEDiCALRVWZwUvNM9131bw6ksgikc\"]}},\"version\":1}",
   "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220e8f084714377e8b4bacc8e3f58202a06538a522443b894c14210e7b8a91afc6b64736f6c63430006060033",
   "deployedBytecode": "0x6080604052600080fdfea2646970667358221220e8f084714377e8b4bacc8e3f58202a06538a522443b894c14210e7b8a91afc6b64736f6c63430006060033",
->>>>>>> oracle_cluster
   "immutableReferences": {},
   "sourceMap": "48:3144:9:-:0;;;;5:9:-1;2:2;;;27:1;24;17:12;2:2;48:3144:9;;;;;;;",
   "deployedSourceMap": "48:3144:9:-:0;;;12:1:-1;9;2:12",
   "source": "// solhint-disable-line\npragma solidity 0.6.6;\n\ncontract StringUtils {\n    function _addressToString(address _address)\n        internal\n        pure\n        returns (string memory)\n    {\n        bytes32 _bytes = bytes32(uint256(_address));\n        bytes memory HEX = \"0123456789abcdef\";\n        bytes memory _string = new bytes(42);\n        _string[0] = \"0\";\n        _string[1] = \"x\";\n        for (uint256 i = 0; i < 20; i++) {\n            _string[2 + i * 2] = HEX[uint8(_bytes[i + 12] >> 4)];\n            _string[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];\n        }\n        return string(_string);\n    }\n\n    function _bytes32ToStr(bytes32 _bytes32)\n        internal\n        pure\n        returns (string memory)\n    {\n        uint8 i = 0;\n        while (i < 32 && _bytes32[i] != 0) {\n            i++;\n        }\n        bytes memory bytesArray = new bytes(i);\n        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {\n            bytesArray[i] = _bytes32[i];\n        }\n        return string(bytesArray);\n    }\n\n    function _bytesToUint(bytes memory b)\n        internal\n        pure\n        returns (uint256 result)\n    {\n        result = 0;\n        for (uint256 i = 0; i < b.length; i++) {\n            if (uint8(b[i]) >= 48 && uint8(b[i]) <= 57) {\n                result = result * 10 + (uint8(b[i]) - 48);\n            }\n        }\n        return result;\n    }\n\n    /*\n        ORACLIZE_API\n        Copyright (c) 2015-2016 Oraclize SRL\n        Copyright (c) 2016 Oraclize LTD\n        Permission is hereby granted, free of charge, to any person obtaining a copy\n        of this software and associated documentation files (the \"Software\"), to deal\n        in the Software without restriction, including without limitation the rights\n        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n        copies of the Software, and to permit persons to whom the Software is\n        furnished to do so, subject to the following conditions:\n        The above copyright notice and this permission notice shall be included in\n        all copies or substantial portions of the Software.\n        THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\n        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n        THE SOFTWARE.\n    */\n    function _uintToStr(uint256 _i)\n        internal\n        pure\n        returns (string memory _uintAsString)\n    {\n        uint256 number = _i;\n        if (number == 0) {\n            return \"0\";\n        }\n        uint256 j = number;\n        uint256 len;\n        while (j != 0) {\n            len++;\n            j /= 10;\n        }\n        bytes memory bstr = new bytes(len);\n        uint256 k = len - 1;\n        while (number != 0) {\n            bstr[k--] = bytes1(uint8(48 + (number % 10)));\n            number /= 10;\n        }\n        return string(bstr);\n    }\n}\n",
-<<<<<<< HEAD
-  "sourcePath": "/home/silversurfer/Development/stacktical-dsla-contracts/contracts/StringUtils.sol",
-  "ast": {
-    "absolutePath": "/home/silversurfer/Development/stacktical-dsla-contracts/contracts/StringUtils.sol",
-=======
   "sourcePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/StringUtils.sol",
   "ast": {
     "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/StringUtils.sol",
->>>>>>> oracle_cluster
     "exportedSymbols": {
       "StringUtils": [
         5120
@@ -4305,11 +4293,7 @@
   },
   "legacyAST": {
     "attributes": {
-<<<<<<< HEAD
-      "absolutePath": "/home/silversurfer/Development/stacktical-dsla-contracts/contracts/StringUtils.sol",
-=======
       "absolutePath": "/Users/matiasbn/Desktop/stacktical/stacktical-dsla-contracts/contracts/StringUtils.sol",
->>>>>>> oracle_cluster
       "exportedSymbols": {
         "StringUtils": [
           5120
@@ -8839,13 +8823,8 @@
     "version": "0.6.6+commit.6c089d02.Emscripten.clang"
   },
   "networks": {},
-<<<<<<< HEAD
-  "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-29T21:04:06.045Z",
-=======
   "schemaVersion": "3.3.3",
-  "updatedAt": "2021-03-31T23:40:18.716Z",
->>>>>>> oracle_cluster
+  "updatedAt": "2021-04-01T00:16:50.056Z",
   "devdoc": {
     "methods": {}
   },
