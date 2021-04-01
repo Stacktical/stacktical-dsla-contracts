@@ -147,9 +147,7 @@ contract SLARegistry is Ownable {
         SLA _sla,
         bool _ownerApproval
     ) public {
-        require(isRegisteredSLA(address(_sla)),
-            "SLA contract should be valid"
-        );
+        require(isRegisteredSLA(address(_sla)), "SLA contract should be valid");
         require(
             _periodId == _sla.nextVerifiablePeriod(),
             "Should only verify next period"
@@ -172,10 +170,7 @@ contract SLARegistry is Ownable {
         PeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
         bool periodFinished =
             periodRegistry.periodIsFinished(slaPeriodType, _periodId);
-        require(
-            periodFinished,
-            "SLA contract period has not finished yet"
-        );
+        require(periodFinished, "SLA contract period has not finished yet");
         address slaMessenger = _sla.messengerAddress();
         IMessenger(slaMessenger).requestSLI(
             _periodId,
@@ -191,9 +186,7 @@ contract SLARegistry is Ownable {
     }
 
     function returnLockedValue(SLA _sla) public {
-        require(isRegisteredSLA(address(_sla)),
-            "SLA contract should be valid"
-        );
+        require(isRegisteredSLA(address(_sla)), "SLA contract should be valid");
         require(
             msg.sender == _sla.owner(),
             "Only SLA owner can claim locked value"
