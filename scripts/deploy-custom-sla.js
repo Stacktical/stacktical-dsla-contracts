@@ -1,5 +1,5 @@
 const { networkNamesBytes32, networkNames, networks } = require('../constants');
-const { getIPFSHash } = require('../test/helpers');
+const { getIPFSHash, eventListener } = require('../test/helpers');
 
 const SLA = artifacts.require('SLA');
 const SLARegistry = artifacts.require('SLARegistry');
@@ -14,8 +14,8 @@ const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
 const sloValue = 85000;
 const sloType = 4;
 const periodType = 2;
-const slaNetworkBytes32 = networkNamesBytes32[1];
-const slaNetwork = networkNames[1];
+const slaNetworkBytes32 = networkNamesBytes32[0];
+const slaNetwork = networkNames[0];
 
 module.exports = async (callback) => {
   try {
@@ -38,8 +38,8 @@ module.exports = async (callback) => {
       serviceTicker: slaNetwork,
     };
     const ipfsHash = await getIPFSHash(serviceMetadata);
-    const initialPeriodId = 0;
-    const finalPeriodId = 51;
+    const initialPeriodId = 48;
+    const finalPeriodId = 49;
     const dslaDepositByPeriod = 20000;
     const dslaDeposit = toWei(
       String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1)),
@@ -75,6 +75,21 @@ module.exports = async (callback) => {
     console.log('Starting automated job 2.2: notOwner: 2000 bDSLA');
     await bdslaToken.approve(sla.address, stakeAmountTimesWei(2), { from: notOwner });
     await sla.stakeTokens(stakeAmountTimesWei(2), bdslaToken.address, { from: notOwner });
+
+    // console.log(
+    //   'Starting automated job 10: Request Analytics and SLI for period 0',
+    // );
+    // const ownerApproval = true;
+
+    // await slaRegistry.requestSLI(0, sla.address, ownerApproval);
+    // await eventListener(sla, 'SLICreated');
+
+    // console.log(
+    //   'Starting automated job 10: Request Analytics and SLI for period 1',
+    // );
+    // await slaRegistry.requestSLI(1, sla.address, ownerApproval);
+    // await eventListener(sla, 'SLICreated');
+
     callback(null);
   } catch (error) {
     callback(error);
