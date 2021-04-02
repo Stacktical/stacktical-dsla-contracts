@@ -27,7 +27,7 @@ const addresses = (adminWallet) => ({
     AdminWallet: adminWallet,
     // https://etherscan.io/token/0x6b175474e89094c44da98b954eedeac495271d0f
     DAIToken: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    USDCToken: (USDC.networks[1] && USDC.networks[1].address) || placeHolder,
+    USDCToken: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     MessengerRegistry:
       (MessengerRegistry.networks[1] && MessengerRegistry.networks[1].address)
       || placeHolder,
