@@ -5,7 +5,7 @@ const addresses = {
     SLARegistry: '0xEF12BDcF5E5D5ae4c950a9FaEb2A274d1646b48D',
     AdminWallet: '0xF97Cf29fb0814a83e88DdF324D32bda45706Fb42',
     DAIToken: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    USDCToken: 'TBD',
+    USDCToken: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     MessengerRegistry: '0x857533E7d9DE216E8BdBd1620018099B88cDD792',
     PeriodRegistry: '0x7229e7cb280cb55741B13485ded35C1df3790BC0',
     StakeRegistry: '0x143c0e6cB35AC53C7f06d4914199E4cAc3977AC7',
