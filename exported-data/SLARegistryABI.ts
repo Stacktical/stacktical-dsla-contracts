@@ -23,9 +23,29 @@ export const SLARegistryABI: AbiItem[] = [
         name: '_stakeRegistry',
         type: 'address',
       },
+      { internalType: 'bool', name: '_checkPastPeriod', type: 'bool' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'bool',
+        name: 'checkPastPeriod',
+        type: 'bool',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'CheckPastPeriod',
+    type: 'event',
   },
   {
     anonymous: false,
@@ -69,6 +89,14 @@ export const SLARegistryABI: AbiItem[] = [
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     name: 'SLAs',
     outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [],
+    name: 'checkPastPeriod',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
     constant: true,
@@ -227,5 +255,12 @@ export const SLARegistryABI: AbiItem[] = [
     stateMutability: 'view',
     type: 'function',
     constant: true,
+  },
+  {
+    inputs: [{ internalType: 'bool', name: '_checkPastPeriod', type: 'bool' }],
+    name: 'changeCheckPastPeriod',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ];

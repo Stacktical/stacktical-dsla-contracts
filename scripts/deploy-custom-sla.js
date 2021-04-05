@@ -38,8 +38,8 @@ module.exports = async (callback) => {
       serviceTicker: slaNetwork,
     };
     const ipfsHash = await getIPFSHash(serviceMetadata);
-    const initialPeriodId = 48;
-    const finalPeriodId = 49;
+    const initialPeriodId = 0;
+    const finalPeriodId = 2;
     const dslaDepositByPeriod = 20000;
     const dslaDeposit = toWei(
       String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1)),

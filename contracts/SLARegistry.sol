@@ -33,6 +33,8 @@ contract SLARegistry is Ownable {
     mapping(address => uint256[]) private userToSLAIndexes;
     /// @dev to check if registered SLA
     mapping(address => bool) private registeredSLAs;
+    // value to lock past periods on SLA deployment
+    bool public checkPastPeriod;
 
     /**
      * @dev event for service level agreement creation logging
@@ -42,17 +44,26 @@ contract SLARegistry is Ownable {
     event SLACreated(SLA indexed sla, address indexed owner);
 
     /**
+     * @dev event for check past period changed
+     * @param checkPastPeriod 1. checkPastPeriod new value
+     * @param owner 2. The address of the function caller
+     */
+    event CheckPastPeriod(bool checkPastPeriod, address indexed owner);
+
+    /**
      * @dev constructor
      * @param _sloRegistry 1. SLO Registry
      * @param _periodRegistry 2. Periods registry
      * @param _messengerRegistry 3. Messenger registry
      * @param _stakeRegistry 4. Stake registry
+     * @param _checkPastPeriod 5. -
      */
     constructor(
         SLORegistry _sloRegistry,
         PeriodRegistry _periodRegistry,
         MessengerRegistry _messengerRegistry,
-        StakeRegistry _stakeRegistry
+        StakeRegistry _stakeRegistry,
+        bool _checkPastPeriod
     ) public {
         sloRegistry = _sloRegistry;
         sloRegistry.setSLARegistry();
@@ -61,6 +72,7 @@ contract SLARegistry is Ownable {
         stakeRegistry.setSLARegistry();
         messengerRegistry = _messengerRegistry;
         messengerRegistry.setSLARegistry();
+        checkPastPeriod = _checkPastPeriod;
     }
 
     /**
@@ -98,9 +110,12 @@ contract SLARegistry is Ownable {
             _finalPeriodId >= _initialPeriodId,
             "finalPeriodId should be greater than or equal to initialPeriodId"
         );
-        bool periodHasStarted =
-            periodRegistry.periodHasStarted(_periodType, _initialPeriodId);
-        require(!periodHasStarted, "Period has started");
+
+        if (checkPastPeriod) {
+            bool periodHasStarted =
+                periodRegistry.periodHasStarted(_periodType, _initialPeriodId);
+            require(!periodHasStarted, "Period has started");
+        }
         bool registeredMessenger =
             messengerRegistry.registeredMessengers(_messengerAddress);
         require(
@@ -275,5 +290,14 @@ contract SLARegistry is Ownable {
      */
     function isRegisteredSLA(address _slaAddress) public view returns (bool) {
         return registeredSLAs[_slaAddress];
+    }
+
+    /**
+     * @dev change the checkPastPeriod value
+     * @param _checkPastPeriod new value
+     */
+    function changeCheckPastPeriod(bool _checkPastPeriod) public onlyOwner {
+        checkPastPeriod = _checkPastPeriod;
+        emit CheckPastPeriod(checkPastPeriod, msg.sender);
     }
 }

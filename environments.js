@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 
 const environments = {
@@ -26,6 +27,7 @@ const environments = {
     dslaTokenAddress: '0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe',
     daiTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
     usdcTokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    checkPastPeriods: true,
   },
   kovan: {
     web3WebsocketProviderUrl: `wss://kovan.infura.io/ws/v3/${infura_project_id}`,
@@ -47,6 +49,7 @@ const environments = {
       ],
     },
     chainlinkTokenAddress: '0xa36085F69e2889c224210F603D836748e7dC0088',
+    checkPastPeriods: false,
   },
   develop: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
@@ -58,6 +61,7 @@ const environments = {
     chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
     chainlinkNodeUrl: 'http://localhost:6688',
+    checkPastPeriods: false,
   },
 };
 
@@ -70,11 +74,10 @@ const getNetworkName = (network) => {
   throw new Error(`Network not recognized: ${network}`);
 };
 
-export const getEnvFromNetwork = (network) =>
-  environments[getNetworkName(network)];
+export const getEnvFromNetwork = (network) => environments[getNetworkName(network)];
 
 export const envParameters = environments[process.env.NODE_ENV];
 
 export const needsGetJobId = ['develop', 'staging'].includes(
-  process.env.NODE_ENV
+  process.env.NODE_ENV,
 );

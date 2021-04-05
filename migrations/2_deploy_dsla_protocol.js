@@ -37,6 +37,7 @@ module.exports = (deployer, network) => {
         periodRegistry.address,
         messengerRegistry.address,
         stakeRegistry.address,
+        env.checkPastPeriods,
       );
     });
   }
