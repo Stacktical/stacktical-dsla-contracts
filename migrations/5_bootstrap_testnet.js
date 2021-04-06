@@ -30,12 +30,12 @@ const [periodStarts, periodEnds] = generateWeeklyPeriods(52, 7);
 const slaNetworkBytes32 = networkNamesBytes32[0];
 const slaNetwork = networkNames[0];
 const seMessengerSpec = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, '../semessenger.develop.spec.json'))
+  fs.readFileSync(path.resolve(__dirname, '../semessenger.develop.spec.json')),
 );
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
-    if (/kovan/i.test(network)) {
+    if (/kovan/i.test(network) || /harmonytestnet/i.test(network)) {
       if (!!process.env.ONLY_DETAILS === true) return;
       console.log('Starting automated jobs to bootstrap protocol correctly');
       const [owner, notOwner] = await web3.eth.getAccounts();
@@ -58,24 +58,24 @@ module.exports = (deployer, network) => {
       await periodRegistry.initializePeriod(
         periodType,
         periodStarts,
-        periodEnds
+        periodEnds,
       );
 
       console.log(
-        'Starting automated job 3: allowing DAI and USDC on StakeRegistry'
+        'Starting automated job 3: allowing DAI and USDC on StakeRegistry',
       );
       const stakeRegistry = await StakeRegistry.deployed();
       await stakeRegistry.addAllowedTokens(daiToken.address);
       await stakeRegistry.addAllowedTokens(usdcToken.address);
 
       console.log(
-        'Starting automated job 4: Adding the network names to the NetworkAnalytics contract'
+        'Starting automated job 4: Adding the network names to the NetworkAnalytics contract',
       );
       const networkAnalytics = await NetworkAnalytics.deployed();
       await networkAnalytics.addMultipleNetworks(networkNamesBytes32);
 
       console.log(
-        'Starting automated job 5: Increasing allowance for NetworkAnalytics and SEMessenger with 10 link tokens'
+        'Starting automated job 5: Increasing allowance for NetworkAnalytics and SEMessenger with 10 link tokens',
       );
       const seMessenger = await SEMessenger.deployed();
       const linkToken = await IERC20.at(envParameters.chainlinkTokenAddress);
@@ -83,7 +83,7 @@ module.exports = (deployer, network) => {
       await linkToken.approve(seMessenger.address, web3.utils.toWei('10'));
 
       console.log(
-        'Starting automated job 6: Registering messenger on the SLARegistry'
+        'Starting automated job 6: Registering messenger on the SLARegistry',
       );
       const slaRegistry = await SLARegistry.deployed();
       const updatedSpec = {
@@ -94,7 +94,7 @@ module.exports = (deployer, network) => {
 
       await slaRegistry.registerMessenger(
         seMessenger.address,
-        `https://ipfs.dsla.network/ipfs/${seMessengerSpecIPFS}`
+        `https://ipfs.dsla.network/ipfs/${seMessengerSpecIPFS}`,
       );
 
       // Next steps are optional and not required for production (review before copy/paste)
@@ -113,7 +113,7 @@ module.exports = (deployer, network) => {
       const finalPeriodId = 51;
       const dslaDepositByPeriod = 20000;
       const dslaDeposit = toWei(
-        String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1))
+        String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1)),
       );
       await bdslaToken.approve(stakeRegistry.address, dslaDeposit);
       const whitelisted = false;
@@ -126,25 +126,24 @@ module.exports = (deployer, network) => {
         initialPeriodId,
         finalPeriodId,
         ipfsHash,
-        [slaNetworkBytes32]
+        [slaNetworkBytes32],
       );
 
       console.log(
-        'Starting automated job 8: Adding bDSLA as allowed to SLA contract'
+        'Starting automated job 8: Adding bDSLA as allowed to SLA contract',
       );
       const slaAddresses = await slaRegistry.userSLAs(owner);
       const sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);
       await sla.addAllowedTokens(bdslaToken.address);
 
       console.log(
-        'Starting automated job 9: Stake on owner and notOwner pools'
+        'Starting automated job 9: Stake on owner and notOwner pools',
       );
       console.log('Starting automated job 9.1: owner: 30000 bDSLA');
       // Owner
       // 3 * bsdla
       await bdslaToken.approve(sla.address, stakeAmountTimesWei(3));
       await sla.stakeTokens(stakeAmountTimesWei(3), bdslaToken.address);
-
       // NotOwner
       // 3 * bdsla
       console.log('Starting automated job 9.2: notOwner: 2000 bDSLA');
@@ -155,53 +154,50 @@ module.exports = (deployer, network) => {
         from: notOwner,
       });
 
-      // period 0 is already finished
-      console.log(
-        'Starting automated job 10: Request Analytics and SLI for period 0'
-      );
-      const ownerApproval = true;
+      // const ownerApproval = true;
+      // console.log(
+      //   'Starting automated job 10: Request Analytics and SLI for period 0',
+      // );
+      // networkAnalytics.requestAnalytics(
+      //   0,
+      //   periodType,
+      //   slaNetworkBytes32,
+      //   ownerApproval,
+      // );
+      // await eventListener(networkAnalytics, 'AnalyticsReceived');
+      // await slaRegistry.requestSLI(0, sla.address, ownerApproval);
+      // await eventListener(sla, 'SLICreated');
 
-      // period 0 is already finished
-      networkAnalytics.requestAnalytics(
-        0,
-        periodType,
-        slaNetworkBytes32,
-        ownerApproval
-      );
-      await eventListener(networkAnalytics, 'AnalyticsReceived');
-      await slaRegistry.requestSLI(0, sla.address, ownerApproval);
-      await eventListener(sla, 'SLICreated');
+      // console.log(
+      //   'Starting automated job 11: Request Analytics and SLI for period 1',
+      // );
+      // networkAnalytics.requestAnalytics(
+      //   1,
+      //   periodType,
+      //   slaNetworkBytes32,
+      //   ownerApproval,
+      // );
+      // await eventListener(networkAnalytics, 'AnalyticsReceived');
+      // await slaRegistry.requestSLI(1, sla.address, ownerApproval);
+      // await eventListener(sla, 'SLICreated');
 
-      console.log(
-        'Starting automated job 11: Request Analytics and SLI for period 1'
-      );
-      networkAnalytics.requestAnalytics(
-        1,
-        periodType,
-        slaNetworkBytes32,
-        ownerApproval
-      );
-      await eventListener(networkAnalytics, 'AnalyticsReceived');
-      await slaRegistry.requestSLI(1, sla.address, ownerApproval);
-      await eventListener(sla, 'SLICreated');
+      // console.log('Starting automated job 12: Request Analytics for period 2');
+      // networkAnalytics.requestAnalytics(
+      //   2,
+      //   periodType,
+      //   slaNetworkBytes32,
+      //   ownerApproval,
+      // );
+      // await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-      console.log('Starting automated job 12: Request Analytics for period 2');
-      networkAnalytics.requestAnalytics(
-        2,
-        periodType,
-        slaNetworkBytes32,
-        ownerApproval
-      );
-      await eventListener(networkAnalytics, 'AnalyticsReceived');
-
-      console.log('Starting automated job 13: Request Analytics for period 3');
-      networkAnalytics.requestAnalytics(
-        3,
-        periodType,
-        slaNetworkBytes32,
-        ownerApproval
-      );
-      await eventListener(networkAnalytics, 'AnalyticsReceived');
+      // console.log('Starting automated job 13: Request Analytics for period 3');
+      // networkAnalytics.requestAnalytics(
+      //   3,
+      //   periodType,
+      //   slaNetworkBytes32,
+      //   ownerApproval,
+      // );
+      // await eventListener(networkAnalytics, 'AnalyticsReceived');
 
       console.log('Bootstrap process completed');
     }

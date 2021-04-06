@@ -3,6 +3,7 @@ require('babel-register');
 
 require('dotenv').config();
 const HDWalletProvider = require('truffle-hdwallet-provider');
+const { TruffleProvider } = require('@harmony-js/core');
 
 const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 const mnemonic = process.env.DSLA_MNEMONIC;
@@ -10,6 +11,8 @@ const test_mnemonic = process.env.TEST_MNEMONIC;
 const stagingIP = process.env.STAGING_IP;
 const kovan_project_id = process.env.KOVAN_PROJECT_ID;
 const kovan_mnemonic = process.env.KOVAN_MNEMONIC;
+const harmony_testnet_mnemonic = process.env.HARMONY_TESTNET_MNEMONIC;
+const harmony_testnet_private_key = process.env.HARMONY_TESTNET_PRIVATE_KEY;
 
 module.exports = {
   networks: {
@@ -74,6 +77,21 @@ module.exports = {
       networkCheckTimeout: '99999',
       gas: 12000000,
       timeoutBlocks: 200,
+      skipDryRun: true,
+    },
+    harmonytestnet: {
+      network_id: '2', // Any network (default: none)
+      provider: () => {
+        const truffleProvider = new TruffleProvider(
+          'https://api.s0.b.hmny.io',
+          { memonic: harmony_testnet_mnemonic },
+          { shardID: 0, chainId: 2 },
+          { gasLimit: 12000000, gasPrice: 1000000000 },
+        );
+        const newAcc = truffleProvider.addByPrivateKey(harmony_testnet_private_key);
+        truffleProvider.setSigner(newAcc);
+        return truffleProvider;
+      },
       skipDryRun: true,
     },
   },

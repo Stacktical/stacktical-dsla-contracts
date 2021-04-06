@@ -35,14 +35,13 @@ module.exports = (deployer, network) => {
         }
         : env.preCoordinatorConfiguration;
 
-      preCoordinator.createServiceAgreement(
+      const receipt = await preCoordinator.createServiceAgreement(
         minResponses,
         preCoordinatorConfiguration.oracles,
         preCoordinatorConfiguration.jobIds,
         preCoordinatorConfiguration.payments,
       );
-
-      const { values: { saId } } = await eventListener(preCoordinator, 'NewServiceAgreement');
+      const { saId } = receipt.logs[0].args;
       const feeMultiplier = preCoordinatorConfiguration.payments.length;
       const networkAnalytics = await deployer.deploy(
         NetworkAnalytics,

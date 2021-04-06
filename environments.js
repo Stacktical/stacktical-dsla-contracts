@@ -51,6 +51,28 @@ const environments = {
     chainlinkTokenAddress: '0xa36085F69e2889c224210F603D836748e7dC0088',
     checkPastPeriods: false,
   },
+  harmonytestnet: {
+    web3WebsocketProviderUrl: 'wss://ws.s0.b.hmny.io',
+    preCoordinatorConfiguration: {
+      oracles: [
+        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+      ],
+      jobIds: [
+        '0x329f60c5b0bf429597433e617544c71e',
+        '0x9f4ff7c86eb94a11b5a45b9b020fc481',
+        '0x5a08e037f50d4c73823b34b2e3a03eae',
+      ],
+      payments: [
+        String(0.1 * 10 ** 18),
+        String(0.1 * 10 ** 18),
+        String(0.1 * 10 ** 18),
+      ],
+    },
+    chainlinkTokenAddress: '0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab',
+    checkPastPeriods: false,
+  },
   develop: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
     preCoordinatorConfiguration: {
@@ -71,6 +93,7 @@ const getNetworkName = (network) => {
   if (/staging/i.test(network)) return 'staging';
   if (/kovan/i.test(network)) return 'kovan';
   if (/mainnet/i.test(network)) return 'mainnet';
+  if (/harmonytestnet/i.test(network)) return 'harmonytestnet';
   throw new Error(`Network not recognized: ${network}`);
 };
 
