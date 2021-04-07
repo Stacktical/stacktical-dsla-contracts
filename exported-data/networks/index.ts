@@ -1,6 +1,6 @@
-import mainnet from './mainnet';
-import kovan from './kovan';
-import harmonytestnet from './harmonytestnet';
 import develop from './develop';
+import kovan from './kovan';
+import mainnet from './mainnet';
+import harmonytestnet from './harmonytestnet';
 
-export { mainnet, kovan, harmonytestnet, develop };
+export { develop, kovan, mainnet, harmonytestnet };

@@ -4,7 +4,7 @@ require('babel-register');
 
 const fs = require('fs');
 const path = require('path');
-const { envParameters, environments } = require('../environments');
+const { networkNames, getEnvFromNetwork } = require('../environments');
 
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const SLARegistry = artifacts.require('SLARegistry');
@@ -26,6 +26,7 @@ const getLines = (networkName) => [`const ${networkName} = `, `\n\nexport defaul
 module.exports = (deployer, network) => {
   deployer.then(async () => {
     console.log(`Creating addresses file for ${network}`);
+    const envParameters = getEnvFromNetwork(network);
     const [startingLine, finalLine] = getLines(network);
     const addresses = {
       DSLAToken: envParameters.DSLAToken || (await bDSLA.deployed()).address,
@@ -47,9 +48,8 @@ module.exports = (deployer, network) => {
     );
 
     console.log('Updating index.ts file with networks addresses');
-    const networkNames = Object.keys(environments);
-    const importLines = networkNames.reduce((r, name) => r += `import ${name} from './${name}'\n`, '');
-    const exportLines = networkNames.reduce((r, name) => r += `${name}, `, '');
+    const importLines = Object.values(networkNames).reduce((r, name) => r += `import ${name} from './${name}'\n`, '');
+    const exportLines = Object.values(networkNames).reduce((r, name) => r += `${name}, `, '');
 
     fs.writeFileSync(
       path.resolve(__dirname, `${base_path}/index.ts`),

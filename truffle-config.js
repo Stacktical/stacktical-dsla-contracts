@@ -4,6 +4,7 @@ require('babel-register');
 require('dotenv').config();
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const { TruffleProvider } = require('@harmony-js/core');
+const { networkNames } = require('./environments');
 
 const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 const mnemonic = process.env.DSLA_MNEMONIC;
@@ -11,11 +12,12 @@ const test_mnemonic = process.env.TEST_MNEMONIC;
 const kovan_project_id = process.env.KOVAN_PROJECT_ID;
 const kovan_mnemonic = process.env.KOVAN_MNEMONIC;
 const harmony_testnet_mnemonic = process.env.HARMONY_TESTNET_MNEMONIC;
-const harmony_testnet_private_key = process.env.HARMONY_TESTNET_PRIVATE_KEY;
+const harmony_testnet_private_key_1 = process.env.HARMONY_TESTNET_PRIVATE_KEY_1;
+const harmony_testnet_private_key_2 = process.env.HARMONY_TESTNET_PRIVATE_KEY_2;
 
 module.exports = {
   networks: {
-    develop: {
+    [networkNames.DEVELOP]: {
       provider() {
         return new HDWalletProvider(
           test_mnemonic,
@@ -26,7 +28,7 @@ module.exports = {
       },
       network_id: '1337',
     },
-    mainnet: {
+    [networkNames.MAINNET]: {
       provider() {
         return new HDWalletProvider(
           mnemonic,
@@ -40,7 +42,7 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true,
     },
-    kovan: {
+    [networkNames.KOVAN]: {
       provider() {
         return new HDWalletProvider(
           kovan_mnemonic,
@@ -55,16 +57,17 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true,
     },
-    harmonytestnet: {
+    [networkNames.HARMONYTESTNET]: {
       network_id: '2', // Any network (default: none)
       provider: () => {
         const truffleProvider = new TruffleProvider(
           'https://api.s0.b.hmny.io',
-          { memonic: harmony_testnet_mnemonic },
+          { memonic: harmony_testnet_mnemonic, addressCount: 2 },
           { shardID: 0, chainId: 2 },
           { gasLimit: 12000000, gasPrice: 1000000000 },
         );
-        const newAcc = truffleProvider.addByPrivateKey(harmony_testnet_private_key);
+        const newAcc = truffleProvider.addByPrivateKey(harmony_testnet_private_key_1);
+        truffleProvider.addByPrivateKey(harmony_testnet_private_key_2);
         truffleProvider.setSigner(newAcc);
         return truffleProvider;
       },

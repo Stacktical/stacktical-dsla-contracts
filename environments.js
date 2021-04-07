@@ -2,8 +2,15 @@ require('dotenv').config();
 
 const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 
-export const environments = {
-  mainnet: {
+export const networkNames = {
+  DEVELOP: 'develop',
+  KOVAN: 'kovan',
+  MAINNET: 'mainnet',
+  HARMONYTESTNET: 'harmonytestnet',
+};
+
+const environments = {
+  [networkNames.MAINNET]: {
     web3WebsocketProviderUrl: `wss://mainnet.infura.io/ws/v3/${infura_project_id}`,
     // Paris, New York, Berlin
     preCoordinatorConfiguration: {
@@ -28,8 +35,9 @@ export const environments = {
     daiTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
     usdcTokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     checkPastPeriods: true,
+
   },
-  kovan: {
+  [networkNames.KOVAN]: {
     web3WebsocketProviderUrl: `wss://kovan.infura.io/ws/v3/${infura_project_id}`,
     preCoordinatorConfiguration: {
       oracles: [
@@ -54,7 +62,7 @@ export const environments = {
     usdcTokenAddress: null,
     checkPastPeriods: false,
   },
-  harmonytestnet: {
+  [networkNames.HARMONYTESTNET]: {
     web3WebsocketProviderUrl: 'wss://ws.s0.b.hmny.io',
     preCoordinatorConfiguration: {
       oracles: [
@@ -79,7 +87,7 @@ export const environments = {
     usdcTokenAddress: null,
     checkPastPeriods: false,
   },
-  develop: {
+  [networkNames.DEVELOP]: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
     preCoordinatorConfiguration: {
       oracles: 'obtained on deployment time',
@@ -91,11 +99,10 @@ export const environments = {
     daiTokenAddress: null,
     usdcTokenAddress: null,
     checkPastPeriods: false,
-    chainlinkNodeUrl: 'http://localhost:6688',
     chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
   },
 };
 
 export const getEnvFromNetwork = (network) => environments[network];
 
-export const envParameters = environments[process.env.NODE_ENV];
+export const getEnvFromNodeEnv = () => environments[process.env.NODE_ENV];

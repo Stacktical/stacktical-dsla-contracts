@@ -1,4 +1,4 @@
-import { envParameters } from '../../environments';
+import { getEnvFromNodeEnv } from '../environments';
 
 const { ContractFactory } = require('@harmony-js/contract');
 const { Wallet } = require('@harmony-js/account');
@@ -8,6 +8,7 @@ const { ChainID, ChainType } = require('@harmony-js/utils');
 const Web3 = require('web3');
 
 const contractCreator = (contract) => {
+  const envParameters = getEnvFromNodeEnv();
   const { abi, address } = contract;
   try {
     if (/harmony/i.test(process.env.NODE_ENV)) {
