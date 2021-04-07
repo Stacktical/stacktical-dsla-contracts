@@ -8,7 +8,6 @@ const { TruffleProvider } = require('@harmony-js/core');
 const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 const mnemonic = process.env.DSLA_MNEMONIC;
 const test_mnemonic = process.env.TEST_MNEMONIC;
-const stagingIP = process.env.STAGING_IP;
 const kovan_project_id = process.env.KOVAN_PROJECT_ID;
 const kovan_mnemonic = process.env.KOVAN_MNEMONIC;
 const harmony_testnet_mnemonic = process.env.HARMONY_TESTNET_MNEMONIC;
@@ -16,18 +15,6 @@ const harmony_testnet_private_key = process.env.HARMONY_TESTNET_PRIVATE_KEY;
 
 module.exports = {
   networks: {
-    testing: {
-      provider() {
-        return new HDWalletProvider(
-          test_mnemonic,
-          'http://localhost:8545',
-          0,
-          10,
-        );
-      },
-      network_id: '1337',
-      gas: 12000000,
-    },
     develop: {
       provider() {
         return new HDWalletProvider(
@@ -38,17 +25,6 @@ module.exports = {
         );
       },
       network_id: '1337',
-    },
-    staging: {
-      provider() {
-        return new HDWalletProvider(
-          test_mnemonic,
-          `http://${stagingIP}:8545`,
-          0,
-          10,
-        );
-      },
-      network_id: '1336',
     },
     mainnet: {
       provider() {

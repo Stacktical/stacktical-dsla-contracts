@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 
-const environments = {
+export const environments = {
   mainnet: {
     web3WebsocketProviderUrl: `wss://mainnet.infura.io/ws/v3/${infura_project_id}`,
     // Paris, New York, Berlin
@@ -49,6 +49,9 @@ const environments = {
       ],
     },
     chainlinkTokenAddress: '0xa36085F69e2889c224210F603D836748e7dC0088',
+    dslaTokenAddress: null,
+    daiTokenAddress: null,
+    usdcTokenAddress: null,
     checkPastPeriods: false,
   },
   harmonytestnet: {
@@ -71,6 +74,9 @@ const environments = {
       ],
     },
     chainlinkTokenAddress: '0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab',
+    dslaTokenAddress: null,
+    daiTokenAddress: null,
+    usdcTokenAddress: null,
     checkPastPeriods: false,
   },
   develop: {
@@ -80,27 +86,16 @@ const environments = {
       jobIds: 'obtained on deployment time',
       payments: 'obtained on deployment time',
     },
-    chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
-    chainlinkNodeUrl: 'http://localhost:6688',
+    dslaTokenAddress: null,
+    daiTokenAddress: null,
+    usdcTokenAddress: null,
     checkPastPeriods: false,
+    chainlinkNodeUrl: 'http://localhost:6688',
+    chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
   },
 };
 
-const getNetworkName = (network) => {
-  if (/testing/i.test(network)) return 'develop';
-  if (/develop/i.test(network)) return 'develop';
-  if (/staging/i.test(network)) return 'staging';
-  if (/kovan/i.test(network)) return 'kovan';
-  if (/mainnet/i.test(network)) return 'mainnet';
-  if (/harmonytestnet/i.test(network)) return 'harmonytestnet';
-  throw new Error(`Network not recognized: ${network}`);
-};
-
-export const getEnvFromNetwork = (network) => environments[getNetworkName(network)];
+export const getEnvFromNetwork = (network) => environments[network];
 
 export const envParameters = environments[process.env.NODE_ENV];
-
-export const needsGetJobId = ['develop', 'staging'].includes(
-  process.env.NODE_ENV,
-);
