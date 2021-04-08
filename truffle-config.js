@@ -60,12 +60,13 @@ module.exports = {
     [networkNames.HARMONYTESTNET]: {
       network_id: '2', // Any network (default: none)
       provider: () => {
-        const truffleProvider = new TruffleProvider(
-          'https://api.s0.b.hmny.io',
-          { memonic: harmony_testnet_mnemonic, addressCount: 2 },
-          { shardID: 0, chainId: 2 },
-          { gasLimit: 12000000, gasPrice: 1000000000 },
-        );
+        // const truffleProvider = new TruffleProvider(
+        //   'https://api.s0.b.hmny.io',
+        //   { memonic: harmony_testnet_mnemonic, addressCount: 2 },
+        //   { shardID: 0, chainId: 2 },
+        //   { gasLimit: 12000000, gasPrice: 1000000000 },
+        // );
+        const truffleProvider = new TruffleProvider('https://api.s0.b.hmny.io', harmony_testnet_mnemonic);
         const newAcc = truffleProvider.addByPrivateKey(harmony_testnet_private_key_1);
         truffleProvider.addByPrivateKey(harmony_testnet_private_key_2);
         truffleProvider.setSigner(newAcc);

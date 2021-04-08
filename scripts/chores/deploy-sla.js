@@ -1,9 +1,12 @@
+const { Account, Wallet } = require('@harmony-js/account');
+const { Messenger, HttpProvider } = require('@harmony-js/network');
+const { ChainType, ChainID } = require('@harmony-js/utils');
 const { SENetworkNamesBytes32, SENetworkNames, SENetworks } = require('../../constants');
-const { getIPFSHash, eventListener } = require('../../utils');
+const { networkNames } = require('../../environments');
+const { getIPFSHash } = require('../../utils');
 
 const { toWei } = web3.utils;
 
-const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const SLARegistry = artifacts.require('SLARegistry');
 const SEMessenger = artifacts.require('SEMessenger');
@@ -17,6 +20,24 @@ const sloType = 4;
 const periodType = 2;
 const slaNetworkBytes32 = SENetworkNamesBytes32[0];
 const slaNetwork = SENetworkNames[0];
+
+const getHarmonyAccounts = async () => {
+  // const wallet = new Wallet(
+  //   new Messenger(
+  //     new HttpProvider('https://api.s0.b.hmny.io'),
+  //     ChainType.Harmony,
+  //     ChainID.HmyTestnet,
+  //   ),
+  // );
+  // wallet.addByMnemonic(
+  //   process.env.NODE_ENV === networkNames.HARMONYTESTNET
+  //     ? process.env.HARMONY_TESTNET_MNEMONIC
+  //     : '',
+  // );
+  // await wallet.createAccount();
+  const [owner] = await web3.eth.getAccounts();
+  return [owner, owner];
+};
 
 module.exports = async (callback) => {
   try {
@@ -58,7 +79,10 @@ module.exports = async (callback) => {
       [slaNetworkBytes32],
     );
 
-    const [owner, notOwner] = await web3.eth.getAccounts();
+    const accounts = process.env.NODE_ENV === networkNames.HARMONYTESTNET
+      ? await getHarmonyAccounts()
+      : await web3.eth.getAccounts();
+    const [owner, notOwner] = accounts;
     const slaAddresses = await slaRegistry.userSLAs(owner);
     const sla = await SLA.at(slaAddresses[slaAddresses.length - 1]);
     console.log(`SLA address: ${slaAddresses[slaAddresses.length - 1]}`);
@@ -81,48 +105,6 @@ module.exports = async (callback) => {
     await sla.stakeTokens(stakeAmountTimesWei(2), bdslaToken.address, {
       from: notOwner,
     });
-
-    console.log('Starting automated job 4: Request Analytics and SLI for period 0');
-    const networkAnalytics = await NetworkAnalytics.deployed();
-    const ownerApproval = true;
-    networkAnalytics.requestAnalytics(
-      0,
-      periodType,
-      slaNetworkBytes32,
-      ownerApproval,
-    );
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
-    await slaRegistry.requestSLI(0, sla.address, ownerApproval);
-    await eventListener(sla, 'SLICreated');
-
-    console.log('Starting automated job 4: Request Analytics and SLI for period 1');
-    networkAnalytics.requestAnalytics(
-      1,
-      periodType,
-      slaNetworkBytes32,
-      ownerApproval,
-    );
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
-    await slaRegistry.requestSLI(1, sla.address, ownerApproval);
-    await eventListener(sla, 'SLICreated');
-
-    console.log('Starting automated job 4: Request Analytics for period 2');
-    networkAnalytics.requestAnalytics(
-      2,
-      periodType,
-      slaNetworkBytes32,
-      ownerApproval,
-    );
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
-
-    console.log('Starting automated job 4: Request Analytics for period 3');
-    networkAnalytics.requestAnalytics(
-      3,
-      periodType,
-      slaNetworkBytes32,
-      ownerApproval,
-    );
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
 
     callback(null);
   } catch (error) {
