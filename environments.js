@@ -2,8 +2,15 @@ require('dotenv').config();
 
 const infura_project_id = process.env.DSLA_INFURA_PROJECT_ID;
 
+export const networkNames = {
+  DEVELOP: 'develop',
+  KOVAN: 'kovan',
+  MAINNET: 'mainnet',
+  HARMONYTESTNET: 'harmonytestnet',
+};
+
 const environments = {
-  mainnet: {
+  [networkNames.MAINNET]: {
     web3WebsocketProviderUrl: `wss://mainnet.infura.io/ws/v3/${infura_project_id}`,
     // Paris, New York, Berlin
     preCoordinatorConfiguration: {
@@ -28,8 +35,9 @@ const environments = {
     daiTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
     usdcTokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     checkPastPeriods: true,
+
   },
-  kovan: {
+  [networkNames.KOVAN]: {
     web3WebsocketProviderUrl: `wss://kovan.infura.io/ws/v3/${infura_project_id}`,
     preCoordinatorConfiguration: {
       oracles: [
@@ -49,35 +57,52 @@ const environments = {
       ],
     },
     chainlinkTokenAddress: '0xa36085F69e2889c224210F603D836748e7dC0088',
+    dslaTokenAddress: null,
+    daiTokenAddress: null,
+    usdcTokenAddress: null,
     checkPastPeriods: false,
   },
-  develop: {
+  [networkNames.HARMONYTESTNET]: {
+    web3WebsocketProviderUrl: 'wss://ws.s0.b.hmny.io',
+    preCoordinatorConfiguration: {
+      oracles: [
+        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+      ],
+      jobIds: [
+        '0x329f60c5b0bf429597433e617544c71e',
+        '0x9f4ff7c86eb94a11b5a45b9b020fc481',
+        '0x5a08e037f50d4c73823b34b2e3a03eae',
+      ],
+      payments: [
+        String(0.1 * 10 ** 18),
+        String(0.1 * 10 ** 18),
+        String(0.1 * 10 ** 18),
+      ],
+    },
+    chainlinkTokenAddress: '0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab',
+    dslaTokenAddress: null,
+    daiTokenAddress: null,
+    usdcTokenAddress: null,
+    checkPastPeriods: false,
+  },
+  [networkNames.DEVELOP]: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
     preCoordinatorConfiguration: {
       oracles: 'obtained on deployment time',
       jobIds: 'obtained on deployment time',
       payments: 'obtained on deployment time',
     },
-    chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
     chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
-    chainlinkNodeUrl: 'http://localhost:6688',
+    dslaTokenAddress: null,
+    daiTokenAddress: null,
+    usdcTokenAddress: null,
     checkPastPeriods: false,
+    chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
   },
 };
 
-const getNetworkName = (network) => {
-  if (/testing/i.test(network)) return 'develop';
-  if (/develop/i.test(network)) return 'develop';
-  if (/staging/i.test(network)) return 'staging';
-  if (/kovan/i.test(network)) return 'kovan';
-  if (/mainnet/i.test(network)) return 'mainnet';
-  throw new Error(`Network not recognized: ${network}`);
-};
+export const getEnvFromNetwork = (network) => environments[network];
 
-export const getEnvFromNetwork = (network) => environments[getNetworkName(network)];
-
-export const envParameters = environments[process.env.NODE_ENV];
-
-export const needsGetJobId = ['develop', 'staging'].includes(
-  process.env.NODE_ENV,
-);
+export const getEnvFromNodeEnv = () => environments[process.env.NODE_ENV];

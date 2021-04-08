@@ -18,8 +18,8 @@ export const sloTypesNames = {
   GreaterOrEqualTo: sloTypes[5],
 };
 
-// validators values not used for production, only networkNames
-export const networks = {
+// SEMessenger configuration
+export const SENetworks = {
   ONE: { validators: ['P-OPS', 'Chainode', 'Everstake'] },
   DOT: { validators: ['Everstake', 'Figment', 'stakefish'] },
   ATOM: { validators: ['Everstake', 'Figment', 'stakefish'] },
@@ -30,6 +30,6 @@ export const networks = {
   ROSE: { },
 };
 
-export const networkNames = Object.keys(networks);
+export const SENetworkNames = Object.keys(SENetworks);
 
-export const networkNamesBytes32 = networkNames.map(fromAscii);
+export const SENetworkNamesBytes32 = SENetworkNames.map(fromAscii);

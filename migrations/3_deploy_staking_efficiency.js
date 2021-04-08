@@ -2,8 +2,8 @@ require('babel-polyfill');
 require('babel-register');
 
 const { toWei } = require('web3-utils');
-const { getChainlinkJobId, eventListener } = require('../test/helpers');
-const { getEnvFromNetwork } = require('../environments');
+const { getChainlinkJobId } = require('../utils');
+const { getEnvFromNetwork, networkNames } = require('../environments');
 
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const PreCoordinator = artifacts.require('PreCoordinator');
@@ -12,56 +12,51 @@ const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const SEMessenger = artifacts.require('SEMessenger');
 
 module.exports = (deployer, network) => {
-  if (!/testing/i.test(network)) {
-    deployer.then(async () => {
-      if (!!process.env.ONLY_DETAILS === true) return;
-      const env = getEnvFromNetwork(network);
-      const periodRegistry = await PeriodRegistry.deployed();
-      const stakeRegistry = await StakeRegistry.deployed();
+  deployer.then(async () => {
+    if (!!process.env.ONLY_DETAILS === true) return;
+    const envParameters = getEnvFromNetwork(network);
+    const periodRegistry = await PeriodRegistry.deployed();
+    const stakeRegistry = await StakeRegistry.deployed();
 
-      const chainlinkJobId = (/develop/i.test(network) && await getChainlinkJobId()) || null;
+    const preCoordinator = await deployer.deploy(
+      PreCoordinator,
+      envParameters.chainlinkTokenAddress,
+    );
 
-      const preCoordinator = await deployer.deploy(
-        PreCoordinator,
-        env.chainlinkTokenAddress,
-      );
+    const minResponses = 1;
+    const preCoordinatorConfiguration = network === networkNames.DEVELOP
+      ? {
+        oracles: [envParameters.chainlinkOracleAddress],
+        jobIds: [await getChainlinkJobId()],
+        payments: [toWei('0.1')],
+      }
+      : envParameters.preCoordinatorConfiguration;
 
-      const minResponses = 1;
-      const preCoordinatorConfiguration = /develop/i.test(network)
-        ? {
-          oracles: [env.chainlinkOracleAddress],
-          jobIds: [chainlinkJobId],
-          payments: [toWei('0.1')],
-        }
-        : env.preCoordinatorConfiguration;
+    const receipt = await preCoordinator.createServiceAgreement(
+      minResponses,
+      preCoordinatorConfiguration.oracles,
+      preCoordinatorConfiguration.jobIds,
+      preCoordinatorConfiguration.payments,
+    );
+    const { saId } = receipt.logs[0].args;
+    const feeMultiplier = preCoordinatorConfiguration.payments.length;
+    const networkAnalytics = await deployer.deploy(
+      NetworkAnalytics,
+      preCoordinator.address,
+      envParameters.chainlinkTokenAddress,
+      saId,
+      periodRegistry.address,
+      stakeRegistry.address,
+      feeMultiplier,
+    );
 
-      preCoordinator.createServiceAgreement(
-        minResponses,
-        preCoordinatorConfiguration.oracles,
-        preCoordinatorConfiguration.jobIds,
-        preCoordinatorConfiguration.payments,
-      );
-
-      const { values: { saId } } = await eventListener(preCoordinator, 'NewServiceAgreement');
-      const feeMultiplier = preCoordinatorConfiguration.payments.length;
-      const networkAnalytics = await deployer.deploy(
-        NetworkAnalytics,
-        preCoordinator.address,
-        env.chainlinkTokenAddress,
-        saId,
-        periodRegistry.address,
-        stakeRegistry.address,
-        feeMultiplier,
-      );
-
-      await deployer.deploy(
-        SEMessenger,
-        preCoordinator.address,
-        env.chainlinkTokenAddress,
-        saId,
-        networkAnalytics.address,
-        feeMultiplier,
-      );
-    });
-  }
+    await deployer.deploy(
+      SEMessenger,
+      preCoordinator.address,
+      envParameters.chainlinkTokenAddress,
+      saId,
+      networkAnalytics.address,
+      feeMultiplier,
+    );
+  });
 };

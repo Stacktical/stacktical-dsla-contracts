@@ -1,6 +1,11 @@
 import generateWeeklyPeriods from './generateWeeklyPeriods';
+import getChainlinkJobId from './getChainlinkJobId';
+import getIPFSHash from './getIPFSHash';
+import eventListener from './eventListener';
 
 export {
-  // eslint-disable-next-line import/prefer-default-export
   generateWeeklyPeriods,
+  getChainlinkJobId,
+  getIPFSHash,
+  eventListener,
 };
