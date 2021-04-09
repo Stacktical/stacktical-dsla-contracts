@@ -4,7 +4,6 @@ export const SLAABI: AbiItem[] = [
   {
     inputs: [
       { internalType: 'address', name: '_owner', type: 'address' },
-      { internalType: 'address', name: '_sloRegistryAddress', type: 'address' },
       { internalType: 'bool', name: '_whitelisted', type: 'bool' },
       {
         internalType: 'enum PeriodRegistry.PeriodType',
