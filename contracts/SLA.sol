@@ -183,7 +183,7 @@ contract SLA is Staking {
         }
     }
 
-    function isAllowedPeriod(uint256 _periodId) public view returns (bool) {
+    function isAllowedPeriod(uint256 _periodId) external view returns (bool) {
         if (_periodId < initialPeriodId) return false;
         if (_periodId > finalPeriodId) return false;
         return true;
@@ -205,7 +205,7 @@ contract SLA is Staking {
      */
 
     function stakeTokens(uint256 _amount, address _token)
-        public
+        external
         notZero(_amount)
     {
         bool isContractFinished = contractFinished();
@@ -219,7 +219,7 @@ contract SLA is Staking {
     }
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
-        public
+        external
         notZero(_amount)
     {
         bool isContractFinished = contractFinished();
@@ -233,7 +233,7 @@ contract SLA is Staking {
      */
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
-        public
+        external
         notZero(_amount)
     {
         if (msg.sender != owner()) {
@@ -243,11 +243,11 @@ contract SLA is Staking {
         _withdrawUserTokens(_amount, _tokenAddress);
     }
 
-    function getStakersLength() public view returns (uint256) {
+    function getStakersLength() external view returns (uint256) {
         return stakers.length;
     }
 
-    function breachedContract() public view returns (bool) {
+    function breachedContract() external view returns (bool) {
         return _breachedContract;
     }
 }

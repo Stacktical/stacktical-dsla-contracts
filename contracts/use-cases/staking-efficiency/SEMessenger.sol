@@ -169,7 +169,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * @param _chainlinkResponseUint256 response object from Chainlink Oracles
      */
     function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponseUint256)
-        public
+        external
         override
         recordChainlinkFulfillment(_requestId)
     {
@@ -231,7 +231,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * @param _feeMultiplier how many Chainlink nodes would be paid on the agreement id, to set the fee value
      */
     function setChainlinkJobID(bytes32 _newJobId, uint256 _feeMultiplier)
-        public
+        external
         onlyOwner
     {
         _jobId = _newJobId;
@@ -242,49 +242,49 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /**
      * @dev returns the value of the sla registry address
      */
-    function slaRegistryAddress() public view override returns (address) {
+    function slaRegistryAddress() external view override returns (address) {
         return _slaRegistryAddress;
     }
 
     /**
      * @dev returns the value of the messenger precision
      */
-    function messengerPrecision() public view override returns (uint256) {
+    function messengerPrecision() external view override returns (uint256) {
         return _messengerPrecision;
     }
 
     /**
      * @dev returns the chainlink oracle contract address
      */
-    function oracle() public view override returns (address) {
+    function oracle() external view override returns (address) {
         return _oracle;
     }
 
     /**
      * @dev returns the chainlink job id
      */
-    function jobId() public view override returns (bytes32) {
+    function jobId() external view override returns (bytes32) {
         return _jobId;
     }
 
     /**
      * @dev returns the chainlink fee value on LINK tokens
      */
-    function fee() public view override returns (uint256) {
+    function fee() external view override returns (uint256) {
         return _fee;
     }
 
     /**
      * @dev returns the requestsCounter
      */
-    function requestsCounter() public view override returns (uint256) {
+    function requestsCounter() external view override returns (uint256) {
         return _requestsCounter;
     }
 
     /**
      * @dev returns the fulfillsCounter
      */
-    function fulfillsCounter() public view override returns (uint256) {
+    function fulfillsCounter() external view override returns (uint256) {
         return _fulfillsCounter;
     }
 }

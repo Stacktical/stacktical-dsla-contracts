@@ -116,7 +116,11 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @dev function to add a valid network name
      * @param _networkName 1. bytes32 network name
      */
-    function addNetwork(bytes32 _networkName) public onlyOwner returns (bool) {
+    function addNetwork(bytes32 _networkName)
+        external
+        onlyOwner
+        returns (bool)
+    {
         require(
             isValidNetwork(_networkName) == false,
             "Network name already registered"
@@ -129,8 +133,8 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @dev function to add multiple valid network names
      * @param _networkNames 1. bytes32[] network names
      */
-    function addMultipleNetworks(bytes32[] memory _networkNames)
-        public
+    function addMultipleNetworks(bytes32[] calldata _networkNames)
+        external
         onlyOwner
         returns (bool)
     {
@@ -212,7 +216,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @param _chainlinkResponse response object from Chainlink Oracles
      */
     function fulFillAnalytics(bytes32 _requestId, bytes32 _chainlinkResponse)
-        public
+        external
         recordChainlinkFulfillment(_requestId)
     {
         AnalyticsRequest memory request =
@@ -236,7 +240,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @param _feeMultiplier how many Chainlink nodes would be paid on the agreement id, to set the fee value
      */
     function setChainlinkJobID(bytes32 _jobId, uint256 _feeMultiplier)
-        public
+        external
         onlyOwner
     {
         jobId = _jobId;
@@ -244,7 +248,11 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         emit JobIdModified(msg.sender, _jobId, fee);
     }
 
-    function getNetworkNames() public view returns (bytes32[] memory networks) {
+    function getNetworkNames()
+        external
+        view
+        returns (bytes32[] memory networks)
+    {
         networks = networkNames;
     }
 }
