@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./SLA.sol";
 import "./messenger/IMessenger.sol";
 import "./SLARegistry.sol";
@@ -17,7 +18,7 @@ import "./StringUtils.sol";
  * @dev StakeRegistry is a contract to register the staking activity of the platform, along
  with controlling certain admin privileged parameters
  */
-contract StakeRegistry is Ownable, StringUtils {
+contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
     using SafeERC20 for ERC20;
     using SafeMath for uint256;
 
@@ -219,7 +220,7 @@ contract StakeRegistry is Ownable, StringUtils {
         address _slaOwner,
         address _sla,
         uint256 _periodIdsLength
-    ) external onlySLARegistry {
+    ) external onlySLARegistry nonReentrant {
         uint256 lockedValue = _dslaDepositByPeriod.mul(_periodIdsLength);
         ERC20(DSLATokenAddress).safeTransferFrom(
             _slaOwner,
@@ -241,7 +242,7 @@ contract StakeRegistry is Ownable, StringUtils {
         address _sla,
         address _verificationRewardReceiver,
         uint256 _periodId
-    ) external onlySLARegistry {
+    ) external onlySLARegistry nonReentrant {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         require(
             !_lockedValue.verifiedPeriods[_periodId],
@@ -274,7 +275,11 @@ contract StakeRegistry is Ownable, StringUtils {
         );
     }
 
-    function returnLockedValue(address _sla) external onlySLARegistry {
+    function returnLockedValue(address _sla)
+        external
+        onlySLARegistry
+        nonReentrant
+    {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         uint256 remainingBalance = _lockedValue.lockedValue;
         require(remainingBalance > 0, "locked value is empty");
