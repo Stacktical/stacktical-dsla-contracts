@@ -133,7 +133,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @dev function to add multiple valid network names
      * @param _networkNames 1. bytes32[] network names
      */
-    function addMultipleNetworks(bytes32[] memory _networkNames)
+    function addMultipleNetworks(bytes32[] calldata _networkNames)
         external
         onlyOwner
         returns (bool)
@@ -216,7 +216,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @param _chainlinkResponse response object from Chainlink Oracles
      */
     function fulFillAnalytics(bytes32 _requestId, bytes32 _chainlinkResponse)
-        public
+        external
         recordChainlinkFulfillment(_requestId)
     {
         AnalyticsRequest memory request =

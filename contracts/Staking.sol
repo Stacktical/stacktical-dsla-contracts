@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./StakeRegistry.sol";
+import "./SLARegistry.sol";
 import "./PeriodRegistry.sol";
 
 contract Staking is Ownable {
@@ -50,11 +51,6 @@ contract Staking is Ownable {
     /// @dev (userAddress=bool) to declare whitelisted addresses
     mapping(address => bool) public whitelist;
 
-    modifier notOwner {
-        require(msg.sender != owner(), "Should not be called by the SLA owner");
-        _;
-    }
-
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token) == true, "token is not allowed");
         _;
@@ -90,13 +86,13 @@ contract Staking is Ownable {
      *@param _slaID 6. identifies the SLA to uniquely to emit dTokens
      */
     constructor(
-        SLARegistry _slaRegistryAddress,
+        SLARegistry _slaRegistry,
         PeriodRegistry.PeriodType _periodType,
         bool _whitelistedContract,
         uint128 _slaID
     ) public {
-        stakeRegistry = _slaRegistryAddress.stakeRegistry();
-        periodRegistry = _slaRegistryAddress.periodRegistry();
+        stakeRegistry = _slaRegistry.stakeRegistry();
+        periodRegistry = _slaRegistry.periodRegistry();
         periodType = _periodType;
         whitelistedContract = _whitelistedContract;
         (uint256 _DSLAburnRate, , , , , , ) =
@@ -112,8 +108,8 @@ contract Staking is Ownable {
         whitelist[_userAddress] = true;
     }
 
-    function addMultipleUsersToWhitelist(address[] memory _userAddresses)
-        public
+    function addMultipleUsersToWhitelist(address[] calldata _userAddresses)
+        external
         onlyOwner
     {
         for (uint256 index = 0; index < _userAddresses.length; index++) {
@@ -123,13 +119,13 @@ contract Staking is Ownable {
         }
     }
 
-    function removeUserFromWhitelist(address _userAddress) public onlyOwner {
+    function removeUserFromWhitelist(address _userAddress) external onlyOwner {
         require(whitelist[_userAddress] == true, "User not whitelisted");
         whitelist[_userAddress] = false;
     }
 
-    function removeMultipleUsersFromWhitelist(address[] memory _userAddresses)
-        public
+    function removeMultipleUsersFromWhitelist(address[] calldata _userAddresses)
+        external
         onlyOwner
     {
         for (uint256 index = 0; index < _userAddresses.length; index++) {
@@ -143,7 +139,7 @@ contract Staking is Ownable {
      *@dev add a token to ve allowed for staking
      *@param _tokenAddress 1. address of the new allowed token
      */
-    function addAllowedTokens(address _tokenAddress) public onlyOwner {
+    function addAllowedTokens(address _tokenAddress) external onlyOwner {
         (, , , , , , uint256 maxTokenLength) =
             stakeRegistry.getStakingParameters();
         require(!isAllowedToken(_tokenAddress), "Token already added");
@@ -347,12 +343,12 @@ contract Staking is Ownable {
      *@dev use this function to evaluate the length of the allowed tokens length
      *@return allowedTokens.length
      */
-    function getAllowedTokensLength() public view returns (uint256) {
+    function getAllowedTokensLength() external view returns (uint256) {
         return allowedTokens.length;
     }
 
     function getTokenStake(address _staker, uint256 _allowedTokenIndex)
-        public
+        external
         view
         returns (address tokenAddress, uint256 stake)
     {

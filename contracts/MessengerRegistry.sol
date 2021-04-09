@@ -64,7 +64,7 @@ contract MessengerRegistry {
     function registerMessenger(
         address _callerAddress,
         address _messengerAddress,
-        string memory _specificationUrl
+        string calldata _specificationUrl
     ) external {
         require(
             msg.sender == slaRegistry,
@@ -113,7 +113,7 @@ contract MessengerRegistry {
      * @dev function to modifyMessenger a Messenger
      */
     function modifyMessenger(
-        string memory _specificationUrl,
+        string calldata _specificationUrl,
         uint256 _messengerId
     ) external {
         Messenger storage storedMessenger = messengers[_messengerId];

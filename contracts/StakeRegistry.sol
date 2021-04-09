@@ -133,7 +133,7 @@ contract StakeRegistry is Ownable, StringUtils {
      * @dev sets the SLARegistry contract address and can only be called
      * once
      */
-    function setSLARegistry() public {
+    function setSLARegistry() external {
         // Only able to trigger this function once
         require(
             address(slaRegistry) == address(0),
@@ -147,7 +147,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@dev add a token to ve allowed for staking
      *@param _tokenAddress 1. address of the new allowed token
      */
-    function addAllowedTokens(address _tokenAddress) public onlyOwner {
+    function addAllowedTokens(address _tokenAddress) external onlyOwner {
         require(!isAllowedToken(_tokenAddress), "token already added");
         allowedTokens.push(_tokenAddress);
     }
@@ -185,7 +185,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@dev register the sending SLA contract as staked by _owner
      *@param _owner 1. SLA contract to stake
      */
-    function registerStakedSla(address _owner) public returns (bool) {
+    function registerStakedSla(address _owner) external returns (bool) {
         require(
             slaRegistry.isRegisteredSLA(msg.sender),
             "Only for registered SLAs"
@@ -201,8 +201,8 @@ contract StakeRegistry is Ownable, StringUtils {
      *@param _name 1. token name
      *@param _symbol 2. token symbol
      */
-    function createDToken(string memory _name, string memory _symbol)
-        public
+    function createDToken(string calldata _name, string calldata _symbol)
+        external
         returns (address)
     {
         require(
@@ -219,7 +219,7 @@ contract StakeRegistry is Ownable, StringUtils {
         address _slaOwner,
         address _sla,
         uint256 _periodIdsLength
-    ) public onlySLARegistry {
+    ) external onlySLARegistry {
         uint256 lockedValue = _dslaDepositByPeriod.mul(_periodIdsLength);
         ERC20(DSLATokenAddress).safeTransferFrom(
             _slaOwner,
@@ -241,7 +241,7 @@ contract StakeRegistry is Ownable, StringUtils {
         address _sla,
         address _verificationRewardReceiver,
         uint256 _periodId
-    ) public onlySLARegistry {
+    ) external onlySLARegistry {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         require(
             !_lockedValue.verifiedPeriods[_periodId],
@@ -274,7 +274,7 @@ contract StakeRegistry is Ownable, StringUtils {
         );
     }
 
-    function returnLockedValue(address _sla) public onlySLARegistry {
+    function returnLockedValue(address _sla) external onlySLARegistry {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         uint256 remainingBalance = _lockedValue.lockedValue;
         require(remainingBalance > 0, "locked value is empty");
@@ -300,7 +300,7 @@ contract StakeRegistry is Ownable, StringUtils {
      * @return ActivePool[], array of structs: {SLAAddress,stake,assetName}
      */
     function getActivePool(address _slaOwner)
-        public
+        external
         view
         returns (ActivePool[] memory)
     {
@@ -361,7 +361,7 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification,
         uint256 maxTokenLength
-    ) public onlyOwner {
+    ) external onlyOwner {
         _DSLAburnRate = DSLAburnRate;
         _dslaDepositByPeriod = dslaDepositByPeriod;
         _dslaPlatformReward = dslaPlatformReward;
@@ -389,7 +389,7 @@ contract StakeRegistry is Ownable, StringUtils {
     }
 
     function getStakingParameters()
-        public
+        external
         view
         returns (
             uint256 DSLAburnRate,
@@ -411,7 +411,7 @@ contract StakeRegistry is Ownable, StringUtils {
     }
 
     function periodIsVerified(address _sla, uint256 _periodId)
-        public
+        external
         view
         returns (bool)
     {
