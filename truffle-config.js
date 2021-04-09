@@ -27,6 +27,7 @@ module.exports = {
         );
       },
       network_id: '1337',
+      gas: 12000000,
     },
     [networkNames.MAINNET]: {
       provider() {

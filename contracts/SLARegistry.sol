@@ -78,6 +78,7 @@ contract SLARegistry {
      * @param _messengerAddress 7. -
      * @param _whitelisted 8. -
      * @param _extraData 9. -
+     * @param _leverage 10. -
      */
     function createSLA(
         uint256 _sloValue,
@@ -88,7 +89,8 @@ contract SLARegistry {
         uint128 _initialPeriodId,
         uint128 _finalPeriodId,
         string memory _ipfsHash,
-        bytes32[] memory _extraData
+        bytes32[] memory _extraData,
+        uint256 _leverage
     ) public {
         bool validPeriod =
             periodRegistry.isValidPeriod(_periodType, _initialPeriodId);
@@ -125,7 +127,8 @@ contract SLARegistry {
                 _finalPeriodId,
                 uint128(SLAs.length),
                 _ipfsHash,
-                _extraData
+                _extraData,
+                _leverage
             );
 
         sloRegistry.registerSLO(_sloValue, _sloType, address(sla));

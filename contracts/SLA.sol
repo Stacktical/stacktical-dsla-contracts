@@ -111,10 +111,17 @@ contract SLA is Staking {
         uint128 _finalPeriodId,
         uint128 _slaID,
         string memory _ipfsHash,
-        bytes32[] memory _extraData
+        bytes32[] memory _extraData,
+        uint256 _leverage
     )
         public
-        Staking(SLARegistry(msg.sender), _periodType, _whitelisted, _slaID)
+        Staking(
+            SLARegistry(msg.sender),
+            _periodType,
+            _whitelisted,
+            _slaID,
+            _leverage
+        )
     {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;

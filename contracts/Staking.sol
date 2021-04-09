@@ -18,9 +18,9 @@ contract Staking is Ownable, ReentrancyGuard {
     /// @dev StakeRegistry contract
     StakeRegistry private stakeRegistry;
     /// @dev SLARegistry contract
-    PeriodRegistry private periodRegistry;
+    PeriodRegistry private immutable periodRegistry;
     /// @dev current SLA id
-    uint128 public slaID;
+    uint128 public immutable slaID;
 
     /// @dev (tokenAddress=>uint256) total pooled token balance
     mapping(address => uint256) public providerPool;
@@ -37,20 +37,22 @@ contract Staking is Ownable, ReentrancyGuard {
     /// @dev (slaOwner=>bool)
     mapping(address => bool) public registeredStakers;
     /// @dev DSLA token address to burn fees
-    address public dslaTokenAddress;
+    address public immutable dslaTokenAddress;
     /// @dev array with the allowed tokens addresses for the current SLA
     address[] public allowedTokens;
 
     /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %
-    uint256 public DSLAburnRate;
+    uint256 public immutable DSLAburnRate;
 
     /// @dev PeriodRegistry period type of the SLA contract
-    PeriodRegistry.PeriodType private periodType;
+    PeriodRegistry.PeriodType private immutable periodType;
 
     /// @dev boolean to declare if contract is whitelisted
-    bool public whitelistedContract;
+    bool public immutable whitelistedContract;
     /// @dev (userAddress=bool) to declare whitelisted addresses
     mapping(address => bool) public whitelist;
+
+    uint256 public immutable leverage;
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token) == true, "token is not allowed");
@@ -90,7 +92,8 @@ contract Staking is Ownable, ReentrancyGuard {
         SLARegistry _slaRegistry,
         PeriodRegistry.PeriodType _periodType,
         bool _whitelistedContract,
-        uint128 _slaID
+        uint128 _slaID,
+        uint256 _leverage
     ) public {
         stakeRegistry = _slaRegistry.stakeRegistry();
         periodRegistry = _slaRegistry.periodRegistry();
@@ -102,6 +105,8 @@ contract Staking is Ownable, ReentrancyGuard {
         DSLAburnRate = _DSLAburnRate;
         addUserToWhitelist(msg.sender);
         slaID = _slaID;
+        require(_leverage <= stakeRegistry._maxLeverage());
+        leverage = _leverage;
     }
 
     function addUserToWhitelist(address _userAddress) public onlyOwner {
@@ -203,8 +208,8 @@ contract Staking is Ownable, ReentrancyGuard {
             (uint256 providerStake, uint256 usersStake) =
                 (providerPool[_tokenAddress], usersPool[_tokenAddress]);
             require(
-                usersStake.add(_amount) <= providerStake,
-                "Cannot stake more than SLA provider stake"
+                usersStake.add(_amount).mul(leverage) <= providerStake,
+                "Cannot stake more than leveraged SLA provider stake"
             );
             ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
@@ -283,7 +288,7 @@ contract Staking is Ownable, ReentrancyGuard {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
             uint256 usersStake = usersPool[tokenAddress];
-            uint256 compensation = usersStake;
+            uint256 compensation = usersStake.mul(leverage);
             providerPool[tokenAddress] = providerPool[tokenAddress].sub(
                 compensation
             );
@@ -307,8 +312,8 @@ contract Staking is Ownable, ReentrancyGuard {
         uint256 usersStake = usersPool[_tokenAddress];
         if (!_contractFinished) {
             require(
-                providerStake.sub(_amount) >= usersStake,
-                "Should not withdraw more than users stake"
+                providerStake.sub(_amount) >= usersStake.mul(leverage),
+                "Should not withdraw more than leveraged users stake"
             );
         }
         ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];

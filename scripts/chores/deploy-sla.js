@@ -67,6 +67,7 @@ module.exports = async (callback) => {
     const seMessenger = await SEMessenger.deployed();
     const slaRegistry = await SLARegistry.deployed();
     const whitelisted = false;
+    const leverage = 101;
     await slaRegistry.createSLA(
       sloValue,
       sloType,
@@ -77,6 +78,7 @@ module.exports = async (callback) => {
       finalPeriodId,
       ipfsHash,
       [slaNetworkBytes32],
+      leverage,
     );
 
     const accounts = process.env.NODE_ENV === networkNames.HARMONYTESTNET

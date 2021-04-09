@@ -53,7 +53,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -61,7 +60,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -71,7 +69,6 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -81,7 +78,6 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -91,7 +87,6 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -101,7 +96,6 @@ export const SLARegistryABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [
@@ -122,6 +116,7 @@ export const SLARegistryABI: AbiItem[] = [
       { internalType: 'uint128', name: '_finalPeriodId', type: 'uint128' },
       { internalType: 'string', name: '_ipfsHash', type: 'string' },
       { internalType: 'bytes32[]', name: '_extraData', type: 'bytes32[]' },
+      { internalType: 'uint256', name: '_leverage', type: 'uint256' },
     ],
     name: 'createSLA',
     outputs: [],
@@ -162,7 +157,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
@@ -170,7 +164,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -178,7 +171,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'contract SLA[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [],
@@ -186,7 +178,6 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
@@ -194,6 +185,5 @@ export const SLARegistryABI: AbiItem[] = [
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
 ];
