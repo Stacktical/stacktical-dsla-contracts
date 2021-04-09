@@ -16,7 +16,12 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
  * @dev Staking efficiency Messenger
  */
 
-contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
+contract SEMessenger is
+    ChainlinkClient,
+    IMessenger,
+    StringUtils,
+    ReentrancyGuard
+{
     using SafeERC20 for ERC20;
 
     /// @dev Mapping that stores chainlink sli request information
@@ -24,7 +29,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /// @dev Array with all request IDs
     bytes32[] public requests;
     /// @dev The address of the SLARegistry contract
-    address private immutable _slaRegistryAddress;
+    address private _slaRegistryAddress;
     /// @dev Network analytics contract address
     address public immutable networkAnalyticsAddress;
     /// @dev Chainlink oracle address
@@ -74,9 +79,9 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
 
     /**
      * @dev event emitted when modifying the jobId
-     * @param owner 1. -
-     * @param jobId 2. -
-     * @param fee 3. -
+     * @param caller 1. -
+     * @param requestsCounter 2. -
+     * @param requestId 3. -
      */
     event SLIRequested(
         address indexed caller,
@@ -119,7 +124,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         address _slaAddress,
         bool _messengerOwnerApproval,
         address _callerAddress
-    ) public override onlySLARegistry {
+    ) public override onlySLARegistry nonReentrant {
         SLA sla = SLA(_slaAddress);
         PeriodRegistry.PeriodType periodType = sla.periodType();
         // extraData[0] is the networkName for StakingEfficiency use case
@@ -184,6 +189,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponseUint256)
         external
         override
+        nonReentrant
         recordChainlinkFulfillment(_requestId)
     {
         bytes32 _chainlinkResponse = bytes32(_chainlinkResponseUint256);
