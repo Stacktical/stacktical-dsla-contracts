@@ -239,7 +239,7 @@ contract SLARegistry {
      * @return array of SLAs
      */
     function userSLAs(address _user) public view returns (SLA[] memory) {
-        uint256 count = userSLACount(_user);
+        uint256 count = userToSLAIndexes[_user].length;
         SLA[] memory SLAList = new SLA[](count);
         uint256[] memory userSLAIndexes = userToSLAIndexes[_user];
 
@@ -251,31 +251,11 @@ contract SLARegistry {
     }
 
     /**
-     * @dev public view function that returns the amount of service level
-     * agreements the given user is the owner of
-     * @param _user 1. address of the user for which to return the amount of
-     * service level agreements
-     * @return uint256 corresponding to the amount of user's SLAs
-     */
-    function userSLACount(address _user) public view returns (uint256) {
-        return userToSLAIndexes[_user].length;
-    }
-
-    /**
      * @dev public view function that returns all the service level agreements
      * @return SLA[] array of SLAs
      */
     function allSLAs() public view returns (SLA[] memory) {
         return (SLAs);
-    }
-
-    /**
-     * @dev public view function that returns the total amount of service
-     * level agreements
-     * @return uint256, the length of SLA array
-     */
-    function SLACount() public view returns (uint256) {
-        return SLAs.length;
     }
 
     /**

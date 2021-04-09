@@ -6,12 +6,11 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./StakeRegistry.sol";
 import "./SLARegistry.sol";
 import "./PeriodRegistry.sol";
 
-contract Staking is Ownable, ReentrancyGuard {
+contract Staking is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for ERC20;
 
@@ -105,7 +104,10 @@ contract Staking is Ownable, ReentrancyGuard {
         DSLAburnRate = _DSLAburnRate;
         addUserToWhitelist(msg.sender);
         slaID = _slaID;
-        require(_leverage <= stakeRegistry._maxLeverage());
+        require(
+            _leverage <= stakeRegistry._maxLeverage(),
+            "leverage should be smaller than maxLeverage"
+        );
         leverage = _leverage;
     }
 
@@ -145,11 +147,7 @@ contract Staking is Ownable, ReentrancyGuard {
      *@dev add a token to ve allowed for staking
      *@param _tokenAddress 1. address of the new allowed token
      */
-    function addAllowedTokens(address _tokenAddress)
-        external
-        onlyOwner
-        nonReentrant
-    {
+    function addAllowedTokens(address _tokenAddress) external onlyOwner {
         (, , , , , , uint256 maxTokenLength) =
             stakeRegistry.getStakingParameters();
         require(!isAllowedToken(_tokenAddress), "Token already added");
@@ -196,7 +194,6 @@ contract Staking is Ownable, ReentrancyGuard {
         internal
         onlyAllowedToken(_tokenAddress)
         onlyWhitelisted
-        nonReentrant
     {
         ERC20(_tokenAddress).safeTransferFrom(
             msg.sender,
@@ -307,7 +304,7 @@ contract Staking is Ownable, ReentrancyGuard {
         uint256 _amount,
         address _tokenAddress,
         bool _contractFinished
-    ) internal onlyAllowedToken(_tokenAddress) nonReentrant {
+    ) internal onlyAllowedToken(_tokenAddress) {
         uint256 providerStake = providerPool[_tokenAddress];
         uint256 usersStake = usersPool[_tokenAddress];
         if (!_contractFinished) {
@@ -336,7 +333,6 @@ contract Staking is Ownable, ReentrancyGuard {
     function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
-        nonReentrant
     {
         ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
         uint256 p0 = duToken.totalSupply();
