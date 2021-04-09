@@ -21,45 +21,30 @@ contract SLA is Staking {
 
     enum Status {NotVerified, Respected, NotRespected}
 
-    /// @dev Struct used for storing period status
     struct PeriodSLI {
         uint256 timestamp;
         uint256 sli;
         Status status;
     }
 
-    /// @dev The ipfs hash that stores extra information about the agreement
+    //
     string public ipfsHash;
-
-    /// @dev uint8 of the period type
-    PeriodRegistry.PeriodType public periodType;
-
-    PeriodRegistry private periodRegistry;
-    SLORegistry private sloRegistry;
-
-    uint128 public initialPeriodId;
-    uint128 public finalPeriodId;
-
-    /// @dev The address of the slaRegistry contract
+    address public immutable messengerAddress;
     SLARegistry public slaRegistry;
-
-    /// @dev The address of the messenger
-    address public messengerAddress;
-
-    /// @dev states if the contract was breached or not
-    bool private _breachedContract = false;
-
-    /// @dev periodId=>PeriodSLI mapping
-    mapping(uint256 => PeriodSLI) public periodSLIs;
-
-    /// @dev block number of SLA deployment
-    uint256 public creationBlockNumber;
-
+    PeriodRegistry private immutable periodRegistry;
+    SLORegistry private immutable sloRegistry;
+    uint256 public immutable creationBlockNumber;
+    uint128 public immutable initialPeriodId;
+    uint128 public immutable finalPeriodId;
+    PeriodRegistry.PeriodType public immutable periodType;
     /// @dev extra data for customized workflows
     bytes32[] public extraData;
 
-    /// @dev states if the contract was breached or not
+    bool private _breachedContract = false;
     uint256 public nextVerifiablePeriod;
+
+    /// @dev periodId=>PeriodSLI mapping
+    mapping(uint256 => PeriodSLI) public periodSLIs;
 
     /**
      * @dev event for SLI creation logging
@@ -108,7 +93,6 @@ contract SLA is Staking {
 
     /**
      * @param _owner 1. -
-     * @param _sloRegistryAddress 2. -
      * @param _ipfsHash 3. -
      * @param _messengerAddress 3. -
      * @param _initialPeriodId 4. -
@@ -120,7 +104,6 @@ contract SLA is Staking {
      */
     constructor(
         address _owner,
-        address _sloRegistryAddress,
         bool _whitelisted,
         PeriodRegistry.PeriodType _periodType,
         address _messengerAddress,
@@ -138,13 +121,13 @@ contract SLA is Staking {
         messengerAddress = _messengerAddress;
         slaRegistry = SLARegistry(msg.sender);
         periodRegistry = slaRegistry.periodRegistry();
+        sloRegistry = slaRegistry.sloRegistry();
         creationBlockNumber = block.number;
         initialPeriodId = _initialPeriodId;
         finalPeriodId = _finalPeriodId;
         periodType = _periodType;
         extraData = _extraData;
         nextVerifiablePeriod = _initialPeriodId;
-        sloRegistry = SLORegistry(_sloRegistryAddress);
     }
 
     /**

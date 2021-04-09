@@ -3,7 +3,6 @@ pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./SLA.sol";
 import "./SLORegistry.sol";
 import "./PeriodRegistry.sol";
@@ -16,7 +15,7 @@ import "./messenger/IMessenger.sol";
  * @dev SLARegistry is a contract for handling creation of service level
  * agreements and keeping track of the created agreements
  */
-contract SLARegistry is Ownable {
+contract SLARegistry {
     using SafeMath for uint256;
 
     /// @dev SLO registry
@@ -34,7 +33,7 @@ contract SLARegistry is Ownable {
     /// @dev to check if registered SLA
     mapping(address => bool) private registeredSLAs;
     // value to lock past periods on SLA deployment
-    bool public checkPastPeriod;
+    bool public immutable checkPastPeriod;
 
     /**
      * @dev event for service level agreement creation logging
@@ -42,13 +41,6 @@ contract SLARegistry is Ownable {
      * @param owner 2. The address of the owner of the service level agreement
      */
     event SLACreated(SLA indexed sla, address indexed owner);
-
-    /**
-     * @dev event for check past period changed
-     * @param checkPastPeriod 1. checkPastPeriod new value
-     * @param owner 2. The address of the function caller
-     */
-    event CheckPastPeriod(bool checkPastPeriod, address indexed owner);
 
     /**
      * @dev constructor
@@ -126,7 +118,6 @@ contract SLARegistry is Ownable {
         SLA sla =
             new SLA(
                 msg.sender,
-                address(sloRegistry),
                 _whitelisted,
                 _periodType,
                 _messengerAddress,
@@ -290,14 +281,5 @@ contract SLARegistry is Ownable {
      */
     function isRegisteredSLA(address _slaAddress) public view returns (bool) {
         return registeredSLAs[_slaAddress];
-    }
-
-    /**
-     * @dev change the checkPastPeriod value
-     * @param _checkPastPeriod new value
-     */
-    function changeCheckPastPeriod(bool _checkPastPeriod) public onlyOwner {
-        checkPastPeriod = _checkPastPeriod;
-        emit CheckPastPeriod(checkPastPeriod, msg.sender);
     }
 }
