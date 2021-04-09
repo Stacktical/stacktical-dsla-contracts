@@ -24,11 +24,11 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /// @dev Array with all request IDs
     bytes32[] public requests;
     /// @dev The address of the SLARegistry contract
-    address private _slaRegistryAddress;
+    address private immutable _slaRegistryAddress;
     /// @dev Network analytics contract address
-    address public networkAnalyticsAddress;
+    address public immutable networkAnalyticsAddress;
     /// @dev Chainlink oracle address
-    address private _oracle;
+    address private immutable _oracle;
     /// @dev chainlink jobId
     bytes32 private _jobId;
     // @dev fee for Chainlink querys. Currently 0.1 LINK
@@ -71,6 +71,18 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * @param fee 3. -
      */
     event JobIdModified(address indexed owner, bytes32 jobId, uint256 fee);
+
+    /**
+     * @dev event emitted when modifying the jobId
+     * @param owner 1. -
+     * @param jobId 2. -
+     * @param fee 3. -
+     */
+    event SLIRequested(
+        address indexed caller,
+        uint256 requestsCounter,
+        bytes32 requestId
+    );
 
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
     modifier onlySLARegistry() {
@@ -160,6 +172,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         });
 
         _requestsCounter += 1;
+        emit SLIRequested(_callerAddress, _requestsCounter, requestId);
     }
 
     /**
