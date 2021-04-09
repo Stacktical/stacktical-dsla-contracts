@@ -78,6 +78,7 @@ contract SLARegistry {
      * @param _messengerAddress 7. -
      * @param _whitelisted 8. -
      * @param _extraData 9. -
+     * @param _leverage 10. -
      */
     function createSLA(
         uint256 _sloValue,
@@ -88,7 +89,8 @@ contract SLARegistry {
         uint128 _initialPeriodId,
         uint128 _finalPeriodId,
         string memory _ipfsHash,
-        bytes32[] memory _extraData
+        bytes32[] memory _extraData,
+        uint256 _leverage
     ) public {
         bool validPeriod =
             periodRegistry.isValidPeriod(_periodType, _initialPeriodId);
@@ -125,7 +127,8 @@ contract SLARegistry {
                 _finalPeriodId,
                 uint128(SLAs.length),
                 _ipfsHash,
-                _extraData
+                _extraData,
+                _leverage
             );
 
         sloRegistry.registerSLO(_sloValue, _sloType, address(sla));
@@ -206,7 +209,7 @@ contract SLARegistry {
             _sla.breachedContract() ||
                 (block.timestamp >= endOfLastValidPeriod &&
                     lastPeriodStatus != SLA.Status.NotVerified),
-            "Can only withdraw locked DSLA after the final period is verified or if the contract is breached"
+            "Should only withdraw for finished contracts"
         );
         stakeRegistry.returnLockedValue(address(_sla));
     }
@@ -236,7 +239,7 @@ contract SLARegistry {
      * @return array of SLAs
      */
     function userSLAs(address _user) public view returns (SLA[] memory) {
-        uint256 count = userSLACount(_user);
+        uint256 count = userToSLAIndexes[_user].length;
         SLA[] memory SLAList = new SLA[](count);
         uint256[] memory userSLAIndexes = userToSLAIndexes[_user];
 
@@ -248,31 +251,11 @@ contract SLARegistry {
     }
 
     /**
-     * @dev public view function that returns the amount of service level
-     * agreements the given user is the owner of
-     * @param _user 1. address of the user for which to return the amount of
-     * service level agreements
-     * @return uint256 corresponding to the amount of user's SLAs
-     */
-    function userSLACount(address _user) public view returns (uint256) {
-        return userToSLAIndexes[_user].length;
-    }
-
-    /**
      * @dev public view function that returns all the service level agreements
      * @return SLA[] array of SLAs
      */
     function allSLAs() public view returns (SLA[] memory) {
         return (SLAs);
-    }
-
-    /**
-     * @dev public view function that returns the total amount of service
-     * level agreements
-     * @return uint256, the length of SLA array
-     */
-    function SLACount() public view returns (uint256) {
-        return SLAs.length;
     }
 
     /**

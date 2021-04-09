@@ -60,8 +60,10 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
     uint256 private _dslaUserReward = 250 ether;
     /// @dev DSLA burned after every period verification
     uint256 private _dslaBurnedByVerification = 250 ether;
-    /// @dev DSLA burned after every period verification
+    /// @dev max token length for allowedTokens array of Staking contracts
     uint256 private _maxTokenLength = 1;
+    /// @dev max times of hedge leverage
+    uint256 public _maxLeverage = 100;
 
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
@@ -102,7 +104,8 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
         uint256 dslaMessengerReward,
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification,
-        uint256 maxTokenLength
+        uint256 maxTokenLength,
+        uint256 maxLeverage
     );
 
     /**
@@ -365,7 +368,8 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
         uint256 dslaMessengerReward,
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification,
-        uint256 maxTokenLength
+        uint256 maxTokenLength,
+        uint256 maxLeverage
     ) external onlyOwner {
         _DSLAburnRate = DSLAburnRate;
         _dslaDepositByPeriod = dslaDepositByPeriod;
@@ -374,6 +378,7 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
         _dslaUserReward = dslaUserReward;
         _dslaBurnedByVerification = dslaBurnedByVerification;
         _maxTokenLength = maxTokenLength;
+        _maxLeverage = maxLeverage;
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
@@ -389,7 +394,8 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
             dslaMessengerReward,
             dslaUserReward,
             dslaBurnedByVerification,
-            maxTokenLength
+            maxTokenLength,
+            maxLeverage
         );
     }
 

@@ -1,13 +1,13 @@
 const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
-const initialTokenSupply = '10000000';
+const initialTokenSupply = '1000000000';
 
 const { toWei } = web3.utils;
 
 module.exports = async (callback) => {
   try {
-    console.log('Starting automated job 1: token deployment and minting');
+    console.log('Minting tokens to owner and notOwner');
     const [owner, notOwner] = await web3.eth.getAccounts();
 
     const bdslaToken = await bDSLA.deployed();
