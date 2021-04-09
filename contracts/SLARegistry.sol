@@ -209,7 +209,7 @@ contract SLARegistry {
             _sla.breachedContract() ||
                 (block.timestamp >= endOfLastValidPeriod &&
                     lastPeriodStatus != SLA.Status.NotVerified),
-            "Can only withdraw locked DSLA after the final period is verified or if the contract is breached"
+            "Should only withdraw for finished contracts"
         );
         stakeRegistry.returnLockedValue(address(_sla));
     }
