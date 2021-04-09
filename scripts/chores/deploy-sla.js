@@ -5,9 +5,10 @@ const { SENetworkNamesBytes32, SENetworkNames, SENetworks } = require('../../con
 const { networkNames } = require('../../environments');
 const { getIPFSHash } = require('../../utils');
 
-const { toWei } = web3.utils;
+const { toWei, fromWei } = web3.utils;
 
 const StakeRegistry = artifacts.require('StakeRegistry');
+const IERC20 = artifacts.require('IERC20');
 const SLARegistry = artifacts.require('SLARegistry');
 const SEMessenger = artifacts.require('SEMessenger');
 const bDSLA = artifacts.require('bDSLA');
@@ -15,7 +16,7 @@ const SLA = artifacts.require('SLA');
 const initialTokenSupply = '10000000';
 const stakeAmount = initialTokenSupply / 100;
 const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
-const sloValue = 50000;
+const sloValue = 100 * 10 ** 3;
 const sloType = 4;
 const periodType = 2;
 const slaNetworkBytes32 = SENetworkNamesBytes32[0];
@@ -44,7 +45,7 @@ module.exports = async (callback) => {
     console.log('Starting SLA deployment process');
     console.log('Starting process 1: Allowance on Stake registry to deploy SLA');
     const initialPeriodId = 0;
-    const finalPeriodId = 1;
+    const finalPeriodId = 0;
     const dslaDepositByPeriod = 20000;
     const dslaDeposit = toWei(
       String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1)),
@@ -67,7 +68,7 @@ module.exports = async (callback) => {
     const seMessenger = await SEMessenger.deployed();
     const slaRegistry = await SLARegistry.deployed();
     const whitelisted = false;
-    const leverage = 101;
+    const leverage = 10;
     await slaRegistry.createSLA(
       sloValue,
       sloType,
@@ -92,21 +93,25 @@ module.exports = async (callback) => {
     await sla.addAllowedTokens(bdslaToken.address);
 
     console.log('Starting process 3: Stake on owner and notOwner pools');
-    console.log('Starting process 3.1: owner: 30000 bDSLA');
-    // Owner
-    // 3 * bsdla
-    await bdslaToken.approve(sla.address, stakeAmountTimesWei(3));
-    await sla.stakeTokens(stakeAmountTimesWei(3), bdslaToken.address);
 
-    // NotOwner
-    // 3 * bdsla
-    console.log('Starting process 3.2: notOwner: 2000 bDSLA');
-    await bdslaToken.approve(sla.address, stakeAmountTimesWei(2), {
+    const ownerStake = stakeAmountTimesWei(30);
+    console.log(`Starting process 3.1: owner: ${fromWei(ownerStake)} bDSLA`);
+    await bdslaToken.approve(sla.address, ownerStake);
+    await sla.stakeTokens(ownerStake, bdslaToken.address);
+
+    const notOwnerStake = stakeAmountTimesWei(2);
+    console.log(`Starting process 3.2: notOwner: ${fromWei(notOwnerStake)} bDSLA`);
+    await bdslaToken.approve(sla.address, notOwnerStake, {
       from: notOwner,
     });
-    await sla.stakeTokens(stakeAmountTimesWei(2), bdslaToken.address, {
+    await sla.stakeTokens(notOwnerStake, bdslaToken.address, {
       from: notOwner,
     });
+
+    // const bdslaDPTokenAddress = await sla.dpTokenRegistry(bdslaToken.address);
+    // const bdslaDPToken = await IERC20.at(bdslaDPTokenAddress);
+    // await bdslaDPToken.approve(sla.address, ownerStake);
+    // await sla.withdrawProviderTokens(stakeAmountTimesWei(11), bdslaToken.address);
 
     callback(null);
   } catch (error) {

@@ -29,35 +29,35 @@ module.exports = async (callback) => {
     await slaRegistry.requestSLI(0, sla.address, ownerApproval);
     await eventListener(sla, 'SLICreated');
 
-    console.log('Starting automated job 2: Request Analytics and SLI for period 1');
-    networkAnalytics.requestAnalytics(
-      1,
-      periodType,
-      slaNetworkBytes32,
-      ownerApproval,
-    );
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
-    await slaRegistry.requestSLI(1, sla.address, ownerApproval);
-    await eventListener(sla, 'SLICreated');
+    // console.log('Starting automated job 2: Request Analytics and SLI for period 1');
+    // networkAnalytics.requestAnalytics(
+    //   1,
+    //   periodType,
+    //   slaNetworkBytes32,
+    //   ownerApproval,
+    // );
+    // await eventListener(networkAnalytics, 'AnalyticsReceived');
+    // await slaRegistry.requestSLI(1, sla.address, ownerApproval);
+    // await eventListener(sla, 'SLICreated');
 
-    console.log('Starting automated job 3: Request Analytics for period 2');
-    networkAnalytics.requestAnalytics(
-      2,
-      periodType,
-      slaNetworkBytes32,
-      ownerApproval,
-    );
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
+    // console.log('Starting automated job 3: Request Analytics for period 2');
+    // networkAnalytics.requestAnalytics(
+    //   2,
+    //   periodType,
+    //   slaNetworkBytes32,
+    //   ownerApproval,
+    // );
+    // await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-    console.log('Starting automated job 4: Request Analytics for period 3');
-    networkAnalytics.requestAnalytics(
-      3,
-      periodType,
-      slaNetworkBytes32,
-      ownerApproval,
-    );
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
-    console.log('SLI request process finished');
+    // console.log('Starting automated job 4: Request Analytics for period 3');
+    // networkAnalytics.requestAnalytics(
+    //   3,
+    //   periodType,
+    //   slaNetworkBytes32,
+    //   ownerApproval,
+    // );
+    // await eventListener(networkAnalytics, 'AnalyticsReceived');
+    // console.log('SLI request process finished');
 
     callback(null);
   } catch (error) {

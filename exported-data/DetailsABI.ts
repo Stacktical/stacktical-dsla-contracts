@@ -15,6 +15,7 @@ export const DetailsABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -49,6 +50,7 @@ export const DetailsABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [{ internalType: 'address', name: '_slaAddress', type: 'address' }],
@@ -78,6 +80,7 @@ export const DetailsABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -117,5 +120,6 @@ export const DetailsABI: AbiItem[] = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];
