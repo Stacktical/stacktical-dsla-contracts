@@ -102,7 +102,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         oracle = _chainlinkOracle;
         periodRegistry = _periodRegistry;
         stakeRegistry = _stakeRegistry;
-        fee = _feeMultiplier * baseFee;
+        fee = _feeMultiplier.mul(baseFee);
     }
 
     function isValidNetwork(bytes32 _networkName) public view returns (bool) {
@@ -244,7 +244,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         onlyOwner
     {
         jobId = _jobId;
-        fee = _feeMultiplier * baseFee;
+        fee = _feeMultiplier.mul(baseFee);
         emit JobIdModified(msg.sender, _jobId, fee);
     }
 

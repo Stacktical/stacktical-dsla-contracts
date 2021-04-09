@@ -32,11 +32,11 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /// @dev chainlink jobId
     bytes32 private _jobId;
     // @dev fee for Chainlink querys. Currently 0.1 LINK
-    uint256 private _baseFee = 0.1 ether;
+    uint256 private constant _baseFee = 0.1 ether;
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
     uint256 private _fee;
     /// @dev to multiply the SLI value and get better precision. Useful to deploy SLO correctly
-    uint256 private _messengerPrecision = 10**3;
+    uint256 private constant _messengerPrecision = 10**3;
 
     uint256 private _requestsCounter;
     uint256 private _fulfillsCounter;

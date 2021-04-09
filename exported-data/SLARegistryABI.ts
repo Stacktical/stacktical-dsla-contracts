@@ -32,44 +32,6 @@ export const SLARegistryABI: AbiItem[] = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
-        internalType: 'bool',
-        name: 'checkPastPeriod',
-        type: 'bool',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
-      },
-    ],
-    name: 'CheckPastPeriod',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'previousOwner',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
-    ],
-    name: 'OwnershipTransferred',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
         indexed: true,
         internalType: 'contract SLA',
         name: 'sla',
@@ -113,14 +75,6 @@ export const SLARegistryABI: AbiItem[] = [
   },
   {
     inputs: [],
-    name: 'owner',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
-    inputs: [],
     name: 'periodRegistry',
     outputs: [
       { internalType: 'contract PeriodRegistry', name: '', type: 'address' },
@@ -128,13 +82,6 @@ export const SLARegistryABI: AbiItem[] = [
     stateMutability: 'view',
     type: 'function',
     constant: true,
-  },
-  {
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
   },
   {
     inputs: [],
@@ -155,13 +102,6 @@ export const SLARegistryABI: AbiItem[] = [
     stateMutability: 'view',
     type: 'function',
     constant: true,
-  },
-  {
-    inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
   },
   {
     inputs: [
@@ -255,12 +195,5 @@ export const SLARegistryABI: AbiItem[] = [
     stateMutability: 'view',
     type: 'function',
     constant: true,
-  },
-  {
-    inputs: [{ internalType: 'bool', name: '_checkPastPeriod', type: 'bool' }],
-    name: 'changeCheckPastPeriod',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
   },
 ];
