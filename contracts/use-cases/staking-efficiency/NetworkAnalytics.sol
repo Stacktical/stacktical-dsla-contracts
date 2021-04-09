@@ -5,6 +5,7 @@ import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../../StringUtils.sol";
 import "../../PeriodRegistry.sol";
 import "../../StakeRegistry.sol";
@@ -14,7 +15,12 @@ import "../../StakeRegistry.sol";
  * @dev contract to get the network analytics for the staking efficiency use case
  */
 
-contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
+contract NetworkAnalytics is
+    Ownable,
+    ChainlinkClient,
+    StringUtils,
+    ReentrancyGuard
+{
     using SafeERC20 for ERC20;
 
     struct AnalyticsRequest {
@@ -158,7 +164,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         PeriodRegistry.PeriodType _periodType,
         bytes32 _networkName,
         bool _ownerApproval
-    ) public {
+    ) public nonReentrant {
         require(isValidNetwork(_networkName), "Invalid network name");
         bool periodIsFinished =
             periodRegistry.periodIsFinished(_periodType, _periodId);
@@ -218,6 +224,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
     function fulFillAnalytics(bytes32 _requestId, bytes32 _chainlinkResponse)
         external
         recordChainlinkFulfillment(_requestId)
+        nonReentrant
     {
         AnalyticsRequest memory request =
             requestIdToAnalyticsRequest[_requestId];
