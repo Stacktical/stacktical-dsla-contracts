@@ -105,8 +105,8 @@ contract Staking is Ownable {
         addUserToWhitelist(msg.sender);
         slaID = _slaID;
         require(
-            _leverage <= stakeRegistry._maxLeverage(),
-            "leverage should be smaller than maxLeverage"
+            _leverage <= stakeRegistry._maxLeverage() && _leverage >= 1,
+            "Incorrect leverage"
         );
         leverage = _leverage;
     }
