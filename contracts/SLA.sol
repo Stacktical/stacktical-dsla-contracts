@@ -62,6 +62,46 @@ contract SLA is Staking {
     event SLANotRespected(uint256 _periodId, uint256 _sli);
 
     /**
+     * @dev event for Stake loging
+     * @param tokenAddress 1. -
+     * @param periodId 2. -
+     * @param amount 3. -
+     * @param caller 4. -
+     */
+    event Stake(
+        address indexed tokenAddress,
+        uint256 indexed periodId,
+        address indexed caller,
+        uint256 amount
+    );
+    /**
+     * @dev event for Stake loging
+     * @param tokenAddress 1. -
+     * @param periodId 2. -
+     * @param amount 3. -
+     * @param caller 4. -
+     */
+    event ProviderWithdraw(
+        address indexed tokenAddress,
+        uint256 indexed periodId,
+        address indexed caller,
+        uint256 amount
+    );
+    /**
+     * @dev event for Stake loging
+     * @param tokenAddress 1. -
+     * @param periodId 2. -
+     * @param amount 3. -
+     * @param caller 4. -
+     */
+    event UserWithdraw(
+        address indexed tokenAddress,
+        uint256 indexed periodId,
+        address indexed caller,
+        uint256 amount
+    );
+
+    /**
      * @dev throws if called by any address other than the messenger contract.
      */
     modifier onlyMessenger() {
@@ -204,6 +244,7 @@ contract SLA is Staking {
             "Can only stake on not finished contracts"
         );
         _stake(_amount, _token);
+        emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount);
         StakeRegistry stakeRegistry = slaRegistry.stakeRegistry();
         stakeRegistry.registerStakedSla(msg.sender);
     }
@@ -214,6 +255,12 @@ contract SLA is Staking {
     {
         bool isContractFinished = contractFinished();
         _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
+        emit ProviderWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
+        );
     }
 
     /**
@@ -230,6 +277,12 @@ contract SLA is Staking {
             bool isContractFinished = contractFinished();
             require(isContractFinished, "Only for finished contract");
         }
+        emit UserWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
+        );
         _withdrawUserTokens(_amount, _tokenAddress);
     }
 

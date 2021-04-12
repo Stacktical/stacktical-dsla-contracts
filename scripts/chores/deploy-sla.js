@@ -8,20 +8,10 @@ const { getIPFSHash } = require('../../utils');
 const { toWei, fromWei } = web3.utils;
 
 const StakeRegistry = artifacts.require('StakeRegistry');
-const IERC20 = artifacts.require('IERC20');
 const SLARegistry = artifacts.require('SLARegistry');
 const SEMessenger = artifacts.require('SEMessenger');
 const bDSLA = artifacts.require('bDSLA');
 const SLA = artifacts.require('SLA');
-const StringUtils = artifacts.require('StringUtils');
-const initialTokenSupply = '10000000';
-const stakeAmount = initialTokenSupply / 100;
-const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
-const sloValue = 50 * 10 ** 3;
-const sloType = 4;
-const periodType = 2;
-const slaNetworkBytes32 = SENetworkNamesBytes32[0];
-const slaNetwork = SENetworkNames[0];
 
 const getHarmonyAccounts = async () => {
   // const wallet = new Wallet(
@@ -46,10 +36,19 @@ module.exports = async (callback) => {
     SLA.link(StringUtils);
     console.log('Starting SLA deployment process');
     console.log('Starting process 1: Allowance on Stake registry to deploy SLA');
+    const initialTokenSupply = '10000000';
+    const stakeAmount = initialTokenSupply / 100;
+    const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
+    const sloValue = 100 * 10 ** 3;
+    const sloType = 4;
+    const periodType = 2;
+    const slaNetworkBytes32 = SENetworkNamesBytes32[0];
+    const slaNetwork = SENetworkNames[0];
     const initialPeriodId = 0;
     const finalPeriodId = 4;
     const dslaDepositByPeriod = 20000;
     const dslaDeposit = toWei(String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1)));
+
     const stakeRegistry = await StakeRegistry.deployed();
     const bdslaToken = await bDSLA.deployed();
     await bdslaToken.approve(stakeRegistry.address, dslaDeposit);
@@ -107,7 +106,8 @@ module.exports = async (callback) => {
     await sla.stakeTokens(notOwnerStake, bdslaToken.address, {
       from: notOwner,
     });
-
+    const stakes = await sla.getPastEvents('Stake', { fromBlock: await sla.creationBlockNumber() });
+    console.log(stakes);
     // const bdslaDPTokenAddress = await sla.dpTokenRegistry(bdslaToken.address);
     // const bdslaDPToken = await IERC20.at(bdslaDPTokenAddress);
     // await bdslaDPToken.approve(sla.address, ownerStake);

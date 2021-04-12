@@ -103,7 +103,7 @@ contract Staking is Ownable {
             stakeRegistry.getStakingParameters();
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
-        addUserToWhitelist(msg.sender);
+        whitelist[owner()] = true;
         slaID = _slaID;
         require(
             _leverage <= _maxLeverage && _leverage >= 1,
@@ -112,13 +112,8 @@ contract Staking is Ownable {
         leverage = _leverage;
     }
 
-    function addUserToWhitelist(address _userAddress) public onlyOwner {
-        require(whitelist[_userAddress] == false, "User already whitelisted");
-        whitelist[_userAddress] = true;
-    }
-
-    function addMultipleUsersToWhitelist(address[] calldata _userAddresses)
-        external
+    function addUsersToWhitelist(address[] memory _userAddresses)
+        public
         onlyOwner
     {
         for (uint256 index = 0; index < _userAddresses.length; index++) {
@@ -128,12 +123,7 @@ contract Staking is Ownable {
         }
     }
 
-    function removeUserFromWhitelist(address _userAddress) external onlyOwner {
-        require(whitelist[_userAddress] == true, "User not whitelisted");
-        whitelist[_userAddress] = false;
-    }
-
-    function removeMultipleUsersFromWhitelist(address[] calldata _userAddresses)
+    function removeUsersFromWhitelist(address[] calldata _userAddresses)
         external
         onlyOwner
     {
