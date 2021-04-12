@@ -16,7 +16,7 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'uint128', name: '_slaID', type: 'uint128' },
       { internalType: 'string', name: '_ipfsHash', type: 'string' },
       { internalType: 'bytes32[]', name: '_extraData', type: 'bytes32[]' },
-      { internalType: 'uint256', name: '_leverage', type: 'uint256' },
+      { internalType: 'uint64', name: '_leverage', type: 'uint64' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -257,7 +257,7 @@ export const SLAABI: AbiItem[] = [
   {
     inputs: [],
     name: 'leverage',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    outputs: [{ internalType: 'uint64', name: '', type: 'uint64' }],
     stateMutability: 'view',
     type: 'function',
   },

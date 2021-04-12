@@ -16,12 +16,7 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
  * @dev Staking efficiency Messenger
  */
 
-contract SEMessenger is
-    ChainlinkClient,
-    IMessenger,
-    StringUtils,
-    ReentrancyGuard
-{
+contract SEMessenger is ChainlinkClient, IMessenger, ReentrancyGuard {
     using SafeERC20 for ERC20;
 
     /// @dev Mapping that stores chainlink sli request information
@@ -159,11 +154,11 @@ contract SEMessenger is
                 this.fulfillSLI.selector
             );
         request.add("job_type", "staking_efficiency");
-        request.add("period_id", _uintToStr(_periodId));
-        request.add("sla_address", _addressToString(_slaAddress));
+        request.add("period_id", StringUtils.uintToStr(_periodId));
+        request.add("sla_address", StringUtils.addressToString(_slaAddress));
         request.add(
             "network_analytics_address",
-            _addressToString(networkAnalyticsAddress)
+            StringUtils.addressToString(networkAnalyticsAddress)
         );
 
         // Sends the request with 0.1 LINK to the oracle contract
@@ -221,7 +216,7 @@ contract SEMessenger is
         pure
         returns (uint256, uint256)
     {
-        bytes memory bytesSLIData = bytes(_bytes32ToStr(sliData));
+        bytes memory bytesSLIData = bytes(StringUtils.bytes32ToStr(sliData));
         uint256 sliDataLength = bytesSLIData.length;
         bytes memory bytesHits = new bytes(sliDataLength);
         bytes memory bytesMisses = new bytes(sliDataLength);
@@ -239,8 +234,8 @@ contract SEMessenger is
                 }
             }
         }
-        uint256 hits = _bytesToUint(bytesHits);
-        uint256 misses = _bytesToUint(bytesMisses);
+        uint256 hits = StringUtils.bytesToUint(bytesHits);
+        uint256 misses = StringUtils.bytesToUint(bytesMisses);
         return (hits, misses);
     }
 

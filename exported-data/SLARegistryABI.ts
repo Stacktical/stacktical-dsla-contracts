@@ -122,7 +122,7 @@ export const SLARegistryABI: AbiItem[] = [
       { internalType: 'uint128', name: '_finalPeriodId', type: 'uint128' },
       { internalType: 'string', name: '_ipfsHash', type: 'string' },
       { internalType: 'bytes32[]', name: '_extraData', type: 'bytes32[]' },
-      { internalType: 'uint256', name: '_leverage', type: 'uint256' },
+      { internalType: 'uint64', name: '_leverage', type: 'uint64' },
     ],
     name: 'createSLA',
     outputs: [],

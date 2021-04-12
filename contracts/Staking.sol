@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./StakeRegistry.sol";
 import "./SLARegistry.sol";
 import "./PeriodRegistry.sol";
+import "./StringUtils.sol";
 
 contract Staking is Ownable {
     using SafeMath for uint256;
@@ -160,7 +161,7 @@ contract Staking is Ownable {
             maxTokenLength >= allowedTokens.length,
             "Allowed tokens length greater than max token length"
         );
-        string memory dTokenID = _uintToStr(slaID);
+        string memory dTokenID = StringUtils.uintToStr(slaID);
         string memory duTokenName =
             string(abi.encodePacked("DSLA-SHORT-", dTokenID));
         string memory duTokenSymbol =
@@ -392,29 +393,5 @@ contract Staking is Ownable {
             }
         }
         return false;
-    }
-
-    function _uintToStr(uint256 _i)
-        internal
-        pure
-        returns (string memory _uintAsString)
-    {
-        uint256 number = _i;
-        if (number == 0) {
-            return "0";
-        }
-        uint256 j = number;
-        uint256 len;
-        while (j != 0) {
-            len++;
-            j /= 10;
-        }
-        bytes memory bstr = new bytes(len);
-        uint256 k = len - 1;
-        while (number != 0) {
-            bstr[k--] = bytes1(uint8(48 + (number % 10)));
-            number /= 10;
-        }
-        return string(bstr);
     }
 }
