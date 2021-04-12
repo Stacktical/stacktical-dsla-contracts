@@ -33,7 +33,6 @@ const getHarmonyAccounts = async () => {
 
 module.exports = async (callback) => {
   try {
-    SLA.link(StringUtils);
     console.log('Starting SLA deployment process');
     console.log('Starting process 1: Allowance on Stake registry to deploy SLA');
     const initialTokenSupply = '10000000';
@@ -106,8 +105,6 @@ module.exports = async (callback) => {
     await sla.stakeTokens(notOwnerStake, bdslaToken.address, {
       from: notOwner,
     });
-    const stakes = await sla.getPastEvents('Stake', { fromBlock: await sla.creationBlockNumber() });
-    console.log(stakes);
     // const bdslaDPTokenAddress = await sla.dpTokenRegistry(bdslaToken.address);
     // const bdslaDPToken = await IERC20.at(bdslaDPTokenAddress);
     // await bdslaDPToken.approve(sla.address, ownerStake);

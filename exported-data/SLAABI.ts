@@ -81,6 +81,37 @@ export const SLAABI: AbiItem[] = [
     anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'periodId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'caller',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'ProviderWithdraw',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: false,
         internalType: 'uint256',
         name: '_periodId',
@@ -134,7 +165,7 @@ export const SLAABI: AbiItem[] = [
       {
         indexed: true,
         internalType: 'address',
-        name: 'owner',
+        name: 'caller',
         type: 'address',
       },
       {
@@ -145,6 +176,37 @@ export const SLAABI: AbiItem[] = [
       },
     ],
     name: 'Stake',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'periodId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'caller',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'UserWithdraw',
     type: 'event',
   },
   {
@@ -167,16 +229,7 @@ export const SLAABI: AbiItem[] = [
     inputs: [
       { internalType: 'address[]', name: '_userAddresses', type: 'address[]' },
     ],
-    name: 'addMultipleUsersToWhitelist',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '_userAddress', type: 'address' },
-    ],
-    name: 'addUserToWhitelist',
+    name: 'addUsersToWhitelist',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -355,16 +408,7 @@ export const SLAABI: AbiItem[] = [
     inputs: [
       { internalType: 'address[]', name: '_userAddresses', type: 'address[]' },
     ],
-    name: 'removeMultipleUsersFromWhitelist',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '_userAddress', type: 'address' },
-    ],
-    name: 'removeUserFromWhitelist',
+    name: 'removeUsersFromWhitelist',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
