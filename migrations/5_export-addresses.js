@@ -15,6 +15,7 @@ const Details = artifacts.require('Details');
 const PreCoordinator = artifacts.require('PreCoordinator');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const SEMessenger = artifacts.require('SEMessenger');
+const StringUtils = artifacts.require('StringUtils');
 const bDSLA = artifacts.require('bDSLA');
 const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
@@ -41,6 +42,7 @@ module.exports = (deployer, network) => {
       NetworkAnalytics: (await NetworkAnalytics.deployed()).address,
       Details: (await Details.deployed()).address,
       PreCoordinator: (await PreCoordinator.deployed()).address,
+      StringUtils: (await StringUtils.deployed()).address,
     };
     fs.writeFileSync(
       path.resolve(__dirname, `${base_path}/${network}.ts`),
@@ -48,8 +50,11 @@ module.exports = (deployer, network) => {
     );
 
     console.log('Updating index.ts file with networks addresses');
-    const importLines = Object.values(networkNames).reduce((r, name) => r += `import ${name} from './${name}'\n`, '');
-    const exportLines = Object.values(networkNames).reduce((r, name) => r += `${name}, `, '');
+    const importLines = Object.values(networkNames).reduce(
+      (r, name) => (r += `import ${name} from './${name}'\n`),
+      '',
+    );
+    const exportLines = Object.values(networkNames).reduce((r, name) => (r += `${name}, `), '');
 
     fs.writeFileSync(
       path.resolve(__dirname, `${base_path}/index.ts`),

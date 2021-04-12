@@ -10,10 +10,13 @@ const PreCoordinator = artifacts.require('PreCoordinator');
 const StakeRegistry = artifacts.require('StakeRegistry');
 const NetworkAnalytics = artifacts.require('NetworkAnalytics');
 const SEMessenger = artifacts.require('SEMessenger');
+const StringUtils = artifacts.require('StringUtils');
 
 module.exports = (deployer, network) => {
   deployer.then(async () => {
     if (!!process.env.ONLY_DETAILS === true) return;
+    deployer.link(StringUtils, [NetworkAnalytics, SEMessenger]);
+
     const envParameters = getEnvFromNetwork(network);
     const periodRegistry = await PeriodRegistry.deployed();
     const stakeRegistry = await StakeRegistry.deployed();

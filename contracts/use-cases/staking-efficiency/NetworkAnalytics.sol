@@ -15,12 +15,7 @@ import "../../StakeRegistry.sol";
  * @dev contract to get the network analytics for the staking efficiency use case
  */
 
-contract NetworkAnalytics is
-    Ownable,
-    ChainlinkClient,
-    StringUtils,
-    ReentrancyGuard
-{
+contract NetworkAnalytics is Ownable, ChainlinkClient, ReentrancyGuard {
     using SafeERC20 for ERC20;
 
     struct AnalyticsRequest {
@@ -199,11 +194,14 @@ contract NetworkAnalytics is
             periodRegistry.getPeriodStartAndEnd(_periodType, _periodId);
 
         request.add("job_type", "staking_efficiency_analytics");
-        request.add("network_name", _bytes32ToStr(_networkName));
-        request.add("period_id", _uintToStr(_periodId));
-        request.add("period_type", _uintToStr(uint256(uint8(_periodType))));
-        request.add("sla_monitoring_start", _uintToStr(start));
-        request.add("sla_monitoring_end", _uintToStr(end));
+        request.add("network_name", StringUtils.bytes32ToStr(_networkName));
+        request.add("period_id", StringUtils.uintToStr(_periodId));
+        request.add(
+            "period_type",
+            StringUtils.uintToStr(uint256(uint8(_periodType)))
+        );
+        request.add("sla_monitoring_start", StringUtils.uintToStr(start));
+        request.add("sla_monitoring_end", StringUtils.uintToStr(end));
 
         bytes32 requestId = sendChainlinkRequestTo(oracle, request, fee);
         requests.push(requestId);

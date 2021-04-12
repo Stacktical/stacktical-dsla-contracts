@@ -1,9 +1,9 @@
 // solhint-disable-line
 pragma solidity 0.6.6;
 
-contract StringUtils {
-    function _addressToString(address _address)
-        internal
+library StringUtils {
+    function addressToString(address _address)
+        external
         pure
         returns (string memory)
     {
@@ -19,8 +19,8 @@ contract StringUtils {
         return string(_string);
     }
 
-    function _bytes32ToStr(bytes32 _bytes32)
-        internal
+    function bytes32ToStr(bytes32 _bytes32)
+        external
         pure
         returns (string memory)
     {
@@ -35,8 +35,8 @@ contract StringUtils {
         return string(bytesArray);
     }
 
-    function _bytesToUint(bytes memory b)
-        internal
+    function bytesToUint(bytes calldata b)
+        external
         pure
         returns (uint256 result)
     {
@@ -69,8 +69,8 @@ contract StringUtils {
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
         THE SOFTWARE.
     */
-    function _uintToStr(uint256 _i)
-        internal
+    function uintToStr(uint256 _i)
+        external
         pure
         returns (string memory _uintAsString)
     {

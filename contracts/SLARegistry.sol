@@ -102,7 +102,7 @@ contract SLARegistry {
         require(initializedPeriod, "Period type not initialized yet");
         require(
             _finalPeriodId >= _initialPeriodId,
-            "finalPeriodId should be greater than or equal to initialPeriodId"
+            "invalid finalPeriodId and initialPeriodId"
         );
 
         if (checkPastPeriod) {
@@ -112,10 +112,7 @@ contract SLARegistry {
         }
         bool registeredMessenger =
             messengerRegistry.registeredMessengers(_messengerAddress);
-        require(
-            registeredMessenger == true,
-            "messenger address is not registered"
-        );
+        require(registeredMessenger == true, "messenger not registered");
 
         SLA sla =
             new SLA(
@@ -155,30 +152,18 @@ contract SLARegistry {
         SLA _sla,
         bool _ownerApproval
     ) public {
-        require(isRegisteredSLA(address(_sla)), "SLA contract should be valid");
-        require(
-            _periodId == _sla.nextVerifiablePeriod(),
-            "Should only verify next period"
-        );
+        require(isRegisteredSLA(address(_sla)), "invalid SLA");
+        require(_periodId == _sla.nextVerifiablePeriod(), "invalid periodId");
         (, , SLA.Status status) = _sla.periodSLIs(_periodId);
-        require(
-            status == SLA.Status.NotVerified,
-            "SLA contract was already verified for the period"
-        );
+        require(status == SLA.Status.NotVerified, "invalid SLA status");
         bool breachedContract = _sla.breachedContract();
-        require(
-            !breachedContract,
-            "Should only be called for not breached contracts"
-        );
+        require(!breachedContract, "breached contract");
         bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
-        require(
-            slaAllowedPeriodId,
-            "Period ID not registered in the SLA contract"
-        );
+        require(slaAllowedPeriodId, "invalid period Id");
         PeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
         bool periodFinished =
             periodRegistry.periodIsFinished(slaPeriodType, _periodId);
-        require(periodFinished, "SLA contract period has not finished yet");
+        require(periodFinished, "period not finished");
         address slaMessenger = _sla.messengerAddress();
         IMessenger(slaMessenger).requestSLI(
             _periodId,
@@ -194,11 +179,8 @@ contract SLARegistry {
     }
 
     function returnLockedValue(SLA _sla) public {
-        require(isRegisteredSLA(address(_sla)), "SLA contract should be valid");
-        require(
-            msg.sender == _sla.owner(),
-            "Only SLA owner can claim locked value"
-        );
+        require(isRegisteredSLA(address(_sla)), "invalid SLA");
+        require(msg.sender == _sla.owner(), "msg.sender not owner");
         uint256 lastValidPeriodId = _sla.finalPeriodId();
         PeriodRegistry.PeriodType periodType = _sla.periodType();
         (, uint256 endOfLastValidPeriod) =
