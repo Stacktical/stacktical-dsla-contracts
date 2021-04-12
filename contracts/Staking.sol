@@ -51,7 +51,7 @@ contract Staking is Ownable {
     /// @dev (userAddress=bool) to declare whitelisted addresses
     mapping(address => bool) public whitelist;
 
-    uint256 public immutable leverage;
+    uint64 public immutable leverage;
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token) == true, "token is not allowed");
@@ -92,20 +92,20 @@ contract Staking is Ownable {
         PeriodRegistry.PeriodType _periodType,
         bool _whitelistedContract,
         uint128 _slaID,
-        uint256 _leverage
+        uint64 _leverage
     ) public {
         stakeRegistry = _slaRegistry.stakeRegistry();
         periodRegistry = _slaRegistry.periodRegistry();
         periodType = _periodType;
         whitelistedContract = _whitelistedContract;
-        (uint256 _DSLAburnRate, , , , , , ) =
+        (uint256 _DSLAburnRate, , , , , , , uint64 _maxLeverage) =
             stakeRegistry.getStakingParameters();
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
         addUserToWhitelist(msg.sender);
         slaID = _slaID;
         require(
-            _leverage <= stakeRegistry._maxLeverage() && _leverage >= 1,
+            _leverage <= _maxLeverage && _leverage >= 1,
             "Incorrect leverage"
         );
         leverage = _leverage;
@@ -148,7 +148,7 @@ contract Staking is Ownable {
      *@param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
-        (, , , , , , uint256 maxTokenLength) =
+        (, , , , , , uint256 maxTokenLength, ) =
             stakeRegistry.getStakingParameters();
         require(!isAllowedToken(_tokenAddress), "Token already added");
         require(

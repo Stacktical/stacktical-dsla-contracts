@@ -63,7 +63,7 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
     /// @dev max token length for allowedTokens array of Staking contracts
     uint256 private _maxTokenLength = 1;
     /// @dev max times of hedge leverage
-    uint256 public _maxLeverage = 100;
+    uint64 private _maxLeverage = 100;
 
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
@@ -105,7 +105,7 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification,
         uint256 maxTokenLength,
-        uint256 maxLeverage
+        uint64 maxLeverage
     );
 
     /**
@@ -369,7 +369,7 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification,
         uint256 maxTokenLength,
-        uint256 maxLeverage
+        uint64 maxLeverage
     ) external onlyOwner {
         _DSLAburnRate = DSLAburnRate;
         _dslaDepositByPeriod = dslaDepositByPeriod;
@@ -409,7 +409,8 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
             uint256 dslaMessengerReward,
             uint256 dslaUserReward,
             uint256 dslaBurnedByVerification,
-            uint256 maxTokenLength
+            uint256 maxTokenLength,
+            uint64 maxLeverage
         )
     {
         DSLAburnRate = _DSLAburnRate;
@@ -419,6 +420,7 @@ contract StakeRegistry is Ownable, StringUtils, ReentrancyGuard {
         dslaUserReward = _dslaUserReward;
         dslaBurnedByVerification = _dslaBurnedByVerification;
         maxTokenLength = _maxTokenLength;
+        maxLeverage = _maxLeverage;
     }
 
     function periodIsVerified(address _sla, uint256 _periodId)

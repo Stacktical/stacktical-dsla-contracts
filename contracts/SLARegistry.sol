@@ -90,7 +90,7 @@ contract SLARegistry {
         uint128 _finalPeriodId,
         string memory _ipfsHash,
         bytes32[] memory _extraData,
-        uint256 _leverage
+        uint64 _leverage
     ) public {
         bool validPeriod =
             periodRegistry.isValidPeriod(_periodType, _initialPeriodId);

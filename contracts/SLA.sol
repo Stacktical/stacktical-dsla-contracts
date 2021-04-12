@@ -112,7 +112,7 @@ contract SLA is Staking {
         uint128 _slaID,
         string memory _ipfsHash,
         bytes32[] memory _extraData,
-        uint256 _leverage
+        uint64 _leverage
     )
         public
         Staking(
