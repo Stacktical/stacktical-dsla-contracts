@@ -117,6 +117,37 @@ export const SLAABI: AbiItem[] = [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'periodId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'Stake',
+    type: 'event',
+  },
+  {
     inputs: [],
     name: 'DSLAburnRate',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],

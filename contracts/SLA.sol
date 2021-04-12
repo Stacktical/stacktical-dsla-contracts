@@ -255,7 +255,12 @@ contract SLA is Staking {
     {
         bool isContractFinished = contractFinished();
         _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
-        emit ProviderWithdraw(_tokenAddress, nextVerifiablePeriod, msg.sender, _amount);
+        emit ProviderWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
+        );
     }
 
     /**
@@ -272,7 +277,12 @@ contract SLA is Staking {
             bool isContractFinished = contractFinished();
             require(isContractFinished, "Only for finished contract");
         }
-        emit UserWithdraw(_tokenAddress, nextVerifiablePeriod, msg.sender, _amount);
+        emit UserWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
+        );
         _withdrawUserTokens(_amount, _tokenAddress);
     }
 
