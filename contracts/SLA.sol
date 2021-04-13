@@ -55,13 +55,6 @@ contract SLA is Staking {
     event SLICreated(uint256 timestamp, uint256 sli, uint256 periodId);
 
     /**
-     * @dev event for SLI creation logging
-     * @param _periodId 1. the id of the given period
-     * @param _sli 2. value of the SLI
-     */
-    event SLANotRespected(uint256 _periodId, uint256 _sli);
-
-    /**
      * @dev event for Stake loging
      * @param tokenAddress 1. -
      * @param periodId 2. -
@@ -208,9 +201,8 @@ contract SLA is Staking {
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
             periodSLI.status = Status.NotRespected;
-            _setUsersCompensation();
+            _setUsersCompensation(_periodId);
             _breachedContract = true;
-            emit SLANotRespected(_periodId, _sli);
         }
     }
 

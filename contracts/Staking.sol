@@ -61,7 +61,7 @@ contract Staking is Ownable {
 
     modifier onlyWhitelisted {
         if (whitelistedContract == true) {
-            require(whitelist[msg.sender] == true, "User is not whitelisted");
+            require(whitelist[msg.sender] == true, "Not whitelisted");
         }
         _;
     }
@@ -80,6 +80,24 @@ contract Staking is Ownable {
         uint256 rewardPercentage,
         uint256 rewardPercentagePrecision,
         uint256 rewardAmount
+    );
+
+    event UserCompensationGenerated(
+        uint256 indexed periodId,
+        address indexed tokenAddress,
+        uint256 usersStake,
+        uint256 leverage,
+        uint256 compensation
+    );
+
+    event DTokensCreated(
+        address indexed tokenAddress,
+        address indexed dpTokenAddress,
+        string dpTokenName,
+        string dpTokenSymbol,
+        address indexed duTokenAddress,
+        string duTokenName,
+        string duTokenSymbol
     );
 
     /**
@@ -173,6 +191,15 @@ contract Staking is Ownable {
 
         dpTokenRegistry[_tokenAddress] = dpToken;
         duTokenRegistry[_tokenAddress] = duToken;
+        emit DTokensCreated(
+            _tokenAddress,
+            address(dpToken),
+            dpTokenName,
+            dpTokenName,
+            address(duToken),
+            duTokenName,
+            duTokenName
+        );
     }
 
     /**
@@ -198,7 +225,7 @@ contract Staking is Ownable {
                 (providerPool[_tokenAddress], usersPool[_tokenAddress]);
             require(
                 usersStake.add(_amount).mul(leverage) <= providerStake,
-                "Cannot stake more than leveraged SLA provider stake"
+                "Incorrect user stake"
             );
             ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
@@ -273,7 +300,7 @@ contract Staking is Ownable {
      *@dev sets the users compensation pool
      *@notice it calculates the usersStake and calculates the users compensation from it
      */
-    function _setUsersCompensation() internal {
+    function _setUsersCompensation(uint256 _periodId) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
             uint256 usersStake = usersPool[tokenAddress];
@@ -281,8 +308,14 @@ contract Staking is Ownable {
             providerPool[tokenAddress] = providerPool[tokenAddress].sub(
                 compensation
             );
-
             usersPool[tokenAddress] = usersPool[tokenAddress].add(compensation);
+            emit UserCompensationGenerated(
+                _periodId,
+                tokenAddress,
+                usersStake,
+                leverage,
+                compensation
+            );
         }
     }
 
@@ -302,7 +335,7 @@ contract Staking is Ownable {
         if (!_contractFinished) {
             require(
                 providerStake.sub(_amount) >= usersStake.mul(leverage),
-                "Should not withdraw more than leveraged users stake"
+                "Incorrect withdraw"
             );
         }
         ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];

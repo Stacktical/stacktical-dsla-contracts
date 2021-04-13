@@ -43,6 +43,25 @@ contract SLARegistry {
     event SLACreated(SLA indexed sla, address indexed owner);
 
     /**
+     * @dev event for service level agreement creation logging
+     * @param periodId 1. -
+     * @param sla 2. -
+     * @param caller 3. -
+     */
+    event SLIRequested(
+        uint256 periodId,
+        address indexed sla,
+        address indexed caller
+    );
+
+    /**
+     * @dev event for service level agreement creation logging
+     * @param sla 1. -
+     * @param caller 2. -
+     */
+    event ReturnLockedValue(address indexed sla, address indexed caller);
+
+    /**
      * @dev constructor
      * @param _sloRegistry 1. SLO Registry
      * @param _periodRegistry 2. Periods registry
@@ -165,6 +184,7 @@ contract SLARegistry {
             periodRegistry.periodIsFinished(slaPeriodType, _periodId);
         require(periodFinished, "period not finished");
         address slaMessenger = _sla.messengerAddress();
+        SLIRequested(_periodId, address(_sla), msg.sender);
         IMessenger(slaMessenger).requestSLI(
             _periodId,
             address(_sla),
@@ -193,6 +213,7 @@ contract SLARegistry {
                     lastPeriodStatus != SLA.Status.NotVerified),
             "Should only withdraw for finished contracts"
         );
+        ReturnLockedValue(address(_sla), msg.sender);
         stakeRegistry.returnLockedValue(address(_sla));
     }
 
