@@ -109,6 +109,45 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
     );
 
     /**
+     * @dev event to log modifications on the staking parameters
+     *@param sla 1. -
+     *@param owner 2. -
+     *@param amount 3. -
+     */
+
+    event LockedValueReturned(
+        address indexed sla,
+        address indexed owner,
+        uint256 amount
+    );
+
+    /**
+     * @dev event to log modifications on the staking parameters
+     *@param dTokenAddress 1. -
+     *@param sla 2. -
+     *@param name 3. -
+     *@param symbol 4. -
+     */
+    event DTokenCreated(
+        address indexed dTokenAddress,
+        address indexed sla,
+        string name,
+        string symbol
+    );
+
+    /**
+     * @dev event to log modifications on the staking parameters
+     *@param sla 1. -
+     *@param owner 2. -
+     *@param amount 3. -
+     */
+    event ValueLocked(
+        address indexed sla,
+        address indexed owner,
+        uint256 amount
+    );
+
+    /**
      * @param _dslaTokenAddress 1. DSLA Token
      */
     constructor(address _dslaTokenAddress) public {
@@ -216,6 +255,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         ERC20PresetMinterPauser dToken =
             new ERC20PresetMinterPauser(_name, _symbol);
         dToken.grantRole(dToken.MINTER_ROLE(), msg.sender);
+        emit DTokenCreated(address(dToken), msg.sender, _name, _symbol);
         return address(dToken);
     }
 
@@ -239,6 +279,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
             dslaUserReward: _dslaUserReward,
             dslaBurnedByVerification: _dslaBurnedByVerification
         });
+        emit ValueLocked(_sla, _slaOwner, lockedValue);
     }
 
     function distributeVerificationRewards(
@@ -291,6 +332,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
             SLA(_sla).owner(),
             remainingBalance
         );
+        emit LockedValueReturned(_sla, SLA(_sla).owner(), remainingBalance);
     }
 
     function _burnDSLATokens(uint256 _amount) internal {
