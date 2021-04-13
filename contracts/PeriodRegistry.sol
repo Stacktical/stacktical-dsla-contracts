@@ -33,6 +33,13 @@ contract PeriodRegistry is Ownable {
     event PeriodInitialized(PeriodType periodType, uint256 periodsAdded);
 
     /**
+     * @dev event to log a new period initialized
+     *@param periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
+     *@param periodsAdded 2. amount of periods added
+     */
+    event PeriodModified(PeriodType periodType, uint256 periodsAdded);
+
+    /**
      * @dev public function for creating canonical service level agreements
      *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      *@param _periodStarts 2. array of the starts of the period
@@ -101,6 +108,7 @@ contract PeriodRegistry is Ownable {
             periodDefinition.starts.push(_periodStarts[index]);
             periodDefinition.ends.push(_periodEnds[index]);
         }
+        emit PeriodModified(_periodType, _periodStarts.length);
     }
 
     /**
