@@ -17,9 +17,9 @@ module.exports = async (callback) => {
     await slaRegistry.requestSLI(0, sla.address, ownerApproval);
     await eventListener(sla, 'SLICreated');
 
-    // console.log('Starting automated job 2: Request SLI for period 1');
-    // await slaRegistry.requestSLI(1, sla.address, ownerApproval);
-    // await eventListener(sla, 'SLICreated');
+    console.log('Starting automated job 2: Request SLI for period 1');
+    await slaRegistry.requestSLI(1, sla.address, ownerApproval);
+    await eventListener(sla, 'SLICreated');
 
     console.log('SLI request process finished');
 

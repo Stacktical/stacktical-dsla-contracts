@@ -160,7 +160,8 @@ contract SLA is Staking {
             _periodType,
             _whitelisted,
             _slaID,
-            _leverage
+            _leverage,
+            _owner
         )
     {
         transferOwnership(_owner);
@@ -254,13 +255,13 @@ contract SLA is Staking {
         notZero(_amount)
     {
         bool isContractFinished = contractFinished();
-        _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
         emit ProviderWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
             msg.sender,
             _amount
         );
+        _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
     }
 
     /**

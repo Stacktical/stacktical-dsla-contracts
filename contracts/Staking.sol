@@ -93,7 +93,8 @@ contract Staking is Ownable {
         PeriodRegistry.PeriodType _periodType,
         bool _whitelistedContract,
         uint128 _slaID,
-        uint64 _leverage
+        uint64 _leverage,
+        address _contractOwner
     ) public {
         stakeRegistry = _slaRegistry.stakeRegistry();
         periodRegistry = _slaRegistry.periodRegistry();
@@ -103,7 +104,7 @@ contract Staking is Ownable {
             stakeRegistry.getStakingParameters();
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
-        whitelist[owner()] = true;
+        whitelist[_contractOwner] = true;
         slaID = _slaID;
         require(
             _leverage <= _maxLeverage && _leverage >= 1,
