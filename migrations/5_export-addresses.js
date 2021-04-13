@@ -30,9 +30,9 @@ module.exports = (deployer, network) => {
     const envParameters = getEnvFromNetwork(network);
     const [startingLine, finalLine] = getLines(network);
     const addresses = {
-      DSLAToken: envParameters.DSLAToken || (await bDSLA.deployed()).address,
-      DAIToken: envParameters.DAIToken || (await DAI.deployed()).address,
-      USDCToken: envParameters.USDCToken || (await USDC.deployed()).address,
+      DSLAToken: envParameters.dslaTokenAddress || (await bDSLA.deployed()).address,
+      DAIToken: envParameters.daiTokenAddress || (await DAI.deployed()).address,
+      USDCToken: envParameters.usdcTokenAddress || (await USDC.deployed()).address,
       SLORegistry: (await SLORegistry.deployed()).address,
       SLARegistry: (await SLARegistry.deployed()).address,
       MessengerRegistry: (await MessengerRegistry.deployed()).address,
