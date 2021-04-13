@@ -31,6 +31,20 @@ export const SLARegistryABI: AbiItem[] = [
   {
     anonymous: false,
     inputs: [
+      { indexed: true, internalType: 'address', name: 'sla', type: 'address' },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'caller',
+        type: 'address',
+      },
+    ],
+    name: 'ReturnLockedValue',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
       {
         indexed: true,
         internalType: 'contract SLA',
@@ -45,6 +59,26 @@ export const SLARegistryABI: AbiItem[] = [
       },
     ],
     name: 'SLACreated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'periodId',
+        type: 'uint256',
+      },
+      { indexed: true, internalType: 'address', name: 'sla', type: 'address' },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'caller',
+        type: 'address',
+      },
+    ],
+    name: 'SLIRequested',
     type: 'event',
   },
   {

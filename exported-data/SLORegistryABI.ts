@@ -2,6 +2,26 @@ import { AbiItem } from 'web3-utils/types';
 
 export const SLORegistryABI: AbiItem[] = [
   {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'sla', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'sloValue',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'enum SLORegistry.SLOType',
+        name: 'sloType',
+        type: 'uint8',
+      },
+    ],
+    name: 'SLORegistered',
+    type: 'event',
+  },
+  {
     inputs: [{ internalType: 'address', name: '', type: 'address' }],
     name: 'registeredSLO',
     outputs: [

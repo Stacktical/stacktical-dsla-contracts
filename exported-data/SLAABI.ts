@@ -27,6 +27,55 @@ export const SLAABI: AbiItem[] = [
       {
         indexed: true,
         internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'dpTokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'dpTokenName',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'dpTokenSymbol',
+        type: 'string',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'duTokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'duTokenName',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'duTokenSymbol',
+        type: 'string',
+      },
+    ],
+    name: 'DTokensCreated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
         name: 'previousOwner',
         type: 'address',
       },
@@ -114,25 +163,6 @@ export const SLAABI: AbiItem[] = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_periodId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: '_sli',
-        type: 'uint256',
-      },
-    ],
-    name: 'SLANotRespected',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
         name: 'timestamp',
         type: 'uint256',
       },
@@ -176,6 +206,43 @@ export const SLAABI: AbiItem[] = [
       },
     ],
     name: 'Stake',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'periodId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'usersStake',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'leverage',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'compensation',
+        type: 'uint256',
+      },
+    ],
+    name: 'UserCompensationGenerated',
     type: 'event',
   },
   {

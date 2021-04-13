@@ -40,6 +40,25 @@ export const PeriodRegistryABI: AbiItem[] = [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'enum PeriodRegistry.PeriodType',
+        name: 'periodType',
+        type: 'uint8',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'periodsAdded',
+        type: 'uint256',
+      },
+    ],
+    name: 'PeriodModified',
+    type: 'event',
+  },
+  {
     inputs: [],
     name: 'owner',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
