@@ -21,6 +21,13 @@ contract SLORegistry {
         uint256 sloValue;
         SLOType sloType;
     }
+    /**
+     * @dev SLO Registered event
+     * @param sla 1. -
+     * @param sloValue 2. -
+     * @param sloType 3. -
+     */
+    event SLORegistered(address indexed sla, uint256 sloValue, SLOType sloType);
 
     address private slaRegistry;
     mapping(address => SLO) public registeredSLO;
@@ -57,6 +64,7 @@ contract SLORegistry {
             sloValue: _sloValue,
             sloType: _sloType
         });
+        emit SLORegistered(_slaAddress, _sloValue, _sloType);
     }
 
     /**
