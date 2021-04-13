@@ -44,12 +44,14 @@ module.exports = async (callback) => {
     const slaNetworkBytes32 = SENetworkNamesBytes32[0];
     const slaNetwork = SENetworkNames[0];
     const initialPeriodId = 0;
-    const finalPeriodId = 4;
+    const finalPeriodId = 0;
     const dslaDepositByPeriod = 20000;
-    const dslaDeposit = toWei(String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1)));
+    const whitelisted = false;
+    const leverage = 10;
 
     const stakeRegistry = await StakeRegistry.deployed();
     const bdslaToken = await bDSLA.deployed();
+    const dslaDeposit = toWei(String(dslaDepositByPeriod * (finalPeriodId - initialPeriodId + 1)));
     await bdslaToken.approve(stakeRegistry.address, dslaDeposit);
 
     console.log('Starting process 2: Deploy SLA');
@@ -65,8 +67,6 @@ module.exports = async (callback) => {
     const ipfsHash = await getIPFSHash(serviceMetadata);
     const seMessenger = await SEMessenger.deployed();
     const slaRegistry = await SLARegistry.deployed();
-    const whitelisted = false;
-    const leverage = 10;
     await slaRegistry.createSLA(
       sloValue,
       sloType,
