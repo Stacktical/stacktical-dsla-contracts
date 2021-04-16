@@ -38,7 +38,7 @@ module.exports = async (callback) => {
     const initialTokenSupply = '10000000';
     const stakeAmount = initialTokenSupply / 100;
     const stakeAmountTimesWei = (times) => toWei(String(stakeAmount * times));
-    const sloValue = 100 * 10 ** 3;
+    const sloValue = 50 * 10 ** 3;
     const sloType = 4;
     const periodType = 2;
     const slaNetworkBytes32 = SENetworkNamesBytes32[0];
@@ -47,7 +47,7 @@ module.exports = async (callback) => {
     const finalPeriodId = 0;
     const dslaDepositByPeriod = 20000;
     const whitelisted = false;
-    const leverage = 10;
+    const leverage = 50;
 
     const stakeRegistry = await StakeRegistry.deployed();
     const bdslaToken = await bDSLA.deployed();
@@ -92,10 +92,12 @@ module.exports = async (callback) => {
 
     console.log('Starting process 3: Stake on owner and notOwner pools');
 
-    const ownerStake = stakeAmountTimesWei(30);
+    const ownerStake = stakeAmountTimesWei(100);
     console.log(`Starting process 3.1: owner: ${fromWei(ownerStake)} bDSLA`);
     await bdslaToken.approve(sla.address, ownerStake);
-    await sla.stakeTokens(ownerStake, bdslaToken.address);
+    // await sla.stakeTokens(ownerStake, bdslaToken.address);
+    const gas = await sla.stakeTokens.estimateGas(ownerStake, bdslaToken.address);
+    console.log(gas);
 
     // await sla.addUsersToWhitelist([notOwner]);
     const notOwnerStake = stakeAmountTimesWei(2);

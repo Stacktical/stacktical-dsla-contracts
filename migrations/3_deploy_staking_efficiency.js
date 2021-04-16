@@ -3,7 +3,7 @@ require('babel-register');
 
 const { toWei } = require('web3-utils');
 const { getChainlinkJobId } = require('../utils');
-const { getEnvFromNetwork, networkNames } = require('../environments');
+const { getEnvFromNetwork } = require('../environments');
 
 const PeriodRegistry = artifacts.require('PeriodRegistry');
 const PreCoordinator = artifacts.require('PreCoordinator');
@@ -27,9 +27,9 @@ module.exports = (deployer, network) => {
     );
 
     const minResponses = 1;
-    const preCoordinatorConfiguration = network === networkNames.DEVELOP
+    const preCoordinatorConfiguration = envParameters.localChainlinkNode !== null
       ? {
-        oracles: [envParameters.chainlinkOracleAddress],
+        oracles: [envParameters.localChainlinkNode.chainlinkOracleAddress],
         jobIds: [await getChainlinkJobId()],
         payments: [toWei('0.1')],
       }
