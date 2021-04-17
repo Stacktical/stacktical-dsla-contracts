@@ -19,22 +19,14 @@ module.exports = {
   networks: {
     [networkNames.DEVELOP]: {
       provider() {
-        return new HDWalletProvider(
-          test_mnemonic,
-          'http://localhost:8545',
-          0,
-          10,
-        );
+        return new HDWalletProvider(test_mnemonic, 'http://localhost:8545', 0, 10);
       },
       network_id: '1337',
       gas: 12000000,
     },
     [networkNames.MAINNET]: {
       provider() {
-        return new HDWalletProvider(
-          mnemonic,
-          `https://mainnet.infura.io/v3/${infura_project_id}`,
-        );
+        return new HDWalletProvider(mnemonic, `https://mainnet.infura.io/v3/${infura_project_id}`);
       },
       network_id: '1',
       networkCheckTimeout: '99999',
@@ -67,13 +59,18 @@ module.exports = {
         //   { shardID: 0, chainId: 2 },
         //   { gasLimit: 12000000, gasPrice: 1000000000 },
         // );
-        const truffleProvider = new TruffleProvider('https://api.s0.b.hmny.io', harmony_testnet_mnemonic);
+        const truffleProvider = new TruffleProvider(
+          'https://api.s0.b.hmny.io',
+          harmony_testnet_mnemonic,
+        );
         const newAcc = truffleProvider.addByPrivateKey(harmony_testnet_private_key_1);
         truffleProvider.addByPrivateKey(harmony_testnet_private_key_2);
         truffleProvider.setSigner(newAcc);
         return truffleProvider;
       },
       skipDryRun: true,
+      gas: 12000000,
+      gasPrice: 1000000000,
     },
   },
 

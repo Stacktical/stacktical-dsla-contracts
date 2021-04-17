@@ -37,10 +37,7 @@ const contractCreator = (contract) => {
 // of the value. e.g. {0:'hola','message':hola}
 const filterEventValues = (values) => {
   const valuesCount = Object.keys(values).length;
-  const splicedEntries = Object.entries(values).slice(
-    valuesCount / 2,
-    valuesCount,
-  );
+  const splicedEntries = Object.entries(values).slice(valuesCount / 2, valuesCount);
   return splicedEntries.reduce((r, [k, v]) => Object.assign(r, { [k]: v }), {});
 };
 
