@@ -167,7 +167,7 @@ describe('SLA', () => {
   });
 
   // it('should return getDetails correctly', async () => {
-  //   const slaDetails = await sla.getDetails();
+  //   const slaDetails = await..& sla.getDetails();
   //   console.log(slaDetails);
   // });
 

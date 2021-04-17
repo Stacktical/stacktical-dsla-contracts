@@ -95,9 +95,7 @@ module.exports = async (callback) => {
     const ownerStake = stakeAmountTimesWei(100);
     console.log(`Starting process 3.1: owner: ${fromWei(ownerStake)} bDSLA`);
     await bdslaToken.approve(sla.address, ownerStake);
-    // await sla.stakeTokens(ownerStake, bdslaToken.address);
-    const gas = await sla.stakeTokens.estimateGas(ownerStake, bdslaToken.address);
-    console.log(gas);
+    await sla.stakeTokens(ownerStake, bdslaToken.address);
 
     // await sla.addUsersToWhitelist([notOwner]);
     const notOwnerStake = stakeAmountTimesWei(2);
