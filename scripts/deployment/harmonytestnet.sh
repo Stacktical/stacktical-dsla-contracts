@@ -9,5 +9,5 @@ truffle deploy --reset --network harmonytestnet
 truffle exec --network harmonytestnet scripts/bootstrap/testnet.js
 truffle exec --network harmonytestnet scripts/chores/mint-tokens.js
 truffle exec --network harmonytestnet scripts/chores/deploy-sla.js
-truffle exec --network harmonytestnet scripts/chores/request-analytics.js
-truffle exec --network harmonytestnet scripts/chores/request-sli.js
+#truffle exec --network harmonytestnet scripts/chores/request-analytics.js
+#truffle exec --network harmonytestnet scripts/chores/request-sli.js
