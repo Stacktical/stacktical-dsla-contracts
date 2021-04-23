@@ -20,14 +20,14 @@ export const sloTypesNames = {
 
 // SEMessenger configuration
 export const SENetworks = {
-  ONE: { validators: ['P-OPS', 'Chainode', 'Everstake'] },
-  DOT: { validators: ['Everstake', 'Figment', 'stakefish'] },
-  ATOM: { validators: ['Everstake', 'Figment', 'stakefish'] },
-  BAND: { validators: ['Chainode'] },
-  eGLD: { },
-  XTZ: { },
-  AVAX: { },
-  ROSE: { },
+  ONE: 'ONE',
+  DOT: 'DOT',
+  ATOM: 'ATOM',
+  BAND: 'BAND',
+  eGLD: 'eGLD',
+  XTZ: 'XTZ',
+  AVAX: 'AVAX',
+  ROSE: 'ROSE',
 };
 
 export const SENetworkNames = Object.keys(SENetworks);

@@ -19,18 +19,18 @@ module.exports = async (callback) => {
     await networkAnalytics.requestAnalytics(0, periodType, slaNetworkBytes32, ownerApproval);
     await eventListener(networkAnalytics, 'AnalyticsReceived');
 
-    console.log('Starting automated job 2: Request Analytics for period 1');
-    await networkAnalytics.requestAnalytics(1, periodType, slaNetworkBytes32, ownerApproval);
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
-
-    console.log('Starting automated job 3: Request Analytics for period 2');
-    await networkAnalytics.requestAnalytics(2, periodType, slaNetworkBytes32, ownerApproval);
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
-
-    console.log('Starting automated job 4: Request Analytics for period 3');
-    await networkAnalytics.requestAnalytics(3, periodType, slaNetworkBytes32, ownerApproval);
-    await eventListener(networkAnalytics, 'AnalyticsReceived');
-    console.log('Analytics request process finished');
+    // console.log('Starting automated job 2: Request Analytics for period 1');
+    // await networkAnalytics.requestAnalytics(1, periodType, slaNetworkBytes32, ownerApproval);
+    // await eventListener(networkAnalytics, 'AnalyticsReceived');
+    //
+    // console.log('Starting automated job 3: Request Analytics for period 2');
+    // await networkAnalytics.requestAnalytics(2, periodType, slaNetworkBytes32, ownerApproval);
+    // await eventListener(networkAnalytics, 'AnalyticsReceived');
+    //
+    // console.log('Starting automated job 4: Request Analytics for period 3');
+    // await networkAnalytics.requestAnalytics(3, periodType, slaNetworkBytes32, ownerApproval);
+    // await eventListener(networkAnalytics, 'AnalyticsReceived');
+    // console.log('Analytics request process finished');
 
     callback(null);
   } catch (error) {

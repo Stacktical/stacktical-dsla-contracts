@@ -1,7 +1,7 @@
 const { Account, Wallet } = require('@harmony-js/account');
 const { Messenger, HttpProvider } = require('@harmony-js/network');
 const { ChainType, ChainID } = require('@harmony-js/utils');
-const { SENetworkNamesBytes32, SENetworkNames, SENetworks } = require('../../constants');
+const { SENetworkNamesBytes32, SENetworkNames } = require('../../constants');
 const { networkNames } = require('../../environments');
 const { getIPFSHash } = require('../../utils');
 
@@ -42,7 +42,6 @@ module.exports = async (callback) => {
     const sloType = 4;
     const periodType = 2;
     const slaNetworkBytes32 = SENetworkNamesBytes32[0];
-    const slaNetwork = SENetworkNames[0];
     const initialPeriodId = 0;
     const finalPeriodId = 0;
     const dslaDepositByPeriod = 20000;
@@ -56,13 +55,13 @@ module.exports = async (callback) => {
 
     console.log('Starting process 2: Deploy SLA');
     const serviceMetadata = {
-      serviceName: SENetworks[slaNetwork].validators[0],
+      serviceName: 'P-OPS',
       serviceDescription: 'Official bDSLA Beta Partner.',
       serviceImage:
         'https://storage.googleapis.com/bdsla-incentivized-beta/validators/chainode.svg',
       serviceURL: 'https://bdslaToken.network',
-      serviceAddress: 'one18hum2avunkz3u448lftwmk7wr88qswdlfvvrdm',
-      serviceTicker: slaNetwork,
+      serviceAddress: 'one1kf42rl6yg2avkjsu34ch2jn8yjs64ycn4n9wdj',
+      serviceTicker: 'ONE',
     };
     const ipfsHash = await getIPFSHash(serviceMetadata);
     const seMessenger = await SEMessenger.deployed();

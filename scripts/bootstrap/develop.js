@@ -18,7 +18,7 @@ const DAI = artifacts.require('DAI');
 const USDC = artifacts.require('USDC');
 
 const periodType = 2;
-const [periodStarts, periodEnds] = generateWeeklyPeriods(52, 7);
+const [periodStarts, periodEnds] = generateWeeklyPeriods(52, 4);
 const seMessengerSpec = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, '../../semessenger.develop.spec.json')),
 );
