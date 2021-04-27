@@ -54,3 +54,17 @@ Truffle `5.1.64`
 
 ### Documentation
 NATSpec userdoc and devdoc JSON files are included in natspec-docs directory. Use it to check the inputs of the functions, or events parameters.
+
+### Audits
+
+ * Certik [Report](https://www.certik.org/projects/stacktical)
+ * Chainsulting [Report]()
+ * @lucash-dev [Report](https://storage.googleapis.com/stacktical-public/audits/audit1v2.pdf)
+
+#### Caveats
+
+* [Staking.sol](./contracts/Staking.sol)
+
+As Staking.sol contract is going to call contracts defined by Stacktical we consider the implementation of Reentrancy Guard as unnecessary, since we fully control the external calls.
+Those external calls correspond to ERC-20 contracts with is a fully reviewed and battle tested standard.
+In future versions, when the token selection will be opened, we can implement a full Reentrancy Guard protection.
