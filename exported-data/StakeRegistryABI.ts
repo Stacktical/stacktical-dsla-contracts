@@ -14,6 +14,47 @@ export const StakeRegistryABI: AbiItem[] = [
       {
         indexed: true,
         internalType: 'address',
+        name: 'dTokenAddress',
+        type: 'address',
+      },
+      { indexed: true, internalType: 'address', name: 'sla', type: 'address' },
+      { indexed: false, internalType: 'string', name: 'name', type: 'string' },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'symbol',
+        type: 'string',
+      },
+    ],
+    name: 'DTokenCreated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'sla', type: 'address' },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'LockedValueReturned',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
         name: 'previousOwner',
         type: 'address',
       },
@@ -72,8 +113,34 @@ export const StakeRegistryABI: AbiItem[] = [
         name: 'maxTokenLength',
         type: 'uint256',
       },
+      {
+        indexed: false,
+        internalType: 'uint64',
+        name: 'maxLeverage',
+        type: 'uint64',
+      },
     ],
     name: 'StakingParametersModified',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'sla', type: 'address' },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'ValueLocked',
     type: 'event',
   },
   {
@@ -313,6 +380,7 @@ export const StakeRegistryABI: AbiItem[] = [
         type: 'uint256',
       },
       { internalType: 'uint256', name: 'maxTokenLength', type: 'uint256' },
+      { internalType: 'uint64', name: 'maxLeverage', type: 'uint64' },
     ],
     name: 'setStakingParameters',
     outputs: [],
@@ -334,6 +402,7 @@ export const StakeRegistryABI: AbiItem[] = [
         type: 'uint256',
       },
       { internalType: 'uint256', name: 'maxTokenLength', type: 'uint256' },
+      { internalType: 'uint64', name: 'maxLeverage', type: 'uint64' },
     ],
     stateMutability: 'view',
     type: 'function',

@@ -23,6 +23,7 @@ export const SLARegistryABI: AbiItem[] = [
         name: '_stakeRegistry',
         type: 'address',
       },
+      { internalType: 'bool', name: '_checkPastPeriod', type: 'bool' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -30,20 +31,15 @@ export const SLARegistryABI: AbiItem[] = [
   {
     anonymous: false,
     inputs: [
+      { indexed: true, internalType: 'address', name: 'sla', type: 'address' },
       {
         indexed: true,
         internalType: 'address',
-        name: 'previousOwner',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'newOwner',
+        name: 'caller',
         type: 'address',
       },
     ],
-    name: 'OwnershipTransferred',
+    name: 'ReturnLockedValue',
     type: 'event',
   },
   {
@@ -66,9 +62,37 @@ export const SLARegistryABI: AbiItem[] = [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'periodId',
+        type: 'uint256',
+      },
+      { indexed: true, internalType: 'address', name: 'sla', type: 'address' },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'caller',
+        type: 'address',
+      },
+    ],
+    name: 'SLIRequested',
+    type: 'event',
+  },
+  {
     inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     name: 'SLAs',
     outputs: [{ internalType: 'contract SLA', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [],
+    name: 'checkPastPeriod',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
     constant: true,
@@ -85,14 +109,6 @@ export const SLARegistryABI: AbiItem[] = [
   },
   {
     inputs: [],
-    name: 'owner',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
-    inputs: [],
     name: 'periodRegistry',
     outputs: [
       { internalType: 'contract PeriodRegistry', name: '', type: 'address' },
@@ -100,13 +116,6 @@ export const SLARegistryABI: AbiItem[] = [
     stateMutability: 'view',
     type: 'function',
     constant: true,
-  },
-  {
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
   },
   {
     inputs: [],
@@ -129,13 +138,6 @@ export const SLARegistryABI: AbiItem[] = [
     constant: true,
   },
   {
-    inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     inputs: [
       { internalType: 'uint256', name: '_sloValue', type: 'uint256' },
       {
@@ -154,6 +156,7 @@ export const SLARegistryABI: AbiItem[] = [
       { internalType: 'uint128', name: '_finalPeriodId', type: 'uint128' },
       { internalType: 'string', name: '_ipfsHash', type: 'string' },
       { internalType: 'bytes32[]', name: '_extraData', type: 'bytes32[]' },
+      { internalType: 'uint64', name: '_leverage', type: 'uint64' },
     ],
     name: 'createSLA',
     outputs: [],
@@ -197,25 +200,9 @@ export const SLARegistryABI: AbiItem[] = [
     constant: true,
   },
   {
-    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
-    name: 'userSLACount',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
     inputs: [],
     name: 'allSLAs',
     outputs: [{ internalType: 'contract SLA[]', name: '', type: 'address[]' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
-    inputs: [],
-    name: 'SLACount',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
     constant: true,

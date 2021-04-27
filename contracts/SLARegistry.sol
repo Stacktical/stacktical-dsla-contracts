@@ -3,7 +3,6 @@ pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./SLA.sol";
 import "./SLORegistry.sol";
 import "./PeriodRegistry.sol";
@@ -16,7 +15,7 @@ import "./messenger/IMessenger.sol";
  * @dev SLARegistry is a contract for handling creation of service level
  * agreements and keeping track of the created agreements
  */
-contract SLARegistry is Ownable {
+contract SLARegistry {
     using SafeMath for uint256;
 
     /// @dev SLO registry
@@ -33,6 +32,8 @@ contract SLARegistry is Ownable {
     mapping(address => uint256[]) private userToSLAIndexes;
     /// @dev to check if registered SLA
     mapping(address => bool) private registeredSLAs;
+    // value to lock past periods on SLA deployment
+    bool public immutable checkPastPeriod;
 
     /**
      * @dev event for service level agreement creation logging
@@ -42,17 +43,38 @@ contract SLARegistry is Ownable {
     event SLACreated(SLA indexed sla, address indexed owner);
 
     /**
+     * @dev event for service level agreement creation logging
+     * @param periodId 1. -
+     * @param sla 2. -
+     * @param caller 3. -
+     */
+    event SLIRequested(
+        uint256 periodId,
+        address indexed sla,
+        address indexed caller
+    );
+
+    /**
+     * @dev event for service level agreement creation logging
+     * @param sla 1. -
+     * @param caller 2. -
+     */
+    event ReturnLockedValue(address indexed sla, address indexed caller);
+
+    /**
      * @dev constructor
      * @param _sloRegistry 1. SLO Registry
      * @param _periodRegistry 2. Periods registry
      * @param _messengerRegistry 3. Messenger registry
      * @param _stakeRegistry 4. Stake registry
+     * @param _checkPastPeriod 5. -
      */
     constructor(
         SLORegistry _sloRegistry,
         PeriodRegistry _periodRegistry,
         MessengerRegistry _messengerRegistry,
-        StakeRegistry _stakeRegistry
+        StakeRegistry _stakeRegistry,
+        bool _checkPastPeriod
     ) public {
         sloRegistry = _sloRegistry;
         sloRegistry.setSLARegistry();
@@ -61,6 +83,7 @@ contract SLARegistry is Ownable {
         stakeRegistry.setSLARegistry();
         messengerRegistry = _messengerRegistry;
         messengerRegistry.setSLARegistry();
+        checkPastPeriod = _checkPastPeriod;
     }
 
     /**
@@ -74,6 +97,7 @@ contract SLARegistry is Ownable {
      * @param _messengerAddress 7. -
      * @param _whitelisted 8. -
      * @param _extraData 9. -
+     * @param _leverage 10. -
      */
     function createSLA(
         uint256 _sloValue,
@@ -84,7 +108,8 @@ contract SLARegistry is Ownable {
         uint128 _initialPeriodId,
         uint128 _finalPeriodId,
         string memory _ipfsHash,
-        bytes32[] memory _extraData
+        bytes32[] memory _extraData,
+        uint64 _leverage
     ) public {
         bool validPeriod =
             periodRegistry.isValidPeriod(_periodType, _initialPeriodId);
@@ -96,22 +121,21 @@ contract SLARegistry is Ownable {
         require(initializedPeriod, "Period type not initialized yet");
         require(
             _finalPeriodId >= _initialPeriodId,
-            "finalPeriodId should be greater than or equal to initialPeriodId"
+            "invalid finalPeriodId and initialPeriodId"
         );
-        bool periodHasStarted =
-            periodRegistry.periodHasStarted(_periodType, _initialPeriodId);
-        require(!periodHasStarted, "Period has started");
+
+        if (checkPastPeriod) {
+            bool periodHasStarted =
+                periodRegistry.periodHasStarted(_periodType, _initialPeriodId);
+            require(!periodHasStarted, "Period has started");
+        }
         bool registeredMessenger =
             messengerRegistry.registeredMessengers(_messengerAddress);
-        require(
-            registeredMessenger == true,
-            "messenger address is not registered"
-        );
+        require(registeredMessenger == true, "messenger not registered");
 
         SLA sla =
             new SLA(
                 msg.sender,
-                address(sloRegistry),
                 _whitelisted,
                 _periodType,
                 _messengerAddress,
@@ -119,7 +143,8 @@ contract SLARegistry is Ownable {
                 _finalPeriodId,
                 uint128(SLAs.length),
                 _ipfsHash,
-                _extraData
+                _extraData,
+                _leverage
             );
 
         sloRegistry.registerSLO(_sloValue, _sloType, address(sla));
@@ -146,31 +171,20 @@ contract SLARegistry is Ownable {
         SLA _sla,
         bool _ownerApproval
     ) public {
-        require(isRegisteredSLA(address(_sla)), "SLA contract should be valid");
-        require(
-            _periodId == _sla.nextVerifiablePeriod(),
-            "Should only verify next period"
-        );
+        require(isRegisteredSLA(address(_sla)), "invalid SLA");
+        require(_periodId == _sla.nextVerifiablePeriod(), "invalid periodId");
         (, , SLA.Status status) = _sla.periodSLIs(_periodId);
-        require(
-            status == SLA.Status.NotVerified,
-            "SLA contract was already verified for the period"
-        );
+        require(status == SLA.Status.NotVerified, "invalid SLA status");
         bool breachedContract = _sla.breachedContract();
-        require(
-            !breachedContract,
-            "Should only be called for not breached contracts"
-        );
+        require(!breachedContract, "breached contract");
         bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
-        require(
-            slaAllowedPeriodId,
-            "Period ID not registered in the SLA contract"
-        );
+        require(slaAllowedPeriodId, "invalid period Id");
         PeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
         bool periodFinished =
             periodRegistry.periodIsFinished(slaPeriodType, _periodId);
-        require(periodFinished, "SLA contract period has not finished yet");
+        require(periodFinished, "period not finished");
         address slaMessenger = _sla.messengerAddress();
+        SLIRequested(_periodId, address(_sla), msg.sender);
         IMessenger(slaMessenger).requestSLI(
             _periodId,
             address(_sla),
@@ -185,11 +199,8 @@ contract SLARegistry is Ownable {
     }
 
     function returnLockedValue(SLA _sla) public {
-        require(isRegisteredSLA(address(_sla)), "SLA contract should be valid");
-        require(
-            msg.sender == _sla.owner(),
-            "Only SLA owner can claim locked value"
-        );
+        require(isRegisteredSLA(address(_sla)), "invalid SLA");
+        require(msg.sender == _sla.owner(), "msg.sender not owner");
         uint256 lastValidPeriodId = _sla.finalPeriodId();
         PeriodRegistry.PeriodType periodType = _sla.periodType();
         (, uint256 endOfLastValidPeriod) =
@@ -200,8 +211,9 @@ contract SLARegistry is Ownable {
             _sla.breachedContract() ||
                 (block.timestamp >= endOfLastValidPeriod &&
                     lastPeriodStatus != SLA.Status.NotVerified),
-            "Can only withdraw locked DSLA after the final period is verified or if the contract is breached"
+            "Should only withdraw for finished contracts"
         );
+        ReturnLockedValue(address(_sla), msg.sender);
         stakeRegistry.returnLockedValue(address(_sla));
     }
 
@@ -230,7 +242,7 @@ contract SLARegistry is Ownable {
      * @return array of SLAs
      */
     function userSLAs(address _user) public view returns (SLA[] memory) {
-        uint256 count = userSLACount(_user);
+        uint256 count = userToSLAIndexes[_user].length;
         SLA[] memory SLAList = new SLA[](count);
         uint256[] memory userSLAIndexes = userToSLAIndexes[_user];
 
@@ -242,31 +254,11 @@ contract SLARegistry is Ownable {
     }
 
     /**
-     * @dev public view function that returns the amount of service level
-     * agreements the given user is the owner of
-     * @param _user 1. address of the user for which to return the amount of
-     * service level agreements
-     * @return uint256 corresponding to the amount of user's SLAs
-     */
-    function userSLACount(address _user) public view returns (uint256) {
-        return userToSLAIndexes[_user].length;
-    }
-
-    /**
      * @dev public view function that returns all the service level agreements
      * @return SLA[] array of SLAs
      */
     function allSLAs() public view returns (SLA[] memory) {
         return (SLAs);
-    }
-
-    /**
-     * @dev public view function that returns the total amount of service
-     * level agreements
-     * @return uint256, the length of SLA array
-     */
-    function SLACount() public view returns (uint256) {
-        return SLAs.length;
     }
 
     /**

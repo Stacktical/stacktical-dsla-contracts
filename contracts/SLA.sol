@@ -21,45 +21,30 @@ contract SLA is Staking {
 
     enum Status {NotVerified, Respected, NotRespected}
 
-    /// @dev Struct used for storing period status
     struct PeriodSLI {
         uint256 timestamp;
         uint256 sli;
         Status status;
     }
 
-    /// @dev The ipfs hash that stores extra information about the agreement
+    //
     string public ipfsHash;
-
-    /// @dev uint8 of the period type
-    PeriodRegistry.PeriodType public periodType;
-
-    PeriodRegistry private periodRegistry;
-    SLORegistry private sloRegistry;
-
-    uint128 public initialPeriodId;
-    uint128 public finalPeriodId;
-
-    /// @dev The address of the slaRegistry contract
+    address public immutable messengerAddress;
     SLARegistry public slaRegistry;
-
-    /// @dev The address of the messenger
-    address public messengerAddress;
-
-    /// @dev states if the contract was breached or not
-    bool private _breachedContract = false;
-
-    /// @dev periodId=>PeriodSLI mapping
-    mapping(uint256 => PeriodSLI) public periodSLIs;
-
-    /// @dev block number of SLA deployment
-    uint256 public creationBlockNumber;
-
+    PeriodRegistry private immutable periodRegistry;
+    SLORegistry private immutable sloRegistry;
+    uint256 public immutable creationBlockNumber;
+    uint128 public immutable initialPeriodId;
+    uint128 public immutable finalPeriodId;
+    PeriodRegistry.PeriodType public immutable periodType;
     /// @dev extra data for customized workflows
     bytes32[] public extraData;
 
-    /// @dev states if the contract was breached or not
+    bool private _breachedContract = false;
     uint256 public nextVerifiablePeriod;
+
+    /// @dev periodId=>PeriodSLI mapping
+    mapping(uint256 => PeriodSLI) public periodSLIs;
 
     /**
      * @dev event for SLI creation logging
@@ -70,11 +55,44 @@ contract SLA is Staking {
     event SLICreated(uint256 timestamp, uint256 sli, uint256 periodId);
 
     /**
-     * @dev event for SLI creation logging
-     * @param _periodId 1. the id of the given period
-     * @param _sli 2. value of the SLI
+     * @dev event for Stake loging
+     * @param tokenAddress 1. -
+     * @param periodId 2. -
+     * @param amount 3. -
+     * @param caller 4. -
      */
-    event SLANotRespected(uint256 _periodId, uint256 _sli);
+    event Stake(
+        address indexed tokenAddress,
+        uint256 indexed periodId,
+        address indexed caller,
+        uint256 amount
+    );
+    /**
+     * @dev event for Stake loging
+     * @param tokenAddress 1. -
+     * @param periodId 2. -
+     * @param amount 3. -
+     * @param caller 4. -
+     */
+    event ProviderWithdraw(
+        address indexed tokenAddress,
+        uint256 indexed periodId,
+        address indexed caller,
+        uint256 amount
+    );
+    /**
+     * @dev event for Stake loging
+     * @param tokenAddress 1. -
+     * @param periodId 2. -
+     * @param amount 3. -
+     * @param caller 4. -
+     */
+    event UserWithdraw(
+        address indexed tokenAddress,
+        uint256 indexed periodId,
+        address indexed caller,
+        uint256 amount
+    );
 
     /**
      * @dev throws if called by any address other than the messenger contract.
@@ -108,7 +126,6 @@ contract SLA is Staking {
 
     /**
      * @param _owner 1. -
-     * @param _sloRegistryAddress 2. -
      * @param _ipfsHash 3. -
      * @param _messengerAddress 3. -
      * @param _initialPeriodId 4. -
@@ -120,7 +137,6 @@ contract SLA is Staking {
      */
     constructor(
         address _owner,
-        address _sloRegistryAddress,
         bool _whitelisted,
         PeriodRegistry.PeriodType _periodType,
         address _messengerAddress,
@@ -128,23 +144,31 @@ contract SLA is Staking {
         uint128 _finalPeriodId,
         uint128 _slaID,
         string memory _ipfsHash,
-        bytes32[] memory _extraData
+        bytes32[] memory _extraData,
+        uint64 _leverage
     )
         public
-        Staking(SLARegistry(msg.sender), _periodType, _whitelisted, _slaID)
+        Staking(
+            SLARegistry(msg.sender),
+            _periodType,
+            _whitelisted,
+            _slaID,
+            _leverage,
+            _owner
+        )
     {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;
         messengerAddress = _messengerAddress;
         slaRegistry = SLARegistry(msg.sender);
         periodRegistry = slaRegistry.periodRegistry();
+        sloRegistry = slaRegistry.sloRegistry();
         creationBlockNumber = block.number;
         initialPeriodId = _initialPeriodId;
         finalPeriodId = _finalPeriodId;
         periodType = _periodType;
         extraData = _extraData;
         nextVerifiablePeriod = _initialPeriodId;
-        sloRegistry = SLORegistry(_sloRegistryAddress);
     }
 
     /**
@@ -177,13 +201,12 @@ contract SLA is Staking {
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
             periodSLI.status = Status.NotRespected;
-            _setUsersCompensation();
+            _setUsersCompensation(_periodId);
             _breachedContract = true;
-            emit SLANotRespected(_periodId, _sli);
         }
     }
 
-    function isAllowedPeriod(uint256 _periodId) public view returns (bool) {
+    function isAllowedPeriod(uint256 _periodId) external view returns (bool) {
         if (_periodId < initialPeriodId) return false;
         if (_periodId > finalPeriodId) return false;
         return true;
@@ -205,7 +228,7 @@ contract SLA is Staking {
      */
 
     function stakeTokens(uint256 _amount, address _token)
-        public
+        external
         notZero(_amount)
     {
         bool isContractFinished = contractFinished();
@@ -214,15 +237,22 @@ contract SLA is Staking {
             "Can only stake on not finished contracts"
         );
         _stake(_amount, _token);
+        emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount);
         StakeRegistry stakeRegistry = slaRegistry.stakeRegistry();
         stakeRegistry.registerStakedSla(msg.sender);
     }
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
-        public
+        external
         notZero(_amount)
     {
         bool isContractFinished = contractFinished();
+        emit ProviderWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
+        );
         _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
     }
 
@@ -233,21 +263,27 @@ contract SLA is Staking {
      */
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
-        public
+        external
         notZero(_amount)
     {
         if (msg.sender != owner()) {
             bool isContractFinished = contractFinished();
             require(isContractFinished, "Only for finished contract");
         }
+        emit UserWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
+        );
         _withdrawUserTokens(_amount, _tokenAddress);
     }
 
-    function getStakersLength() public view returns (uint256) {
+    function getStakersLength() external view returns (uint256) {
         return stakers.length;
     }
 
-    function breachedContract() public view returns (bool) {
+    function breachedContract() external view returns (bool) {
         return _breachedContract;
     }
 }

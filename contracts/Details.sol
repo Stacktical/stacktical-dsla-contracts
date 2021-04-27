@@ -46,13 +46,15 @@ contract Details {
         returns (
             bool breachedContract,
             uint256 stakersCount,
-            uint256 nextVerifiablePeriod
+            uint256 nextVerifiablePeriod,
+            uint64 leverage
         )
     {
         SLA sla = SLA(_slaAddress);
         breachedContract = sla.breachedContract();
         stakersCount = sla.getStakersLength();
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
+        leverage = sla.leverage();
     }
 
     function getSLAStaticDetails(address _slaAddress, SLORegistry _sloRegistry)
@@ -60,15 +62,15 @@ contract Details {
         view
         returns (
             address slaOwner,
-            bool whiteListed,
-            PeriodRegistry.PeriodType periodType,
-            SLORegistry.SLOType sloType,
             address messengerAddress,
             uint256 sloValue,
             uint256 creationBlockNumber,
             uint256 slaId,
             uint128 initialPeriodId,
             uint128 finalPeriodId,
+            bool whiteListed,
+            PeriodRegistry.PeriodType periodType,
+            SLORegistry.SLOType sloType,
             string memory ipfsHash
         )
     {

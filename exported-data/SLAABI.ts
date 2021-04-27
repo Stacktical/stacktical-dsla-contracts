@@ -4,7 +4,6 @@ export const SLAABI: AbiItem[] = [
   {
     inputs: [
       { internalType: 'address', name: '_owner', type: 'address' },
-      { internalType: 'address', name: '_sloRegistryAddress', type: 'address' },
       { internalType: 'bool', name: '_whitelisted', type: 'bool' },
       {
         internalType: 'enum PeriodRegistry.PeriodType',
@@ -17,9 +16,59 @@ export const SLAABI: AbiItem[] = [
       { internalType: 'uint128', name: '_slaID', type: 'uint128' },
       { internalType: 'string', name: '_ipfsHash', type: 'string' },
       { internalType: 'bytes32[]', name: '_extraData', type: 'bytes32[]' },
+      { internalType: 'uint64', name: '_leverage', type: 'uint64' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'dpTokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'dpTokenName',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'dpTokenSymbol',
+        type: 'string',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'duTokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'duTokenName',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'duTokenSymbol',
+        type: 'string',
+      },
+    ],
+    name: 'DTokensCreated',
+    type: 'event',
   },
   {
     anonymous: false,
@@ -81,19 +130,31 @@ export const SLAABI: AbiItem[] = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: true,
         internalType: 'uint256',
-        name: '_periodId',
+        name: 'periodId',
         type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'caller',
+        type: 'address',
       },
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_sli',
+        name: 'amount',
         type: 'uint256',
       },
     ],
-    name: 'SLANotRespected',
+    name: 'ProviderWithdraw',
     type: 'event',
   },
   {
@@ -117,6 +178,105 @@ export const SLAABI: AbiItem[] = [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'periodId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'caller',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'Stake',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'periodId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'usersStake',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'leverage',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'compensation',
+        type: 'uint256',
+      },
+    ],
+    name: 'UserCompensationGenerated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'tokenAddress',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'periodId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'caller',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'UserWithdraw',
+    type: 'event',
+  },
+  {
     inputs: [],
     name: 'DSLAburnRate',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
@@ -136,16 +296,7 @@ export const SLAABI: AbiItem[] = [
     inputs: [
       { internalType: 'address[]', name: '_userAddresses', type: 'address[]' },
     ],
-    name: 'addMultipleUsersToWhitelist',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '_userAddress', type: 'address' },
-    ],
-    name: 'addUserToWhitelist',
+    name: 'addUsersToWhitelist',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -256,6 +407,13 @@ export const SLAABI: AbiItem[] = [
   },
   {
     inputs: [],
+    name: 'leverage',
+    outputs: [{ internalType: 'uint64', name: '', type: 'uint64' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'messengerAddress',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
@@ -317,16 +475,7 @@ export const SLAABI: AbiItem[] = [
     inputs: [
       { internalType: 'address[]', name: '_userAddresses', type: 'address[]' },
     ],
-    name: 'removeMultipleUsersFromWhitelist',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '_userAddress', type: 'address' },
-    ],
-    name: 'removeUserFromWhitelist',
+    name: 'removeUsersFromWhitelist',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',

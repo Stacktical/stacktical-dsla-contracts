@@ -48,7 +48,7 @@ contract MessengerRegistry {
      * @dev sets the SLARegistry contract address and can only be called
      * once
      */
-    function setSLARegistry() public {
+    function setSLARegistry() external {
         // Only able to trigger this function once
         require(
             address(slaRegistry) == address(0),
@@ -64,8 +64,8 @@ contract MessengerRegistry {
     function registerMessenger(
         address _callerAddress,
         address _messengerAddress,
-        string memory _specificationUrl
-    ) public {
+        string calldata _specificationUrl
+    ) external {
         require(
             msg.sender == slaRegistry,
             "Should only be called using the SLARegistry contract"
@@ -113,9 +113,9 @@ contract MessengerRegistry {
      * @dev function to modifyMessenger a Messenger
      */
     function modifyMessenger(
-        string memory _specificationUrl,
+        string calldata _specificationUrl,
         uint256 _messengerId
-    ) public {
+    ) external {
         Messenger storage storedMessenger = messengers[_messengerId];
         IMessenger messenger = IMessenger(storedMessenger.messengerAddress);
         require(
@@ -133,7 +133,7 @@ contract MessengerRegistry {
         );
     }
 
-    function getMessengers() public view returns (Messenger[] memory) {
+    function getMessengers() external view returns (Messenger[] memory) {
         Messenger[] memory returnMessengers =
             new Messenger[](messengers.length);
         for (uint256 index = 0; index < messengers.length; index++) {
@@ -154,7 +154,7 @@ contract MessengerRegistry {
         return returnMessengers;
     }
 
-    function getMessengersLength() public view returns (uint256) {
+    function getMessengersLength() external view returns (uint256) {
         return messengers.length;
     }
 }

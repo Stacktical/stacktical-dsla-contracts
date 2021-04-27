@@ -5,6 +5,7 @@ import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../../StringUtils.sol";
 import "../../PeriodRegistry.sol";
 import "../../StakeRegistry.sol";
@@ -14,7 +15,7 @@ import "../../StakeRegistry.sol";
  * @dev contract to get the network analytics for the staking efficiency use case
  */
 
-contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
+contract NetworkAnalytics is Ownable, ChainlinkClient, ReentrancyGuard {
     using SafeERC20 for ERC20;
 
     struct AnalyticsRequest {
@@ -102,7 +103,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         oracle = _chainlinkOracle;
         periodRegistry = _periodRegistry;
         stakeRegistry = _stakeRegistry;
-        fee = _feeMultiplier * baseFee;
+        fee = _feeMultiplier.mul(baseFee);
     }
 
     function isValidNetwork(bytes32 _networkName) public view returns (bool) {
@@ -116,7 +117,11 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @dev function to add a valid network name
      * @param _networkName 1. bytes32 network name
      */
-    function addNetwork(bytes32 _networkName) public onlyOwner returns (bool) {
+    function addNetwork(bytes32 _networkName)
+        external
+        onlyOwner
+        returns (bool)
+    {
         require(
             isValidNetwork(_networkName) == false,
             "Network name already registered"
@@ -129,8 +134,8 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @dev function to add multiple valid network names
      * @param _networkNames 1. bytes32[] network names
      */
-    function addMultipleNetworks(bytes32[] memory _networkNames)
-        public
+    function addMultipleNetworks(bytes32[] calldata _networkNames)
+        external
         onlyOwner
         returns (bool)
     {
@@ -154,7 +159,7 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
         PeriodRegistry.PeriodType _periodType,
         bytes32 _networkName,
         bool _ownerApproval
-    ) public {
+    ) public nonReentrant {
         require(isValidNetwork(_networkName), "Invalid network name");
         bool periodIsFinished =
             periodRegistry.periodIsFinished(_periodType, _periodId);
@@ -189,11 +194,14 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
             periodRegistry.getPeriodStartAndEnd(_periodType, _periodId);
 
         request.add("job_type", "staking_efficiency_analytics");
-        request.add("network_name", _bytes32ToStr(_networkName));
-        request.add("period_id", _uintToStr(_periodId));
-        request.add("period_type", _uintToStr(uint256(uint8(_periodType))));
-        request.add("sla_monitoring_start", _uintToStr(start));
-        request.add("sla_monitoring_end", _uintToStr(end));
+        request.add("network_name", StringUtils.bytes32ToStr(_networkName));
+        request.add("period_id", StringUtils.uintToStr(_periodId));
+        request.add(
+            "period_type",
+            StringUtils.uintToStr(uint256(uint8(_periodType)))
+        );
+        request.add("sla_monitoring_start", StringUtils.uintToStr(start));
+        request.add("sla_monitoring_end", StringUtils.uintToStr(end));
 
         bytes32 requestId = sendChainlinkRequestTo(oracle, request, fee);
         requests.push(requestId);
@@ -212,8 +220,9 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @param _chainlinkResponse response object from Chainlink Oracles
      */
     function fulFillAnalytics(bytes32 _requestId, bytes32 _chainlinkResponse)
-        public
+        external
         recordChainlinkFulfillment(_requestId)
+        nonReentrant
     {
         AnalyticsRequest memory request =
             requestIdToAnalyticsRequest[_requestId];
@@ -236,15 +245,19 @@ contract NetworkAnalytics is Ownable, ChainlinkClient, StringUtils {
      * @param _feeMultiplier how many Chainlink nodes would be paid on the agreement id, to set the fee value
      */
     function setChainlinkJobID(bytes32 _jobId, uint256 _feeMultiplier)
-        public
+        external
         onlyOwner
     {
         jobId = _jobId;
-        fee = _feeMultiplier * baseFee;
+        fee = _feeMultiplier.mul(baseFee);
         emit JobIdModified(msg.sender, _jobId, fee);
     }
 
-    function getNetworkNames() public view returns (bytes32[] memory networks) {
+    function getNetworkNames()
+        external
+        view
+        returns (bytes32[] memory networks)
+    {
         networks = networkNames;
     }
 }

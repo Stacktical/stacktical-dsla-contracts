@@ -16,7 +16,7 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
  * @dev Staking efficiency Messenger
  */
 
-contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
+contract SEMessenger is ChainlinkClient, IMessenger, ReentrancyGuard {
     using SafeERC20 for ERC20;
 
     /// @dev Mapping that stores chainlink sli request information
@@ -26,17 +26,17 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /// @dev The address of the SLARegistry contract
     address private _slaRegistryAddress;
     /// @dev Network analytics contract address
-    address public networkAnalyticsAddress;
+    address public immutable networkAnalyticsAddress;
     /// @dev Chainlink oracle address
-    address private _oracle;
+    address private immutable _oracle;
     /// @dev chainlink jobId
     bytes32 private _jobId;
     // @dev fee for Chainlink querys. Currently 0.1 LINK
-    uint256 private _baseFee = 0.1 ether;
+    uint256 private constant _baseFee = 0.1 ether;
     /// @dev fee for Chainlink querys. Currently 0.1 LINK
     uint256 private _fee;
     /// @dev to multiply the SLI value and get better precision. Useful to deploy SLO correctly
-    uint256 private _messengerPrecision = 10**3;
+    uint256 private constant _messengerPrecision = 10**3;
 
     uint256 private _requestsCounter;
     uint256 private _fulfillsCounter;
@@ -71,6 +71,18 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * @param fee 3. -
      */
     event JobIdModified(address indexed owner, bytes32 jobId, uint256 fee);
+
+    /**
+     * @dev event emitted when modifying the jobId
+     * @param caller 1. -
+     * @param requestsCounter 2. -
+     * @param requestId 3. -
+     */
+    event SLIRequested(
+        address indexed caller,
+        uint256 requestsCounter,
+        bytes32 requestId
+    );
 
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
     modifier onlySLARegistry() {
@@ -107,7 +119,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         address _slaAddress,
         bool _messengerOwnerApproval,
         address _callerAddress
-    ) public override onlySLARegistry {
+    ) public override onlySLARegistry nonReentrant {
         SLA sla = SLA(_slaAddress);
         PeriodRegistry.PeriodType periodType = sla.periodType();
         // extraData[0] is the networkName for StakingEfficiency use case
@@ -142,11 +154,11 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
                 this.fulfillSLI.selector
             );
         request.add("job_type", "staking_efficiency");
-        request.add("period_id", _uintToStr(_periodId));
-        request.add("sla_address", _addressToString(_slaAddress));
+        request.add("period_id", StringUtils.uintToStr(_periodId));
+        request.add("sla_address", StringUtils.addressToString(_slaAddress));
         request.add(
             "network_analytics_address",
-            _addressToString(networkAnalyticsAddress)
+            StringUtils.addressToString(networkAnalyticsAddress)
         );
 
         // Sends the request with 0.1 LINK to the oracle contract
@@ -160,6 +172,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         });
 
         _requestsCounter += 1;
+        emit SLIRequested(_callerAddress, _requestsCounter, requestId);
     }
 
     /**
@@ -169,8 +182,9 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * @param _chainlinkResponseUint256 response object from Chainlink Oracles
      */
     function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponseUint256)
-        public
+        external
         override
+        nonReentrant
         recordChainlinkFulfillment(_requestId)
     {
         bytes32 _chainlinkResponse = bytes32(_chainlinkResponseUint256);
@@ -202,7 +216,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
         pure
         returns (uint256, uint256)
     {
-        bytes memory bytesSLIData = bytes(_bytes32ToStr(sliData));
+        bytes memory bytesSLIData = bytes(StringUtils.bytes32ToStr(sliData));
         uint256 sliDataLength = bytesSLIData.length;
         bytes memory bytesHits = new bytes(sliDataLength);
         bytes memory bytesMisses = new bytes(sliDataLength);
@@ -220,8 +234,8 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
                 }
             }
         }
-        uint256 hits = _bytesToUint(bytesHits);
-        uint256 misses = _bytesToUint(bytesMisses);
+        uint256 hits = StringUtils.bytesToUint(bytesHits);
+        uint256 misses = StringUtils.bytesToUint(bytesMisses);
         return (hits, misses);
     }
 
@@ -231,7 +245,7 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
      * @param _feeMultiplier how many Chainlink nodes would be paid on the agreement id, to set the fee value
      */
     function setChainlinkJobID(bytes32 _newJobId, uint256 _feeMultiplier)
-        public
+        external
         onlyOwner
     {
         _jobId = _newJobId;
@@ -242,49 +256,49 @@ contract SEMessenger is ChainlinkClient, IMessenger, StringUtils {
     /**
      * @dev returns the value of the sla registry address
      */
-    function slaRegistryAddress() public view override returns (address) {
+    function slaRegistryAddress() external view override returns (address) {
         return _slaRegistryAddress;
     }
 
     /**
      * @dev returns the value of the messenger precision
      */
-    function messengerPrecision() public view override returns (uint256) {
+    function messengerPrecision() external view override returns (uint256) {
         return _messengerPrecision;
     }
 
     /**
      * @dev returns the chainlink oracle contract address
      */
-    function oracle() public view override returns (address) {
+    function oracle() external view override returns (address) {
         return _oracle;
     }
 
     /**
      * @dev returns the chainlink job id
      */
-    function jobId() public view override returns (bytes32) {
+    function jobId() external view override returns (bytes32) {
         return _jobId;
     }
 
     /**
      * @dev returns the chainlink fee value on LINK tokens
      */
-    function fee() public view override returns (uint256) {
+    function fee() external view override returns (uint256) {
         return _fee;
     }
 
     /**
      * @dev returns the requestsCounter
      */
-    function requestsCounter() public view override returns (uint256) {
+    function requestsCounter() external view override returns (uint256) {
         return _requestsCounter;
     }
 
     /**
      * @dev returns the fulfillsCounter
      */
-    function fulfillsCounter() public view override returns (uint256) {
+    function fulfillsCounter() external view override returns (uint256) {
         return _fulfillsCounter;
     }
 }

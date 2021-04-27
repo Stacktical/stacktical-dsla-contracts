@@ -58,7 +58,7 @@ const files = {
   },
 };
 
-const base_path = '../exported-data';
+const base_path = '../../exported-data';
 const importAbiItem = "import { AbiItem } from 'web3-utils/types';\n\n";
 
 module.exports = async (callback) => {

@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./SLA.sol";
 import "./messenger/IMessenger.sol";
 import "./SLARegistry.sol";
@@ -17,7 +18,7 @@ import "./StringUtils.sol";
  * @dev StakeRegistry is a contract to register the staking activity of the platform, along
  with controlling certain admin privileged parameters
  */
-contract StakeRegistry is Ownable, StringUtils {
+contract StakeRegistry is Ownable, ReentrancyGuard {
     using SafeERC20 for ERC20;
     using SafeMath for uint256;
 
@@ -59,8 +60,10 @@ contract StakeRegistry is Ownable, StringUtils {
     uint256 private _dslaUserReward = 250 ether;
     /// @dev DSLA burned after every period verification
     uint256 private _dslaBurnedByVerification = 250 ether;
-    /// @dev DSLA burned after every period verification
+    /// @dev max token length for allowedTokens array of Staking contracts
     uint256 private _maxTokenLength = 1;
+    /// @dev max times of hedge leverage
+    uint64 private _maxLeverage = 100;
 
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
@@ -101,7 +104,47 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 dslaMessengerReward,
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification,
-        uint256 maxTokenLength
+        uint256 maxTokenLength,
+        uint64 maxLeverage
+    );
+
+    /**
+     * @dev event to log modifications on the staking parameters
+     *@param sla 1. -
+     *@param owner 2. -
+     *@param amount 3. -
+     */
+
+    event LockedValueReturned(
+        address indexed sla,
+        address indexed owner,
+        uint256 amount
+    );
+
+    /**
+     * @dev event to log modifications on the staking parameters
+     *@param dTokenAddress 1. -
+     *@param sla 2. -
+     *@param name 3. -
+     *@param symbol 4. -
+     */
+    event DTokenCreated(
+        address indexed dTokenAddress,
+        address indexed sla,
+        string name,
+        string symbol
+    );
+
+    /**
+     * @dev event to log modifications on the staking parameters
+     *@param sla 1. -
+     *@param owner 2. -
+     *@param amount 3. -
+     */
+    event ValueLocked(
+        address indexed sla,
+        address indexed owner,
+        uint256 amount
     );
 
     /**
@@ -133,7 +176,7 @@ contract StakeRegistry is Ownable, StringUtils {
      * @dev sets the SLARegistry contract address and can only be called
      * once
      */
-    function setSLARegistry() public {
+    function setSLARegistry() external {
         // Only able to trigger this function once
         require(
             address(slaRegistry) == address(0),
@@ -147,7 +190,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@dev add a token to ve allowed for staking
      *@param _tokenAddress 1. address of the new allowed token
      */
-    function addAllowedTokens(address _tokenAddress) public onlyOwner {
+    function addAllowedTokens(address _tokenAddress) external onlyOwner {
         require(!isAllowedToken(_tokenAddress), "token already added");
         allowedTokens.push(_tokenAddress);
     }
@@ -185,7 +228,7 @@ contract StakeRegistry is Ownable, StringUtils {
      *@dev register the sending SLA contract as staked by _owner
      *@param _owner 1. SLA contract to stake
      */
-    function registerStakedSla(address _owner) public returns (bool) {
+    function registerStakedSla(address _owner) external returns (bool) {
         require(
             slaRegistry.isRegisteredSLA(msg.sender),
             "Only for registered SLAs"
@@ -201,8 +244,8 @@ contract StakeRegistry is Ownable, StringUtils {
      *@param _name 1. token name
      *@param _symbol 2. token symbol
      */
-    function createDToken(string memory _name, string memory _symbol)
-        public
+    function createDToken(string calldata _name, string calldata _symbol)
+        external
         returns (address)
     {
         require(
@@ -212,6 +255,7 @@ contract StakeRegistry is Ownable, StringUtils {
         ERC20PresetMinterPauser dToken =
             new ERC20PresetMinterPauser(_name, _symbol);
         dToken.grantRole(dToken.MINTER_ROLE(), msg.sender);
+        emit DTokenCreated(address(dToken), msg.sender, _name, _symbol);
         return address(dToken);
     }
 
@@ -219,7 +263,7 @@ contract StakeRegistry is Ownable, StringUtils {
         address _slaOwner,
         address _sla,
         uint256 _periodIdsLength
-    ) public onlySLARegistry {
+    ) external onlySLARegistry nonReentrant {
         uint256 lockedValue = _dslaDepositByPeriod.mul(_periodIdsLength);
         ERC20(DSLATokenAddress).safeTransferFrom(
             _slaOwner,
@@ -235,13 +279,14 @@ contract StakeRegistry is Ownable, StringUtils {
             dslaUserReward: _dslaUserReward,
             dslaBurnedByVerification: _dslaBurnedByVerification
         });
+        emit ValueLocked(_sla, _slaOwner, lockedValue);
     }
 
     function distributeVerificationRewards(
         address _sla,
         address _verificationRewardReceiver,
         uint256 _periodId
-    ) public onlySLARegistry {
+    ) external onlySLARegistry nonReentrant {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         require(
             !_lockedValue.verifiedPeriods[_periodId],
@@ -274,7 +319,11 @@ contract StakeRegistry is Ownable, StringUtils {
         );
     }
 
-    function returnLockedValue(address _sla) public onlySLARegistry {
+    function returnLockedValue(address _sla)
+        external
+        onlySLARegistry
+        nonReentrant
+    {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         uint256 remainingBalance = _lockedValue.lockedValue;
         require(remainingBalance > 0, "locked value is empty");
@@ -283,6 +332,7 @@ contract StakeRegistry is Ownable, StringUtils {
             SLA(_sla).owner(),
             remainingBalance
         );
+        emit LockedValueReturned(_sla, SLA(_sla).owner(), remainingBalance);
     }
 
     function _burnDSLATokens(uint256 _amount) internal {
@@ -300,7 +350,7 @@ contract StakeRegistry is Ownable, StringUtils {
      * @return ActivePool[], array of structs: {SLAAddress,stake,assetName}
      */
     function getActivePool(address _slaOwner)
-        public
+        external
         view
         returns (ActivePool[] memory)
     {
@@ -360,8 +410,9 @@ contract StakeRegistry is Ownable, StringUtils {
         uint256 dslaMessengerReward,
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification,
-        uint256 maxTokenLength
-    ) public onlyOwner {
+        uint256 maxTokenLength,
+        uint64 maxLeverage
+    ) external onlyOwner {
         _DSLAburnRate = DSLAburnRate;
         _dslaDepositByPeriod = dslaDepositByPeriod;
         _dslaPlatformReward = dslaPlatformReward;
@@ -369,6 +420,7 @@ contract StakeRegistry is Ownable, StringUtils {
         _dslaUserReward = dslaUserReward;
         _dslaBurnedByVerification = dslaBurnedByVerification;
         _maxTokenLength = maxTokenLength;
+        _maxLeverage = maxLeverage;
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
@@ -384,12 +436,13 @@ contract StakeRegistry is Ownable, StringUtils {
             dslaMessengerReward,
             dslaUserReward,
             dslaBurnedByVerification,
-            maxTokenLength
+            maxTokenLength,
+            maxLeverage
         );
     }
 
     function getStakingParameters()
-        public
+        external
         view
         returns (
             uint256 DSLAburnRate,
@@ -398,7 +451,8 @@ contract StakeRegistry is Ownable, StringUtils {
             uint256 dslaMessengerReward,
             uint256 dslaUserReward,
             uint256 dslaBurnedByVerification,
-            uint256 maxTokenLength
+            uint256 maxTokenLength,
+            uint64 maxLeverage
         )
     {
         DSLAburnRate = _DSLAburnRate;
@@ -408,10 +462,11 @@ contract StakeRegistry is Ownable, StringUtils {
         dslaUserReward = _dslaUserReward;
         dslaBurnedByVerification = _dslaBurnedByVerification;
         maxTokenLength = _maxTokenLength;
+        maxLeverage = _maxLeverage;
     }
 
     function periodIsVerified(address _sla, uint256 _periodId)
-        public
+        external
         view
         returns (bool)
     {

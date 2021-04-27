@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { envParameters } from '../../environments';
 
-const baseURL = envParameters.chainlinkNodeUrl;
+const baseURL = 'http://localhost:6688';
 
 const getSessionCookie = async () => {
   const resp = await axios({
