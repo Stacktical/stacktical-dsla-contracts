@@ -1,5 +1,8 @@
 # stacktical-dsla-contracts
 
+    DSLA Protocol is a risk management framework that enables developers and infrastructure operators to reduce their users exposure to service delays, interruptions and financial losses, using self-executing service level agreements, bonus-malus insurance policies, and crowdfunded liquidity pools.
+
+
 ## Dev
 
 ### Versions
@@ -21,7 +24,9 @@ Truffle `5.1.64`
 [Natspec](https://github.com/ethereum/wiki/wiki/Ethereum-Natural-Specification-Format)
 
 
-### Mainnet
+## Mainnet
+
+[Reference](./exported-data/networks/mainnet.ts)
 
 ``` 
     DSLAToken: '0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe'
@@ -38,7 +43,7 @@ Truffle `5.1.64`
     Details: '0x9986B2ec991D58954A3AE6f3Ab754FFE2EDE21a4'
 ```
 
-## Contracts
+## Contracts description
 * SLORegistry: Contract to register SLAs SLO value and type
 * SLARegistry: Contract to deploy SLAs and request SLIs
 * AdminWallet: Owner wallet
@@ -55,13 +60,13 @@ Truffle `5.1.64`
 ### Documentation
 NATSpec userdoc and devdoc JSON files are included in natspec-docs directory. Use it to check the inputs of the functions, or events parameters.
 
-### Audits
+## Audits
 
  * Certik [Report](https://www.certik.org/projects/stacktical)
  * Chainsulting [Report]()
  * @lucash-dev [Report](https://storage.googleapis.com/stacktical-public/audits/audit1v2.pdf)
 
-#### Caveats
+### Caveats
 
 * [Staking.sol](./contracts/Staking.sol)
 
