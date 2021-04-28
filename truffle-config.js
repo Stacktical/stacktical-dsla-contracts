@@ -14,6 +14,7 @@ const kovan_mnemonic = process.env.KOVAN_MNEMONIC;
 const harmony_testnet_mnemonic = process.env.HARMONY_TESTNET_MNEMONIC;
 const harmony_testnet_private_key_1 = process.env.HARMONY_TESTNET_PRIVATE_KEY_1;
 const harmony_testnet_private_key_2 = process.env.HARMONY_TESTNET_PRIVATE_KEY_2;
+const etherscan_api_key = process.env.ETHERSCAN_API_KEY;
 
 module.exports = {
   networks: {
@@ -89,4 +90,12 @@ module.exports = {
       },
     },
   },
-};
+
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+
+  api_keys: {
+    etherscan: etherscan_api_key
+  },
+}
