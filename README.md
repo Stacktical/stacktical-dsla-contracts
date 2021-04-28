@@ -10,12 +10,13 @@ DSLA Protocol is a risk management framework that enables developers and infrast
 #### Requirements
 
 * node
-* Truffle `5.1.64`
+* Truffle `5.2.5`
 * Ganache
 
 #### Local deployment
 ```
 npm i
+ganache-cli -h 0.0.0.0
 npm run deploy:develop
 ```
 
