@@ -1,13 +1,29 @@
 # stacktical-dsla-contracts
 
-    DSLA Protocol is a risk management framework that enables developers and infrastructure operators to reduce their users exposure to service delays, interruptions and financial losses, using self-executing service level agreements, bonus-malus insurance policies, and crowdfunded liquidity pools.
+DSLA Protocol is a risk management framework that enables developers and infrastructure operators to reduce their users exposure to service delays, interruptions and financial losses, using self-executing service level agreements, bonus-malus insurance policies, and crowdfunded liquidity pools.
 
 
-## Dev
+## DSLA Protocol Smart Contracts
 
-### Versions
+### Getting Started
 
-Truffle `5.1.64`
+#### Requirements
+
+* node
+* Truffle `5.1.64`
+* Ganache
+
+#### Local deployment
+```
+npm i
+npm run deploy:develop
+```
+
+#### Run tests
+
+```
+npm run test:develop
+```
 
 ### Code styling
 
@@ -24,7 +40,26 @@ Truffle `5.1.64`
 [Natspec](https://github.com/ethereum/wiki/wiki/Ethereum-Natural-Specification-Format)
 
 
-## Mainnet
+## Contracts description
+* SLORegistry: Contract to register SLAs SLO value and type
+* SLARegistry: Contract to deploy SLAs and request SLIs
+* AdminWallet: Owner wallet
+* MessengerRegistry: Contract to register new messengers
+* PeriodRegistry: Contract to register new periods
+* StakeRegistry: Contract to register stakes
+* SEMessenger: Staking efficiency messenger
+* NetworkAnalytics: Contract to request analytics objects
+* Details: Contract to get details of multiple contracts
+* DSLAToken: DSLA token address
+* DAIToken: DAI token address
+* USDCToken: USDC token address
+
+
+### Documentation
+NATSpec userdoc and devdoc JSON files are included in natspec-docs directory. Use it to check the inputs of the functions, or events parameters.
+
+
+## Mainnet Deployment
 
 [Reference](./exported-data/networks/mainnet.ts)
 
@@ -43,32 +78,15 @@ Truffle `5.1.64`
     Details: '0x9986B2ec991D58954A3AE6f3Ab754FFE2EDE21a4'
 ```
 
-## Contracts description
-* SLORegistry: Contract to register SLAs SLO value and type
-* SLARegistry: Contract to deploy SLAs and request SLIs
-* AdminWallet: Owner wallet
-* MessengerRegistry: Contract to register new messengers
-* PeriodRegistry: Contract to register new periods
-* StakeRegistry: Contract to register stakes
-* SEMessenger: Staking efficiency messenger
-* NetworkAnalytics: Contract to request analytics objects
-* Details: Contract to get details of multiple contracts
-* DSLAToken: DSLA token address
-* DAIToken: DAI token address
-* USDCToken: USDC token address
-
-### Documentation
-NATSpec userdoc and devdoc JSON files are included in natspec-docs directory. Use it to check the inputs of the functions, or events parameters.
-
 ## Audits
 
  * Certik [Report](https://www.certik.org/projects/stacktical)
- * Chainsulting [Report]()
+ * Chainsulting [Report](https://github.com/chainsulting/Smart-Contract-Security-Audits/blob/master/Stacktical/02_Smart%20Contract%20Audit_Stacktical_DSLA_Protocol.pdf)
  * @lucash-dev [Report](https://storage.googleapis.com/stacktical-public/audits/audit1v2.pdf)
 
-### Caveats
+**Note:**
 
-* [Staking.sol](./contracts/Staking.sol)
+* Regarding Certik's SCK-03 in [Staking.sol](./contracts/Staking.sol)
 
 As Staking.sol contract is going to call contracts defined by Stacktical we consider the implementation of Reentrancy Guard as unnecessary, since we fully control the external calls.
 Those external calls correspond to ERC-20 contracts with is a fully reviewed and battle tested standard.
