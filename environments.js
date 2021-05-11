@@ -7,6 +7,8 @@ export const networkNames = {
   KOVAN: 'kovan',
   MAINNET: 'mainnet',
   HARMONYTESTNET: 'harmonytestnet',
+  MUMBAI: 'mumbai',
+  POLYGON: 'polygon',
 };
 
 const environments = {
@@ -33,6 +35,29 @@ const environments = {
     checkPastPeriods: true,
     localChainlinkNode: null,
   },
+  [networkNames.POLYGON]: {
+    web3WebsocketProviderUrl: process.env.POLYGON_WS_URI,
+    // Paris, New York, Berlin
+    preCoordinatorConfiguration: {
+      oracles: [
+        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+      ],
+      jobIds: [
+        '0x329f60c5b0bf429597433e617544c71e',
+        '0x9f4ff7c86eb94a11b5a45b9b020fc481',
+        '0x5a08e037f50d4c73823b34b2e3a03eae',
+      ],
+      payments: [String(0.1 * 10 ** 18), String(0.1 * 10 ** 18), String(0.1 * 10 ** 18)],
+    },
+    chainlinkTokenAddress: '0xb0897686c545045afc77cf20ec7a532e3120e0f1',
+    dslaTokenAddress: '0xa0E390e9ceA0D0e8cd40048ced9fA9EA10D71639',
+    daiTokenAddress: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
+    usdcTokenAddress: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+    checkPastPeriods: true,
+    localChainlinkNode: null,
+  },
   [networkNames.KOVAN]: {
     web3WebsocketProviderUrl: `wss://kovan.infura.io/ws/v3/${infura_project_id}`,
     preCoordinatorConfiguration: {
@@ -55,6 +80,18 @@ const environments = {
     checkPastPeriods: false,
     localChainlinkNode: null,
   },
+  [networkNames.MUMBAI]: {
+    web3WebsocketProviderUrl: process.env.MUMBAI_WS_URI,
+    preCoordinatorConfiguration: null,
+    chainlinkTokenAddress: '0xC148f7eAd02656c94d3d2a5faB459d246D1501c0',
+    dslaTokenAddress: null,
+    daiTokenAddress: null,
+    usdcTokenAddress: null,
+    checkPastPeriods: false,
+    localChainlinkNode: {
+      chainlinkOracleAddress: '0xB79f56BEF7d5706eD665F0F32d5A0d4955bF43ad',
+    },
+  },
   [networkNames.HARMONYTESTNET]: {
     web3WebsocketProviderUrl: 'wss://ws.s0.b.hmny.io',
     preCoordinatorConfiguration: {
@@ -73,13 +110,13 @@ const environments = {
   [networkNames.DEVELOP]: {
     web3WebsocketProviderUrl: 'ws://localhost:8545',
     preCoordinatorConfiguration: null,
-    chainlinkTokenAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
+    chainlinkTokenAddress: '0x7231ECd1355a60251eE56Bf81f987969fc9bAe29',
     dslaTokenAddress: null,
     daiTokenAddress: null,
     usdcTokenAddress: null,
     checkPastPeriods: false,
     localChainlinkNode: {
-      chainlinkOracleAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B',
+      chainlinkOracleAddress: '0x3acc15dE35aaB8A94B7D2426E27c887541e4DE6c',
     },
   },
 };

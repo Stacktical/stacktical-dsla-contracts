@@ -36,10 +36,22 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true,
     },
+    [networkNames.POLYGON]: {
+      provider() {
+        return new HDWalletProvider(
+          process.env.MAINNET_MNEMONIC,
+          process.env.POLYGON_URI,
+          0,
+          10,
+        );
+      },
+      network_id: '137',
+      skipDryRun: true,
+    },
     [networkNames.KOVAN]: {
       provider() {
         return new HDWalletProvider(
-          kovan_mnemonic,
+          process.env.TEST_MNEMONIC,
           `https://kovan.infura.io/v3/${kovan_project_id}`,
           0,
           10,
@@ -49,6 +61,18 @@ module.exports = {
       networkCheckTimeout: '99999',
       gas: 12000000,
       timeoutBlocks: 200,
+      skipDryRun: true,
+    },
+    [networkNames.MUMBAI]: {
+      provider() {
+        return new HDWalletProvider(
+          process.env.TEST_MNEMONIC,
+          process.env.MUMBAI_URI,
+          0,
+          10,
+        );
+      },
+      network_id: '80001',
       skipDryRun: true,
     },
     [networkNames.HARMONYTESTNET]: {
@@ -92,10 +116,10 @@ module.exports = {
   },
 
   plugins: [
-    'truffle-plugin-verify'
+    'truffle-plugin-verify',
   ],
 
   api_keys: {
-    etherscan: etherscan_api_key
+    etherscan: etherscan_api_key,
   },
-}
+};
