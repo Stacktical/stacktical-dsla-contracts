@@ -73,7 +73,9 @@ module.exports = {
         );
       },
       network_id: '80001',
-      skipDryRun: true,
+      skipDryRun: false,
+      timeoutBlocks: 200,
+      gasPrice: '0x2540be400',
     },
     [networkNames.HARMONYTESTNET]: {
       network_id: '2', // Any network (default: none)

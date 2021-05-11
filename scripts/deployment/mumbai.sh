@@ -9,5 +9,5 @@ truffle deploy --reset --network mumbai
 truffle exec --network mumbai scripts/bootstrap/develop.js
 truffle exec --network mumbai scripts/chores/mint-tokens.js
 truffle exec --network mumbai scripts/chores/deploy-sla.js
-truffle exec --network mumbai scripts/chores/request-analytics.js
-truffle exec --network mumbai scripts/chores/request-sli.js
+#truffle exec --network mumbai scripts/chores/request-analytics.js
+#truffle exec --network mumbai scripts/chores/request-sli.js
