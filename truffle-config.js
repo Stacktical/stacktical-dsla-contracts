@@ -2,7 +2,9 @@ require('babel-polyfill');
 require('babel-register');
 
 require('dotenv').config();
-const HDWalletProvider = require('truffle-hdwallet-provider');
+const DeprecatedHDWalletProvider = require('truffle-hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+
 const { TruffleProvider } = require('@harmony-js/core');
 const { networkNames } = require('./environments');
 
@@ -20,14 +22,14 @@ module.exports = {
   networks: {
     [networkNames.DEVELOP]: {
       provider() {
-        return new HDWalletProvider(test_mnemonic, 'http://localhost:8545', 0, 10);
+        return new DeprecatedHDWalletProvider(test_mnemonic, 'http://localhost:8545', 0, 10);
       },
       network_id: '1337',
       gas: 12000000,
     },
     [networkNames.MAINNET]: {
       provider() {
-        return new HDWalletProvider(mnemonic, `https://mainnet.infura.io/v3/${infura_project_id}`);
+        return new DeprecatedHDWalletProvider(mnemonic, `https://mainnet.infura.io/v3/${infura_project_id}`);
       },
       network_id: '1',
       networkCheckTimeout: '99999',
@@ -38,12 +40,13 @@ module.exports = {
     },
     [networkNames.POLYGON]: {
       provider() {
-        return new HDWalletProvider(
-          process.env.MAINNET_MNEMONIC,
-          process.env.POLYGON_URI,
-          0,
-          10,
-        );
+        return new HDWalletProvider({
+          mnemonic: process.env.MAINNET_MNEMONIC,
+          providerOrUrl: process.env.POLYGON_URI,
+          addressIndex: 0,
+          numberOfAddresses: 10,
+          pollingInterval: 6 * 1000, // in ms
+        });
       },
       network_id: '137',
       skipDryRun: true,
@@ -51,7 +54,7 @@ module.exports = {
     },
     [networkNames.KOVAN]: {
       provider() {
-        return new HDWalletProvider(
+        return new DeprecatedHDWalletProvider(
           process.env.TEST_MNEMONIC,
           `https://kovan.infura.io/v3/${kovan_project_id}`,
           0,
@@ -66,7 +69,7 @@ module.exports = {
     },
     [networkNames.MUMBAI]: {
       provider() {
-        return new HDWalletProvider(
+        return new DeprecatedHDWalletProvider(
           process.env.TEST_MNEMONIC,
           process.env.MUMBAI_URI,
           0,
