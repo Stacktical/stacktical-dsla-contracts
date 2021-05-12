@@ -49,6 +49,7 @@ module.exports = {
         });
       },
       network_id: '137',
+      networkCheckTimeout: '99999',
       skipDryRun: true,
       gasPrice: '0x3b9aca00',
     },

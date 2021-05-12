@@ -40,14 +40,14 @@ const environments = {
     // Paris, New York, Berlin
     preCoordinatorConfiguration: {
       oracles: [
-        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
-        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
-        '0x972614782a893ad3139418Ef00e17fE95896A7c6',
+        '0x99F4e62a317cc666589c9e370c73c15B158f3c61',
+        '0x99F4e62a317cc666589c9e370c73c15B158f3c61',
+        '0x99F4e62a317cc666589c9e370c73c15B158f3c61',
       ],
       jobIds: [
-        '0x329f60c5b0bf429597433e617544c71e',
-        '0x9f4ff7c86eb94a11b5a45b9b020fc481',
-        '0x5a08e037f50d4c73823b34b2e3a03eae',
+        '0xa25e7fe5f416430188bf072d5cb5831e',
+        '0x96f4f67a18934c63b23b2adf2cb64bbf',
+        '0x511ec136539d4e9f971bf203ddff7b35',
       ],
       payments: [String(0.1 * 10 ** 18), String(0.1 * 10 ** 18), String(0.1 * 10 ** 18)],
     },
