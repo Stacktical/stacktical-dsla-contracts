@@ -47,6 +47,7 @@ module.exports = {
       },
       network_id: '137',
       skipDryRun: true,
+      gasPrice: '0x3b9aca00',
     },
     [networkNames.KOVAN]: {
       provider() {
@@ -73,7 +74,7 @@ module.exports = {
         );
       },
       network_id: '80001',
-      skipDryRun: false,
+      skipDryRun: true,
       timeoutBlocks: 200,
       gasPrice: '0x2540be400',
     },
