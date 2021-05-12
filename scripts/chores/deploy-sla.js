@@ -60,7 +60,7 @@ module.exports = async (callback) => {
       serviceImage:
         'https://storage.googleapis.com/bdsla-incentivized-beta/validators/chainode.svg',
       serviceURL: 'https://bdslaToken.network',
-      serviceAddress: 'one1kf42rl6yg2avkjsu34ch2jn8yjs64ycn4n9wdj',
+      serviceAddress: 'validator-address',
       serviceTicker: 'ONE',
     };
     const ipfsHash = await getIPFSHash(serviceMetadata);

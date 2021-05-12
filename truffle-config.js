@@ -14,6 +14,7 @@ const kovan_mnemonic = process.env.KOVAN_MNEMONIC;
 const harmony_testnet_mnemonic = process.env.HARMONY_TESTNET_MNEMONIC;
 const harmony_testnet_private_key_1 = process.env.HARMONY_TESTNET_PRIVATE_KEY_1;
 const harmony_testnet_private_key_2 = process.env.HARMONY_TESTNET_PRIVATE_KEY_2;
+const etherscan_api_key = process.env.ETHERSCAN_API_KEY;
 
 module.exports = {
   networks: {
@@ -35,10 +36,23 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true,
     },
+    [networkNames.POLYGON]: {
+      provider() {
+        return new HDWalletProvider(
+          process.env.MAINNET_MNEMONIC,
+          process.env.POLYGON_URI,
+          0,
+          10,
+        );
+      },
+      network_id: '137',
+      skipDryRun: true,
+      gasPrice: '0x3b9aca00',
+    },
     [networkNames.KOVAN]: {
       provider() {
         return new HDWalletProvider(
-          kovan_mnemonic,
+          process.env.TEST_MNEMONIC,
           `https://kovan.infura.io/v3/${kovan_project_id}`,
           0,
           10,
@@ -49,6 +63,20 @@ module.exports = {
       gas: 12000000,
       timeoutBlocks: 200,
       skipDryRun: true,
+    },
+    [networkNames.MUMBAI]: {
+      provider() {
+        return new HDWalletProvider(
+          process.env.TEST_MNEMONIC,
+          process.env.MUMBAI_URI,
+          0,
+          10,
+        );
+      },
+      network_id: '80001',
+      skipDryRun: true,
+      timeoutBlocks: 200,
+      gasPrice: '0x2540be400',
     },
     [networkNames.HARMONYTESTNET]: {
       network_id: '2', // Any network (default: none)
@@ -88,5 +116,13 @@ module.exports = {
         },
       },
     },
+  },
+
+  plugins: [
+    'truffle-plugin-verify',
+  ],
+
+  api_keys: {
+    etherscan: etherscan_api_key,
   },
 };
