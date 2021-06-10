@@ -9,9 +9,11 @@ DSLA Protocol is a risk management framework that enables developers and infrast
 
 #### Requirements
 
+```
 * node
 * Truffle `5.2.5`
 * Ganache
+```
 
 #### Local deployment
 ```
@@ -65,21 +67,26 @@ NATSpec userdoc and devdoc JSON files are included in natspec-docs directory. Us
 [Reference](./exported-data/networks/mainnet.ts)
 
 ``` 
-    DSLAToken: '0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe'
-    SLORegistry: '0x33065a04993BeEd06C2415349DbF976B941e80D1'
-    SLARegistry: '0xEF12BDcF5E5D5ae4c950a9FaEb2A274d1646b48D'
-    AdminWallet: '0xF97Cf29fb0814a83e88DdF324D32bda45706Fb42'
-    DAIToken: '0x6b175474e89094c44da98b954eedeac495271d0f'
-    USDCToken: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
-    MessengerRegistry: '0x857533E7d9DE216E8BdBd1620018099B88cDD792'
-    PeriodRegistry: '0x7229e7cb280cb55741B13485ded35C1df3790BC0'
-    StakeRegistry: '0x143c0e6cB35AC53C7f06d4914199E4cAc3977AC7'
-    SEMessenger: '0x674c6ee7cAdDc782b54fE53B89C4d4F6f2722644'
-    NetworkAnalytics: '0xf41EaA49BBae8650f051100d4385d5d7F9af4a54'
-    Details: '0x9986B2ec991D58954A3AE6f3Ab754FFE2EDE21a4'
+DSLAToken: '0x3aFfCCa64c2A6f4e3B6Bd9c64CD2C969EFd1ECBe',
+DAIToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+USDCToken: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+SLORegistry: '0x1bE60A36Ba9De2eCeFe8be8d2720B67f932EC487',
+SLARegistry: '0xB63a13825e129fBa2f2205847158461bec5f265A',
+MessengerRegistry: '0x766C0b52fADC43Bc3EEAe8BC64536404981951bE',
+PeriodRegistry: '0x5Da279bE9D6CeB11e7D7117915075066909357bc',
+StakeRegistry: '0x4b48AdDd838A11061cE285106f4a30cc5636735C',
+SEMessenger: '0xFB29aFC3F4B78755f07faD5B86448595D2EEC86C',
+NetworkAnalytics: '0xC33492F8D76918A9527165A9fD71089980656357',
+Details: '0x38b0cd8BB4C4608E32EE75b25A8846459cEAd513',
 ```
 
-## Audits
+## Security
+
+### Bug Bounty
+
+This repository is subject to the DSLA Bug bounty program [here](https://immunefi.com/bounty/dslaprotocol/).
+
+### Audits
 
  * Certik [Report](https://www.certik.org/projects/stacktical)
  * Chainsulting [Report](https://github.com/chainsulting/Smart-Contract-Security-Audits/blob/master/Stacktical/02_Smart%20Contract%20Audit_Stacktical_DSLA_Protocol.pdf)
