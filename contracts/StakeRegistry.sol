@@ -2,16 +2,16 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "./SLA.sol";
-import "./messenger/IMessenger.sol";
-import "./SLARegistry.sol";
-import "./StringUtils.sol";
+import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/math/SafeMath.sol';
+import '@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol';
+import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
+import './SLA.sol';
+import './messenger/IMessenger.sol';
+import './SLARegistry.sol';
+import './StringUtils.sol';
 
 /**
  * @title StakeRegistry
@@ -64,6 +64,8 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
     uint256 private _maxTokenLength = 1;
     /// @dev max times of hedge leverage
     uint64 private _maxLeverage = 100;
+    /// @dev burn DSLA after verification
+    bool private _burnDSLA = true;
 
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
@@ -105,7 +107,8 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification,
         uint256 maxTokenLength,
-        uint64 maxLeverage
+        uint64 maxLeverage,
+        bool burnDSLA
     );
 
     /**
@@ -154,10 +157,10 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
-                    .add(_dslaMessengerReward)
-                    .add(_dslaUserReward)
-                    .add(_dslaBurnedByVerification),
-            "Staking parameters should match on summation"
+                .add(_dslaMessengerReward)
+                .add(_dslaUserReward)
+                .add(_dslaBurnedByVerification),
+            'Staking parameters should match on summation'
         );
         DSLATokenAddress = _dslaTokenAddress;
         allowedTokens.push(_dslaTokenAddress);
@@ -167,7 +170,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
     modifier onlySLARegistry() {
         require(
             msg.sender == address(slaRegistry),
-            "Can only be called by SLARegistry"
+            'Can only be called by SLARegistry'
         );
         _;
     }
@@ -180,7 +183,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         // Only able to trigger this function once
         require(
             address(slaRegistry) == address(0),
-            "SLARegistry address has already been set"
+            'SLARegistry address has already been set'
         );
 
         slaRegistry = SLARegistry(msg.sender);
@@ -191,7 +194,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
      *@param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
-        require(!isAllowedToken(_tokenAddress), "token already added");
+        require(!isAllowedToken(_tokenAddress), 'token already added');
         allowedTokens.push(_tokenAddress);
     }
 
@@ -231,7 +234,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
     function registerStakedSla(address _owner) external returns (bool) {
         require(
             slaRegistry.isRegisteredSLA(msg.sender),
-            "Only for registered SLAs"
+            'Only for registered SLAs'
         );
         if (!slaWasStakedByUser(_owner, msg.sender)) {
             userStakedSlas[_owner].push(SLA(msg.sender));
@@ -250,10 +253,12 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
     {
         require(
             slaRegistry.isRegisteredSLA(msg.sender),
-            "Only for registered SLAs"
+            'Only for registered SLAs'
         );
-        ERC20PresetMinterPauser dToken =
-            new ERC20PresetMinterPauser(_name, _symbol);
+        ERC20PresetMinterPauser dToken = new ERC20PresetMinterPauser(
+            _name,
+            _symbol
+        );
         dToken.grantRole(dToken.MINTER_ROLE(), msg.sender);
         emit DTokenCreated(address(dToken), msg.sender, _name, _symbol);
         return address(dToken);
@@ -290,7 +295,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         require(
             !_lockedValue.verifiedPeriods[_periodId],
-            "Period rewards already distributed"
+            'Period rewards already distributed'
         );
         _lockedValue.verifiedPeriods[_periodId] = true;
         _lockedValue.lockedValue = _lockedValue.lockedValue.sub(
@@ -308,7 +313,15 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
             IMessenger(SLA(_sla).messengerAddress()).owner(),
             _lockedValue.dslaMessengerReward
         );
-        _burnDSLATokens(_lockedValue.dslaBurnedByVerification);
+        if (_burnDSLA) {
+            (bool success, ) = DSLATokenAddress.call(
+                abi.encodeWithSelector(
+                    bytes4(keccak256(bytes('burn(uint256)'))),
+                    _lockedValue.dslaBurnedByVerification
+                )
+            );
+            require(success, 'burn process failed');
+        }
         emit VerificationRewardDistributed(
             _sla,
             _verificationRewardReceiver,
@@ -326,22 +339,13 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
     {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         uint256 remainingBalance = _lockedValue.lockedValue;
-        require(remainingBalance > 0, "locked value is empty");
+        require(remainingBalance > 0, 'locked value is empty');
         _lockedValue.lockedValue = 0;
         ERC20(DSLATokenAddress).safeTransfer(
             SLA(_sla).owner(),
             remainingBalance
         );
         emit LockedValueReturned(_sla, SLA(_sla).owner(), remainingBalance);
-    }
-
-    function _burnDSLATokens(uint256 _amount) internal {
-        bytes4 BURN_SELECTOR = bytes4(keccak256(bytes("burn(uint256)")));
-        (bool _success, ) =
-            DSLATokenAddress.call(
-                abi.encodeWithSelector(BURN_SELECTOR, _amount)
-            );
-        require(_success, "DSLA burn process was not successful");
     }
 
     /**
@@ -354,7 +358,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         view
         returns (ActivePool[] memory)
     {
-        bytes4 NAME_SELECTOR = bytes4(keccak256(bytes("name()")));
+        bytes4 NAME_SELECTOR = bytes4(keccak256(bytes('name()')));
         uint256 stakeCounter = 0;
         // Count the stakes of the user, checking every SLA staked
         for (
@@ -382,19 +386,17 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
                 tokenIndex < currentSLA.getAllowedTokensLength();
                 tokenIndex++
             ) {
-                (address tokenAddress, uint256 stake) =
-                    currentSLA.getTokenStake(_slaOwner, tokenIndex);
-                (, bytes memory tokenNameBytes) =
-                    tokenAddress.staticcall(
-                        abi.encodeWithSelector(NAME_SELECTOR)
-                    );
-                ActivePool memory currentActivePool =
-                    ActivePool({
-                        SLAAddress: address(currentSLA),
-                        stake: stake,
-                        assetName: string(tokenNameBytes),
-                        assetAddress: tokenAddress
-                    });
+                (address tokenAddress, uint256 stake) = currentSLA
+                .getTokenStake(_slaOwner, tokenIndex);
+                (, bytes memory tokenNameBytes) = tokenAddress.staticcall(
+                    abi.encodeWithSelector(NAME_SELECTOR)
+                );
+                ActivePool memory currentActivePool = ActivePool({
+                    SLAAddress: address(currentSLA),
+                    stake: stake,
+                    assetName: string(tokenNameBytes),
+                    assetAddress: tokenAddress
+                });
                 activePools[stakePosition] = currentActivePool;
                 stakePosition = stakePosition.add(1);
             }
@@ -411,7 +413,8 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         uint256 dslaUserReward,
         uint256 dslaBurnedByVerification,
         uint256 maxTokenLength,
-        uint64 maxLeverage
+        uint64 maxLeverage,
+        bool burnDSLA
     ) external onlyOwner {
         _DSLAburnRate = DSLAburnRate;
         _dslaDepositByPeriod = dslaDepositByPeriod;
@@ -421,13 +424,14 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         _dslaBurnedByVerification = dslaBurnedByVerification;
         _maxTokenLength = maxTokenLength;
         _maxLeverage = maxLeverage;
+        _burnDSLA = burnDSLA;
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
-                    .add(_dslaMessengerReward)
-                    .add(_dslaUserReward)
-                    .add(_dslaBurnedByVerification),
-            "Staking parameters should match on summation"
+                .add(_dslaMessengerReward)
+                .add(_dslaUserReward)
+                .add(_dslaBurnedByVerification),
+            'Staking parameters should match on summation'
         );
         emit StakingParametersModified(
             DSLAburnRate,
@@ -437,7 +441,8 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
             dslaUserReward,
             dslaBurnedByVerification,
             maxTokenLength,
-            maxLeverage
+            maxLeverage,
+            burnDSLA
         );
     }
 
@@ -452,7 +457,8 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
             uint256 dslaUserReward,
             uint256 dslaBurnedByVerification,
             uint256 maxTokenLength,
-            uint64 maxLeverage
+            uint64 maxLeverage,
+            bool burnDSLA
         )
     {
         DSLAburnRate = _DSLAburnRate;
@@ -463,6 +469,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         dslaBurnedByVerification = _dslaBurnedByVerification;
         maxTokenLength = _maxTokenLength;
         maxLeverage = _maxLeverage;
+        burnDSLA = _burnDSLA;
     }
 
     function periodIsVerified(address _sla, uint256 _periodId)

@@ -1,6 +1,6 @@
 pragma solidity 0.6.6;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 /**
  * @title IMessenger
@@ -91,4 +91,12 @@ abstract contract IMessenger is Ownable {
      * @dev returns the fulfillsCounter
      */
     function fulfillsCounter() external view virtual returns (uint256);
+
+    function setChainlinkJobID(bytes32 _newJobId, uint256 _feeMultiplier)
+        external
+        virtual;
+
+    function retryRequest(address _slaAddress, uint256 _periodId)
+        external
+        virtual;
 }

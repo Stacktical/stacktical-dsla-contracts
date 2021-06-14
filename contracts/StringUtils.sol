@@ -8,10 +8,10 @@ library StringUtils {
         returns (string memory)
     {
         bytes32 _bytes = bytes32(uint256(_address));
-        bytes memory HEX = "0123456789abcdef";
+        bytes memory HEX = '0123456789abcdef';
         bytes memory _string = new bytes(42);
-        _string[0] = "0";
-        _string[1] = "x";
+        _string[0] = '0';
+        _string[1] = 'x';
         for (uint256 i = 0; i < 20; i++) {
             _string[2 + i * 2] = HEX[uint8(_bytes[i + 12] >> 4)];
             _string[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
@@ -76,7 +76,7 @@ library StringUtils {
     {
         uint256 number = _i;
         if (number == 0) {
-            return "0";
+            return '0';
         }
         uint256 j = number;
         uint256 len;

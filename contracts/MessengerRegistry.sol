@@ -2,7 +2,7 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "./messenger/IMessenger.sol";
+import './messenger/IMessenger.sol';
 
 /**
  * @title MessengerRegistry
@@ -52,7 +52,7 @@ contract MessengerRegistry {
         // Only able to trigger this function once
         require(
             address(slaRegistry) == address(0),
-            "SLARegistry address has already been set"
+            'SLARegistry address has already been set'
         );
 
         slaRegistry = msg.sender;
@@ -68,18 +68,18 @@ contract MessengerRegistry {
     ) external {
         require(
             msg.sender == slaRegistry,
-            "Should only be called using the SLARegistry contract"
+            'Should only be called using the SLARegistry contract'
         );
         require(
             !registeredMessengers[_messengerAddress],
-            "messenger already registered"
+            'messenger already registered'
         );
 
         IMessenger messenger = IMessenger(_messengerAddress);
         address messengerOwner = messenger.owner();
         require(
             messengerOwner == _callerAddress,
-            "Should only be called by the messenger owner"
+            'Should only be called by the messenger owner'
         );
         uint256 precision = messenger.messengerPrecision();
         uint256 requestsCounter = messenger.requestsCounter();
@@ -120,7 +120,7 @@ contract MessengerRegistry {
         IMessenger messenger = IMessenger(storedMessenger.messengerAddress);
         require(
             msg.sender == messenger.owner(),
-            "Can only be modified by the owner"
+            'Can only be modified by the owner'
         );
         storedMessenger.specificationUrl = _specificationUrl;
         storedMessenger.ownerAddress = msg.sender;
@@ -134,11 +134,13 @@ contract MessengerRegistry {
     }
 
     function getMessengers() external view returns (Messenger[] memory) {
-        Messenger[] memory returnMessengers =
-            new Messenger[](messengers.length);
+        Messenger[] memory returnMessengers = new Messenger[](
+            messengers.length
+        );
         for (uint256 index = 0; index < messengers.length; index++) {
-            IMessenger messenger =
-                IMessenger(messengers[index].messengerAddress);
+            IMessenger messenger = IMessenger(
+                messengers[index].messengerAddress
+            );
             uint256 requestsCounter = messenger.requestsCounter();
             uint256 fulfillsCounter = messenger.fulfillsCounter();
             returnMessengers[index] = Messenger({

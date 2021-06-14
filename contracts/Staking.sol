@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.6;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "./StakeRegistry.sol";
-import "./SLARegistry.sol";
-import "./PeriodRegistry.sol";
-import "./StringUtils.sol";
+import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
+import '@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/math/SafeMath.sol';
+import './StakeRegistry.sol';
+import './SLARegistry.sol';
+import './PeriodRegistry.sol';
+import './StringUtils.sol';
 
 contract Staking is Ownable {
     using SafeMath for uint256;
@@ -55,13 +55,13 @@ contract Staking is Ownable {
     uint64 public immutable leverage;
 
     modifier onlyAllowedToken(address _token) {
-        require(isAllowedToken(_token) == true, "token is not allowed");
+        require(isAllowedToken(_token) == true, 'token not allowed');
         _;
     }
 
     modifier onlyWhitelisted {
         if (whitelistedContract == true) {
-            require(whitelist[msg.sender] == true, "Not whitelisted");
+            require(whitelist[msg.sender] == true, 'not whitelisted');
         }
         _;
     }
@@ -118,15 +118,24 @@ contract Staking is Ownable {
         periodRegistry = _slaRegistry.periodRegistry();
         periodType = _periodType;
         whitelistedContract = _whitelistedContract;
-        (uint256 _DSLAburnRate, , , , , , , uint64 _maxLeverage) =
-            stakeRegistry.getStakingParameters();
+        (
+            uint256 _DSLAburnRate,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            uint64 _maxLeverage,
+
+        ) = stakeRegistry.getStakingParameters();
         dslaTokenAddress = stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
         whitelist[_contractOwner] = true;
         slaID = _slaID;
         require(
             _leverage <= _maxLeverage && _leverage >= 1,
-            "Incorrect leverage"
+            'incorrect leverage'
         );
         leverage = _leverage;
     }
@@ -158,36 +167,35 @@ contract Staking is Ownable {
      *@param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
-        (, , , , , , uint256 maxTokenLength, ) =
-            stakeRegistry.getStakingParameters();
-        require(!isAllowedToken(_tokenAddress), "Token already added");
+        (, , , , , , uint256 maxTokenLength, , ) = stakeRegistry
+        .getStakingParameters();
+        require(!isAllowedToken(_tokenAddress), 'already added');
         require(
             stakeRegistry.isAllowedToken(_tokenAddress),
-            "Token not allowed by the SLARegistry contract"
+            'not allowed by SLARegistry'
         );
         allowedTokens.push(_tokenAddress);
-        require(
-            maxTokenLength >= allowedTokens.length,
-            "Allowed tokens length greater than max token length"
-        );
+        require(maxTokenLength >= allowedTokens.length, 'max token length');
         string memory dTokenID = StringUtils.uintToStr(slaID);
-        string memory duTokenName =
-            string(abi.encodePacked("DSLA-SHORT-", dTokenID));
-        string memory duTokenSymbol =
-            string(abi.encodePacked("DSLA-SP-", dTokenID));
-        string memory dpTokenName =
-            string(abi.encodePacked("DSLA-LONG-", dTokenID));
-        string memory dpTokenSymbol =
-            string(abi.encodePacked("DSLA-LP-", dTokenID));
+        string memory duTokenName = string(
+            abi.encodePacked('DSLA-SHORT-', dTokenID)
+        );
+        string memory duTokenSymbol = string(
+            abi.encodePacked('DSLA-SP-', dTokenID)
+        );
+        string memory dpTokenName = string(
+            abi.encodePacked('DSLA-LONG-', dTokenID)
+        );
+        string memory dpTokenSymbol = string(
+            abi.encodePacked('DSLA-LP-', dTokenID)
+        );
 
-        ERC20PresetMinterPauser duToken =
-            ERC20PresetMinterPauser(
-                stakeRegistry.createDToken(duTokenName, duTokenSymbol)
-            );
-        ERC20PresetMinterPauser dpToken =
-            ERC20PresetMinterPauser(
-                stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
-            );
+        ERC20PresetMinterPauser duToken = ERC20PresetMinterPauser(
+            stakeRegistry.createDToken(duTokenName, duTokenSymbol)
+        );
+        ERC20PresetMinterPauser dpToken = ERC20PresetMinterPauser(
+            stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
+        );
 
         dpTokenRegistry[_tokenAddress] = dpToken;
         duTokenRegistry[_tokenAddress] = duToken;
@@ -221,11 +229,13 @@ contract Staking is Ownable {
         );
         //duTokens
         if (msg.sender != owner()) {
-            (uint256 providerStake, uint256 usersStake) =
-                (providerPool[_tokenAddress], usersPool[_tokenAddress]);
+            (uint256 providerStake, uint256 usersStake) = (
+                providerPool[_tokenAddress],
+                usersPool[_tokenAddress]
+            );
             require(
                 usersStake.add(_amount).mul(leverage) <= providerStake,
-                "Incorrect user stake"
+                'incorrect user stake'
             );
             ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
@@ -335,7 +345,7 @@ contract Staking is Ownable {
         if (!_contractFinished) {
             require(
                 providerStake.sub(_amount) >= usersStake.mul(leverage),
-                "Incorrect withdraw"
+                'incorrect withdraw'
             );
         }
         ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
@@ -389,8 +399,9 @@ contract Staking is Ownable {
         if (_staker == owner()) {
             return (allowedTokenAddress, providerPool[allowedTokenAddress]);
         } else {
-            ERC20PresetMinterPauser dToken =
-                duTokenRegistry[allowedTokenAddress];
+            ERC20PresetMinterPauser dToken = duTokenRegistry[
+                allowedTokenAddress
+            ];
             uint256 dTokenSupply = dToken.totalSupply();
             if (dTokenSupply == 0) {
                 return (allowedTokenAddress, 0);
