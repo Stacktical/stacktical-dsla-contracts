@@ -2,8 +2,8 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import '@openzeppelin/contracts/math/SafeMath.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 /**
  * @title SLARegistry
@@ -13,7 +13,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract PeriodRegistry is Ownable {
     using SafeMath for uint256;
 
-    enum PeriodType {Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly}
+    enum PeriodType {
+        Hourly,
+        Daily,
+        Weekly,
+        BiWeekly,
+        Monthly,
+        Yearly
+    }
 
     /// @dev struct to store the definition of a period
     struct PeriodDefinition {
@@ -50,26 +57,27 @@ contract PeriodRegistry is Ownable {
         uint256[] memory _periodStarts,
         uint256[] memory _periodEnds
     ) public onlyOwner {
-        PeriodDefinition storage periodDefinition =
-            periodDefinitions[_periodType];
+        PeriodDefinition storage periodDefinition = periodDefinitions[
+            _periodType
+        ];
         require(
             !periodDefinition.initialized,
-            "Period type already initialized"
+            'Period type already initialized'
         );
         require(
             _periodStarts.length == _periodEnds.length,
-            "Period type starts and ends should match"
+            'Period type starts and ends should match'
         );
         require(_periodStarts.length > 0, "Period length can't be 0");
         for (uint256 index = 0; index < _periodStarts.length; index++) {
             require(
                 _periodStarts[index] < _periodEnds[index],
-                "Start should be before end"
+                'Start should be before end'
             );
             if (index < _periodStarts.length - 1) {
                 require(
                     _periodStarts[index + 1].sub(_periodEnds[index]) == 1,
-                    "Start of a period should be 1 second after the end of the previous period"
+                    'Start of a period should be 1 second after the end of the previous period'
                 );
             }
             periodDefinition.starts.push(_periodStarts[index]);
@@ -91,18 +99,19 @@ contract PeriodRegistry is Ownable {
         uint256[] memory _periodEnds
     ) public onlyOwner {
         require(_periodStarts.length > 0, "Period length can't be 0");
-        PeriodDefinition storage periodDefinition =
-            periodDefinitions[_periodType];
-        require(periodDefinition.initialized, "Period was not initialized yet");
+        PeriodDefinition storage periodDefinition = periodDefinitions[
+            _periodType
+        ];
+        require(periodDefinition.initialized, 'Period was not initialized yet');
         for (uint256 index = 0; index < _periodStarts.length; index++) {
             require(
                 _periodStarts[index] < _periodEnds[index],
-                "Start should be before end"
+                'Start should be before end'
             );
             if (index < _periodStarts.length.sub(1)) {
                 require(
                     _periodStarts[index + 1].sub(_periodEnds[index]) == 1,
-                    "Start of a period should be 1 second after the end of the previous period"
+                    'Start of a period should be 1 second after the end of the previous period'
                 );
             }
             periodDefinition.starts.push(_periodStarts[index]);
@@ -134,8 +143,9 @@ contract PeriodRegistry is Ownable {
         view
         returns (bool initialized)
     {
-        PeriodDefinition memory periodDefinition =
-            periodDefinitions[_periodType];
+        PeriodDefinition memory periodDefinition = periodDefinitions[
+            _periodType
+        ];
         initialized = periodDefinition.initialized;
     }
 
@@ -149,8 +159,9 @@ contract PeriodRegistry is Ownable {
         view
         returns (bool valid)
     {
-        PeriodDefinition memory periodDefinition =
-            periodDefinitions[_periodType];
+        PeriodDefinition memory periodDefinition = periodDefinitions[
+            _periodType
+        ];
         valid = periodDefinition.starts.length.sub(1) >= _periodId;
     }
 
@@ -166,7 +177,7 @@ contract PeriodRegistry is Ownable {
     {
         require(
             isValidPeriod(_periodType, _periodId),
-            "Period data is not valid"
+            'Period data is not valid'
         );
         finished =
             periodDefinitions[_periodType].ends[_periodId] < block.timestamp;
@@ -184,7 +195,7 @@ contract PeriodRegistry is Ownable {
     {
         require(
             isValidPeriod(_periodType, _periodId),
-            "Period data is not valid"
+            'Period data is not valid'
         );
         started =
             periodDefinitions[_periodType].starts[_periodId] < block.timestamp;

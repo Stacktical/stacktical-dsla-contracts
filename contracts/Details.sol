@@ -2,14 +2,14 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "./SLA.sol";
-import "./SLARegistry.sol";
-import "./SLORegistry.sol";
-import "./StakeRegistry.sol";
-import "./PeriodRegistry.sol";
-import "./MessengerRegistry.sol";
-import "./Staking.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import './SLA.sol';
+import './SLARegistry.sol';
+import './SLORegistry.sol';
+import './StakeRegistry.sol';
+import './PeriodRegistry.sol';
+import './MessengerRegistry.sol';
+import './Staking.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
 /**
  * @title Details
@@ -102,8 +102,8 @@ contract Details {
         periodSLIs = new SLA.PeriodSLI[](periodIdsLength);
         for (uint256 index = 0; index < periodIdsLength; index++) {
             uint256 periodId = initialPeriodId + index;
-            (uint256 timestamp, uint256 sli, SLA.Status status) =
-                sla.periodSLIs(periodId);
+            (uint256 timestamp, uint256 sli, SLA.Status status) = sla
+            .periodSLIs(periodId);
             periodSLIs[index] = SLA.PeriodSLI({
                 status: status,
                 sli: sli,
@@ -176,10 +176,10 @@ contract Details {
         returns (string memory)
     {
         bytes32 _bytes = bytes32(uint256(_address));
-        bytes memory HEX = "0123456789abcdef";
+        bytes memory HEX = '0123456789abcdef';
         bytes memory _string = new bytes(42);
-        _string[0] = "0";
-        _string[1] = "x";
+        _string[0] = '0';
+        _string[1] = 'x';
         for (uint256 i = 0; i < 20; i++) {
             _string[2 + i * 2] = HEX[uint8(_bytes[i + 12] >> 4)];
             _string[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
