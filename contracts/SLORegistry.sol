@@ -35,7 +35,7 @@ contract SLORegistry {
     modifier onlySLARegistry {
         require(
             msg.sender == slaRegistry,
-            "Should only be called using the SLARegistry contract"
+            'Should only be called using the SLARegistry contract'
         );
         _;
     }
@@ -44,7 +44,7 @@ contract SLORegistry {
         // Only able to trigger this function once
         require(
             address(slaRegistry) == address(0),
-            "SLARegistry address has already been set"
+            'SLARegistry address has already been set'
         );
         slaRegistry = msg.sender;
     }

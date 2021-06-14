@@ -2,14 +2,14 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "./SLARegistry.sol";
-import "./SLORegistry.sol";
-import "./StakeRegistry.sol";
-import "./PeriodRegistry.sol";
-import "./Staking.sol";
+import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/math/SafeMath.sol';
+import './SLARegistry.sol';
+import './SLORegistry.sol';
+import './StakeRegistry.sol';
+import './PeriodRegistry.sol';
+import './Staking.sol';
 
 /**
  * @title SLA
@@ -19,7 +19,11 @@ import "./Staking.sol";
 contract SLA is Staking {
     using SafeMath for uint256;
 
-    enum Status {NotVerified, Respected, NotRespected}
+    enum Status {
+        NotVerified,
+        Respected,
+        NotRespected
+    }
 
     struct PeriodSLI {
         uint256 timestamp;
@@ -98,10 +102,7 @@ contract SLA is Staking {
      * @dev throws if called by any address other than the messenger contract.
      */
     modifier onlyMessenger() {
-        require(
-            msg.sender == messengerAddress,
-            "Only Messenger can call this function"
-        );
+        require(msg.sender == messengerAddress, 'only messenger');
         _;
     }
 
@@ -109,10 +110,7 @@ contract SLA is Staking {
      * @dev throws if called by any address other than the messenger contract.
      */
     modifier onlySLARegistry() {
-        require(
-            msg.sender == address(slaRegistry),
-            "Only SLARegistry can call this function"
-        );
+        require(msg.sender == address(slaRegistry), 'only SLARegistry');
         _;
     }
 
@@ -120,7 +118,7 @@ contract SLA is Staking {
      * @dev throws if called with an amount less or equal to zero.
      */
     modifier notZero(uint256 _amount) {
-        require(_amount > 0, "amount cannot be 0");
+        require(_amount > 0, 'amount cant be 0');
         _;
     }
 
@@ -189,15 +187,13 @@ contract SLA is Staking {
         if (sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
             uint256 precision = 10000;
-            uint256 deviation =
-                _sli.sub(sloValue).mul(precision).div(
-                    _sli.add(sloValue).div(2)
-                );
+            uint256 deviation = _sli.sub(sloValue).mul(precision).div(
+                _sli.add(sloValue).div(2)
+            );
             uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
-            uint256 rewardPercentage =
-                deviation.mul(normalizedPeriodId).div(
-                    finalPeriodId - initialPeriodId + 1
-                );
+            uint256 rewardPercentage = deviation.mul(normalizedPeriodId).div(
+                finalPeriodId - initialPeriodId + 1
+            );
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
             periodSLI.status = Status.NotRespected;
@@ -213,8 +209,10 @@ contract SLA is Staking {
     }
 
     function contractFinished() public view returns (bool) {
-        (, uint256 endOfLastValidPeriod) =
-            periodRegistry.getPeriodStartAndEnd(periodType, finalPeriodId);
+        (, uint256 endOfLastValidPeriod) = periodRegistry.getPeriodStartAndEnd(
+            periodType,
+            finalPeriodId
+        );
         return
             _breachedContract == true ||
             (block.timestamp >= endOfLastValidPeriod &&
@@ -232,10 +230,7 @@ contract SLA is Staking {
         notZero(_amount)
     {
         bool isContractFinished = contractFinished();
-        require(
-            !isContractFinished,
-            "Can only stake on not finished contracts"
-        );
+        require(!isContractFinished, 'finished contract');
         _stake(_amount, _token);
         emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount);
         StakeRegistry stakeRegistry = slaRegistry.stakeRegistry();
@@ -268,7 +263,7 @@ contract SLA is Staking {
     {
         if (msg.sender != owner()) {
             bool isContractFinished = contractFinished();
-            require(isContractFinished, "Only for finished contract");
+            require(isContractFinished, 'not finished contract');
         }
         emit UserWithdraw(
             _tokenAddress,

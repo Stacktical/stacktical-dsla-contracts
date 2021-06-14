@@ -2,13 +2,13 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "./SLA.sol";
-import "./SLORegistry.sol";
-import "./PeriodRegistry.sol";
-import "./MessengerRegistry.sol";
-import "./StakeRegistry.sol";
-import "./messenger/IMessenger.sol";
+import '@openzeppelin/contracts/math/SafeMath.sol';
+import './SLA.sol';
+import './SLORegistry.sol';
+import './PeriodRegistry.sol';
+import './MessengerRegistry.sol';
+import './StakeRegistry.sol';
+import './messenger/IMessenger.sol';
 
 /**
  * @title SLARegistry
@@ -111,41 +111,46 @@ contract SLARegistry {
         bytes32[] memory _extraData,
         uint64 _leverage
     ) public {
-        bool validPeriod =
-            periodRegistry.isValidPeriod(_periodType, _initialPeriodId);
-        require(validPeriod, "First period id not valid");
+        bool validPeriod = periodRegistry.isValidPeriod(
+            _periodType,
+            _initialPeriodId
+        );
+        require(validPeriod, 'first period id invalid');
         validPeriod = periodRegistry.isValidPeriod(_periodType, _finalPeriodId);
-        require(validPeriod, "Final period id not valid");
-        bool initializedPeriod =
-            periodRegistry.isInitializedPeriod(_periodType);
-        require(initializedPeriod, "Period type not initialized yet");
+        require(validPeriod, 'final period id invalid');
+        bool initializedPeriod = periodRegistry.isInitializedPeriod(
+            _periodType
+        );
+        require(initializedPeriod, 'period type not initialized');
         require(
             _finalPeriodId >= _initialPeriodId,
-            "invalid finalPeriodId and initialPeriodId"
+            'invalid finalPeriodId/initialPeriodId'
         );
 
         if (checkPastPeriod) {
-            bool periodHasStarted =
-                periodRegistry.periodHasStarted(_periodType, _initialPeriodId);
-            require(!periodHasStarted, "Period has started");
-        }
-        bool registeredMessenger =
-            messengerRegistry.registeredMessengers(_messengerAddress);
-        require(registeredMessenger == true, "messenger not registered");
-
-        SLA sla =
-            new SLA(
-                msg.sender,
-                _whitelisted,
+            bool periodHasStarted = periodRegistry.periodHasStarted(
                 _periodType,
-                _messengerAddress,
-                _initialPeriodId,
-                _finalPeriodId,
-                uint128(SLAs.length),
-                _ipfsHash,
-                _extraData,
-                _leverage
+                _initialPeriodId
             );
+            require(!periodHasStarted, 'past period');
+        }
+        bool registeredMessenger = messengerRegistry.registeredMessengers(
+            _messengerAddress
+        );
+        require(registeredMessenger == true, 'messenger not registered');
+
+        SLA sla = new SLA(
+            msg.sender,
+            _whitelisted,
+            _periodType,
+            _messengerAddress,
+            _initialPeriodId,
+            _finalPeriodId,
+            uint128(SLAs.length),
+            _ipfsHash,
+            _extraData,
+            _leverage
+        );
 
         sloRegistry.registerSLO(_sloValue, _sloType, address(sla));
         stakeRegistry.lockDSLAValue(
@@ -171,18 +176,23 @@ contract SLARegistry {
         SLA _sla,
         bool _ownerApproval
     ) public {
-        require(isRegisteredSLA(address(_sla)), "invalid SLA");
-        require(_periodId == _sla.nextVerifiablePeriod(), "invalid periodId");
+        require(isRegisteredSLA(address(_sla)), 'invalid SLA');
+        require(
+            _periodId == _sla.nextVerifiablePeriod(),
+            'not nextVerifiablePeriod'
+        );
         (, , SLA.Status status) = _sla.periodSLIs(_periodId);
-        require(status == SLA.Status.NotVerified, "invalid SLA status");
+        require(status == SLA.Status.NotVerified, 'invalid SLA status');
         bool breachedContract = _sla.breachedContract();
-        require(!breachedContract, "breached contract");
+        require(!breachedContract, 'breached contract');
         bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
-        require(slaAllowedPeriodId, "invalid period Id");
+        require(slaAllowedPeriodId, 'invalid period Id');
         PeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
-        bool periodFinished =
-            periodRegistry.periodIsFinished(slaPeriodType, _periodId);
-        require(periodFinished, "period not finished");
+        bool periodFinished = periodRegistry.periodIsFinished(
+            slaPeriodType,
+            _periodId
+        );
+        require(periodFinished, 'period unfinished');
         address slaMessenger = _sla.messengerAddress();
         SLIRequested(_periodId, address(_sla), msg.sender);
         IMessenger(slaMessenger).requestSLI(
@@ -199,19 +209,21 @@ contract SLARegistry {
     }
 
     function returnLockedValue(SLA _sla) public {
-        require(isRegisteredSLA(address(_sla)), "invalid SLA");
-        require(msg.sender == _sla.owner(), "msg.sender not owner");
+        require(isRegisteredSLA(address(_sla)), 'invalid SLA');
+        require(msg.sender == _sla.owner(), 'msg.sender not owner');
         uint256 lastValidPeriodId = _sla.finalPeriodId();
         PeriodRegistry.PeriodType periodType = _sla.periodType();
-        (, uint256 endOfLastValidPeriod) =
-            periodRegistry.getPeriodStartAndEnd(periodType, lastValidPeriodId);
+        (, uint256 endOfLastValidPeriod) = periodRegistry.getPeriodStartAndEnd(
+            periodType,
+            lastValidPeriodId
+        );
 
         (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(lastValidPeriodId);
         require(
             _sla.breachedContract() ||
                 (block.timestamp >= endOfLastValidPeriod &&
                     lastPeriodStatus != SLA.Status.NotVerified),
-            "Should only withdraw for finished contracts"
+            'not finished contract'
         );
         ReturnLockedValue(address(_sla), msg.sender);
         stakeRegistry.returnLockedValue(address(_sla));
