@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.3](https://github.com/Stacktical/stacktical-dsla-contracts/compare/v2.2.2...v2.2.3) (2021-06-15)
+
+
+### Features
+
+* messenger id fixed on messenger registry ([35eebde](https://github.com/Stacktical/stacktical-dsla-contracts/commit/35eebde6f542093953c26362e32a7c61319b05e2))
+* mocking imessenger on test ([cb6f53b](https://github.com/Stacktical/stacktical-dsla-contracts/commit/cb6f53b21a7f0ca9239785164eedf9fe11c41f56))
+* tests running with mocha ([22b6c34](https://github.com/Stacktical/stacktical-dsla-contracts/commit/22b6c34300924ec268ea8c33531e6177ca25f0d6))
+
 ### 2.2.2 (2021-06-14)
 
 
