@@ -4,6 +4,8 @@
   "description": "DSLA protocol contracts",
   "main": "index.js",
   "scripts": {
+    "test": "mocha --require ts-node/register test/**.test.ts",
+    "build": "waffle",
     "release:patch": "standard-version --release-as patch",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
@@ -29,16 +31,31 @@
   "dependencies": {
     "@chainlink/contracts": "0.0.11",
     "@openzeppelin/contracts": "^3.2.0",
-    "standard-version": "^9.3.0"
+    "chai-ethers": "0.0.1",
+    "standard-version": "^9.3.0",
+    "ts-generator": "^0.1.1"
   },
   "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.3.0-beta.10",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@typechain/ethers-v5": "^7.0.1",
+    "@typechain/hardhat": "^2.0.2",
+    "@types/chai": "^4.2.18",
+    "@types/mocha": "^8.2.2",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.3.1",
     "hardhat": "^2.3.0",
+    "hardhat-deploy": "^0.8.6",
+    "hardhat-deploy-ethers": "^0.3.0-beta.10",
     "husky": "^6.0.0",
+    "mocha": "^9.0.0",
     "prettier": "^2.3.1",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "solhint": "^3.3.6",
     "solhint-plugin-prettier": "0.0.5",
     "ts-node": "^10.0.0",
+    "typechain": "^5.0.0",
     "typescript": "^4.3.2"
   }
 }

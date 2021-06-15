@@ -137,7 +137,7 @@ contract SLARegistry {
         bool registeredMessenger = messengerRegistry.registeredMessengers(
             _messengerAddress
         );
-        require(registeredMessenger == true, 'messenger not registered');
+        require(registeredMessenger == true, 'invalid messenger');
 
         SLA sla = new SLA(
             msg.sender,

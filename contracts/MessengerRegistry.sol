@@ -85,7 +85,7 @@ contract MessengerRegistry {
         uint256 requestsCounter = messenger.requestsCounter();
         uint256 fulfillsCounter = messenger.fulfillsCounter();
         registeredMessengers[_messengerAddress] = true;
-        uint256 id = messengers.length - 1;
+        uint256 id = messengers.length;
         ownerMessengers[messengerOwner].push(id);
 
         messengers.push(
