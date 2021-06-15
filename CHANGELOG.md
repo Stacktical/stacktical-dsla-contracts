@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.4](https://github.com/Stacktical/stacktical-dsla-contracts/compare/v2.2.3...v2.2.4) (2021-06-15)
+
+
+### Features
+
+* whitelisting npm from package json ([17e5b2d](https://github.com/Stacktical/stacktical-dsla-contracts/commit/17e5b2d2929d8d1a0e85f9b5e40a02b5b1c17814))
+
 ### [2.2.3](https://github.com/Stacktical/stacktical-dsla-contracts/compare/v2.2.2...v2.2.3) (2021-06-15)
 
 
