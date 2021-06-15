@@ -1,3 +1,8 @@
+import '@typechain/hardhat';
+import '@nomiclabs/hardhat-ethers';
+import '@nomiclabs/hardhat-waffle';
+import 'hardhat-deploy';
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -14,5 +19,13 @@ module.exports = {
         },
       },
     ],
+  },
+  namedAccounts: {
+    deployer: {
+      default: 0,
+    },
+    notDeployer: {
+      default: 1,
+    },
   },
 };
