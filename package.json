@@ -4,12 +4,12 @@
   "description": "DSLA protocol contracts",
   "main": "index.js",
   "scripts": {
+    "test": "mocha --require ts-node/register test/**.test.ts",
+    "build": "waffle",
     "release:patch": "standard-version --release-as patch",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
-    "prettier": "npx prettier --write contracts",
-    "build": "waffle",
-    "test": "mocha --require ts-node/register test/**.test.ts "
+    "prettier": "npx prettier --write contracts"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@chainlink/contracts": "0.0.11",
     "@openzeppelin/contracts": "^3.2.0",
+    "chai-ethers": "0.0.1",
     "standard-version": "^9.3.0",
     "ts-generator": "^0.1.1"
   },
