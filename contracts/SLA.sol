@@ -115,14 +115,6 @@ contract SLA is Staking {
     }
 
     /**
-     * @dev throws if called with an amount less or equal to zero.
-     */
-    modifier notZero(uint256 _amount) {
-        require(_amount > 0, 'amount cant be 0');
-        _;
-    }
-
-    /**
      * @param _owner 1. -
      * @param _ipfsHash 3. -
      * @param _messengerAddress 3. -
@@ -225,10 +217,7 @@ contract SLA is Staking {
      *@param _token 2. address of the ERC to be staked
      */
 
-    function stakeTokens(uint256 _amount, address _token)
-        external
-        notZero(_amount)
-    {
+    function stakeTokens(uint256 _amount, address _token) external {
         bool isContractFinished = contractFinished();
         require(!isContractFinished, 'finished contract');
         _stake(_amount, _token);
@@ -239,7 +228,6 @@ contract SLA is Staking {
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
-        notZero(_amount)
     {
         bool isContractFinished = contractFinished();
         emit ProviderWithdraw(
@@ -259,7 +247,6 @@ contract SLA is Staking {
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
-        notZero(_amount)
     {
         if (msg.sender != owner()) {
             bool isContractFinished = contractFinished();
