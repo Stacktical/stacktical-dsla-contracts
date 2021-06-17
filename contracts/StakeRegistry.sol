@@ -9,7 +9,7 @@ import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './SLA.sol';
-import './messenger/IMessenger.sol';
+import './interfaces/IMessenger.sol';
 import './SLARegistry.sol';
 import './StringUtils.sol';
 

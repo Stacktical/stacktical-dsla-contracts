@@ -100,7 +100,7 @@ contract SLA is Staking {
     );
 
     /**
-     * @dev throws if called by any address other than the messenger contract.
+     * @dev throws if called by any address other than the interfaces contract.
      */
     modifier onlyMessenger() {
         require(msg.sender == messengerAddress, 'not messenger');
@@ -108,7 +108,7 @@ contract SLA is Staking {
     }
 
     /**
-     * @dev throws if called by any address other than the messenger contract.
+     * @dev throws if called by any address other than the interfaces contract.
      */
     modifier onlySLARegistry() {
         require(msg.sender == address(slaRegistry), 'not SLARegistry');

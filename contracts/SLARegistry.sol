@@ -8,7 +8,7 @@ import './SLORegistry.sol';
 import './PeriodRegistry.sol';
 import './MessengerRegistry.sol';
 import './StakeRegistry.sol';
-import './messenger/IMessenger.sol';
+import './interfaces/IMessenger.sol';
 
 /**
  * @title SLARegistry
@@ -228,7 +228,7 @@ contract SLARegistry {
 
     /**
      * @dev function to declare this SLARegistry contract as SLARegistry of _messengerAddress
-     * @param _messengerAddress 1. address of the messenger
+     * @param _messengerAddress 1. address of the interfaces
      */
 
     function registerMessenger(

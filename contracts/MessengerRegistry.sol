@@ -2,7 +2,7 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import './messenger/IMessenger.sol';
+import './interfaces/IMessenger.sol';
 
 /**
  * @title MessengerRegistry

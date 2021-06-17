@@ -26,7 +26,7 @@ const setup = deployments.createFixture(async () => {
     await ethers.getSigner(deployer),
     iMessengerArtifact.abi
   );
-  // Mock messenger to return proper values
+  // Mock interfaces to return proper values
   await mockMessenger.mock.owner.returns(deployer);
   await mockMessenger.mock.messengerPrecision.returns(10000);
   await mockMessenger.mock.requestsCounter.returns(0);
