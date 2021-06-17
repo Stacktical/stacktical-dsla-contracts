@@ -115,17 +115,14 @@ contract SLARegistry {
             _periodType,
             _initialPeriodId
         );
-        require(validPeriod, 'first period id invalid');
+        require(validPeriod, 'first id invalid');
         validPeriod = periodRegistry.isValidPeriod(_periodType, _finalPeriodId);
-        require(validPeriod, 'final period id invalid');
+        require(validPeriod, 'final id invalid');
         bool initializedPeriod = periodRegistry.isInitializedPeriod(
             _periodType
         );
-        require(initializedPeriod, 'period type not initialized');
-        require(
-            _finalPeriodId >= _initialPeriodId,
-            'invalid finalPeriodId/initialPeriodId'
-        );
+        require(initializedPeriod, 'period not initialized');
+        require(_finalPeriodId >= _initialPeriodId, 'invalid final/initial');
 
         if (checkPastPeriod) {
             bool periodHasStarted = periodRegistry.periodHasStarted(
@@ -186,7 +183,7 @@ contract SLARegistry {
         bool breachedContract = _sla.breachedContract();
         require(!breachedContract, 'breached contract');
         bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
-        require(slaAllowedPeriodId, 'invalid period Id');
+        require(slaAllowedPeriodId, 'invalid period');
         PeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
         bool periodFinished = periodRegistry.periodIsFinished(
             slaPeriodType,

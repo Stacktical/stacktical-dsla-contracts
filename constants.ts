@@ -53,11 +53,7 @@ export enum TOKEN_NAMES {
 
 export enum DEPLOYMENT_TAGS {
   DSLA = 'dsla',
-  Chainlink = 'chainlink',
-  Services = 'services',
-  Details = 'details',
-  Messengers = 'messengers',
-  DummyTokens = 'dummy-tokens',
+  SLA_REGISTRY_FIXTURE = 'sla_registry_fixture',
 }
 
 export enum USE_CASES {
@@ -71,6 +67,8 @@ export enum NETWORKS {
   ETHEREUM = 'ethereum',
   POLYGON = 'polygon',
   HARMONY = 'harmony',
+  KOVAN = 'kovan',
+  FUJI = 'fuji',
 }
 
 export enum PERIOD_TYPE {

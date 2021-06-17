@@ -55,7 +55,9 @@ interface SLAInterface extends ethers.utils.Interface {
     "slaRegistry()": FunctionFragment;
     "stakeTokens(uint256,address)": FunctionFragment;
     "stakers(uint256)": FunctionFragment;
+    "toggleUserWithdrawLocked()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "userWithdrawLocked()": FunctionFragment;
     "usersPool(address)": FunctionFragment;
     "whitelist(address)": FunctionFragment;
     "whitelistedContract()": FunctionFragment;
@@ -188,8 +190,16 @@ interface SLAInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "toggleUserWithdrawLocked",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "userWithdrawLocked",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "usersPool", values: [string]): string;
   encodeFunctionData(functionFragment: "whitelist", values: [string]): string;
@@ -319,7 +329,15 @@ interface SLAInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "stakers", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "toggleUserWithdrawLocked",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "userWithdrawLocked",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "usersPool", data: BytesLike): Result;
@@ -516,10 +534,16 @@ export class SLA extends BaseContract {
 
     stakers(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
+    toggleUserWithdrawLocked(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    userWithdrawLocked(overrides?: CallOverrides): Promise<[boolean]>;
 
     usersPool(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -646,10 +670,16 @@ export class SLA extends BaseContract {
 
   stakers(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  toggleUserWithdrawLocked(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   transferOwnership(
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  userWithdrawLocked(overrides?: CallOverrides): Promise<boolean>;
 
   usersPool(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -782,10 +812,14 @@ export class SLA extends BaseContract {
 
     stakers(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+    toggleUserWithdrawLocked(overrides?: CallOverrides): Promise<void>;
+
     transferOwnership(
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    userWithdrawLocked(overrides?: CallOverrides): Promise<boolean>;
 
     usersPool(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1041,10 +1075,16 @@ export class SLA extends BaseContract {
 
     stakers(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
+    toggleUserWithdrawLocked(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    userWithdrawLocked(overrides?: CallOverrides): Promise<BigNumber>;
 
     usersPool(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1193,9 +1233,17 @@ export class SLA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    toggleUserWithdrawLocked(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    userWithdrawLocked(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     usersPool(

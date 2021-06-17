@@ -170,10 +170,7 @@ contract Staking is Ownable {
         (, , , , , , uint256 maxTokenLength, , ) = stakeRegistry
         .getStakingParameters();
         require(!isAllowedToken(_tokenAddress), 'already added');
-        require(
-            stakeRegistry.isAllowedToken(_tokenAddress),
-            'not allowed by SLARegistry'
-        );
+        require(stakeRegistry.isAllowedToken(_tokenAddress), 'not allowed');
         allowedTokens.push(_tokenAddress);
         require(maxTokenLength >= allowedTokens.length, 'max token length');
         string memory dTokenID = StringUtils.uintToStr(slaID);
@@ -235,7 +232,7 @@ contract Staking is Ownable {
             );
             require(
                 usersStake.add(_amount).mul(leverage) <= providerStake,
-                'incorrect user stake'
+                'user stake'
             );
             ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
@@ -345,7 +342,7 @@ contract Staking is Ownable {
         if (!_contractFinished) {
             require(
                 providerStake.sub(_amount) >= usersStake.mul(leverage),
-                'incorrect withdraw'
+                'bad amount'
             );
         }
         ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];

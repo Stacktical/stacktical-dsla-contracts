@@ -45,6 +45,7 @@ contract SLA is Staking {
     bytes32[] public extraData;
 
     bool private _breachedContract = false;
+    bool public userWithdrawLocked = true;
     uint256 public nextVerifiablePeriod;
 
     /// @dev periodId=>PeriodSLI mapping
@@ -102,7 +103,7 @@ contract SLA is Staking {
      * @dev throws if called by any address other than the messenger contract.
      */
     modifier onlyMessenger() {
-        require(msg.sender == messengerAddress, 'only messenger');
+        require(msg.sender == messengerAddress, 'not messenger');
         _;
     }
 
@@ -110,7 +111,7 @@ contract SLA is Staking {
      * @dev throws if called by any address other than the messenger contract.
      */
     modifier onlySLARegistry() {
-        require(msg.sender == address(slaRegistry), 'only SLARegistry');
+        require(msg.sender == address(slaRegistry), 'not SLARegistry');
         _;
     }
 
@@ -248,9 +249,9 @@ contract SLA is Staking {
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        if (msg.sender != owner()) {
+        if (msg.sender != owner() && userWithdrawLocked) {
             bool isContractFinished = contractFinished();
-            require(isContractFinished, 'not finished contract');
+            require(isContractFinished, 'not finished');
         }
         emit UserWithdraw(
             _tokenAddress,
@@ -259,6 +260,10 @@ contract SLA is Staking {
             _amount
         );
         _withdrawUserTokens(_amount, _tokenAddress);
+    }
+
+    function toggleUserWithdrawLocked() external onlyOwner {
+        userWithdrawLocked = !userWithdrawLocked;
     }
 
     function getStakersLength() external view returns (uint256) {
