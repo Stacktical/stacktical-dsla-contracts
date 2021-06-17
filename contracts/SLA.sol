@@ -45,6 +45,7 @@ contract SLA is Staking {
     bytes32[] public extraData;
 
     bool private _breachedContract = false;
+    bool public userWithdrawLocked = true;
     uint256 public nextVerifiablePeriod;
 
     /// @dev periodId=>PeriodSLI mapping
@@ -102,7 +103,7 @@ contract SLA is Staking {
      * @dev throws if called by any address other than the messenger contract.
      */
     modifier onlyMessenger() {
-        require(msg.sender == messengerAddress, 'only messenger');
+        require(msg.sender == messengerAddress, 'not messenger');
         _;
     }
 
@@ -110,15 +111,7 @@ contract SLA is Staking {
      * @dev throws if called by any address other than the messenger contract.
      */
     modifier onlySLARegistry() {
-        require(msg.sender == address(slaRegistry), 'only SLARegistry');
-        _;
-    }
-
-    /**
-     * @dev throws if called with an amount less or equal to zero.
-     */
-    modifier notZero(uint256 _amount) {
-        require(_amount > 0, 'amount cant be 0');
+        require(msg.sender == address(slaRegistry), 'not SLARegistry');
         _;
     }
 
@@ -225,10 +218,7 @@ contract SLA is Staking {
      *@param _token 2. address of the ERC to be staked
      */
 
-    function stakeTokens(uint256 _amount, address _token)
-        external
-        notZero(_amount)
-    {
+    function stakeTokens(uint256 _amount, address _token) external {
         bool isContractFinished = contractFinished();
         require(!isContractFinished, 'finished contract');
         _stake(_amount, _token);
@@ -239,7 +229,6 @@ contract SLA is Staking {
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
-        notZero(_amount)
     {
         bool isContractFinished = contractFinished();
         emit ProviderWithdraw(
@@ -259,11 +248,10 @@ contract SLA is Staking {
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
-        notZero(_amount)
     {
-        if (msg.sender != owner()) {
+        if (msg.sender != owner() && userWithdrawLocked) {
             bool isContractFinished = contractFinished();
-            require(isContractFinished, 'not finished contract');
+            require(isContractFinished, 'not finished');
         }
         emit UserWithdraw(
             _tokenAddress,
@@ -272,6 +260,10 @@ contract SLA is Staking {
             _amount
         );
         _withdrawUserTokens(_amount, _tokenAddress);
+    }
+
+    function toggleUserWithdrawLocked() external onlyOwner {
+        userWithdrawLocked = !userWithdrawLocked;
     }
 
     function getStakersLength() external view returns (uint256) {

@@ -6,18 +6,42 @@ module.exports = async ({
   getNamedAccounts,
   deployments,
   network,
+  waffle,
+  ethers,
 }: HardhatRuntimeEnvironment) => {
   const { deployer } = await getNamedAccounts();
   const { deploy, get } = deployments;
+  const { deployMockContract } = waffle;
   const baseOptions: DeployOptionsBase = {
     from: deployer,
     log: true,
   };
 
   await deploy(CONTRACT_NAMES.StringUtils, baseOptions);
+
   await deploy(CONTRACT_NAMES.PeriodRegistry, baseOptions);
+  const periodRegistryArtifact = await deployments.getArtifact(
+    CONTRACT_NAMES.PeriodRegistry
+  );
+  const periodRegistry = await deployMockContract(
+    await (ethers as any).getSigner(deployer),
+    periodRegistryArtifact.abi
+  );
+  await periodRegistry.mock.isInitializedPeriod.returns(true);
+  await periodRegistry.mock.isValidPeriod.returns(true);
+  await periodRegistry.mock.getPeriodStartAndEnd.returns(0, 0);
+
+  const messengerRegistryArtifact = await deployments.getArtifact(
+    CONTRACT_NAMES.MessengerRegistry
+  );
+  const messengerRegistry = await deployMockContract(
+    await (ethers as any).getSigner(deployer),
+    messengerRegistryArtifact.abi
+  );
+  await messengerRegistry.mock.registeredMessengers.returns(true);
+  await messengerRegistry.mock.setSLARegistry.returns();
+
   await deploy(CONTRACT_NAMES.SLORegistry, baseOptions);
-  await deploy(CONTRACT_NAMES.MessengerRegistry, baseOptions);
   await deploy(CONTRACT_NAMES.DSLA, {
     ...baseOptions,
     contract: 'ERC20PresetMinterPauser',
@@ -29,15 +53,12 @@ module.exports = async ({
     ...baseOptions,
     args: [dslaTokenAddress],
   });
-  const periodRegistry = await get(CONTRACT_NAMES.PeriodRegistry);
-  const sloRegistry = await get(CONTRACT_NAMES.SLORegistry);
-  const messengerRegistry = await get(CONTRACT_NAMES.MessengerRegistry);
-  const stakeRegistry = await get(CONTRACT_NAMES.StakeRegistry);
-  const stringUtils = await get(CONTRACT_NAMES.StringUtils);
+  const sloRegistry = await ethers.getContract(CONTRACT_NAMES.SLORegistry);
+  const stakeRegistry = await ethers.getContract(CONTRACT_NAMES.StakeRegistry);
+  const stringUtils = await ethers.getContract(CONTRACT_NAMES.StringUtils);
   const checkPastPeriods = false;
   await deploy(CONTRACT_NAMES.SLARegistry, {
     ...baseOptions,
-    ...(network.config.gas !== 'auto' && { gasLimit: network.config.gas }),
     args: [
       sloRegistry.address,
       periodRegistry.address,
@@ -51,4 +72,4 @@ module.exports = async ({
   });
 };
 
-module.exports.tags = [DEPLOYMENT_TAGS.DSLA];
+module.exports.tags = [DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE];
