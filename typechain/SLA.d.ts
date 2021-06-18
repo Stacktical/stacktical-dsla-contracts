@@ -29,7 +29,6 @@ interface SLAInterface extends ethers.utils.Interface {
     "contractFinished()": FunctionFragment;
     "creationBlockNumber()": FunctionFragment;
     "dpTokenRegistry(address)": FunctionFragment;
-    "dslaTokenAddress()": FunctionFragment;
     "duTokenRegistry(address)": FunctionFragment;
     "extraData(uint256)": FunctionFragment;
     "finalPeriodId()": FunctionFragment;
@@ -52,7 +51,6 @@ interface SLAInterface extends ethers.utils.Interface {
     "removeUsersFromWhitelist(address[])": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "slaID()": FunctionFragment;
-    "slaRegistry()": FunctionFragment;
     "stakeTokens(uint256,address)": FunctionFragment;
     "stakers(uint256)": FunctionFragment;
     "toggleUserWithdrawLocked()": FunctionFragment;
@@ -96,10 +94,6 @@ interface SLAInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "dpTokenRegistry",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "dslaTokenAddress",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "duTokenRegistry",
@@ -178,10 +172,6 @@ interface SLAInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "slaID", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "slaRegistry",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "stakeTokens",
     values: [BigNumberish, string]
   ): string;
@@ -246,10 +236,6 @@ interface SLAInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "dpTokenRegistry",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "dslaTokenAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -319,10 +305,6 @@ interface SLAInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "slaID", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "slaRegistry",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "stakeTokens",
     data: BytesLike
@@ -445,8 +427,6 @@ export class SLA extends BaseContract {
 
     dpTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
-    dslaTokenAddress(overrides?: CallOverrides): Promise<[string]>;
-
     duTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
     extraData(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
@@ -524,8 +504,6 @@ export class SLA extends BaseContract {
 
     slaID(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    slaRegistry(overrides?: CallOverrides): Promise<[string]>;
-
     stakeTokens(
       _amount: BigNumberish,
       _token: string,
@@ -585,8 +563,6 @@ export class SLA extends BaseContract {
   creationBlockNumber(overrides?: CallOverrides): Promise<BigNumber>;
 
   dpTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-  dslaTokenAddress(overrides?: CallOverrides): Promise<string>;
 
   duTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -660,8 +636,6 @@ export class SLA extends BaseContract {
 
   slaID(overrides?: CallOverrides): Promise<BigNumber>;
 
-  slaRegistry(overrides?: CallOverrides): Promise<string>;
-
   stakeTokens(
     _amount: BigNumberish,
     _token: string,
@@ -724,8 +698,6 @@ export class SLA extends BaseContract {
     creationBlockNumber(overrides?: CallOverrides): Promise<BigNumber>;
 
     dpTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-    dslaTokenAddress(overrides?: CallOverrides): Promise<string>;
 
     duTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -801,8 +773,6 @@ export class SLA extends BaseContract {
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     slaID(overrides?: CallOverrides): Promise<BigNumber>;
-
-    slaRegistry(overrides?: CallOverrides): Promise<string>;
 
     stakeTokens(
       _amount: BigNumberish,
@@ -988,8 +958,6 @@ export class SLA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    dslaTokenAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
     duTokenRegistry(
       arg0: string,
       overrides?: CallOverrides
@@ -1065,8 +1033,6 @@ export class SLA extends BaseContract {
 
     slaID(overrides?: CallOverrides): Promise<BigNumber>;
 
-    slaRegistry(overrides?: CallOverrides): Promise<BigNumber>;
-
     stakeTokens(
       _amount: BigNumberish,
       _token: string,
@@ -1135,8 +1101,6 @@ export class SLA extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    dslaTokenAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     duTokenRegistry(
       arg0: string,
@@ -1219,8 +1183,6 @@ export class SLA extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     slaID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    slaRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     stakeTokens(
       _amount: BigNumberish,

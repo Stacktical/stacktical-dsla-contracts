@@ -5,169 +5,125 @@ pragma experimental ABIEncoderV2;
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import './SLA.sol';
 import './SLORegistry.sol';
-import './PeriodRegistry.sol';
-import './MessengerRegistry.sol';
-import './StakeRegistry.sol';
+import './interfaces/IPeriodRegistry.sol';
+import './interfaces/IMessengerRegistry.sol';
+import './interfaces/IStakeRegistry.sol';
 import './interfaces/IMessenger.sol';
+import './interfaces/ISLARegistry.sol';
 
-/**
- * @title SLARegistry
- * @dev SLARegistry is a contract for handling creation of service level
- * agreements and keeping track of the created agreements
- */
-contract SLARegistry {
+contract SLARegistry is ISLARegistry {
     using SafeMath for uint256;
 
     /// @dev SLO registry
-    SLORegistry public sloRegistry;
+    address private _sloRegistry;
     /// @dev Periods registry
-    PeriodRegistry public periodRegistry;
+    address private _periodRegistry;
     /// @dev Messengers registry
-    MessengerRegistry public messengerRegistry;
+    address private _messengerRegistry;
     /// @dev Stake registry
-    StakeRegistry public stakeRegistry;
+    address private _stakeRegistry;
     /// @dev stores the addresses of created SLAs
     SLA[] public SLAs;
     /// @dev stores the indexes of service level agreements owned by an user
-    mapping(address => uint256[]) private userToSLAIndexes;
+    mapping(address => uint256[]) private _userToSLAIndexes;
     /// @dev to check if registered SLA
-    mapping(address => bool) private registeredSLAs;
+    mapping(address => bool) private _registeredSLAs;
     // value to lock past periods on SLA deployment
-    bool public immutable checkPastPeriod;
+    bool private immutable _checkPastPeriod;
 
-    /**
-     * @dev event for service level agreement creation logging
-     * @param sla 1. The address of the created service level agreement contract
-     * @param owner 2. The address of the owner of the service level agreement
-     */
     event SLACreated(SLA indexed sla, address indexed owner);
 
-    /**
-     * @dev event for service level agreement creation logging
-     * @param periodId 1. -
-     * @param sla 2. -
-     * @param caller 3. -
-     */
     event SLIRequested(
         uint256 periodId,
         address indexed sla,
         address indexed caller
     );
 
-    /**
-     * @dev event for service level agreement creation logging
-     * @param sla 1. -
-     * @param caller 2. -
-     */
     event ReturnLockedValue(address indexed sla, address indexed caller);
 
-    /**
-     * @dev constructor
-     * @param _sloRegistry 1. SLO Registry
-     * @param _periodRegistry 2. Periods registry
-     * @param _messengerRegistry 3. Messenger registry
-     * @param _stakeRegistry 4. Stake registry
-     * @param _checkPastPeriod 5. -
-     */
     constructor(
-        SLORegistry _sloRegistry,
-        PeriodRegistry _periodRegistry,
-        MessengerRegistry _messengerRegistry,
-        StakeRegistry _stakeRegistry,
-        bool _checkPastPeriod
+        address sloRegistry_,
+        address periodRegistry_,
+        address messengerRegistry_,
+        address stakeRegistry_,
+        bool checkPastPeriod_
     ) public {
-        sloRegistry = _sloRegistry;
-        sloRegistry.setSLARegistry();
-        periodRegistry = _periodRegistry;
-        stakeRegistry = _stakeRegistry;
-        stakeRegistry.setSLARegistry();
-        messengerRegistry = _messengerRegistry;
-        messengerRegistry.setSLARegistry();
-        checkPastPeriod = _checkPastPeriod;
+        _sloRegistry = sloRegistry_;
+        SLORegistry(_sloRegistry).setSLARegistry();
+        _periodRegistry = periodRegistry_;
+        _stakeRegistry = stakeRegistry_;
+        IStakeRegistry(_stakeRegistry).setSLARegistry();
+        _messengerRegistry = messengerRegistry_;
+        IMessengerRegistry(_messengerRegistry).setSLARegistry();
+        _checkPastPeriod = checkPastPeriod_;
     }
 
-    /**
-     * @dev public function for creating canonical service level agreements
-     * @param _sloValue 1. -
-     * @param _sloType 2. -
-     * @param _ipfsHash 3. -
-     * @param _periodType 4. -
-     * @param _initialPeriodId 5. -
-     * @param _finalPeriodId 6. -
-     * @param _messengerAddress 7. -
-     * @param _whitelisted 8. -
-     * @param _extraData 9. -
-     * @param _leverage 10. -
-     */
     function createSLA(
-        uint256 _sloValue,
-        SLORegistry.SLOType _sloType,
-        bool _whitelisted,
-        address _messengerAddress,
-        PeriodRegistry.PeriodType _periodType,
-        uint128 _initialPeriodId,
-        uint128 _finalPeriodId,
-        string memory _ipfsHash,
-        bytes32[] memory _extraData,
-        uint64 _leverage
+        uint256 sloValue_,
+        SLORegistry.SLOType sloType_,
+        bool whitelisted_,
+        address messengerAddress_,
+        IPeriodRegistry.PeriodType periodType_,
+        uint128 initialPeriodId_,
+        uint128 finalPeriodId_,
+        string memory ipfsHash_,
+        bytes32[] memory extraData_,
+        uint64 leverage_
     ) public {
-        bool validPeriod = periodRegistry.isValidPeriod(
-            _periodType,
-            _initialPeriodId
+        bool validPeriod = IPeriodRegistry(_periodRegistry).isValidPeriod(
+            periodType_,
+            initialPeriodId_
         );
         require(validPeriod, 'first id invalid');
-        validPeriod = periodRegistry.isValidPeriod(_periodType, _finalPeriodId);
-        require(validPeriod, 'final id invalid');
-        bool initializedPeriod = periodRegistry.isInitializedPeriod(
-            _periodType
+        validPeriod = IPeriodRegistry(_periodRegistry).isValidPeriod(
+            periodType_,
+            finalPeriodId_
         );
+        require(validPeriod, 'final id invalid');
+        bool initializedPeriod = IPeriodRegistry(_periodRegistry)
+        .isInitializedPeriod(periodType_);
         require(initializedPeriod, 'period not initialized');
-        require(_finalPeriodId >= _initialPeriodId, 'invalid final/initial');
+        require(finalPeriodId_ >= initialPeriodId_, 'invalid final/initial');
 
-        if (checkPastPeriod) {
-            bool periodHasStarted = periodRegistry.periodHasStarted(
-                _periodType,
-                _initialPeriodId
-            );
+        if (_checkPastPeriod) {
+            bool periodHasStarted = IPeriodRegistry(_periodRegistry)
+            .periodHasStarted(periodType_, initialPeriodId_);
             require(!periodHasStarted, 'past period');
         }
-        bool registeredMessenger = messengerRegistry.registeredMessengers(
-            _messengerAddress
-        );
+        bool registeredMessenger = IMessengerRegistry(_messengerRegistry)
+        .registeredMessengers(messengerAddress_);
         require(registeredMessenger == true, 'invalid messenger');
 
         SLA sla = new SLA(
             msg.sender,
-            _whitelisted,
-            _periodType,
-            _messengerAddress,
-            _initialPeriodId,
-            _finalPeriodId,
+            whitelisted_,
+            periodType_,
+            messengerAddress_,
+            initialPeriodId_,
+            finalPeriodId_,
             uint128(SLAs.length),
-            _ipfsHash,
-            _extraData,
-            _leverage
+            ipfsHash_,
+            extraData_,
+            leverage_
         );
 
-        sloRegistry.registerSLO(_sloValue, _sloType, address(sla));
-        stakeRegistry.lockDSLAValue(
+        SLORegistry(_sloRegistry).registerSLO(
+            sloValue_,
+            sloType_,
+            address(sla)
+        );
+        IStakeRegistry(_stakeRegistry).lockDSLAValue(
             msg.sender,
             address(sla),
-            _finalPeriodId - _initialPeriodId + 1
+            finalPeriodId_ - initialPeriodId_ + 1
         );
         SLAs.push(sla);
-        registeredSLAs[address(sla)] = true;
+        _registeredSLAs[address(sla)] = true;
         uint256 index = SLAs.length.sub(1);
-        userToSLAIndexes[msg.sender].push(index);
+        _userToSLAIndexes[msg.sender].push(index);
         emit SLACreated(sla, msg.sender);
     }
 
-    /**
-     * @dev Gets SLI information for the specified SLA and SLO
-     * @param _periodId 1. id of the period
-     * @param _sla 2. SLA Address
-     * @param _ownerApproval 3. if approval by owner or msg.sender
-     */
     function requestSLI(
         uint256 _periodId,
         SLA _sla,
@@ -184,8 +140,8 @@ contract SLARegistry {
         require(!breachedContract, 'breached contract');
         bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
         require(slaAllowedPeriodId, 'invalid period');
-        PeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
-        bool periodFinished = periodRegistry.periodIsFinished(
+        IPeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
+        bool periodFinished = IPeriodRegistry(_periodRegistry).periodIsFinished(
             slaPeriodType,
             _periodId
         );
@@ -198,7 +154,7 @@ contract SLARegistry {
             _ownerApproval,
             msg.sender
         );
-        stakeRegistry.distributeVerificationRewards(
+        IStakeRegistry(_stakeRegistry).distributeVerificationRewards(
             address(_sla),
             msg.sender,
             _periodId
@@ -209,11 +165,9 @@ contract SLARegistry {
         require(isRegisteredSLA(address(_sla)), 'invalid SLA');
         require(msg.sender == _sla.owner(), 'msg.sender not owner');
         uint256 lastValidPeriodId = _sla.finalPeriodId();
-        PeriodRegistry.PeriodType periodType = _sla.periodType();
-        (, uint256 endOfLastValidPeriod) = periodRegistry.getPeriodStartAndEnd(
-            periodType,
-            lastValidPeriodId
-        );
+        IPeriodRegistry.PeriodType periodType = _sla.periodType();
+        (, uint256 endOfLastValidPeriod) = IPeriodRegistry(_periodRegistry)
+        .getPeriodStartAndEnd(periodType, lastValidPeriodId);
 
         (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(lastValidPeriodId);
         require(
@@ -223,37 +177,25 @@ contract SLARegistry {
             'not finished contract'
         );
         ReturnLockedValue(address(_sla), msg.sender);
-        stakeRegistry.returnLockedValue(address(_sla));
+        IStakeRegistry(_stakeRegistry).returnLockedValue(address(_sla));
     }
-
-    /**
-     * @dev function to declare this SLARegistry contract as SLARegistry of _messengerAddress
-     * @param _messengerAddress 1. address of the interfaces
-     */
 
     function registerMessenger(
         address _messengerAddress,
         string memory _specificationUrl
     ) public {
         IMessenger(_messengerAddress).setSLARegistry();
-        messengerRegistry.registerMessenger(
+        IMessengerRegistry(_messengerRegistry).registerMessenger(
             msg.sender,
             _messengerAddress,
             _specificationUrl
         );
     }
 
-    /**
-     * @dev public view function that returns the service level agreements that
-     * the given user is the owner of
-     * @param _user Address of the user for which to return the service level
-     * agreements
-     * @return array of SLAs
-     */
     function userSLAs(address _user) public view returns (SLA[] memory) {
-        uint256 count = userToSLAIndexes[_user].length;
+        uint256 count = _userToSLAIndexes[_user].length;
         SLA[] memory SLAList = new SLA[](count);
-        uint256[] memory userSLAIndexes = userToSLAIndexes[_user];
+        uint256[] memory userSLAIndexes = _userToSLAIndexes[_user];
 
         for (uint256 i = 0; i < count; i++) {
             SLAList[i] = (SLAs[userSLAIndexes[i]]);
@@ -262,19 +204,36 @@ contract SLARegistry {
         return (SLAList);
     }
 
-    /**
-     * @dev public view function that returns all the service level agreements
-     * @return SLA[] array of SLAs
-     */
     function allSLAs() public view returns (SLA[] memory) {
         return (SLAs);
     }
 
-    /**
-     * @dev public view function that returns true if _slaAddress was deployed using this SLARegistry
-     * @param _slaAddress address of the SLA to be checked
-     */
-    function isRegisteredSLA(address _slaAddress) public view returns (bool) {
-        return registeredSLAs[_slaAddress];
+    function isRegisteredSLA(address _slaAddress)
+        public
+        view
+        override
+        returns (bool)
+    {
+        return _registeredSLAs[_slaAddress];
+    }
+
+    function sloRegistry() external view override returns (address) {
+        return _sloRegistry;
+    }
+
+    function periodRegistry() external view override returns (address) {
+        return _periodRegistry;
+    }
+
+    function messengerRegistry() external view override returns (address) {
+        return _messengerRegistry;
+    }
+
+    function stakeRegistry() external view override returns (address) {
+        return _stakeRegistry;
+    }
+
+    function checkPastPeriod() external view returns (bool) {
+        return _checkPastPeriod;
     }
 }

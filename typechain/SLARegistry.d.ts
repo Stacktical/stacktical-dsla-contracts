@@ -191,16 +191,16 @@ export class SLARegistry extends BaseContract {
     checkPastPeriod(overrides?: CallOverrides): Promise<[boolean]>;
 
     createSLA(
-      _sloValue: BigNumberish,
-      _sloType: BigNumberish,
-      _whitelisted: boolean,
-      _messengerAddress: string,
-      _periodType: BigNumberish,
-      _initialPeriodId: BigNumberish,
-      _finalPeriodId: BigNumberish,
-      _ipfsHash: string,
-      _extraData: BytesLike[],
-      _leverage: BigNumberish,
+      sloValue_: BigNumberish,
+      sloType_: BigNumberish,
+      whitelisted_: boolean,
+      messengerAddress_: string,
+      periodType_: BigNumberish,
+      initialPeriodId_: BigNumberish,
+      finalPeriodId_: BigNumberish,
+      ipfsHash_: string,
+      extraData_: BytesLike[],
+      leverage_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -245,16 +245,16 @@ export class SLARegistry extends BaseContract {
   checkPastPeriod(overrides?: CallOverrides): Promise<boolean>;
 
   createSLA(
-    _sloValue: BigNumberish,
-    _sloType: BigNumberish,
-    _whitelisted: boolean,
-    _messengerAddress: string,
-    _periodType: BigNumberish,
-    _initialPeriodId: BigNumberish,
-    _finalPeriodId: BigNumberish,
-    _ipfsHash: string,
-    _extraData: BytesLike[],
-    _leverage: BigNumberish,
+    sloValue_: BigNumberish,
+    sloType_: BigNumberish,
+    whitelisted_: boolean,
+    messengerAddress_: string,
+    periodType_: BigNumberish,
+    initialPeriodId_: BigNumberish,
+    finalPeriodId_: BigNumberish,
+    ipfsHash_: string,
+    extraData_: BytesLike[],
+    leverage_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -299,16 +299,16 @@ export class SLARegistry extends BaseContract {
     checkPastPeriod(overrides?: CallOverrides): Promise<boolean>;
 
     createSLA(
-      _sloValue: BigNumberish,
-      _sloType: BigNumberish,
-      _whitelisted: boolean,
-      _messengerAddress: string,
-      _periodType: BigNumberish,
-      _initialPeriodId: BigNumberish,
-      _finalPeriodId: BigNumberish,
-      _ipfsHash: string,
-      _extraData: BytesLike[],
-      _leverage: BigNumberish,
+      sloValue_: BigNumberish,
+      sloType_: BigNumberish,
+      whitelisted_: boolean,
+      messengerAddress_: string,
+      periodType_: BigNumberish,
+      initialPeriodId_: BigNumberish,
+      finalPeriodId_: BigNumberish,
+      ipfsHash_: string,
+      extraData_: BytesLike[],
+      leverage_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -372,16 +372,16 @@ export class SLARegistry extends BaseContract {
     checkPastPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
     createSLA(
-      _sloValue: BigNumberish,
-      _sloType: BigNumberish,
-      _whitelisted: boolean,
-      _messengerAddress: string,
-      _periodType: BigNumberish,
-      _initialPeriodId: BigNumberish,
-      _finalPeriodId: BigNumberish,
-      _ipfsHash: string,
-      _extraData: BytesLike[],
-      _leverage: BigNumberish,
+      sloValue_: BigNumberish,
+      sloType_: BigNumberish,
+      whitelisted_: boolean,
+      messengerAddress_: string,
+      periodType_: BigNumberish,
+      initialPeriodId_: BigNumberish,
+      finalPeriodId_: BigNumberish,
+      ipfsHash_: string,
+      extraData_: BytesLike[],
+      leverage_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -430,16 +430,16 @@ export class SLARegistry extends BaseContract {
     checkPastPeriod(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     createSLA(
-      _sloValue: BigNumberish,
-      _sloType: BigNumberish,
-      _whitelisted: boolean,
-      _messengerAddress: string,
-      _periodType: BigNumberish,
-      _initialPeriodId: BigNumberish,
-      _finalPeriodId: BigNumberish,
-      _ipfsHash: string,
-      _extraData: BytesLike[],
-      _leverage: BigNumberish,
+      sloValue_: BigNumberish,
+      sloType_: BigNumberish,
+      whitelisted_: boolean,
+      messengerAddress_: string,
+      periodType_: BigNumberish,
+      initialPeriodId_: BigNumberish,
+      finalPeriodId_: BigNumberish,
+      ipfsHash_: string,
+      extraData_: BytesLike[],
+      leverage_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

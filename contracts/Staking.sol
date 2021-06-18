@@ -6,9 +6,9 @@ import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import './StakeRegistry.sol';
-import './SLARegistry.sol';
-import './PeriodRegistry.sol';
+import './interfaces/IStakeRegistry.sol';
+import './interfaces/ISLARegistry.sol';
+import './interfaces/IPeriodRegistry.sol';
 import './StringUtils.sol';
 
 contract Staking is Ownable {
@@ -16,9 +16,12 @@ contract Staking is Ownable {
     using SafeERC20 for ERC20;
 
     /// @dev StakeRegistry contract
-    StakeRegistry private stakeRegistry;
+    IStakeRegistry private _stakeRegistry;
     /// @dev SLARegistry contract
-    PeriodRegistry private immutable periodRegistry;
+    IPeriodRegistry private immutable _periodRegistry;
+    /// @dev DSLA token address to burn fees
+    address private immutable _dslaTokenAddress;
+
     /// @dev current SLA id
     uint128 public immutable slaID;
 
@@ -36,16 +39,11 @@ contract Staking is Ownable {
     address[] public stakers;
     /// @dev (slaOwner=>bool)
     mapping(address => bool) public registeredStakers;
-    /// @dev DSLA token address to burn fees
-    address public immutable dslaTokenAddress;
     /// @dev array with the allowed tokens addresses for the current SLA
     address[] public allowedTokens;
 
     /// @dev corresponds to the burn rate of DSLA tokens, but divided by 1000 i.e burn percentage = burnRate/1000 %
     uint256 public immutable DSLAburnRate;
-
-    /// @dev PeriodRegistry period type of the SLA contract
-    PeriodRegistry.PeriodType private immutable periodType;
 
     /// @dev boolean to declare if contract is whitelisted
     bool public immutable whitelistedContract;
@@ -66,14 +64,6 @@ contract Staking is Ownable {
         _;
     }
 
-    /**
-     * @dev event for provider reward log
-     * @param periodId 1. id of the period
-     * @param tokenAddress 2. address of the token
-     * @param rewardPercentage 3. reward percentage for the provider
-     * @param rewardPercentagePrecision 4. reward percentage for the provider
-     * @param rewardAmount 5. amount rewarded
-     */
     event ProviderRewardGenerated(
         uint256 indexed periodId,
         address indexed tokenAddress,
@@ -100,24 +90,16 @@ contract Staking is Ownable {
         string duTokenSymbol
     );
 
-    /**
-     *@param _slaRegistryAddress 1. period type of the SLA
-     *@param _periodType 3. period type of the SLA
-     *@param _whitelistedContract 5. enables the white list feature
-     *@param _slaID 6. identifies the SLA to uniquely to emit dTokens
-     */
     constructor(
-        SLARegistry _slaRegistry,
-        PeriodRegistry.PeriodType _periodType,
-        bool _whitelistedContract,
-        uint128 _slaID,
-        uint64 _leverage,
-        address _contractOwner
+        ISLARegistry slaRegistry_,
+        bool whitelistedContract_,
+        uint128 slaID_,
+        uint64 leverage_,
+        address contractOwner_
     ) public {
-        stakeRegistry = _slaRegistry.stakeRegistry();
-        periodRegistry = _slaRegistry.periodRegistry();
-        periodType = _periodType;
-        whitelistedContract = _whitelistedContract;
+        _stakeRegistry = IStakeRegistry(slaRegistry_.stakeRegistry());
+        _periodRegistry = IPeriodRegistry(slaRegistry_.periodRegistry());
+        whitelistedContract = whitelistedContract_;
         (
             uint256 _DSLAburnRate,
             ,
@@ -128,16 +110,16 @@ contract Staking is Ownable {
             ,
             uint64 _maxLeverage,
 
-        ) = stakeRegistry.getStakingParameters();
-        dslaTokenAddress = stakeRegistry.DSLATokenAddress();
+        ) = _stakeRegistry.getStakingParameters();
+        _dslaTokenAddress = _stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
-        whitelist[_contractOwner] = true;
-        slaID = _slaID;
+        whitelist[contractOwner_] = true;
+        slaID = slaID_;
         require(
-            _leverage <= _maxLeverage && _leverage >= 1,
+            leverage_ <= _maxLeverage && leverage_ >= 1,
             'incorrect leverage'
         );
-        leverage = _leverage;
+        leverage = leverage_;
     }
 
     function addUsersToWhitelist(address[] memory _userAddresses)
@@ -162,15 +144,11 @@ contract Staking is Ownable {
         }
     }
 
-    /**
-     *@dev add a token to ve allowed for staking
-     *@param _tokenAddress 1. address of the new allowed token
-     */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
-        (, , , , , , uint256 maxTokenLength, , ) = stakeRegistry
+        (, , , , , , uint256 maxTokenLength, , ) = _stakeRegistry
         .getStakingParameters();
         require(!isAllowedToken(_tokenAddress), 'already added');
-        require(stakeRegistry.isAllowedToken(_tokenAddress), 'not allowed');
+        require(_stakeRegistry.isAllowedToken(_tokenAddress), 'not allowed');
         allowedTokens.push(_tokenAddress);
         require(maxTokenLength >= allowedTokens.length, 'max token length');
         string memory dTokenID = StringUtils.uintToStr(slaID);
@@ -188,10 +166,10 @@ contract Staking is Ownable {
         );
 
         ERC20PresetMinterPauser duToken = ERC20PresetMinterPauser(
-            stakeRegistry.createDToken(duTokenName, duTokenSymbol)
+            _stakeRegistry.createDToken(duTokenName, duTokenSymbol)
         );
         ERC20PresetMinterPauser dpToken = ERC20PresetMinterPauser(
-            stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
+            _stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
         );
 
         dpTokenRegistry[_tokenAddress] = dpToken;
@@ -207,13 +185,6 @@ contract Staking is Ownable {
         );
     }
 
-    /**
-     *@dev increase the amount staked per token
-     *@param _amount 1. amount to be staked
-     *@param _tokenAddress 2. address of the token
-     *@notice providers can stake at any time
-     *@notice users can stake at any time but no more than provider pool
-     */
     function _stake(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
@@ -272,13 +243,6 @@ contract Staking is Ownable {
         }
     }
 
-    /**
-     *@dev sets the provider reward
-     *@notice it calculates the usersStake and calculates the provider reward from it.
-     * @param _periodId 1. id of the period
-     * @param _rewardPercentage to calculate the provider reward
-     * @param _precision used to avoid getting 0 after division in the SLA's registerSLI function
-     */
     function _setRespectedPeriodReward(
         uint256 _periodId,
         uint256 _rewardPercentage,
@@ -303,10 +267,6 @@ contract Staking is Ownable {
         }
     }
 
-    /**
-     *@dev sets the users compensation pool
-     *@notice it calculates the usersStake and calculates the users compensation from it
-     */
     function _setUsersCompensation(uint256 _periodId) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
@@ -326,12 +286,6 @@ contract Staking is Ownable {
         }
     }
 
-    /**
-     *@dev withdraw staked tokens. Only dpToken owners can withdraw,
-     *@param _amount 1. amount to be withdrawn
-     *@param _tokenAddress 2. address of the token
-     *@param _contractFinished 3. contract finished
-     */
     function _withdrawProviderTokens(
         uint256 _amount,
         address _tokenAddress,
@@ -350,18 +304,12 @@ contract Staking is Ownable {
         uint256 t0 = providerPool[_tokenAddress];
         // Burn duTokens in a way that it doesn't affect the PoolTokens/LPTokens average
         // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
-        // burnedDPTokens = _amount*p0/t0
         uint256 burnedDPTokens = _amount.mul(p0).div(t0);
         dpToken.burnFrom(msg.sender, burnedDPTokens);
         providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
         ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
 
-    /**
-     *@dev withdraw staked tokens. Only duToken owners can withdraw,
-     *@param _amount 1. amount to be withdrawn
-     *@param _tokenAddress 2. address of the token
-     */
     function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
@@ -372,17 +320,12 @@ contract Staking is Ownable {
         // Burn duTokens in a way that it doesn't affect the PoolTokens/LPTokens
         // average for current period.
         // t0/p0 = (t0-_amount)/(p0-burnedDUTokens)
-        // burnedDUTokens = _amount*p0/t0
         uint256 burnedDUTokens = _amount.mul(p0).div(t0);
         duToken.burnFrom(msg.sender, burnedDUTokens);
         usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
         ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
 
-    /**
-     *@dev use this function to evaluate the length of the allowed tokens length
-     *@return allowedTokens.length
-     */
     function getAllowedTokensLength() external view returns (uint256) {
         return allowedTokens.length;
     }
@@ -413,11 +356,6 @@ contract Staking is Ownable {
         }
     }
 
-    /**
-     *@dev checks in the allowedTokens array if there's a token with _tokenAddress value
-     *@param _tokenAddress 1. token address to check exixtence
-     *@return true if _tokenAddress exists in the allowedTokens array
-     */
     function isAllowedToken(address _tokenAddress) public view returns (bool) {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {

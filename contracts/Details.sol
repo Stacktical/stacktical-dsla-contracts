@@ -3,12 +3,11 @@ pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import './SLA.sol';
-import './SLARegistry.sol';
 import './SLORegistry.sol';
-import './StakeRegistry.sol';
-import './PeriodRegistry.sol';
-import './MessengerRegistry.sol';
 import './Staking.sol';
+import './interfaces/IStakeRegistry.sol';
+import './interfaces/IPeriodRegistry.sol';
+import './interfaces/IMessengerRegistry.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
 /**
@@ -69,7 +68,7 @@ contract Details {
             uint128 initialPeriodId,
             uint128 finalPeriodId,
             bool whiteListed,
-            PeriodRegistry.PeriodType periodType,
+            IPeriodRegistry.PeriodType periodType,
             SLORegistry.SLOType sloType,
             string memory ipfsHash
         )

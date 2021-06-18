@@ -5,17 +5,12 @@ pragma experimental ABIEncoderV2;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import './SLARegistry.sol';
+import './interfaces/ISLARegistry.sol';
+import './interfaces/IStakeRegistry.sol';
+import './interfaces/IPeriodRegistry.sol';
 import './SLORegistry.sol';
-import './StakeRegistry.sol';
-import './PeriodRegistry.sol';
 import './Staking.sol';
 
-/**
- * @title SLA
- * @dev SLA is a service level agreement contract used for service downtime
- * compensation
- */
 contract SLA is Staking {
     using SafeMath for uint256;
 
@@ -34,13 +29,13 @@ contract SLA is Staking {
     //
     string public ipfsHash;
     address public immutable messengerAddress;
-    SLARegistry public slaRegistry;
-    PeriodRegistry private immutable periodRegistry;
-    SLORegistry private immutable sloRegistry;
+    ISLARegistry private _slaRegistry;
+    IPeriodRegistry private immutable _periodRegistry;
+    SLORegistry private immutable _sloRegistry;
     uint256 public immutable creationBlockNumber;
     uint128 public immutable initialPeriodId;
     uint128 public immutable finalPeriodId;
-    PeriodRegistry.PeriodType public immutable periodType;
+    IPeriodRegistry.PeriodType public immutable periodType;
     /// @dev extra data for customized workflows
     bytes32[] public extraData;
 
@@ -51,47 +46,20 @@ contract SLA is Staking {
     /// @dev periodId=>PeriodSLI mapping
     mapping(uint256 => PeriodSLI) public periodSLIs;
 
-    /**
-     * @dev event for SLI creation logging
-     * @param timestamp 1. the time the SLI has been registered
-     * @param sli 2. the value of the SLI
-     * @param periodId 3. the id of the given period
-     */
     event SLICreated(uint256 timestamp, uint256 sli, uint256 periodId);
 
-    /**
-     * @dev event for Stake loging
-     * @param tokenAddress 1. -
-     * @param periodId 2. -
-     * @param amount 3. -
-     * @param caller 4. -
-     */
     event Stake(
         address indexed tokenAddress,
         uint256 indexed periodId,
         address indexed caller,
         uint256 amount
     );
-    /**
-     * @dev event for Stake loging
-     * @param tokenAddress 1. -
-     * @param periodId 2. -
-     * @param amount 3. -
-     * @param caller 4. -
-     */
     event ProviderWithdraw(
         address indexed tokenAddress,
         uint256 indexed periodId,
         address indexed caller,
         uint256 amount
     );
-    /**
-     * @dev event for Stake loging
-     * @param tokenAddress 1. -
-     * @param periodId 2. -
-     * @param amount 3. -
-     * @param caller 4. -
-     */
     event UserWithdraw(
         address indexed tokenAddress,
         uint256 indexed periodId,
@@ -99,37 +67,20 @@ contract SLA is Staking {
         uint256 amount
     );
 
-    /**
-     * @dev throws if called by any address other than the interfaces contract.
-     */
     modifier onlyMessenger() {
         require(msg.sender == messengerAddress, 'not messenger');
         _;
     }
 
-    /**
-     * @dev throws if called by any address other than the interfaces contract.
-     */
-    modifier onlySLARegistry() {
-        require(msg.sender == address(slaRegistry), 'not SLARegistry');
+    modifier onlyISLARegistry() {
+        require(msg.sender == address(_slaRegistry), 'not ISLARegistry');
         _;
     }
 
-    /**
-     * @param _owner 1. -
-     * @param _ipfsHash 3. -
-     * @param _messengerAddress 3. -
-     * @param _initialPeriodId 4. -
-     * @param _finalPeriodId 4. -
-     * @param _periodType 5. -
-     * @param _whitelisted 8. -
-     * @param _extraData 9. -
-     * @param _slaID 10. -
-     */
     constructor(
         address _owner,
         bool _whitelisted,
-        PeriodRegistry.PeriodType _periodType,
+        IPeriodRegistry.PeriodType _periodType,
         address _messengerAddress,
         uint128 _initialPeriodId,
         uint128 _finalPeriodId,
@@ -140,8 +91,7 @@ contract SLA is Staking {
     )
         public
         Staking(
-            SLARegistry(msg.sender),
-            _periodType,
+            ISLARegistry(msg.sender),
             _whitelisted,
             _slaID,
             _leverage,
@@ -151,9 +101,9 @@ contract SLA is Staking {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;
         messengerAddress = _messengerAddress;
-        slaRegistry = SLARegistry(msg.sender);
-        periodRegistry = slaRegistry.periodRegistry();
-        sloRegistry = slaRegistry.sloRegistry();
+        _slaRegistry = ISLARegistry(msg.sender);
+        _periodRegistry = IPeriodRegistry(_slaRegistry.periodRegistry());
+        _sloRegistry = SLORegistry(_slaRegistry.sloRegistry());
         creationBlockNumber = block.number;
         initialPeriodId = _initialPeriodId;
         finalPeriodId = _finalPeriodId;
@@ -162,11 +112,6 @@ contract SLA is Staking {
         nextVerifiablePeriod = _initialPeriodId;
     }
 
-    /**
-     * @dev external function to register SLI's and check them against the SLORegistry
-     * @param _sli 1. the value of the SLI to check
-     * @param _periodId 2. the id of the given period
-     */
     function registerSLI(uint256 _sli, uint256 _periodId)
         external
         onlyMessenger
@@ -176,8 +121,8 @@ contract SLA is Staking {
         PeriodSLI storage periodSLI = periodSLIs[_periodId];
         periodSLI.sli = _sli;
         periodSLI.timestamp = block.timestamp;
-        (uint256 sloValue, ) = sloRegistry.registeredSLO(address(this));
-        if (sloRegistry.isRespected(_sli, address(this))) {
+        (uint256 sloValue, ) = _sloRegistry.registeredSLO(address(this));
+        if (_sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
             uint256 precision = 10000;
             uint256 deviation = _sli.sub(sloValue).mul(precision).div(
@@ -202,7 +147,7 @@ contract SLA is Staking {
     }
 
     function contractFinished() public view returns (bool) {
-        (, uint256 endOfLastValidPeriod) = periodRegistry.getPeriodStartAndEnd(
+        (, uint256 endOfLastValidPeriod) = _periodRegistry.getPeriodStartAndEnd(
             periodType,
             finalPeriodId
         );
@@ -212,18 +157,14 @@ contract SLA is Staking {
                 periodSLIs[finalPeriodId].status != Status.NotVerified);
     }
 
-    /**
-     *@dev stake _amount tokens into the _token contract
-     *@param _amount 1. amount to be staked
-     *@param _token 2. address of the ERC to be staked
-     */
-
     function stakeTokens(uint256 _amount, address _token) external {
         bool isContractFinished = contractFinished();
         require(!isContractFinished, 'finished contract');
         _stake(_amount, _token);
         emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount);
-        StakeRegistry stakeRegistry = slaRegistry.stakeRegistry();
+        IStakeRegistry stakeRegistry = IStakeRegistry(
+            _slaRegistry.stakeRegistry()
+        );
         stakeRegistry.registerStakedSla(msg.sender);
     }
 
@@ -239,12 +180,6 @@ contract SLA is Staking {
         );
         _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
     }
-
-    /**
-     *@dev withdraw _amount tokens from the _token contract
-     *@param _amount 1. amount to be staked
-     *@param _tokenAddress 2. address of the ERC to be staked
-     */
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external

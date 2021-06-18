@@ -9,9 +9,9 @@ Import the contracts on your Solidity code like:
 import "@stacktical/dsla-protocol/contracts/NAME_OF_CONTRACT"
 ```
 
-Or if you want to create a Messenger, you have to import the IMessenger.sol contract:
+Or if you want to create a Messenger, you have to import the IMessenger.sol abstract:
 ```
-import "@stacktical/dsla-protocol/contracts/messenger/IMessenger.sol"
+import "@stacktical/dsla-protocol/contracts/interfaces/IMessenger.sol"
 ```
 
 Currently on version 0.6.6 of Solidity.
