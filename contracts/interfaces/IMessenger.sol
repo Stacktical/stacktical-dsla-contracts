@@ -58,7 +58,7 @@ abstract contract IMessenger is Ownable {
         virtual;
 
     /**
-     * @dev gets the messenger precision
+     * @dev gets the interfaces precision
      */
     function messengerPrecision() external view virtual returns (uint256);
 

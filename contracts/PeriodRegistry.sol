@@ -4,23 +4,15 @@ pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
+import './interfaces/IPeriodRegistry.sol';
 
 /**
  * @title SLARegistry
  * @dev SLARegistry is a contract for handling creation of service level
  * agreements and keeping track of the created agreements
  */
-contract PeriodRegistry is Ownable {
+contract PeriodRegistry is IPeriodRegistry, Ownable {
     using SafeMath for uint256;
-
-    enum PeriodType {
-        Hourly,
-        Daily,
-        Weekly,
-        BiWeekly,
-        Monthly,
-        Yearly
-    }
 
     /// @dev struct to store the definition of a period
     struct PeriodDefinition {
@@ -126,8 +118,9 @@ contract PeriodRegistry is Ownable {
      *@param _periodId 2. period id to get start and end
      */
     function getPeriodStartAndEnd(PeriodType _periodType, uint256 _periodId)
-        public
+        external
         view
+        override
         returns (uint256 start, uint256 end)
     {
         start = periodDefinitions[_periodType].starts[_periodId];
@@ -139,8 +132,9 @@ contract PeriodRegistry is Ownable {
      *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      */
     function isInitializedPeriod(PeriodType _periodType)
-        public
+        external
         view
+        override
         returns (bool initialized)
     {
         PeriodDefinition memory periodDefinition = periodDefinitions[
@@ -157,6 +151,7 @@ contract PeriodRegistry is Ownable {
     function isValidPeriod(PeriodType _periodType, uint256 _periodId)
         public
         view
+        override
         returns (bool valid)
     {
         PeriodDefinition memory periodDefinition = periodDefinitions[
@@ -171,8 +166,9 @@ contract PeriodRegistry is Ownable {
      *@param _periodId 2. period id to get start and end
      */
     function periodIsFinished(PeriodType _periodType, uint256 _periodId)
-        public
+        external
         view
+        override
         returns (bool finished)
     {
         require(
@@ -189,8 +185,9 @@ contract PeriodRegistry is Ownable {
      *@param _periodId 2. period id to get start and end
      */
     function periodHasStarted(PeriodType _periodType, uint256 _periodId)
-        public
+        external
         view
+        override
         returns (bool started)
     {
         require(

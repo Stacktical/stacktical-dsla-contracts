@@ -2,13 +2,14 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import './messenger/IMessenger.sol';
+import './interfaces/IMessenger.sol';
+import './interfaces/IMessengerRegistry.sol';
 
 /**
  * @title MessengerRegistry
  * @dev MessengerRegistry is a contract to register openly distributed Messengers
  */
-contract MessengerRegistry {
+contract MessengerRegistry is IMessengerRegistry {
     struct Messenger {
         address ownerAddress;
         address messengerAddress;
@@ -19,14 +20,13 @@ contract MessengerRegistry {
         uint256 id;
     }
 
-    /// @dev array to store the messengers
-    Messenger[] public messengers;
+    Messenger[] private _messengers;
     /// @dev (messengerAddress=>bool) to check if the Messenger was
-    mapping(address => bool) public registeredMessengers;
+    mapping(address => bool) private _registeredMessengers;
     /// @dev (userAddress=>messengerAddress[]) to register the messengers of an owner
-    mapping(address => uint256[]) public ownerMessengers;
-    /// @dev (userAddress=>messengerAddress[]) to register the owner of a Messenger
-    address public slaRegistry;
+    mapping(address => uint256[]) private _ownerMessengers;
+
+    address private _slaRegistry;
 
     event MessengerRegistered(
         address indexed ownerAddress,
@@ -48,51 +48,51 @@ contract MessengerRegistry {
      * @dev sets the SLARegistry contract address and can only be called
      * once
      */
-    function setSLARegistry() external {
+    function setSLARegistry() external override {
         // Only able to trigger this function once
         require(
-            address(slaRegistry) == address(0),
+            address(_slaRegistry) == address(0),
             'SLARegistry address has already been set'
         );
 
-        slaRegistry = msg.sender;
+        _slaRegistry = msg.sender;
     }
 
     /**
      * @dev function to register a new Messenger
      */
     function registerMessenger(
-        address _callerAddress,
-        address _messengerAddress,
-        string calldata _specificationUrl
-    ) external {
+        address callerAddress_,
+        address messengerAddress_,
+        string calldata specificationUrl_
+    ) external override {
         require(
-            msg.sender == slaRegistry,
+            msg.sender == _slaRegistry,
             'Should only be called using the SLARegistry contract'
         );
         require(
-            !registeredMessengers[_messengerAddress],
+            !_registeredMessengers[messengerAddress_],
             'messenger already registered'
         );
 
-        IMessenger messenger = IMessenger(_messengerAddress);
+        IMessenger messenger = IMessenger(messengerAddress_);
         address messengerOwner = messenger.owner();
         require(
-            messengerOwner == _callerAddress,
+            messengerOwner == callerAddress_,
             'Should only be called by the messenger owner'
         );
         uint256 precision = messenger.messengerPrecision();
         uint256 requestsCounter = messenger.requestsCounter();
         uint256 fulfillsCounter = messenger.fulfillsCounter();
-        registeredMessengers[_messengerAddress] = true;
-        uint256 id = messengers.length;
-        ownerMessengers[messengerOwner].push(id);
+        _registeredMessengers[messengerAddress_] = true;
+        uint256 id = _messengers.length;
+        _ownerMessengers[messengerOwner].push(id);
 
-        messengers.push(
+        _messengers.push(
             Messenger({
                 ownerAddress: messengerOwner,
-                messengerAddress: _messengerAddress,
-                specificationUrl: _specificationUrl,
+                messengerAddress: messengerAddress_,
+                specificationUrl: specificationUrl_,
                 precision: precision,
                 requestsCounter: requestsCounter,
                 fulfillsCounter: fulfillsCounter,
@@ -102,8 +102,8 @@ contract MessengerRegistry {
 
         emit MessengerRegistered(
             messengerOwner,
-            _messengerAddress,
-            _specificationUrl,
+            messengerAddress_,
+            specificationUrl_,
             precision,
             id
         );
@@ -116,7 +116,7 @@ contract MessengerRegistry {
         string calldata _specificationUrl,
         uint256 _messengerId
     ) external {
-        Messenger storage storedMessenger = messengers[_messengerId];
+        Messenger storage storedMessenger = _messengers[_messengerId];
         IMessenger messenger = IMessenger(storedMessenger.messengerAddress);
         require(
             msg.sender == messenger.owner(),
@@ -135,28 +135,37 @@ contract MessengerRegistry {
 
     function getMessengers() external view returns (Messenger[] memory) {
         Messenger[] memory returnMessengers = new Messenger[](
-            messengers.length
+            _messengers.length
         );
-        for (uint256 index = 0; index < messengers.length; index++) {
+        for (uint256 index = 0; index < _messengers.length; index++) {
             IMessenger messenger = IMessenger(
-                messengers[index].messengerAddress
+                _messengers[index].messengerAddress
             );
             uint256 requestsCounter = messenger.requestsCounter();
             uint256 fulfillsCounter = messenger.fulfillsCounter();
             returnMessengers[index] = Messenger({
-                ownerAddress: messengers[index].ownerAddress,
-                messengerAddress: messengers[index].messengerAddress,
-                specificationUrl: messengers[index].specificationUrl,
-                precision: messengers[index].precision,
+                ownerAddress: _messengers[index].ownerAddress,
+                messengerAddress: _messengers[index].messengerAddress,
+                specificationUrl: _messengers[index].specificationUrl,
+                precision: _messengers[index].precision,
                 requestsCounter: requestsCounter,
                 fulfillsCounter: fulfillsCounter,
-                id: messengers[index].id
+                id: _messengers[index].id
             });
         }
         return returnMessengers;
     }
 
     function getMessengersLength() external view returns (uint256) {
-        return messengers.length;
+        return _messengers.length;
+    }
+
+    function registeredMessengers(address messengerAddress_)
+        external
+        view
+        override
+        returns (bool)
+    {
+        return _registeredMessengers[messengerAddress_];
     }
 }

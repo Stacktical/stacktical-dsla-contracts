@@ -19,28 +19,13 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface MessengerRegistryInterface extends ethers.utils.Interface {
+interface IMessengerRegistryInterface extends ethers.utils.Interface {
   functions: {
-    "getMessengers()": FunctionFragment;
-    "getMessengersLength()": FunctionFragment;
-    "modifyMessenger(string,uint256)": FunctionFragment;
     "registerMessenger(address,address,string)": FunctionFragment;
     "registeredMessengers(address)": FunctionFragment;
     "setSLARegistry()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "getMessengers",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMessengersLength",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "modifyMessenger",
-    values: [string, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "registerMessenger",
     values: [string, string, string]
@@ -55,18 +40,6 @@ interface MessengerRegistryInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getMessengers",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getMessengersLength",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "modifyMessenger",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "registerMessenger",
     data: BytesLike
   ): Result;
@@ -79,16 +52,10 @@ interface MessengerRegistryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
 
-  events: {
-    "MessengerModified(address,address,string,uint256,uint256)": EventFragment;
-    "MessengerRegistered(address,address,string,uint256,uint256)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "MessengerModified"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "MessengerRegistered"): EventFragment;
+  events: {};
 }
 
-export class MessengerRegistry extends BaseContract {
+export class IMessengerRegistry extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -129,41 +96,9 @@ export class MessengerRegistry extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: MessengerRegistryInterface;
+  interface: IMessengerRegistryInterface;
 
   functions: {
-    getMessengers(
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        ([
-          string,
-          string,
-          string,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          ownerAddress: string;
-          messengerAddress: string;
-          specificationUrl: string;
-          precision: BigNumber;
-          requestsCounter: BigNumber;
-          fulfillsCounter: BigNumber;
-          id: BigNumber;
-        })[]
-      ]
-    >;
-
-    getMessengersLength(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    modifyMessenger(
-      _specificationUrl: string,
-      _messengerId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     registerMessenger(
       callerAddress_: string,
       messengerAddress_: string,
@@ -180,28 +115,6 @@ export class MessengerRegistry extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
-
-  getMessengers(
-    overrides?: CallOverrides
-  ): Promise<
-    ([string, string, string, BigNumber, BigNumber, BigNumber, BigNumber] & {
-      ownerAddress: string;
-      messengerAddress: string;
-      specificationUrl: string;
-      precision: BigNumber;
-      requestsCounter: BigNumber;
-      fulfillsCounter: BigNumber;
-      id: BigNumber;
-    })[]
-  >;
-
-  getMessengersLength(overrides?: CallOverrides): Promise<BigNumber>;
-
-  modifyMessenger(
-    _specificationUrl: string,
-    _messengerId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   registerMessenger(
     callerAddress_: string,
@@ -220,28 +133,6 @@ export class MessengerRegistry extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    getMessengers(
-      overrides?: CallOverrides
-    ): Promise<
-      ([string, string, string, BigNumber, BigNumber, BigNumber, BigNumber] & {
-        ownerAddress: string;
-        messengerAddress: string;
-        specificationUrl: string;
-        precision: BigNumber;
-        requestsCounter: BigNumber;
-        fulfillsCounter: BigNumber;
-        id: BigNumber;
-      })[]
-    >;
-
-    getMessengersLength(overrides?: CallOverrides): Promise<BigNumber>;
-
-    modifyMessenger(
-      _specificationUrl: string,
-      _messengerId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     registerMessenger(
       callerAddress_: string,
       messengerAddress_: string,
@@ -257,53 +148,9 @@ export class MessengerRegistry extends BaseContract {
     setSLARegistry(overrides?: CallOverrides): Promise<void>;
   };
 
-  filters: {
-    MessengerModified(
-      ownerAddress?: string | null,
-      messengerAddress?: string | null,
-      specificationUrl?: null,
-      precision?: null,
-      id?: null
-    ): TypedEventFilter<
-      [string, string, string, BigNumber, BigNumber],
-      {
-        ownerAddress: string;
-        messengerAddress: string;
-        specificationUrl: string;
-        precision: BigNumber;
-        id: BigNumber;
-      }
-    >;
-
-    MessengerRegistered(
-      ownerAddress?: string | null,
-      messengerAddress?: string | null,
-      specificationUrl?: null,
-      precision?: null,
-      id?: null
-    ): TypedEventFilter<
-      [string, string, string, BigNumber, BigNumber],
-      {
-        ownerAddress: string;
-        messengerAddress: string;
-        specificationUrl: string;
-        precision: BigNumber;
-        id: BigNumber;
-      }
-    >;
-  };
+  filters: {};
 
   estimateGas: {
-    getMessengers(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getMessengersLength(overrides?: CallOverrides): Promise<BigNumber>;
-
-    modifyMessenger(
-      _specificationUrl: string,
-      _messengerId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     registerMessenger(
       callerAddress_: string,
       messengerAddress_: string,
@@ -322,18 +169,6 @@ export class MessengerRegistry extends BaseContract {
   };
 
   populateTransaction: {
-    getMessengers(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getMessengersLength(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    modifyMessenger(
-      _specificationUrl: string,
-      _messengerId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     registerMessenger(
       callerAddress_: string,
       messengerAddress_: string,

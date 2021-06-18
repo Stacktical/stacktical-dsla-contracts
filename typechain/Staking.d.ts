@@ -26,7 +26,6 @@ interface StakingInterface extends ethers.utils.Interface {
     "addUsersToWhitelist(address[])": FunctionFragment;
     "allowedTokens(uint256)": FunctionFragment;
     "dpTokenRegistry(address)": FunctionFragment;
-    "dslaTokenAddress()": FunctionFragment;
     "duTokenRegistry(address)": FunctionFragment;
     "getAllowedTokensLength()": FunctionFragment;
     "getTokenStake(address,uint256)": FunctionFragment;
@@ -64,10 +63,6 @@ interface StakingInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "dpTokenRegistry",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "dslaTokenAddress",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "duTokenRegistry",
@@ -137,10 +132,6 @@ interface StakingInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "dpTokenRegistry",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "dslaTokenAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -266,8 +257,6 @@ export class Staking extends BaseContract {
 
     dpTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
-    dslaTokenAddress(overrides?: CallOverrides): Promise<[string]>;
-
     duTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
     getAllowedTokensLength(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -337,8 +326,6 @@ export class Staking extends BaseContract {
 
   dpTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
 
-  dslaTokenAddress(overrides?: CallOverrides): Promise<string>;
-
   duTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
 
   getAllowedTokensLength(overrides?: CallOverrides): Promise<BigNumber>;
@@ -405,8 +392,6 @@ export class Staking extends BaseContract {
     ): Promise<string>;
 
     dpTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-    dslaTokenAddress(overrides?: CallOverrides): Promise<string>;
 
     duTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -547,8 +532,6 @@ export class Staking extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    dslaTokenAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
     duTokenRegistry(
       arg0: string,
       overrides?: CallOverrides
@@ -625,8 +608,6 @@ export class Staking extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    dslaTokenAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     duTokenRegistry(
       arg0: string,

@@ -9,8 +9,9 @@ import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './SLA.sol';
-import './messenger/IMessenger.sol';
-import './SLARegistry.sol';
+import './interfaces/IMessenger.sol';
+import './interfaces/ISLARegistry.sol';
+import './interfaces/IStakeRegistry.sol';
 import './StringUtils.sol';
 
 /**
@@ -18,7 +19,7 @@ import './StringUtils.sol';
  * @dev StakeRegistry is a contract to register the staking activity of the platform, along
  with controlling certain admin privileged parameters
  */
-contract StakeRegistry is Ownable, ReentrancyGuard {
+contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
     using SafeERC20 for ERC20;
     using SafeMath for uint256;
 
@@ -41,8 +42,8 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         mapping(uint256 => bool) verifiedPeriods;
     }
 
-    address public DSLATokenAddress;
-    SLARegistry public slaRegistry;
+    address private _DSLATokenAddress;
+    ISLARegistry public slaRegistry;
 
     //______ onlyOwner modifiable parameters ______
 
@@ -162,7 +163,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
                 .add(_dslaBurnedByVerification),
             'Staking parameters should match on summation'
         );
-        DSLATokenAddress = _dslaTokenAddress;
+        _DSLATokenAddress = _dslaTokenAddress;
         allowedTokens.push(_dslaTokenAddress);
     }
 
@@ -179,14 +180,14 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
      * @dev sets the SLARegistry contract address and can only be called
      * once
      */
-    function setSLARegistry() external {
+    function setSLARegistry() external override {
         // Only able to trigger this function once
         require(
             address(slaRegistry) == address(0),
             'SLARegistry address has already been set'
         );
 
-        slaRegistry = SLARegistry(msg.sender);
+        slaRegistry = ISLARegistry(msg.sender);
     }
 
     /**
@@ -198,7 +199,12 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         allowedTokens.push(_tokenAddress);
     }
 
-    function isAllowedToken(address _tokenAddress) public view returns (bool) {
+    function isAllowedToken(address _tokenAddress)
+        public
+        view
+        override
+        returns (bool)
+    {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {
                 return true;
@@ -231,7 +237,11 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
      *@dev register the sending SLA contract as staked by _owner
      *@param _owner 1. SLA contract to stake
      */
-    function registerStakedSla(address _owner) external returns (bool) {
+    function registerStakedSla(address _owner)
+        external
+        override
+        returns (bool)
+    {
         require(
             slaRegistry.isRegisteredSLA(msg.sender),
             'Only for registered SLAs'
@@ -249,6 +259,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
      */
     function createDToken(string calldata _name, string calldata _symbol)
         external
+        override
         returns (address)
     {
         require(
@@ -268,9 +279,9 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         address _slaOwner,
         address _sla,
         uint256 _periodIdsLength
-    ) external onlySLARegistry nonReentrant {
+    ) external override onlySLARegistry nonReentrant {
         uint256 lockedValue = _dslaDepositByPeriod.mul(_periodIdsLength);
-        ERC20(DSLATokenAddress).safeTransferFrom(
+        ERC20(_DSLATokenAddress).safeTransferFrom(
             _slaOwner,
             address(this),
             lockedValue
@@ -291,7 +302,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         address _sla,
         address _verificationRewardReceiver,
         uint256 _periodId
-    ) external onlySLARegistry nonReentrant {
+    ) external override onlySLARegistry nonReentrant {
         LockedValue storage _lockedValue = slaLockedValue[_sla];
         require(
             !_lockedValue.verifiedPeriods[_periodId],
@@ -301,20 +312,20 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         _lockedValue.lockedValue = _lockedValue.lockedValue.sub(
             _lockedValue.dslaDepositByPeriod
         );
-        ERC20(DSLATokenAddress).safeTransfer(
+        ERC20(_DSLATokenAddress).safeTransfer(
             _verificationRewardReceiver,
             _lockedValue.dslaUserReward
         );
-        ERC20(DSLATokenAddress).safeTransfer(
+        ERC20(_DSLATokenAddress).safeTransfer(
             owner(),
             _lockedValue.dslaPlatformReward
         );
-        ERC20(DSLATokenAddress).safeTransfer(
+        ERC20(_DSLATokenAddress).safeTransfer(
             IMessenger(SLA(_sla).messengerAddress()).owner(),
             _lockedValue.dslaMessengerReward
         );
         if (_burnDSLA) {
-            (bool success, ) = DSLATokenAddress.call(
+            (bool success, ) = _DSLATokenAddress.call(
                 abi.encodeWithSelector(
                     bytes4(keccak256(bytes('burn(uint256)'))),
                     _lockedValue.dslaBurnedByVerification
@@ -334,6 +345,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
 
     function returnLockedValue(address _sla)
         external
+        override
         onlySLARegistry
         nonReentrant
     {
@@ -341,7 +353,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         uint256 remainingBalance = _lockedValue.lockedValue;
         require(remainingBalance > 0, 'locked value is empty');
         _lockedValue.lockedValue = 0;
-        ERC20(DSLATokenAddress).safeTransfer(
+        ERC20(_DSLATokenAddress).safeTransfer(
             SLA(_sla).owner(),
             remainingBalance
         );
@@ -449,6 +461,7 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
     function getStakingParameters()
         external
         view
+        override
         returns (
             uint256 DSLAburnRate,
             uint256 dslaDepositByPeriod,
@@ -478,5 +491,9 @@ contract StakeRegistry is Ownable, ReentrancyGuard {
         returns (bool)
     {
         return slaLockedValue[_sla].verifiedPeriods[_periodId];
+    }
+
+    function DSLATokenAddress() external view override returns (address) {
+        return _DSLATokenAddress;
     }
 }

@@ -29,7 +29,6 @@ interface SLAInterface extends ethers.utils.Interface {
     "contractFinished()": FunctionFragment;
     "creationBlockNumber()": FunctionFragment;
     "dpTokenRegistry(address)": FunctionFragment;
-    "dslaTokenAddress()": FunctionFragment;
     "duTokenRegistry(address)": FunctionFragment;
     "extraData(uint256)": FunctionFragment;
     "finalPeriodId()": FunctionFragment;
@@ -52,10 +51,11 @@ interface SLAInterface extends ethers.utils.Interface {
     "removeUsersFromWhitelist(address[])": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "slaID()": FunctionFragment;
-    "slaRegistry()": FunctionFragment;
     "stakeTokens(uint256,address)": FunctionFragment;
     "stakers(uint256)": FunctionFragment;
+    "toggleUserWithdrawLocked()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "userWithdrawLocked()": FunctionFragment;
     "usersPool(address)": FunctionFragment;
     "whitelist(address)": FunctionFragment;
     "whitelistedContract()": FunctionFragment;
@@ -94,10 +94,6 @@ interface SLAInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "dpTokenRegistry",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "dslaTokenAddress",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "duTokenRegistry",
@@ -176,10 +172,6 @@ interface SLAInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "slaID", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "slaRegistry",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "stakeTokens",
     values: [BigNumberish, string]
   ): string;
@@ -188,8 +180,16 @@ interface SLAInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "toggleUserWithdrawLocked",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "userWithdrawLocked",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "usersPool", values: [string]): string;
   encodeFunctionData(functionFragment: "whitelist", values: [string]): string;
@@ -236,10 +236,6 @@ interface SLAInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "dpTokenRegistry",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "dslaTokenAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -310,16 +306,20 @@ interface SLAInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "slaID", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "slaRegistry",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "stakeTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "stakers", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "toggleUserWithdrawLocked",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "userWithdrawLocked",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "usersPool", data: BytesLike): Result;
@@ -427,8 +427,6 @@ export class SLA extends BaseContract {
 
     dpTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
-    dslaTokenAddress(overrides?: CallOverrides): Promise<[string]>;
-
     duTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
     extraData(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
@@ -506,8 +504,6 @@ export class SLA extends BaseContract {
 
     slaID(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    slaRegistry(overrides?: CallOverrides): Promise<[string]>;
-
     stakeTokens(
       _amount: BigNumberish,
       _token: string,
@@ -516,10 +512,16 @@ export class SLA extends BaseContract {
 
     stakers(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
+    toggleUserWithdrawLocked(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    userWithdrawLocked(overrides?: CallOverrides): Promise<[boolean]>;
 
     usersPool(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -561,8 +563,6 @@ export class SLA extends BaseContract {
   creationBlockNumber(overrides?: CallOverrides): Promise<BigNumber>;
 
   dpTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-  dslaTokenAddress(overrides?: CallOverrides): Promise<string>;
 
   duTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -636,8 +636,6 @@ export class SLA extends BaseContract {
 
   slaID(overrides?: CallOverrides): Promise<BigNumber>;
 
-  slaRegistry(overrides?: CallOverrides): Promise<string>;
-
   stakeTokens(
     _amount: BigNumberish,
     _token: string,
@@ -646,10 +644,16 @@ export class SLA extends BaseContract {
 
   stakers(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  toggleUserWithdrawLocked(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   transferOwnership(
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  userWithdrawLocked(overrides?: CallOverrides): Promise<boolean>;
 
   usersPool(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -694,8 +698,6 @@ export class SLA extends BaseContract {
     creationBlockNumber(overrides?: CallOverrides): Promise<BigNumber>;
 
     dpTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-    dslaTokenAddress(overrides?: CallOverrides): Promise<string>;
 
     duTokenRegistry(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -772,8 +774,6 @@ export class SLA extends BaseContract {
 
     slaID(overrides?: CallOverrides): Promise<BigNumber>;
 
-    slaRegistry(overrides?: CallOverrides): Promise<string>;
-
     stakeTokens(
       _amount: BigNumberish,
       _token: string,
@@ -782,10 +782,14 @@ export class SLA extends BaseContract {
 
     stakers(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+    toggleUserWithdrawLocked(overrides?: CallOverrides): Promise<void>;
+
     transferOwnership(
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    userWithdrawLocked(overrides?: CallOverrides): Promise<boolean>;
 
     usersPool(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -954,8 +958,6 @@ export class SLA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    dslaTokenAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
     duTokenRegistry(
       arg0: string,
       overrides?: CallOverrides
@@ -1031,8 +1033,6 @@ export class SLA extends BaseContract {
 
     slaID(overrides?: CallOverrides): Promise<BigNumber>;
 
-    slaRegistry(overrides?: CallOverrides): Promise<BigNumber>;
-
     stakeTokens(
       _amount: BigNumberish,
       _token: string,
@@ -1041,10 +1041,16 @@ export class SLA extends BaseContract {
 
     stakers(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
+    toggleUserWithdrawLocked(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    userWithdrawLocked(overrides?: CallOverrides): Promise<BigNumber>;
 
     usersPool(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1095,8 +1101,6 @@ export class SLA extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    dslaTokenAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     duTokenRegistry(
       arg0: string,
@@ -1180,8 +1184,6 @@ export class SLA extends BaseContract {
 
     slaID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    slaRegistry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     stakeTokens(
       _amount: BigNumberish,
       _token: string,
@@ -1193,9 +1195,17 @@ export class SLA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    toggleUserWithdrawLocked(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    userWithdrawLocked(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     usersPool(
