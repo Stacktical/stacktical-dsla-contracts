@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/Stacktical/stacktical-dsla-contracts/compare/v2.2.4...v2.3.0) (2021-06-18)
+
+
+### Features
+
+* cyclic dependency overriden ([57356e6](https://github.com/Stacktical/stacktical-dsla-contracts/commit/57356e686527870fd9d1bb25c7368cbdce7038eb))
+* deploy fixture complete ([92fa951](https://github.com/Stacktical/stacktical-dsla-contracts/commit/92fa9514a82a06ab40361fe95213b1f7ef89d535))
+* not zero modifier deleted ([6432405](https://github.com/Stacktical/stacktical-dsla-contracts/commit/64324053656040860d9fce40c2b21bbed5fcedcf))
+* unlock user withdraw ([d37b22e](https://github.com/Stacktical/stacktical-dsla-contracts/commit/d37b22e388e40a6140552dd893a2544e467a8d86))
+
 ### [2.2.4](https://github.com/Stacktical/stacktical-dsla-contracts/compare/v2.2.3...v2.2.4) (2021-06-15)
 
 
