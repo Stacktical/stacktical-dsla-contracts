@@ -1,4 +1,4 @@
-# dsla-protocol
+# dsla-protocol-contracts
 
 DSLA Protocol is a risk management framework that enables developers and infrastructure operators to reduce their users exposure to service delays, interruptions and financial losses, using self-executing service level agreements, bonus-malus insurance policies, and crowdfunded liquidity pools.
 
