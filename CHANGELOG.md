@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.1](https://github.com/Stacktical/stacktical-dsla-contracts/compare/v2.3.0...v2.3.1) (2021-06-18)
+
+
+### Features
+
+* package renamed to contracts ([2264802](https://github.com/Stacktical/stacktical-dsla-contracts/commit/226480294ae6d2e7b32850e6d677378fb95c9088))
+
 ## [2.3.0](https://github.com/Stacktical/stacktical-dsla-contracts/compare/v2.2.4...v2.3.0) (2021-06-18)
 
 
