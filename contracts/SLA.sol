@@ -39,7 +39,6 @@ contract SLA is Staking {
     /// @dev extra data for customized workflows
     bytes32[] public extraData;
 
-    bool private _breachedContract = false;
     bool public userWithdrawLocked = true;
     uint256 public nextVerifiablePeriod;
 
@@ -122,21 +121,31 @@ contract SLA is Staking {
         periodSLI.sli = _sli;
         periodSLI.timestamp = block.timestamp;
         (uint256 sloValue, ) = _sloRegistry.registeredSLO(address(this));
+
+        uint256 precision = 10000;
+
+        int256 deviation = _sli.sub(sloValue).mul(precision).div(
+            _sli.add(sloValue).div(2)
+        );
+
+        if (deviation < 0) {
+            deviation = deviation.mul(-1);
+        }
+
+        uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
+
+        uint256 rewardPercentage = deviation.mul(normalizedPeriodId).div(
+            finalPeriodId - initialPeriodId + 1
+        );
+
         if (_sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
-            uint256 precision = 10000;
-            uint256 deviation = _sli.sub(sloValue).mul(precision).div(
-                _sli.add(sloValue).div(2)
-            );
-            uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
-            uint256 rewardPercentage = deviation.mul(normalizedPeriodId).div(
-                finalPeriodId - initialPeriodId + 1
-            );
+
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
         } else {
             periodSLI.status = Status.NotRespected;
-            _setUsersCompensation(_periodId);
-            _breachedContract = true;
+
+            _setUsersCompensation(_periodId, rewardPercentage, precision);
         }
     }
 
@@ -152,7 +161,6 @@ contract SLA is Staking {
             finalPeriodId
         );
         return
-            _breachedContract == true ||
             (block.timestamp >= endOfLastValidPeriod &&
                 periodSLIs[finalPeriodId].status != Status.NotVerified);
     }
@@ -203,9 +211,5 @@ contract SLA is Staking {
 
     function getStakersLength() external view returns (uint256) {
         return stakers.length;
-    }
-
-    function breachedContract() external view returns (bool) {
-        return _breachedContract;
     }
 }
