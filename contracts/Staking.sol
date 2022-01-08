@@ -57,7 +57,7 @@ contract Staking is Ownable {
         _;
     }
 
-    modifier onlyWhitelisted {
+    modifier onlyWhitelisted() {
         if (whitelistedContract == true) {
             require(whitelist[msg.sender] == true, 'not whitelisted');
         }
@@ -146,7 +146,7 @@ contract Staking is Ownable {
 
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
         (, , , , , , uint256 maxTokenLength, , ) = _stakeRegistry
-        .getStakingParameters();
+            .getStakingParameters();
         require(!isAllowedToken(_tokenAddress), 'already added');
         require(_stakeRegistry.isAllowedToken(_tokenAddress), 'not allowed');
         allowedTokens.push(_tokenAddress);
@@ -185,7 +185,7 @@ contract Staking is Ownable {
         );
     }
 
-    function _stake(uint256 _amount, address _tokenAddress)
+    function _stake(uint256 _amount, address _tokenAddress, string _position)
         internal
         onlyAllowedToken(_tokenAddress)
         onlyWhitelisted
@@ -195,8 +195,9 @@ contract Staking is Ownable {
             address(this),
             _amount
         );
-        //duTokens
-        if (msg.sender != owner()) {
+
+        // DSLA-LP & DSLA-LP proofs of SLA Position
+        if (_position == 'long') {
             (uint256 providerStake, uint256 usersStake) = (
                 providerPool[_tokenAddress],
                 usersPool[_tokenAddress]
@@ -208,7 +209,7 @@ contract Staking is Ownable {
             ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
 
-            // if there's no minted tokens, then create 1-1 proportion
+            // If there's no minted tokens, then mint them 1:1
             if (p0 == 0) {
                 duToken.mint(msg.sender, _amount);
             } else {
@@ -218,8 +219,9 @@ contract Staking is Ownable {
                 duToken.mint(msg.sender, mintedDUTokens);
             }
             usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
-            //dpTokens
-        } else {
+        } 
+        
+        if (_position == 'short') {
             ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
             uint256 p0 = dpToken.totalSupply();
 
@@ -267,15 +269,26 @@ contract Staking is Ownable {
         }
     }
 
-    function _setUsersCompensation(uint256 _periodId) internal {
+    function _setUsersCompensation(
+        uint256 _periodId,
+        uint256 _rewardPercentage,
+        uint256 _precision
+    ) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
             uint256 usersStake = usersPool[tokenAddress];
-            uint256 compensation = usersStake.mul(leverage);
+
+            uint256 compensation = usersStake
+                .mul(leverage)
+                .mul(_rewardPercentage)
+                .div(_precision);
+
             providerPool[tokenAddress] = providerPool[tokenAddress].sub(
                 compensation
             );
+
             usersPool[tokenAddress] = usersPool[tokenAddress].add(compensation);
+
             emit UserCompensationGenerated(
                 _periodId,
                 tokenAddress,
