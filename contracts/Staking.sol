@@ -57,6 +57,14 @@ contract Staking is Ownable {
         _;
     }
 
+    modifier onlyAllowedPosition(string memory _position) {
+        require(
+            _position == 'long' || _position == 'short',
+            'SLA Position not allowed'
+        );
+        _;
+    }
+
     modifier onlyWhitelisted() {
         if (whitelistedContract == true) {
             require(whitelist[msg.sender] == true, 'not whitelisted');
@@ -188,8 +196,8 @@ contract Staking is Ownable {
     function _stake(
         uint256 _amount,
         address _tokenAddress,
-        string _position
-    ) internal onlyAllowedToken(_tokenAddress) onlyWhitelisted {
+        string memory _position
+    ) internal onlyAllowedToken(_tokenAddress) onlyAllowedPosition(_position) onlyWhitelisted {
         ERC20(_tokenAddress).safeTransferFrom(
             msg.sender,
             address(this),
@@ -331,32 +339,6 @@ contract Staking is Ownable {
 
     function getAllowedTokensLength() external view returns (uint256) {
         return allowedTokens.length;
-    }
-
-    function getTokenStake(address _staker, uint256 _allowedTokenIndex)
-        external
-        view
-        returns (address tokenAddress, uint256 stake)
-    {
-        address allowedTokenAddress = allowedTokens[_allowedTokenIndex];
-        if (_staker == owner()) {
-            return (allowedTokenAddress, providerPool[allowedTokenAddress]);
-        } else {
-            ERC20PresetMinterPauser dToken = duTokenRegistry[
-                allowedTokenAddress
-            ];
-            uint256 dTokenSupply = dToken.totalSupply();
-            if (dTokenSupply == 0) {
-                return (allowedTokenAddress, 0);
-            }
-            uint256 dTokenBalance = dToken.balanceOf(_staker);
-            return (
-                allowedTokenAddress,
-                usersPool[allowedTokenAddress].mul(dTokenBalance).div(
-                    dTokenSupply
-                )
-            );
-        }
     }
 
     function isAllowedToken(address _tokenAddress) public view returns (bool) {

@@ -23,14 +23,6 @@ contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
     using SafeERC20 for ERC20;
     using SafeMath for uint256;
 
-    /// @dev struct to return on getActivePool function.
-    struct ActivePool {
-        address SLAAddress;
-        uint256 stake;
-        string assetName;
-        address assetAddress;
-    }
-
     struct LockedValue {
         uint256 lockedValue;
         uint256 slaPeriodIdsLength;
@@ -358,62 +350,6 @@ contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
             remainingBalance
         );
         emit LockedValueReturned(_sla, SLA(_sla).owner(), remainingBalance);
-    }
-
-    /**
-     * @dev returns the active pools owned by a user.
-     * @param _slaOwner 1. owner of the active pool
-     * @return ActivePool[], array of structs: {SLAAddress,stake,assetName}
-     */
-    function getActivePool(address _slaOwner)
-        external
-        view
-        returns (ActivePool[] memory)
-    {
-        bytes4 NAME_SELECTOR = bytes4(keccak256(bytes('name()')));
-        uint256 stakeCounter = 0;
-        // Count the stakes of the user, checking every SLA staked
-        for (
-            uint256 index = 0;
-            index < userStakedSlas[_slaOwner].length;
-            index++
-        ) {
-            SLA currentSLA = SLA(userStakedSlas[_slaOwner][index]);
-            stakeCounter = stakeCounter.add(
-                currentSLA.getAllowedTokensLength()
-            );
-        }
-
-        ActivePool[] memory activePools = new ActivePool[](stakeCounter);
-        // to insert on activePools array
-        uint256 stakePosition = 0;
-        for (
-            uint256 index = 0;
-            index < userStakedSlas[_slaOwner].length;
-            index++
-        ) {
-            SLA currentSLA = userStakedSlas[_slaOwner][index];
-            for (
-                uint256 tokenIndex = 0;
-                tokenIndex < currentSLA.getAllowedTokensLength();
-                tokenIndex++
-            ) {
-                (address tokenAddress, uint256 stake) = currentSLA
-                .getTokenStake(_slaOwner, tokenIndex);
-                (, bytes memory tokenNameBytes) = tokenAddress.staticcall(
-                    abi.encodeWithSelector(NAME_SELECTOR)
-                );
-                ActivePool memory currentActivePool = ActivePool({
-                    SLAAddress: address(currentSLA),
-                    stake: stake,
-                    assetName: string(tokenNameBytes),
-                    assetAddress: tokenAddress
-                });
-                activePools[stakePosition] = currentActivePool;
-                stakePosition = stakePosition.add(1);
-            }
-        }
-        return activePools;
     }
 
     //_______ OnlyOwner functions _______

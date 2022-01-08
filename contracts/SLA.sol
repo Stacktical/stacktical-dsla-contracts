@@ -167,7 +167,7 @@ contract SLA is Staking {
     function stakeTokens(
         uint256 _amount,
         address _token,
-        string _position
+        string memory _position
     ) external {
         bool isContractFinished = contractFinished();
         require(!isContractFinished, 'finished contract');
