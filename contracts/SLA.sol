@@ -160,15 +160,18 @@ contract SLA is Staking {
             periodType,
             finalPeriodId
         );
-        return
-            (block.timestamp >= endOfLastValidPeriod &&
-                periodSLIs[finalPeriodId].status != Status.NotVerified);
+        return (block.timestamp >= endOfLastValidPeriod &&
+            periodSLIs[finalPeriodId].status != Status.NotVerified);
     }
 
-    function stakeTokens(uint256 _amount, address _token) external {
+    function stakeTokens(
+        uint256 _amount,
+        address _token,
+        string _position
+    ) external {
         bool isContractFinished = contractFinished();
         require(!isContractFinished, 'finished contract');
-        _stake(_amount, _token);
+        _stake(_amount, _token, _position);
         emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount);
         IStakeRegistry stakeRegistry = IStakeRegistry(
             _slaRegistry.stakeRegistry()
@@ -180,22 +183,23 @@ contract SLA is Staking {
         external
     {
         bool isContractFinished = contractFinished();
+        require(isContractFinished, 'not finished');
+
         emit ProviderWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
             msg.sender,
             _amount
         );
-        _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
+        _withdrawProviderTokens(_amount, _tokenAddress);
     }
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        if (msg.sender != owner() && userWithdrawLocked) {
-            bool isContractFinished = contractFinished();
-            require(isContractFinished, 'not finished');
-        }
+        bool isContractFinished = contractFinished();
+        require(isContractFinished, 'not finished');
+
         emit UserWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
@@ -203,10 +207,6 @@ contract SLA is Staking {
             _amount
         );
         _withdrawUserTokens(_amount, _tokenAddress);
-    }
-
-    function toggleUserWithdrawLocked() external onlyOwner {
-        userWithdrawLocked = !userWithdrawLocked;
     }
 
     function getStakersLength() external view returns (uint256) {

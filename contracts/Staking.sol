@@ -185,11 +185,11 @@ contract Staking is Ownable {
         );
     }
 
-    function _stake(uint256 _amount, address _tokenAddress, string _position)
-        internal
-        onlyAllowedToken(_tokenAddress)
-        onlyWhitelisted
-    {
+    function _stake(
+        uint256 _amount,
+        address _tokenAddress,
+        string _position
+    ) internal onlyAllowedToken(_tokenAddress) onlyWhitelisted {
         ERC20(_tokenAddress).safeTransferFrom(
             msg.sender,
             address(this),
@@ -219,8 +219,8 @@ contract Staking is Ownable {
                 duToken.mint(msg.sender, mintedDUTokens);
             }
             usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
-        } 
-        
+        }
+
         if (_position == 'short') {
             ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
             uint256 p0 = dpToken.totalSupply();
@@ -299,23 +299,14 @@ contract Staking is Ownable {
         }
     }
 
-    function _withdrawProviderTokens(
-        uint256 _amount,
-        address _tokenAddress,
-        bool _contractFinished
-    ) internal onlyAllowedToken(_tokenAddress) {
-        uint256 providerStake = providerPool[_tokenAddress];
-        uint256 usersStake = usersPool[_tokenAddress];
-        if (!_contractFinished) {
-            require(
-                providerStake.sub(_amount) >= usersStake.mul(leverage),
-                'bad amount'
-            );
-        }
+    function _withdrawProviderTokens(uint256 _amount, address _tokenAddress)
+        internal
+        onlyAllowedToken(_tokenAddress)
+    {
         ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
         uint256 p0 = dpToken.totalSupply();
         uint256 t0 = providerPool[_tokenAddress];
-        // Burn duTokens in a way that it doesn't affect the PoolTokens/LPTokens average
+        // Burn duTokens in a way that doesn't affect the Provider Pool / DSLA-SP Pool average
         // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
         uint256 burnedDPTokens = _amount.mul(p0).div(t0);
         dpToken.burnFrom(msg.sender, burnedDPTokens);
@@ -330,8 +321,7 @@ contract Staking is Ownable {
         ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
         uint256 p0 = duToken.totalSupply();
         uint256 t0 = usersPool[_tokenAddress];
-        // Burn duTokens in a way that it doesn't affect the PoolTokens/LPTokens
-        // average for current period.
+        // Burn duTokens in a way that doesn't affect the User Pool / DSLA-SP Pool average
         // t0/p0 = (t0-_amount)/(p0-burnedDUTokens)
         uint256 burnedDUTokens = _amount.mul(p0).div(t0);
         duToken.burnFrom(msg.sender, burnedDUTokens);
