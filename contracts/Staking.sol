@@ -231,7 +231,7 @@ contract Staking is Ownable {
             ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
 
-            // If there's no minted tokens, then mint them 1:1
+            // If there are no minted tokens, then mint them 1:1
             if (p0 == 0) {
                 duToken.mint(msg.sender, _amount);
             } else {
