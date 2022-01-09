@@ -58,9 +58,14 @@ contract Staking is Ownable {
     }
 
     modifier onlyAllowedPosition(string memory _position) {
+        string memory long = 'long';
+        string memory short = 'short';
         require(
-            _position == 'long' || _position == 'short',
-            'SLA Position not allowed'
+            keccak256(abi.encodePacked(_position)) ==
+                keccak256(abi.encodePacked(long)) ||
+                keccak256(abi.encodePacked(_position)) ==
+                keccak256(abi.encodePacked(short)),
+            'position not allowed'
         );
         _;
     }
@@ -197,15 +202,24 @@ contract Staking is Ownable {
         uint256 _amount,
         address _tokenAddress,
         string memory _position
-    ) internal onlyAllowedToken(_tokenAddress) onlyAllowedPosition(_position) onlyWhitelisted {
+    )
+        internal
+        onlyAllowedToken(_tokenAddress)
+        onlyAllowedPosition(_position)
+        onlyWhitelisted
+    {
         ERC20(_tokenAddress).safeTransferFrom(
             msg.sender,
             address(this),
             _amount
         );
 
-        // DSLA-LP & DSLA-LP proofs of SLA Position
-        if (_position == 'long') {
+        // DSLA-LP proofs of SLA Position
+        string memory long = 'long';
+        if (
+            keccak256(abi.encodePacked(_position)) ==
+            keccak256(abi.encodePacked(long))
+        ) {
             (uint256 providerStake, uint256 usersStake) = (
                 providerPool[_tokenAddress],
                 usersPool[_tokenAddress]
@@ -229,7 +243,12 @@ contract Staking is Ownable {
             usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
         }
 
-        if (_position == 'short') {
+        // DSLA-SP proofs of SLA Position
+        string memory short = 'short';
+        if (
+            keccak256(abi.encodePacked(_position)) ==
+            keccak256(abi.encodePacked(short))
+        ) {
             ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
             uint256 p0 = dpToken.totalSupply();
 
