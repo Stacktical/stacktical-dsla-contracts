@@ -34,7 +34,6 @@ contract Details {
 
     /**
      * @dev external view function that returns all dynamic agreement information
-     * @return breachedContract 1. breached contract
      * @return stakersCount 2. amount of stakers
      * @return nextVerifiablePeriod 3. amount of stakers
      */
@@ -43,14 +42,12 @@ contract Details {
         external
         view
         returns (
-            bool breachedContract,
             uint256 stakersCount,
             uint256 nextVerifiablePeriod,
             uint64 leverage
         )
     {
         SLA sla = SLA(_slaAddress);
-        breachedContract = sla.breachedContract();
         stakersCount = sla.getStakersLength();
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
         leverage = sla.leverage();

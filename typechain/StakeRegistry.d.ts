@@ -26,7 +26,6 @@ interface StakeRegistryInterface extends ethers.utils.Interface {
     "allowedTokens(uint256)": FunctionFragment;
     "createDToken(string,string)": FunctionFragment;
     "distributeVerificationRewards(address,address,uint256)": FunctionFragment;
-    "getActivePool(address)": FunctionFragment;
     "getStakingParameters()": FunctionFragment;
     "isAllowedToken(address)": FunctionFragment;
     "lockDSLAValue(address,address,uint256)": FunctionFragment;
@@ -63,10 +62,6 @@ interface StakeRegistryInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "distributeVerificationRewards",
     values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getActivePool",
-    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "getStakingParameters",
@@ -154,10 +149,6 @@ interface StakeRegistryInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "distributeVerificationRewards",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getActivePool",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -306,20 +297,6 @@ export class StakeRegistry extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getActivePool(
-      _slaOwner: string,
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        ([string, BigNumber, string, string] & {
-          SLAAddress: string;
-          stake: BigNumber;
-          assetName: string;
-          assetAddress: string;
-        })[]
-      ]
-    >;
-
     getStakingParameters(
       overrides?: CallOverrides
     ): Promise<
@@ -461,18 +438,6 @@ export class StakeRegistry extends BaseContract {
     _periodId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  getActivePool(
-    _slaOwner: string,
-    overrides?: CallOverrides
-  ): Promise<
-    ([string, BigNumber, string, string] & {
-      SLAAddress: string;
-      stake: BigNumber;
-      assetName: string;
-      assetAddress: string;
-    })[]
-  >;
 
   getStakingParameters(
     overrides?: CallOverrides
@@ -618,18 +583,6 @@ export class StakeRegistry extends BaseContract {
       _periodId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    getActivePool(
-      _slaOwner: string,
-      overrides?: CallOverrides
-    ): Promise<
-      ([string, BigNumber, string, string] & {
-        SLAAddress: string;
-        stake: BigNumber;
-        assetName: string;
-        assetAddress: string;
-      })[]
-    >;
 
     getStakingParameters(
       overrides?: CallOverrides
@@ -862,11 +815,6 @@ export class StakeRegistry extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getActivePool(
-      _slaOwner: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getStakingParameters(overrides?: CallOverrides): Promise<BigNumber>;
 
     isAllowedToken(
@@ -966,11 +914,6 @@ export class StakeRegistry extends BaseContract {
       _verificationRewardReceiver: string,
       _periodId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    getActivePool(
-      _slaOwner: string,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getStakingParameters(

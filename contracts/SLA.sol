@@ -13,6 +13,7 @@ import './Staking.sol';
 
 contract SLA is Staking {
     using SafeMath for uint256;
+    using SafeMath for int256;
 
     enum Status {
         NotVerified,
@@ -124,19 +125,20 @@ contract SLA is Staking {
 
         uint256 precision = 10000;
 
-        int256 deviation = _sli.sub(sloValue).mul(precision).div(
-            _sli.add(sloValue).div(2)
+        int256 deviation = int256(
+            _sli.sub(sloValue).mul(precision).div(_sli.add(sloValue).div(2))
         );
 
         if (deviation < 0) {
-            deviation = deviation.mul(-1);
+            deviation = deviation * -1;
         }
 
         uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
 
-        uint256 rewardPercentage = deviation.mul(normalizedPeriodId).div(
-            finalPeriodId - initialPeriodId + 1
-        );
+        // This cannot be negative
+        uint256 rewardPercentage = uint256(deviation)
+            .mul(normalizedPeriodId)
+            .div(finalPeriodId - initialPeriodId + 1);
 
         if (_sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
@@ -167,11 +169,12 @@ contract SLA is Staking {
     function stakeTokens(
         uint256 _amount,
         address _token,
-        string memory _position
+        string calldata _position
     ) external {
+        string memory position = _position;
         bool isContractFinished = contractFinished();
         require(!isContractFinished, 'finished contract');
-        _stake(_amount, _token, _position);
+        _stake(_amount, _token, position);
         emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount);
         IStakeRegistry stakeRegistry = IStakeRegistry(
             _slaRegistry.stakeRegistry()

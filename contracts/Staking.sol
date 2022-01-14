@@ -58,13 +58,11 @@ contract Staking is Ownable {
     }
 
     modifier onlyAllowedPosition(string memory _position) {
-        string memory long = 'long';
-        string memory short = 'short';
         require(
             keccak256(abi.encodePacked(_position)) ==
-                keccak256(abi.encodePacked(long)) ||
+                keccak256(abi.encodePacked('long')) ||
                 keccak256(abi.encodePacked(_position)) ==
-                keccak256(abi.encodePacked(short)),
+                keccak256(abi.encodePacked('short')),
             'position not allowed'
         );
         _;
@@ -214,11 +212,11 @@ contract Staking is Ownable {
             _amount
         );
 
-        // DSLA-LP proofs of SLA Position
-        string memory long = 'long';
+        // DSLA-SP proofs of SLA Position
+        // string memory short = 'short';
         if (
             keccak256(abi.encodePacked(_position)) ==
-            keccak256(abi.encodePacked(long))
+            keccak256(abi.encodePacked('short'))
         ) {
             (uint256 providerStake, uint256 usersStake) = (
                 providerPool[_tokenAddress],
@@ -243,11 +241,11 @@ contract Staking is Ownable {
             usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
         }
 
-        // DSLA-SP proofs of SLA Position
-        string memory short = 'short';
+        // DSLA-LP proofs of SLA Position
+        // string memory long = 'long';
         if (
             keccak256(abi.encodePacked(_position)) ==
-            keccak256(abi.encodePacked(short))
+            keccak256(abi.encodePacked('long'))
         ) {
             ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
             uint256 p0 = dpToken.totalSupply();

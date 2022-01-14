@@ -204,8 +204,7 @@ export class Details extends BaseContract {
       _slaAddress: string,
       overrides?: CallOverrides
     ): Promise<
-      [boolean, BigNumber, BigNumber, BigNumber] & {
-        breachedContract: boolean;
+      [BigNumber, BigNumber, BigNumber] & {
         stakersCount: BigNumber;
         nextVerifiablePeriod: BigNumber;
         leverage: BigNumber;
@@ -342,8 +341,7 @@ export class Details extends BaseContract {
     _slaAddress: string,
     overrides?: CallOverrides
   ): Promise<
-    [boolean, BigNumber, BigNumber, BigNumber] & {
-      breachedContract: boolean;
+    [BigNumber, BigNumber, BigNumber] & {
       stakersCount: BigNumber;
       nextVerifiablePeriod: BigNumber;
       leverage: BigNumber;
@@ -480,8 +478,7 @@ export class Details extends BaseContract {
       _slaAddress: string,
       overrides?: CallOverrides
     ): Promise<
-      [boolean, BigNumber, BigNumber, BigNumber] & {
-        breachedContract: boolean;
+      [BigNumber, BigNumber, BigNumber] & {
         stakersCount: BigNumber;
         nextVerifiablePeriod: BigNumber;
         leverage: BigNumber;

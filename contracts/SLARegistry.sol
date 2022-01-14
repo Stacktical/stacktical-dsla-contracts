@@ -81,17 +81,17 @@ contract SLARegistry is ISLARegistry {
         );
         require(validPeriod, 'final id invalid');
         bool initializedPeriod = IPeriodRegistry(_periodRegistry)
-        .isInitializedPeriod(periodType_);
+            .isInitializedPeriod(periodType_);
         require(initializedPeriod, 'period not initialized');
         require(finalPeriodId_ >= initialPeriodId_, 'invalid final/initial');
 
         if (_checkPastPeriod) {
             bool periodHasStarted = IPeriodRegistry(_periodRegistry)
-            .periodHasStarted(periodType_, initialPeriodId_);
+                .periodHasStarted(periodType_, initialPeriodId_);
             require(!periodHasStarted, 'past period');
         }
         bool registeredMessenger = IMessengerRegistry(_messengerRegistry)
-        .registeredMessengers(messengerAddress_);
+            .registeredMessengers(messengerAddress_);
         require(registeredMessenger == true, 'invalid messenger');
 
         SLA sla = new SLA(
@@ -136,8 +136,6 @@ contract SLARegistry is ISLARegistry {
         );
         (, , SLA.Status status) = _sla.periodSLIs(_periodId);
         require(status == SLA.Status.NotVerified, 'invalid SLA status');
-        bool breachedContract = _sla.breachedContract();
-        require(!breachedContract, 'breached contract');
         bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
         require(slaAllowedPeriodId, 'invalid period');
         IPeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
@@ -167,13 +165,12 @@ contract SLARegistry is ISLARegistry {
         uint256 lastValidPeriodId = _sla.finalPeriodId();
         IPeriodRegistry.PeriodType periodType = _sla.periodType();
         (, uint256 endOfLastValidPeriod) = IPeriodRegistry(_periodRegistry)
-        .getPeriodStartAndEnd(periodType, lastValidPeriodId);
+            .getPeriodStartAndEnd(periodType, lastValidPeriodId);
 
         (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(lastValidPeriodId);
         require(
-            _sla.breachedContract() ||
-                (block.timestamp >= endOfLastValidPeriod &&
-                    lastPeriodStatus != SLA.Status.NotVerified),
+            (block.timestamp >= endOfLastValidPeriod &&
+                lastPeriodStatus != SLA.Status.NotVerified),
             'not finished contract'
         );
         ReturnLockedValue(address(_sla), msg.sender);
