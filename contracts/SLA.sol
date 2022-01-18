@@ -13,7 +13,6 @@ import './Staking.sol';
 
 contract SLA is Staking {
     using SafeMath for uint256;
-    using SafeMath for int256;
 
     enum Status {
         NotVerified,
@@ -116,31 +115,28 @@ contract SLA is Staking {
         external
         onlyMessenger
     {
-        emit SLICreated(block.timestamp, _sli, _periodId);
-        nextVerifiablePeriod = _periodId + 1;
-        PeriodSLI storage periodSLI = periodSLIs[_periodId];
-        periodSLI.sli = _sli;
-        periodSLI.timestamp = block.timestamp;
-        (uint256 sloValue, ) = _sloRegistry.registeredSLO(address(this));
-
+        uint256 sliValue = _sli;
         uint256 precision = 10000;
 
-        int256 deviation = int256(
-            _sli.sub(sloValue).mul(precision).div(_sli.add(sloValue).div(2))
-        );
+        emit SLICreated(block.timestamp, sliValue, _periodId);
+        nextVerifiablePeriod = _periodId + 1;
+        PeriodSLI storage periodSLI = periodSLIs[_periodId];
+        periodSLI.sli = sliValue;
+        periodSLI.timestamp = block.timestamp;
 
-        if (deviation < 0) {
-            deviation = deviation * -1;
-        }
+        uint256 deviation = _sloRegistry.getDeviation(
+            sliValue,
+            address(this),
+            precision
+        );
 
         uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
 
-        // This cannot be negative
         uint256 rewardPercentage = uint256(deviation)
             .mul(normalizedPeriodId)
             .div(finalPeriodId - initialPeriodId + 1);
 
-        if (_sloRegistry.isRespected(_sli, address(this))) {
+        if (_sloRegistry.isRespected(sliValue, address(this))) {
             periodSLI.status = Status.Respected;
 
             _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
