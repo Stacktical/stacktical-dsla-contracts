@@ -109,6 +109,7 @@ contract SLORegistry {
         if (sloType == SLOType.GreaterOrEqualTo) {
             return _value >= sloValue;
         }
+
         revert("isRespected wasn't executed properly");
     }
 
@@ -129,17 +130,38 @@ contract SLORegistry {
         SLOType sloType = slo.sloType;
         uint256 sloValue = slo.sloValue;
         uint256 precision = _precision;
-        uint256 deviation = 1;
+
+        // Ensures a positive deviation for greater / small comparisions
+        // The deviation is the percentage difference between SLI and SLO
+        uint256 deviation = (
+            _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)
+        ).mul(precision).div(sliValue.add(sloValue).div(2));
 
         if (sloType == SLOType.EqualTo) {
+            // Fixed deviation for this comparison, the reward percentage fully driven by verification period
+            deviation = 1;
             return deviation;
-        } else if (sloType == SLOType.NotEqualTo) {
-            return deviation;
-        } else {
-            deviation = sloValue.sub(sliValue).mul(precision).div(
-                sloValue.add(sliValue).div(2)
-            );
+        }
 
+        if (sloType == SLOType.NotEqualTo) {
+            // Fixed deviation for this comparison, the reward percentage fully driven by verification period
+            deviation = 1;
+            return deviation;
+        }
+
+        if (sloType == SLOType.SmallerThan) {
+            return deviation;
+        }
+
+        if (sloType == SLOType.SmallerOrEqualTo) {
+            return deviation;
+        }
+
+        if (sloType == SLOType.GreaterThan) {
+            return deviation;
+        }
+
+        if (sloType == SLOType.GreaterOrEqualTo) {
             return deviation;
         }
 
