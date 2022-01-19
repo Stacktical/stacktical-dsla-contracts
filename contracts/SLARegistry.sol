@@ -145,7 +145,7 @@ contract SLARegistry is ISLARegistry {
         );
         require(periodFinished, 'period unfinished');
         address slaMessenger = _sla.messengerAddress();
-        SLIRequested(_periodId, address(_sla), msg.sender);
+        emit SLIRequested(_periodId, address(_sla), msg.sender);
         IMessenger(slaMessenger).requestSLI(
             _periodId,
             address(_sla),
