@@ -132,9 +132,9 @@ contract SLA is Staking {
 
         uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
 
-        uint256 rewardPercentage = uint256(deviation)
-            .mul(normalizedPeriodId)
-            .div(finalPeriodId - initialPeriodId + 1);
+        uint256 rewardPercentage = deviation.mul(normalizedPeriodId).div(
+            finalPeriodId - initialPeriodId + 1
+        );
 
         if (_sloRegistry.isRespected(sliValue, address(this))) {
             periodSLI.status = Status.Respected;

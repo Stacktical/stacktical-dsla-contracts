@@ -129,17 +129,13 @@ contract SLORegistry {
         SLOType sloType = slo.sloType;
         uint256 sloValue = slo.sloValue;
         uint256 precision = _precision;
-        uint256 deviation = 0;
+        uint256 deviation = 1;
 
         if (sloType == SLOType.EqualTo) {
             return deviation;
-        }
-
-        if (sloType == SLOType.NotEqualTo) {
+        } else if (sloType == SLOType.NotEqualTo) {
             return deviation;
-        }
-
-        if (sloType == SLOType.SmallerThan) {
+        } else {
             deviation = sloValue.sub(sliValue).mul(precision).div(
                 sloValue.add(sliValue).div(2)
             );
@@ -147,29 +143,6 @@ contract SLORegistry {
             return deviation;
         }
 
-        if (sloType == SLOType.SmallerOrEqualTo) {
-            deviation = sloValue.sub(sliValue).mul(precision).div(
-                sloValue.add(sliValue).div(2)
-            );
-
-            return deviation;
-        }
-
-        if (sloType == SLOType.GreaterThan) {
-            deviation = sliValue.sub(sloValue).mul(precision).div(
-                sliValue.add(sloValue).div(2)
-            );
-
-            return deviation;
-        }
-
-        if (sloType == SLOType.GreaterOrEqualTo) {
-            deviation = sliValue.sub(sloValue).mul(precision).div(
-                sliValue.add(sloValue).div(2)
-            );
-
-            return deviation;
-        }
         revert("getDeviation wasn't executed properly");
     }
 }
