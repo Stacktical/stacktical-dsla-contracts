@@ -39,6 +39,12 @@ As Staking.sol contract is going to call contracts defined by Stacktical we cons
 Those external calls correspond to ERC-20 contracts with is a fully reviewed and battle tested standard.
 In future versions, when the token selection will be opened, we can implement a full Reentrancy Guard protection.
 
+## Tests
+
+### Unit tests
+
+`hh test`
+
 ## Disclaimer
 
 Revert messages for SLARegistry, SLA and Staking contracts were shortened at commit [459ef4f587df48645dcac886d49763ad3e8ab5c3](https://github.com/Stacktical/dsla-protocol-contracts/commit/459ef4f587df48645dcac886d49763ad3e8ab5c3) because of constants "contract too large" problems.
