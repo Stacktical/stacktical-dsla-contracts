@@ -1,0 +1,13 @@
+steps:
+  - id: npm-install
+    name: node:lts-stretch
+    entrypoint: npm
+    args: ['install']
+  - id: compile
+    name: node:lts-stretch
+    entrypoint: npx
+    args: ['hardhat', 'compile']
+  - id: test
+    name: node:lts-stretch
+    entrypoint: npx
+    args: ['hardhat', 'test']
