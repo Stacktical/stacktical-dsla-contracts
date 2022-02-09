@@ -6,7 +6,7 @@ import {
   SLA__factory,
   SLARegistry,
   StakeRegistry,
-} from '../typechain';
+} from '../../typechain';
 const { ethers, waffle, deployments, getNamedAccounts } = hre;
 import {
   CONTRACT_NAMES,
@@ -16,9 +16,9 @@ import {
   SENetworkNamesBytes32,
   SENetworks,
   SLO_TYPE,
-} from '../constants';
+} from '../../constants';
 const { deployMockContract } = waffle;
-import { expect } from './chai-setup';
+import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
 
 const baseSLAConfig = {
@@ -131,6 +131,40 @@ describe(CONTRACT_NAMES.SLA, function () {
         dslaToken.address,
         await sla.nextVerifiablePeriod(),
         notDeployer,
+        mintAmount
+      );
+  });
+
+  it('should let the deployer withdraw tokens', async () => {
+    const { sla, dslaToken } = fixture;
+    await dslaToken.approve(sla.address, mintAmount);
+    await sla.stakeTokens(mintAmount, dslaToken.address);
+    const deployerSLA = await SLA__factory.connect(
+      sla.address,
+      await ethers.getSigner(deployer)
+    );
+    const deployerDSLA = await ERC20PresetMinterPauser__factory.connect(
+      dslaToken.address,
+      await ethers.getSigner(deployer)
+    );
+    await deployerDSLA.approve(sla.address, mintAmount);
+    await deployerSLA.stakeTokens(mintAmount, dslaToken.address);
+    const duTokenAddress = await sla.dpTokenRegistry(dslaToken.address);
+    const duToken: ERC20PresetMinterPauser = await ethers.getContractAt(
+      'ERC20PresetMinterPauser',
+      duTokenAddress,
+      await ethers.getSigner(deployer)
+    );
+    await duToken.approve(sla.address, mintAmount);
+
+    await expect(
+      deployerSLA.withdrawProviderTokens(mintAmount, dslaToken.address)
+    )
+      .to.emit(sla, 'ProviderWithdraw')
+      .withArgs(
+        dslaToken.address,
+        await sla.nextVerifiablePeriod(),
+        deployer,
         mintAmount
       );
   });

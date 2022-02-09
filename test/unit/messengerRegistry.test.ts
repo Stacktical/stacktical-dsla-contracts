@@ -1,9 +1,9 @@
 const hre = require('hardhat');
-import { IMessenger, MessengerRegistry, SLARegistry } from '../typechain';
+import { IMessenger, MessengerRegistry, SLARegistry } from '../../typechain';
 const { ethers, waffle, deployments, getNamedAccounts } = hre;
-import { CONTRACT_NAMES, DEPLOYMENT_TAGS } from '../constants';
+import { CONTRACT_NAMES, DEPLOYMENT_TAGS } from '../../constants';
 const { deployMockContract } = waffle;
-import { expect } from './chai-setup';
+import { expect } from '../chai-setup';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(DEPLOYMENT_TAGS.DSLA);
