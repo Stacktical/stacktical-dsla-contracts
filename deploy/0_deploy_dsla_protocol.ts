@@ -34,6 +34,7 @@ module.exports = async ({
   const messengerRegistry = await get(CONTRACT_NAMES.MessengerRegistry);
   const stakeRegistry = await get(CONTRACT_NAMES.StakeRegistry);
   const stringUtils = await get(CONTRACT_NAMES.StringUtils);
+
   const checkPastPeriods = false;
   await deploy(CONTRACT_NAMES.SLARegistry, {
     ...baseOptions,

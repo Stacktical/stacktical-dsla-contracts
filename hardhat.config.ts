@@ -7,6 +7,9 @@ import 'hardhat-deploy';
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
+  typechain: {
+    target: 'ethers-v5',
+  },
   solidity: {
     compilers: [
       {

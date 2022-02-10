@@ -70,6 +70,8 @@ module.exports = async ({
       StringUtils: stringUtils.address,
     },
   });
+  await deploy(CONTRACT_NAMES.Details, {
+    ...baseOptions  });
 };
 
 module.exports.tags = [DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE];

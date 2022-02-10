@@ -1,4 +1,4 @@
-# dsla-protocol
+# dsla-protocol-contracts
 
 DSLA Protocol is a risk management framework that enables developers and infrastructure operators to reduce their users exposure to service delays, interruptions and financial losses, using self-executing service level agreements, bonus-malus insurance policies, and crowdfunded liquidity pools.
 
@@ -38,6 +38,12 @@ Currently on version 0.6.6 of Solidity.
 As Staking.sol contract is going to call contracts defined by Stacktical we consider the implementation of Reentrancy Guard as unnecessary, since we fully control the external calls.
 Those external calls correspond to ERC-20 contracts with is a fully reviewed and battle tested standard.
 In future versions, when the token selection will be opened, we can implement a full Reentrancy Guard protection.
+
+## Tests
+
+### Unit tests
+
+`hh test`
 
 ## Disclaimer
 
