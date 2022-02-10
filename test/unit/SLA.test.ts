@@ -211,4 +211,83 @@ describe(CONTRACT_NAMES.SLA, function () {
     ).tokensStake[0].totalStake.toString();
     expect(totalStake).equals('0');
   });
+
+  it('checks that allowed period is returning true if period is allowed', async () => {
+    const { sla } = fixture;
+    let isAllowedPeriod = await sla.isAllowedPeriod(0);
+    expect(isAllowedPeriod).to.be.true;
+  });
+
+  it('checks that allowed period is returning false if period is not allowed', async () => {
+    const { sla } = fixture;
+    let isAllowedPeriod = await sla.isAllowedPeriod(11);
+    expect(isAllowedPeriod).to.be.false;
+  });
+
+  it('checks that allowed period is being reverted if period is negative ', async () => {
+    const { sla } = fixture;
+    await expect(sla.isAllowedPeriod(-1)).to.be.reverted;
+  });
+
+  it('checks that allowed period is being reverted if period is too large', async () => {
+    const { sla } = fixture;
+    let bigNumber = 10 ** 100000000000000000000000000000000;
+    await expect(sla.isAllowedPeriod(bigNumber)).to.be.reverted;
+  });
+
+  it('checks that the contract is not finished', async () => {
+    const { sla } = fixture;
+    let isContractFinished = await sla.contractFinished();
+    expect(isContractFinished).to.be.false;
+  });
+
+  it('checks that the stakers length is 0 if there are no stakers', async () => {
+    const { sla } = fixture;
+    let stakersLength = await sla.getStakersLength();
+    expect(stakersLength).to.be.equal(0);
+  });
+
+  it('checks that the stakers length is 1 if there are is 1 staker', async () => {
+    const { sla, dslaToken } = fixture;
+    await dslaToken.approve(sla.address, mintAmount);
+    let stakeAmount = 100000;
+    await sla.stakeTokens(stakeAmount, dslaToken.address, 'long');
+
+    let stakersLength = await sla.getStakersLength();
+    expect(stakersLength).to.be.equal(1);
+  });
+
+  it('checks that the stakers length is 2 if there are are 2 stakers for short and long positions', async () => {
+    const { sla, dslaToken } = fixture;
+    await dslaToken.approve(sla.address, mintAmount);
+
+    // user long stake
+    const notDeployerSLA = SLA__factory.connect(
+      sla.address,
+      await ethers.getSigner(notDeployer)
+    );
+
+    const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+      dslaToken.address,
+      await ethers.getSigner(notDeployer)
+    );
+    await notDeployerDSLA.approve(sla.address, mintAmount);
+    await notDeployerSLA.stakeTokens(mintAmount, dslaToken.address, 'long');
+
+    // provider long stake
+    const deployerSLA = SLA__factory.connect(
+      sla.address,
+      await ethers.getSigner(deployer)
+    );
+    const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
+      dslaToken.address,
+      await ethers.getSigner(deployer)
+    );
+    await deployerDSLA.approve(sla.address, mintAmount);
+    await deployerSLA.stakeTokens(mintAmount, dslaToken.address, 'short');
+
+    // check stakers length
+    let stakersLength = await sla.getStakersLength();
+    expect(stakersLength).to.be.equal(2);
+  });
 });

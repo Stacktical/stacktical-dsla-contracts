@@ -32,6 +32,7 @@ const baseSLAConfig = {
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
   leverage: 1,
 };
+
 const mintAmount = '1000000';
 
 const setup = deployments.createFixture(async () => {
@@ -109,7 +110,5 @@ describe(CONTRACT_NAMES.Details, function () {
   it('test get SLA dynamic details match the creation details', async function () {
     const { details, sla } = fixture;
     const d = await details.getSLADynamicDetails(sla.address);
-
-    console.log(d);
   });
 });
