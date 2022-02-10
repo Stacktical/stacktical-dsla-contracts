@@ -106,7 +106,7 @@ describe(CONTRACT_NAMES.SLA, function () {
   });
 
   it('should not let notDeployer withdraw tokens if the contract is not finished', async function () {
-    const { sla, dslaToken } = fixture;
+    const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
     await sla.stakeTokens(mintAmount, dslaToken.address, 'long');
     const notDeployerSLA = SLA__factory.connect(
@@ -131,10 +131,14 @@ describe(CONTRACT_NAMES.SLA, function () {
     await expect(
       notDeployerSLA.withdrawUserTokens(mintAmount, dslaToken.address)
     ).to.be.reverted;
+    let totalStake = (
+      await details.getSLADetailsArrays(sla.address)
+    ).tokensStake[0].totalStake.toString();
+    expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
   });
 
   it('should not let the deployer withdraw provider tokens if the contract is not finished', async () => {
-    const { sla, dslaToken } = fixture;
+    const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
     await sla.stakeTokens(mintAmount, dslaToken.address, 'long');
     const deployerSLA = SLA__factory.connect(
@@ -158,6 +162,11 @@ describe(CONTRACT_NAMES.SLA, function () {
     await expect(
       deployerSLA.withdrawProviderTokens(mintAmount, dslaToken.address)
     ).to.be.reverted;
+
+    let totalStake = (
+      await details.getSLADetailsArrays(sla.address)
+    ).tokensStake[0].totalStake.toString();
+    expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
   });
 
   it('should check that a normal amount of token can be staked', async () => {
