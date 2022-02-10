@@ -79,4 +79,143 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
       .to.emit(messengerRegistry, 'MessengerRegistered')
       .withArgs(deployer, mockMessenger2.address, dummySpecUrl, 10000, 1);
   });
+
+  it('should revert messengers with non valid address', async function () {
+    const { slaRegistry } = fixture;
+    const dummySpecUrl = 'http://dummy.link';
+    const invalidAddress = dummySpecUrl;
+    // First has id 0
+    await expect(
+      slaRegistry.registerMessenger(invalidAddress, dummySpecUrl)
+    ).to.be.reverted;
+  });
+
+  it('should modify messengers with valid id and specUrl', async function () {
+    const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
+    const dummySpecUrl = 'http://dummy.link';
+    // First has id 0
+    let messangerEmit = await slaRegistry.registerMessenger(
+      mockMessenger.address,
+      dummySpecUrl
+    );
+    const dummySpecUrlModified = 'http://modifieddummy.link';
+
+    await expect(messengerRegistry.modifyMessenger(dummySpecUrlModified, '0'))
+      .to.emit(messengerRegistry, 'MessengerModified')
+      .withArgs(
+        deployer,
+        mockMessenger.address,
+        dummySpecUrlModified,
+        10000,
+        0
+      );
+  });
+
+  it('should revert messengers with valid non existent id', async function () {
+    const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
+    const dummySpecUrl = 'http://dummy.link';
+    // First has id 0
+    await slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl);
+    const dummySpecUrlModified = 'http://modifieddummy.link';
+
+    await expect(
+      messengerRegistry.modifyMessenger(dummySpecUrlModified, '1')
+    ).to.be.reverted;
+  });
+
+  it('should revert messengers with non valid id', async function () {
+    const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
+    const dummySpecUrl = 'http://dummy.link';
+    // First has id 0
+    await slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl);
+    const dummySpecUrlModified = 'http://modifieddummy.link';
+
+    await expect(
+      messengerRegistry.modifyMessenger(dummySpecUrlModified, '-1')
+    ).to.be.reverted;
+  });
+
+  it('should return empty list with no messengers ', async function () {
+    const { messengerRegistry } = fixture;
+    let messengersList = await messengerRegistry.getMessengers();
+    expect(messengersList).to.deep.equal([]);
+  });
+
+  it('should return a list of messengers with length 2 using getMessengers', async function () {
+    const { messengerRegistry, mockMessenger, mockMessenger2, slaRegistry } =
+      fixture;
+    const dummySpecUrl = 'http://dummy.link';
+
+    // First has id 0
+    await expect(
+      slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl)
+    )
+      .to.emit(messengerRegistry, 'MessengerRegistered')
+      .withArgs(deployer, mockMessenger.address, dummySpecUrl, 10000, 0);
+
+    // Second has id 1
+    await expect(
+      slaRegistry.registerMessenger(mockMessenger2.address, dummySpecUrl)
+    )
+      .to.emit(messengerRegistry, 'MessengerRegistered')
+      .withArgs(deployer, mockMessenger2.address, dummySpecUrl, 10000, 1);
+
+    let messengersList = await messengerRegistry.getMessengers();
+    expect(messengersList.length).to.equal(2);
+  });
+
+  it('should return a list of messengers with length 2 using getMessengersLength', async function () {
+    const { messengerRegistry, mockMessenger, mockMessenger2, slaRegistry } =
+      fixture;
+    const dummySpecUrl = 'http://dummy.link';
+
+    // First has id 0
+    await expect(
+      slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl)
+    )
+      .to.emit(messengerRegistry, 'MessengerRegistered')
+      .withArgs(deployer, mockMessenger.address, dummySpecUrl, 10000, 0);
+
+    // Second has id 1
+    await expect(
+      slaRegistry.registerMessenger(mockMessenger2.address, dummySpecUrl)
+    )
+      .to.emit(messengerRegistry, 'MessengerRegistered')
+      .withArgs(deployer, mockMessenger2.address, dummySpecUrl, 10000, 1);
+
+    let messengersLength = await messengerRegistry.getMessengersLength();
+    expect(messengersLength).to.equal('2');
+  });
+
+  it('should return list with length 0 ', async function () {
+    const { messengerRegistry } = fixture;
+    let messengersLength = await messengerRegistry.getMessengersLength();
+    expect(messengersLength).to.equal('0');
+  });
+
+  it('should return true because messenger is registered', async function () {
+    const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
+
+    const dummySpecUrl = 'http://dummy.link';
+    // First has id 0
+    await expect(
+      slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl)
+    )
+      .to.emit(messengerRegistry, 'MessengerRegistered')
+      .withArgs(deployer, mockMessenger.address, dummySpecUrl, 10000, 0);
+
+    let isRegisteredMessenger = await messengerRegistry.registeredMessengers(
+      mockMessenger.address
+    );
+    expect(isRegisteredMessenger).to.be.true;
+  });
+
+  it('should return false because messenger isnt registered', async function () {
+    const { messengerRegistry, mockMessenger } = fixture;
+
+    let isRegisteredMessenger = await messengerRegistry.registeredMessengers(
+      mockMessenger.address
+    );
+    expect(isRegisteredMessenger).to.be.false;
+  });
 });
