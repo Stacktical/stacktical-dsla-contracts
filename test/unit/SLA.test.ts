@@ -6,7 +6,7 @@ import {
   SLA__factory,
   SLARegistry,
   StakeRegistry,
-  Details
+  Details,
 } from '../../typechain';
 const { ethers, waffle, deployments, getNamedAccounts } = hre;
 import {
@@ -46,9 +46,7 @@ const setup = deployments.createFixture(async () => {
     CONTRACT_NAMES.SLARegistry
   );
 
-  const details: Details = await ethers.getContract(
-    CONTRACT_NAMES.Details
-  );
+  const details: Details = await ethers.getContract(CONTRACT_NAMES.Details);
 
   const stakeRegistry: StakeRegistry = await ethers.getContract(
     CONTRACT_NAMES.StakeRegistry
@@ -76,7 +74,7 @@ const setup = deployments.createFixture(async () => {
     baseSLAConfig.extraData,
     baseSLAConfig.leverage
   );
-  
+
   await tx.wait();
   const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
   const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
@@ -86,7 +84,7 @@ const setup = deployments.createFixture(async () => {
     slaRegistry,
     sla,
     dslaToken,
-    details
+    details,
   };
 });
 
@@ -94,7 +92,7 @@ type Fixture = {
   slaRegistry: SLARegistry;
   sla: SLA;
   dslaToken: ERC20PresetMinterPauser;
-  details: Details
+  details: Details;
 };
 
 describe(CONTRACT_NAMES.SLA, function () {
@@ -107,21 +105,21 @@ describe(CONTRACT_NAMES.SLA, function () {
     fixture = await setup();
   });
 
-  it('should let notDeployer withdraw tokens if deployer unlocks contract', async function () {
+  it('should not let notDeployer withdraw tokens if the contract is not finished', async function () {
     const { sla, dslaToken } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
-    await sla.stakeTokens(mintAmount, dslaToken.address);
+    await sla.stakeTokens(mintAmount, dslaToken.address, 'long');
     const notDeployerSLA = SLA__factory.connect(
       sla.address,
       await ethers.getSigner(notDeployer)
     );
-    
+
     const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
       dslaToken.address,
       await ethers.getSigner(notDeployer)
     );
     await notDeployerDSLA.approve(sla.address, mintAmount);
-    await notDeployerSLA.stakeTokens(mintAmount, dslaToken.address);
+    await notDeployerSLA.stakeTokens(mintAmount, dslaToken.address, 'long');
     const duTokenAddress = await sla.duTokenRegistry(dslaToken.address);
     const duToken: ERC20PresetMinterPauser = await ethers.getContractAt(
       'ERC20PresetMinterPauser',
@@ -129,26 +127,16 @@ describe(CONTRACT_NAMES.SLA, function () {
       await ethers.getSigner(notDeployer)
     );
     await duToken.approve(sla.address, mintAmount);
+
     await expect(
       notDeployerSLA.withdrawUserTokens(mintAmount, dslaToken.address)
-    ).to.be.revertedWith('not finished');
-    await sla.toggleUserWithdrawLocked();
-    await expect(
-      notDeployerSLA.withdrawUserTokens(mintAmount, dslaToken.address)
-    )
-      .to.emit(sla, 'UserWithdraw')
-      .withArgs(
-        dslaToken.address,
-        await sla.nextVerifiablePeriod(),
-        notDeployer,
-        mintAmount
-      );
+    ).to.be.reverted;
   });
 
-  it('should let the deployer withdraw provider tokens', async () => {
+  it('should not let the deployer withdraw provider tokens if the contract is not finished', async () => {
     const { sla, dslaToken } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
-    await sla.stakeTokens(mintAmount, dslaToken.address);
+    await sla.stakeTokens(mintAmount, dslaToken.address, 'long');
     const deployerSLA = SLA__factory.connect(
       sla.address,
       await ethers.getSigner(deployer)
@@ -158,7 +146,7 @@ describe(CONTRACT_NAMES.SLA, function () {
       await ethers.getSigner(deployer)
     );
     await deployerDSLA.approve(sla.address, mintAmount);
-    await deployerSLA.stakeTokens(mintAmount, dslaToken.address);
+    await deployerSLA.stakeTokens(mintAmount, dslaToken.address, 'long');
     const duTokenAddress = await sla.dpTokenRegistry(dslaToken.address);
     const duToken: ERC20PresetMinterPauser = await ethers.getContractAt(
       'ERC20PresetMinterPauser',
@@ -169,38 +157,36 @@ describe(CONTRACT_NAMES.SLA, function () {
 
     await expect(
       deployerSLA.withdrawProviderTokens(mintAmount, dslaToken.address)
-    )
-      .to.emit(sla, 'ProviderWithdraw')
-      .withArgs(
-        dslaToken.address,
-        await sla.nextVerifiablePeriod(),
-        deployer,
-        mintAmount
-      );
+    ).to.be.reverted;
   });
-  
 
   it('should check that a normal amount of token can be staked', async () => {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
     let stakeAmount = 100000;
-    await expect(sla.stakeTokens(stakeAmount, dslaToken.address)).to.emit(sla, 'Stake').withArgs(
-      dslaToken.address,
-      await sla.nextVerifiablePeriod(),
-      deployer,
-      stakeAmount
-    );;
-    let totalStake = (await details.getSLADetailsArrays(sla.address)).tokensStake[0].totalStake.toString();
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      .to.emit(sla, 'Stake')
+      .withArgs(
+        dslaToken.address,
+        await sla.nextVerifiablePeriod(),
+        deployer,
+        stakeAmount
+      );
+    let totalStake = (
+      await details.getSLADetailsArrays(sla.address)
+    ).tokensStake[0].totalStake.toString();
     expect(totalStake).equals(stakeAmount.toString());
   });
-
 
   it('should check that a negative amount of token cant be staked', async () => {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
-    
-    await expect(sla.stakeTokens(-1000, dslaToken.address)).to.be.reverted;
-    let totalStake = (await details.getSLADetailsArrays(sla.address)).tokensStake[0].totalStake.toString();
+
+    await expect(sla.stakeTokens(-1000, dslaToken.address, 'long')).to.be
+      .reverted;
+    let totalStake = (
+      await details.getSLADetailsArrays(sla.address)
+    ).tokensStake[0].totalStake.toString();
     expect(totalStake).equals('0');
   });
 
@@ -208,9 +194,12 @@ describe(CONTRACT_NAMES.SLA, function () {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
     let bigNumber = 10 ** 100000000000000000000000000000000;
-    await expect(sla.stakeTokens(bigNumber, dslaToken.address)).to.be.reverted;
+    await expect(sla.stakeTokens(bigNumber, dslaToken.address, 'long')).to.be
+      .reverted;
 
-    let totalStake = (await details.getSLADetailsArrays(sla.address)).tokensStake[0].totalStake.toString();
+    let totalStake = (
+      await details.getSLADetailsArrays(sla.address)
+    ).tokensStake[0].totalStake.toString();
     expect(totalStake).equals('0');
   });
 });
