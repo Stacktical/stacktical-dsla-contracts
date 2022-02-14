@@ -110,5 +110,39 @@ describe(CONTRACT_NAMES.Details, function () {
   it('test get SLA dynamic details match the creation details', async function () {
     const { details, sla } = fixture;
     const d = await details.getSLADynamicDetails(sla.address);
+
+    expect(d).to.have.own.property('stakersCount')
+    expect(d['stakersCount']).to.equal(sla.stakers.length)
+
+    expect(d).to.have.own.property('nextVerifiablePeriod')
+    expect(d['nextVerifiablePeriod']).to.equal(baseSLAConfig.initialPeriodId)
+
+    expect(d).to.have.own.property('leverage')
+    expect(d['leverage']).to.equal(baseSLAConfig.leverage)
+
   });
+
+  it('test get SLA details arrays have the correct structure', async function (){
+    const { details, sla } = fixture;
+    const darr = await details.getSLADetailsArrays(sla.address);
+
+    expect(darr).to.have.own.property('periodSLIs')
+    expect(darr['periodSLIs']).to.be.an('array').lengthOf.least(1)
+    expect(darr['periodSLIs'][0]).to.be.an('array')
+    expect(darr['periodSLIs'][0]).to.have.own.property('timestamp')
+    expect(darr['periodSLIs'][0]).to.have.own.property('sli')
+    expect(darr['periodSLIs'][0]).to.have.own.property('status')
+
+    expect(darr).to.have.own.property('tokensStake')
+    expect(darr['tokensStake']).to.be.an('array').lengthOf.least(1)
+    expect(darr['tokensStake'][0]).to.be.an('array')
+    expect(darr['tokensStake'][0]).to.have.own.property('tokenAddress')
+    expect(darr['tokensStake'][0]['tokenAddress']).to.be.properAddress;
+    expect(darr['tokensStake'][0]).to.have.own.property('totalStake')
+    expect(darr['tokensStake'][0]).to.have.own.property('usersPool')
+    expect(darr['tokensStake'][0]).to.have.own.property('providerPool')
+
+  });
+
+
 });
