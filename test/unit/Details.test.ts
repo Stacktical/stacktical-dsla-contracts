@@ -107,7 +107,7 @@ describe(CONTRACT_NAMES.Details, function () {
     fixture = await setup();
   });
 
-  it('test get SLA dynamic details match the creation details', async function () {
+  it('should return SLA Dynamic Details with required attributes and structure that match the creation details', async function () {
     const { details, sla } = fixture;
     const d = await details.getSLADynamicDetails(sla.address);
 
@@ -121,7 +121,7 @@ describe(CONTRACT_NAMES.Details, function () {
     expect(d['leverage']).to.equal(baseSLAConfig.leverage)
   });
 
-  it('test get SLA details arrays have the correct structure', async function (){
+  it('should return SLA Details arrays with required attributes and structure', async function (){
     const { details, sla } = fixture;
     const darr = await details.getSLADetailsArrays(sla.address);
 
