@@ -119,7 +119,6 @@ describe(CONTRACT_NAMES.Details, function () {
 
     expect(d).to.have.own.property('leverage')
     expect(d['leverage']).to.equal(baseSLAConfig.leverage)
-
   });
 
   it('test get SLA details arrays have the correct structure', async function (){
@@ -141,8 +140,50 @@ describe(CONTRACT_NAMES.Details, function () {
     expect(darr['tokensStake'][0]).to.have.own.property('totalStake')
     expect(darr['tokensStake'][0]).to.have.own.property('usersPool')
     expect(darr['tokensStake'][0]).to.have.own.property('providerPool')
-
   });
 
+  it('should return DTokens Details array with required attributes and structure', async function (){
+    const { details, sla } = fixture;
+    const sla_owner = await sla.owner()
+    const dtarr = await details.getDTokensDetails(sla.address, sla_owner);
 
+    expect(dtarr).to.have.own.property('dpTokens')
+    expect(dtarr['dpTokens']).to.be.an('array').lengthOf.least(1)
+    expect(dtarr['dpTokens'][0]).to.have.own.property('tokenAddress')
+    expect(dtarr['dpTokens'][0]).to.have.own.property('totalSupply')
+    expect(dtarr['dpTokens'][0]).to.have.own.property('dTokenAddress')
+    expect(dtarr['dpTokens'][0]).to.have.own.property('dTokenSymbol')
+    expect(dtarr['dpTokens'][0]).to.have.own.property('dTokenName')
+    expect(dtarr['dpTokens'][0]).to.have.own.property('balance')
+    expect(dtarr['dpTokens'][0]).to.have.own.property('allowance')
+
+    expect(dtarr).to.have.own.property('duTokens')
+    expect(dtarr['duTokens']).to.be.an('array').lengthOf.least(1)
+    expect(dtarr['duTokens'][0]).to.have.own.property('tokenAddress')
+    expect(dtarr['duTokens'][0]).to.have.own.property('totalSupply')
+    expect(dtarr['duTokens'][0]).to.have.own.property('dTokenAddress')
+    expect(dtarr['duTokens'][0]).to.have.own.property('dTokenSymbol')
+    expect(dtarr['duTokens'][0]).to.have.own.property('dTokenName')
+    expect(dtarr['duTokens'][0]).to.have.own.property('balance')
+    expect(dtarr['duTokens'][0]).to.have.own.property('allowance')
+  });
+
+  it('should return SLA Static Details array with all required attributes', async function (){
+    const { details, sla, slaRegistry } = fixture;
+    
+    const _sloRegistry = await slaRegistry.sloRegistry()
+    const stdarr = await details.getSLAStaticDetails(sla.address, _sloRegistry);
+
+    expect(stdarr).to.have.own.property('slaOwner')
+    expect(stdarr).to.have.own.property('messengerAddress')
+    expect(stdarr).to.have.own.property('sloValue')
+    expect(stdarr).to.have.own.property('creationBlockNumber')
+    expect(stdarr).to.have.own.property('slaId')
+    expect(stdarr).to.have.own.property('initialPeriodId')
+    expect(stdarr).to.have.own.property('finalPeriodId')
+    expect(stdarr).to.have.own.property('whiteListed')
+    expect(stdarr).to.have.own.property('periodType')
+    expect(stdarr).to.have.own.property('sloType')
+    expect(stdarr).to.have.own.property('ipfsHash')
+  });
 });
