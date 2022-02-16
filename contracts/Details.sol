@@ -45,13 +45,14 @@ contract Details {
         returns (
             uint256 stakersCount,
             uint256 nextVerifiablePeriod,
-            uint64 leverage
+            uint64 leverage,
+            uint64 cap
         )
     {
         SLA sla = SLA(_slaAddress);
         stakersCount = sla.getStakersLength();
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
-        (leverage,) = sla.governance();
+        (leverage, cap) = sla.governance();
     }
 
     function getSLAStaticDetails(address _slaAddress, SLORegistry _sloRegistry)
