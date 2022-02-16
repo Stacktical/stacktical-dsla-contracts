@@ -22,6 +22,7 @@ const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
 
+const leverage = 10;
 const baseSLAConfig = {
   sloValue: 50 * 10 ** 3,
   sloType: SLO_TYPE.GreaterThan,
@@ -31,7 +32,7 @@ const baseSLAConfig = {
   finalPeriodId: 10,
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
   governance: {
-    leverage: 1,
+    leverage: leverage,
     cap: 1,
   },
 };
@@ -262,7 +263,8 @@ describe(CONTRACT_NAMES.SLA, function () {
 
   it('checks that the stakers length is 2 if there are are 2 stakers for short and long positions', async () => {
     const { sla, dslaToken } = fixture;
-    await dslaToken.approve(sla.address, mintAmount);
+    let amount = 10000;
+    await dslaToken.approve(sla.address, amount);
 
     // user long stake
     const notDeployerSLA = SLA__factory.connect(
@@ -274,9 +276,13 @@ describe(CONTRACT_NAMES.SLA, function () {
       dslaToken.address,
       await ethers.getSigner(notDeployer)
     );
-    await notDeployerDSLA.approve(sla.address, mintAmount);
 
-    await notDeployerSLA.stakeTokens(mintAmount, dslaToken.address, 'long');
+    await notDeployerDSLA.approve(sla.address, amount * leverage);
+    await notDeployerSLA.stakeTokens(
+      amount * leverage,
+      dslaToken.address,
+      'long'
+    );
 
     // provider long stake
     const deployerSLA = SLA__factory.connect(
@@ -288,11 +294,45 @@ describe(CONTRACT_NAMES.SLA, function () {
       await ethers.getSigner(deployer)
     );
 
-    await deployerDSLA.approve(sla.address, mintAmount);
-    await deployerSLA.stakeTokens(mintAmount, dslaToken.address, 'short');
+    await deployerDSLA.approve(sla.address, amount);
+    await deployerSLA.stakeTokens(amount, dslaToken.address, 'short');
 
     // check stakers length
     let stakersLength = await sla.getStakersLength();
     expect(stakersLength).to.be.equal(2);
+  });
+
+  it('should revert because the short position is larger than the long position', async () => {
+    const { sla, dslaToken } = fixture;
+    let amount = 10000;
+    await dslaToken.approve(sla.address, amount);
+
+    // user long stake
+    const notDeployerSLA = SLA__factory.connect(
+      sla.address,
+      await ethers.getSigner(notDeployer)
+    );
+
+    const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+      dslaToken.address,
+      await ethers.getSigner(notDeployer)
+    );
+
+    await notDeployerDSLA.approve(sla.address, amount);
+    await notDeployerSLA.stakeTokens(amount, dslaToken.address, 'long');
+
+    // provider long stake
+    const deployerSLA = SLA__factory.connect(
+      sla.address,
+      await ethers.getSigner(deployer)
+    );
+    const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
+      dslaToken.address,
+      await ethers.getSigner(deployer)
+    );
+
+    await deployerDSLA.approve(sla.address, amount);
+    await expect(deployerSLA.stakeTokens(amount, dslaToken.address, 'short')).to
+      .be.reverted;
   });
 });
