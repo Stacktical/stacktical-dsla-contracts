@@ -30,7 +30,10 @@ const baseSLAConfig = {
   initialPeriodId: 0,
   finalPeriodId: 10,
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
-  leverage: 1,
+  governance: {
+    leverage: 1,
+    cap: 1,
+  },
 };
 const mintAmount = '1000000';
 
@@ -72,7 +75,7 @@ const setup = deployments.createFixture(async () => {
     baseSLAConfig.finalPeriodId,
     'dummy-ipfs-hash',
     baseSLAConfig.extraData,
-    baseSLAConfig.leverage
+    baseSLAConfig.governance
   );
 
   await tx.wait();
@@ -272,6 +275,7 @@ describe(CONTRACT_NAMES.SLA, function () {
       await ethers.getSigner(notDeployer)
     );
     await notDeployerDSLA.approve(sla.address, mintAmount);
+
     await notDeployerSLA.stakeTokens(mintAmount, dslaToken.address, 'long');
 
     // provider long stake
@@ -283,6 +287,7 @@ describe(CONTRACT_NAMES.SLA, function () {
       dslaToken.address,
       await ethers.getSigner(deployer)
     );
+
     await deployerDSLA.approve(sla.address, mintAmount);
     await deployerSLA.stakeTokens(mintAmount, dslaToken.address, 'short');
 

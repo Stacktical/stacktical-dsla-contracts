@@ -30,7 +30,10 @@ const baseSLAConfig = {
   initialPeriodId: 0,
   finalPeriodId: 10,
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
-  leverage: 1,
+  governance: {
+    leverage: 1,
+    cap: 1,
+  },
 };
 
 const mintAmount = '1000000';
@@ -73,7 +76,7 @@ const setup = deployments.createFixture(async () => {
     baseSLAConfig.finalPeriodId,
     'dummy-ipfs-hash',
     baseSLAConfig.extraData,
-    baseSLAConfig.leverage
+    baseSLAConfig.governance
   );
 
   await tx.wait();
@@ -111,79 +114,79 @@ describe(CONTRACT_NAMES.Details, function () {
     const { details, sla } = fixture;
     const d = await details.getSLADynamicDetails(sla.address);
 
-    expect(d).to.have.own.property('stakersCount')
-    expect(d['stakersCount']).to.equal(sla.stakers.length)
+    expect(d).to.have.own.property('stakersCount');
+    expect(d['stakersCount']).to.equal(sla.stakers.length);
 
-    expect(d).to.have.own.property('nextVerifiablePeriod')
-    expect(d['nextVerifiablePeriod']).to.equal(baseSLAConfig.initialPeriodId)
+    expect(d).to.have.own.property('nextVerifiablePeriod');
+    expect(d['nextVerifiablePeriod']).to.equal(baseSLAConfig.initialPeriodId);
 
-    expect(d).to.have.own.property('leverage')
-    expect(d['leverage']).to.equal(baseSLAConfig.leverage)
+    expect(d).to.have.own.property('leverage');
+    expect(d['leverage']).to.equal(baseSLAConfig.governance.leverage);
   });
 
-  it('should return SLA Details arrays with required attributes and structure', async function (){
+  it('should return SLA Details arrays with required attributes and structure', async function () {
     const { details, sla } = fixture;
     const darr = await details.getSLADetailsArrays(sla.address);
 
-    expect(darr).to.have.own.property('periodSLIs')
-    expect(darr['periodSLIs']).to.be.an('array').lengthOf.least(1)
-    expect(darr['periodSLIs'][0]).to.be.an('array')
-    expect(darr['periodSLIs'][0]).to.have.own.property('timestamp')
-    expect(darr['periodSLIs'][0]).to.have.own.property('sli')
-    expect(darr['periodSLIs'][0]).to.have.own.property('status')
+    expect(darr).to.have.own.property('periodSLIs');
+    expect(darr['periodSLIs']).to.be.an('array').lengthOf.least(1);
+    expect(darr['periodSLIs'][0]).to.be.an('array');
+    expect(darr['periodSLIs'][0]).to.have.own.property('timestamp');
+    expect(darr['periodSLIs'][0]).to.have.own.property('sli');
+    expect(darr['periodSLIs'][0]).to.have.own.property('status');
 
-    expect(darr).to.have.own.property('tokensStake')
-    expect(darr['tokensStake']).to.be.an('array').lengthOf.least(1)
-    expect(darr['tokensStake'][0]).to.be.an('array')
-    expect(darr['tokensStake'][0]).to.have.own.property('tokenAddress')
+    expect(darr).to.have.own.property('tokensStake');
+    expect(darr['tokensStake']).to.be.an('array').lengthOf.least(1);
+    expect(darr['tokensStake'][0]).to.be.an('array');
+    expect(darr['tokensStake'][0]).to.have.own.property('tokenAddress');
     expect(darr['tokensStake'][0]['tokenAddress']).to.be.properAddress;
-    expect(darr['tokensStake'][0]).to.have.own.property('totalStake')
-    expect(darr['tokensStake'][0]).to.have.own.property('usersPool')
-    expect(darr['tokensStake'][0]).to.have.own.property('providerPool')
+    expect(darr['tokensStake'][0]).to.have.own.property('totalStake');
+    expect(darr['tokensStake'][0]).to.have.own.property('usersPool');
+    expect(darr['tokensStake'][0]).to.have.own.property('providerPool');
   });
 
-  it('should return DTokens Details array with required attributes and structure', async function (){
+  it('should return DTokens Details array with required attributes and structure', async function () {
     const { details, sla } = fixture;
-    const sla_owner = await sla.owner()
+    const sla_owner = await sla.owner();
     const dtarr = await details.getDTokensDetails(sla.address, sla_owner);
 
-    expect(dtarr).to.have.own.property('dpTokens')
-    expect(dtarr['dpTokens']).to.be.an('array').lengthOf.least(1)
-    expect(dtarr['dpTokens'][0]).to.have.own.property('tokenAddress')
-    expect(dtarr['dpTokens'][0]).to.have.own.property('totalSupply')
-    expect(dtarr['dpTokens'][0]).to.have.own.property('dTokenAddress')
-    expect(dtarr['dpTokens'][0]).to.have.own.property('dTokenSymbol')
-    expect(dtarr['dpTokens'][0]).to.have.own.property('dTokenName')
-    expect(dtarr['dpTokens'][0]).to.have.own.property('balance')
-    expect(dtarr['dpTokens'][0]).to.have.own.property('allowance')
+    expect(dtarr).to.have.own.property('dpTokens');
+    expect(dtarr['dpTokens']).to.be.an('array').lengthOf.least(1);
+    expect(dtarr['dpTokens'][0]).to.have.own.property('tokenAddress');
+    expect(dtarr['dpTokens'][0]).to.have.own.property('totalSupply');
+    expect(dtarr['dpTokens'][0]).to.have.own.property('dTokenAddress');
+    expect(dtarr['dpTokens'][0]).to.have.own.property('dTokenSymbol');
+    expect(dtarr['dpTokens'][0]).to.have.own.property('dTokenName');
+    expect(dtarr['dpTokens'][0]).to.have.own.property('balance');
+    expect(dtarr['dpTokens'][0]).to.have.own.property('allowance');
 
-    expect(dtarr).to.have.own.property('duTokens')
-    expect(dtarr['duTokens']).to.be.an('array').lengthOf.least(1)
-    expect(dtarr['duTokens'][0]).to.have.own.property('tokenAddress')
-    expect(dtarr['duTokens'][0]).to.have.own.property('totalSupply')
-    expect(dtarr['duTokens'][0]).to.have.own.property('dTokenAddress')
-    expect(dtarr['duTokens'][0]).to.have.own.property('dTokenSymbol')
-    expect(dtarr['duTokens'][0]).to.have.own.property('dTokenName')
-    expect(dtarr['duTokens'][0]).to.have.own.property('balance')
-    expect(dtarr['duTokens'][0]).to.have.own.property('allowance')
+    expect(dtarr).to.have.own.property('duTokens');
+    expect(dtarr['duTokens']).to.be.an('array').lengthOf.least(1);
+    expect(dtarr['duTokens'][0]).to.have.own.property('tokenAddress');
+    expect(dtarr['duTokens'][0]).to.have.own.property('totalSupply');
+    expect(dtarr['duTokens'][0]).to.have.own.property('dTokenAddress');
+    expect(dtarr['duTokens'][0]).to.have.own.property('dTokenSymbol');
+    expect(dtarr['duTokens'][0]).to.have.own.property('dTokenName');
+    expect(dtarr['duTokens'][0]).to.have.own.property('balance');
+    expect(dtarr['duTokens'][0]).to.have.own.property('allowance');
   });
 
-  it('should return SLA Static Details array with all required attributes', async function (){
+  it('should return SLA Static Details array with all required attributes', async function () {
     const { details, sla, slaRegistry } = fixture;
-    
-    const _sloRegistry = await slaRegistry.sloRegistry()
+
+    const _sloRegistry = await slaRegistry.sloRegistry();
     const stdarr = await details.getSLAStaticDetails(sla.address, _sloRegistry);
 
-    expect(stdarr).to.have.own.property('slaOwner')
-    expect(stdarr).to.have.own.property('messengerAddress')
-    expect(stdarr).to.have.own.property('sloValue')
-    expect(stdarr).to.have.own.property('creationBlockNumber')
-    expect(stdarr).to.have.own.property('slaId')
-    expect(stdarr).to.have.own.property('initialPeriodId')
-    expect(stdarr).to.have.own.property('finalPeriodId')
-    expect(stdarr).to.have.own.property('whiteListed')
-    expect(stdarr).to.have.own.property('periodType')
-    expect(stdarr).to.have.own.property('sloType')
-    expect(stdarr).to.have.own.property('ipfsHash')
+    expect(stdarr).to.have.own.property('slaOwner');
+    expect(stdarr).to.have.own.property('messengerAddress');
+    expect(stdarr).to.have.own.property('sloValue');
+    expect(stdarr).to.have.own.property('creationBlockNumber');
+    expect(stdarr).to.have.own.property('slaId');
+    expect(stdarr).to.have.own.property('initialPeriodId');
+    expect(stdarr).to.have.own.property('finalPeriodId');
+    expect(stdarr).to.have.own.property('whiteListed');
+    expect(stdarr).to.have.own.property('periodType');
+    expect(stdarr).to.have.own.property('sloType');
+    expect(stdarr).to.have.own.property('ipfsHash');
   });
 });

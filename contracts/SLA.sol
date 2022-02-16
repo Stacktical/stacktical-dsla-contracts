@@ -26,6 +26,10 @@ contract SLA is Staking {
         Status status;
     }
 
+    struct Governance {
+        uint64 leverage;
+        uint64 cap;
+    }
     //
     string public ipfsHash;
     address public immutable messengerAddress;
@@ -41,6 +45,7 @@ contract SLA is Staking {
 
     bool public userWithdrawLocked = true;
     uint256 public nextVerifiablePeriod;
+    Governance public governance;
 
     /// @dev periodId=>PeriodSLI mapping
     mapping(uint256 => PeriodSLI) public periodSLIs;
@@ -86,14 +91,14 @@ contract SLA is Staking {
         uint128 _slaID,
         string memory _ipfsHash,
         bytes32[] memory _extraData,
-        uint64 _leverage
+        Governance memory _governance
     )
         public
         Staking(
             ISLARegistry(msg.sender),
             _whitelisted,
             _slaID,
-            _leverage,
+            _governance.leverage,
             _owner
         )
     {
@@ -109,6 +114,7 @@ contract SLA is Staking {
         periodType = _periodType;
         extraData = _extraData;
         nextVerifiablePeriod = _initialPeriodId;
+        governance = _governance;
     }
 
     function registerSLI(uint256 _sli, uint256 _periodId)
