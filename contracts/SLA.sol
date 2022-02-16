@@ -136,6 +136,10 @@ contract SLA is Staking {
             precision
         );
 
+        if (deviation > governance.cap) {
+            deviation = governance.cap;
+        }
+
         uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
 
         uint256 rewardPercentage = deviation.mul(normalizedPeriodId).div(
