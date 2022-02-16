@@ -1,12 +1,12 @@
 name: DSLA Contracts testing
-on: [pull_request]
+on: [push]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
       - name: NPM Install 
         with:
-          node-version: 14
+          node-version: 16
         run: npm i
       - name: Compile
         run: npx hardhat compile
