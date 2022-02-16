@@ -30,6 +30,7 @@ contract SLA is Staking {
         uint64 leverage;
         uint64 cap;
     }
+
     //
     string public ipfsHash;
     address public immutable messengerAddress;
@@ -58,12 +59,14 @@ contract SLA is Staking {
         address indexed caller,
         uint256 amount
     );
+
     event ProviderWithdraw(
         address indexed tokenAddress,
         uint256 indexed periodId,
         address indexed caller,
         uint256 amount
     );
+
     event UserWithdraw(
         address indexed tokenAddress,
         uint256 indexed periodId,
@@ -133,12 +136,10 @@ contract SLA is Staking {
         uint256 deviation = _sloRegistry.getDeviation(
             sliValue,
             address(this),
-            precision
+            precision,
+            governance.cap
         );
 
-        if (deviation > governance.cap) {
-            deviation = governance.cap;
-        }
 
         uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
 
