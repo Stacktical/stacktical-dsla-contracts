@@ -137,9 +137,9 @@ contract SLORegistry {
             _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)
         ).mul(precision).div(sliValue.add(sloValue).div(2));
 
-        // Enforces a cap limit of 1
-        if (deviation > 1) {
-            deviation = 1;
+        // Enforces a deviation capped at 25%
+        if (deviation > 25) {
+            deviation = 25;
         }
 
         if (sloType == SLOType.EqualTo) {

@@ -40,7 +40,7 @@ const baseSLAConfig = {
 	initialPeriodId: 0,
 	finalPeriodId: 10,
 	extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
-	leverage: 1,
+	leverage: 10,
 };
 const mintAmount = '1000000';
 
