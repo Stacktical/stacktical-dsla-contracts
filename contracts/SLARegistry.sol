@@ -68,7 +68,7 @@ contract SLARegistry is ISLARegistry {
         uint128 finalPeriodId_,
         string memory ipfsHash_,
         bytes32[] memory extraData_,
-        SLA.Governance memory governance_
+        uint64 leverage_
     ) public {
         bool validPeriod = IPeriodRegistry(_periodRegistry).isValidPeriod(
             periodType_,
@@ -104,7 +104,7 @@ contract SLARegistry is ISLARegistry {
             uint128(SLAs.length),
             ipfsHash_,
             extraData_,
-            governance_
+            leverage_
         );
 
         SLORegistry(_sloRegistry).registerSLO(

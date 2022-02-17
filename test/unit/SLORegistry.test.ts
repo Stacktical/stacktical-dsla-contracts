@@ -29,7 +29,7 @@ interface SLAConfig {
 	periodType: PERIOD_TYPE,
 	initialPeriodId: number,
 	finalPeriodId: number,
-	extraData: BytesLike[],
+	extraData: BytesLike[]
 }
 
 const baseSLAConfig = {
@@ -40,10 +40,7 @@ const baseSLAConfig = {
 	initialPeriodId: 0,
 	finalPeriodId: 10,
 	extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
-	governance: {
-		leverage: 10,
-		cap: 1,
-	},
+	leverage: 1,
 };
 const mintAmount = '1000000';
 
@@ -98,7 +95,7 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 		slaConfig.finalPeriodId,
 		'dummy-ipfs-hash',
 		slaConfig.extraData,
-		baseSLAConfig.governance
+		baseSLAConfig.leverage
 	)
 	await tx.wait();
 }
@@ -157,7 +154,7 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 			baseSLAConfig.finalPeriodId,
 			'dummy-ipfs-hash',
 			baseSLAConfig.extraData,
-			baseSLAConfig.governance
+			baseSLAConfig.leverage
 		)).to.emit(sloRegistry, "SLORegistered");
 	})
 

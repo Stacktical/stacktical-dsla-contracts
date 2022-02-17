@@ -123,22 +123,23 @@ contract SLORegistry {
     function getDeviation(
         uint256 _sli,
         address _slaAddress,
-        uint256 _precision,
-        uint64 _cap
+        uint256 _precision
     ) public view returns (uint256) {
         uint256 sliValue = _sli;
         SLO memory slo = registeredSLO[_slaAddress];
         SLOType sloType = slo.sloType;
         uint256 sloValue = slo.sloValue;
+        uint256 precision = _precision;
 
         // Ensures a positive deviation for greater / small comparisions
         // The deviation is the percentage difference between SLI and SLO
         uint256 deviation = (
             _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)
-        ).mul(_precision).div(sliValue.add(sloValue).div(2));
+        ).mul(precision).div(sliValue.add(sloValue).div(2));
 
-        if (deviation > _cap) {
-            deviation = _cap;
+        // Enforces a cap limit of 1
+        if (deviation > 1) {
+            deviation = 1;
         }
 
         if (sloType == SLOType.EqualTo) {
