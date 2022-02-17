@@ -129,5 +129,23 @@ const setup = deployments.createFixture(async () => {
       expect(totalStake).equals(stakeAmount.toString());
     });
 
+    it('should prevent staking in case of invalid token address', async () => {
+      const { sla, dslaToken, details } = fixture;
+      await dslaToken.approve(sla.address, mintAmount);
+      let stakeAmount = 100000;
+      const invalidTokenAddress = "0x61A12"
+      await expect(sla.stakeTokens(stakeAmount, invalidTokenAddress, 'long'))
+      .to.be.reverted;
+    });
+    
+    it('should prevent staking in case of invalid position side', async () => {
+      const { sla, dslaToken, details } = fixture;
+      await dslaToken.approve(sla.address, mintAmount);
+      let stakeAmount = 100000;
+      const invalidPositionSide = 'longshort'
+      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, invalidPositionSide))
+      .to.be.reverted;
+    });
+
 });
   
