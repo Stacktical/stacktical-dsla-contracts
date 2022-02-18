@@ -147,5 +147,24 @@ const setup = deployments.createFixture(async () => {
       .to.be.reverted;
     });
 
+    it('should generate a reward after reached SL staking period', async () => {
+      const { sla, dslaToken, details } = fixture;
+      const sliValueReached = baseSLAConfig['sloValue'] + 1
+      const finalPeriodId = baseSLAConfig['finalPeriodId']
+      //mockMessenger.address
+
+      // should use the messenger to register sli ?
+      let sliRegistered = await sla.registerSLI(sliValueReached, finalPeriodId);
+
+      expect(sliRegistered)
+      .to.emit(sla, 'ProviderRewardGenerated')
+      .withArgs(
+        await sla.nextVerifiablePeriod(), // await sla.nextVerifiablePeriod()
+        dslaToken.address
+      );
+    });
+
+
+
 });
   
