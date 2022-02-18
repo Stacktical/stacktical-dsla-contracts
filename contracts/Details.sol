@@ -32,7 +32,6 @@ contract Details {
         uint256 allowance;
     }
 
-
     /**
      * @dev external view function that returns all dynamic agreement information
      * @return stakersCount 2. amount of stakers
@@ -45,14 +44,13 @@ contract Details {
         returns (
             uint256 stakersCount,
             uint256 nextVerifiablePeriod,
-            uint64 leverage,
-            uint64 cap
+            uint64 leverage
         )
     {
         SLA sla = SLA(_slaAddress);
         stakersCount = sla.getStakersLength();
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
-        (leverage, cap) = sla.governance();
+        leverage = sla.leverage();
     }
 
     function getSLAStaticDetails(address _slaAddress, SLORegistry _sloRegistry)

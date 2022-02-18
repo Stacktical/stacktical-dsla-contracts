@@ -31,10 +31,7 @@ const baseSLAConfig = {
   initialPeriodId: 0,
   finalPeriodId: 10,
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
-  governance: {
-    leverage: leverage,
-    cap: 1,
-  },
+  leverage: leverage,
 };
 const mintAmount = '1000000';
 
@@ -76,7 +73,7 @@ const setup = deployments.createFixture(async () => {
     baseSLAConfig.finalPeriodId,
     'dummy-ipfs-hash',
     baseSLAConfig.extraData,
-    baseSLAConfig.governance
+    baseSLAConfig.leverage
   );
 
   await tx.wait();
