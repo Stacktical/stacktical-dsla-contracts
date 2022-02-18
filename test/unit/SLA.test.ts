@@ -180,7 +180,8 @@ describe(CONTRACT_NAMES.SLA, function () {
         dslaToken.address,
         await sla.nextVerifiablePeriod(),
         deployer,
-        stakeAmount
+        stakeAmount,
+        "long"
       );
     let totalStake = (
       await details.getSLADetailsArrays(sla.address)
