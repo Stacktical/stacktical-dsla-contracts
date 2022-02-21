@@ -83,6 +83,7 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 	);
 	mockMessenger.mock.requestSLI.returns();
 	mockMessenger.mock.owner.returns(deployer);
+	mockMessenger.mock.setSLARegistry.returns();
 
 	let tx = await slaRegistry.createSLA(
 		slaConfig.sloValue,
@@ -101,9 +102,10 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 
 describe(CONTRACT_NAMES.SLARegistry, function () {
 	let fixture: Fixture;
-	let deployer: string;
+	let deployer: string, notDeployer: string;
 	beforeEach(async function () {
 		deployer = (await getNamedAccounts()).deployer;
+		notDeployer = (await getNamedAccounts()).notDeployer;
 		fixture = await setup();
 	});
 	it("should be able to create sla by anyone", async () => {
@@ -151,5 +153,37 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 			slaAddress,
 			false
 		)).to.emit(slaRegistry, "SLIRequested");
+	})
+	it("should able to register new messenger", async () => {
+		// Can't test registerMessenger function cause we use mock contracts for both IMessenger and IMessageRegistry
+	})
+	it("should revert returning locked value when sla is not registered", async () => {
+		const { slaRegistry } = fixture;
+		await expect(slaRegistry.returnLockedValue(
+			deployer
+		)).to.be.revertedWith("invalid SLA");
+	})
+	it("should revert returning locked value when it is called from not-owner address", async () => {
+		const { slaRegistry } = fixture;
+		const signer = await ethers.getSigner(notDeployer);
+
+		await deploySLA(baseSLAConfig);
+		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+		await expect(slaRegistry.connect(signer).returnLockedValue(
+			slaAddress
+		)).to.be.revertedWith("msg.sender not owner");
+	})
+	it("should revert returning locked value when sla contract is not finished yet.", async () => {
+		const { slaRegistry } = fixture;
+
+		await deploySLA(baseSLAConfig);
+		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+		await expect(slaRegistry.returnLockedValue(
+			slaAddress
+		)).to.be.revertedWith("not finished contract");
+	})
+	it("should return checkPastPeriod as set on constructor", async () => {
+		const { slaRegistry } = fixture;
+		expect(await slaRegistry.checkPastPeriod()).to.be.false;
 	})
 })
