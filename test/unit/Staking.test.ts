@@ -31,10 +31,7 @@ const baseSLAConfig = {
   initialPeriodId: 0,
   finalPeriodId: 10,
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
-  governance: {
-    leverage: leverage,
-    cap: 1,
-  },
+  leverage: 1,
 };
 const mintAmount = '1000000';
 
@@ -76,7 +73,7 @@ const setup = deployments.createFixture(async () => {
       baseSLAConfig.finalPeriodId,
       'dummy-ipfs-hash',
       baseSLAConfig.extraData,
-      baseSLAConfig.governance
+      baseSLAConfig.leverage
     );
   
     await tx.wait();
@@ -122,7 +119,8 @@ const setup = deployments.createFixture(async () => {
           dslaToken.address,
           await sla.nextVerifiablePeriod(),
           deployer,
-          stakeAmount
+          stakeAmount,
+          'long'
         );
       let detailsarrs = (
         await details.getSLADetailsArrays(sla.address)
@@ -152,10 +150,9 @@ const setup = deployments.createFixture(async () => {
 
     it('should prevent creation of a stacking contract if incorrect leverage', async() =>{
       const { slaRegistry, dslaToken, mockMessenger } = fixture;
-      let badLeverageSLAConfig = { governance: {
-        leverage: 101,
-        cap: 1,
-      }}
+      let badLeverageSLAConfig = {
+        leverage: 101
+      }
 
       await expect(slaRegistry.createSLA(
         baseSLAConfig.sloValue,
@@ -167,7 +164,7 @@ const setup = deployments.createFixture(async () => {
         baseSLAConfig.finalPeriodId,
         'dummy-ipfs-hash',
         baseSLAConfig.extraData,
-        badLeverageSLAConfig.governance
+        badLeverageSLAConfig.leverage
       )).to.be.reverted;
     });
 
