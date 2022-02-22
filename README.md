@@ -2,6 +2,7 @@
 
 DSLA Protocol is a risk management framework that enables developers and infrastructure operators to reduce their users exposure to service delays, interruptions and financial losses, using self-executing service level agreements, bonus-malus insurance policies, and crowdfunded liquidity pools.
 
+![Tests status](https://github.com/Stacktical/stacktical-dsla-contracts/actions/workflows/test_coveralls/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/Stacktical/stacktical-dsla-contracts/badge.svg)](https://coveralls.io/github/Stacktical/stacktical-dsla-contracts)
 
 # Usage
