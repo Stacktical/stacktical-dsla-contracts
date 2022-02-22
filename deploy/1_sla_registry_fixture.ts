@@ -28,6 +28,7 @@ module.exports = async ({
     periodRegistryArtifact.abi
   );
   await periodRegistry.mock.isInitializedPeriod.returns(true);
+  await periodRegistry.mock.periodIsFinished.returns(true);
   await periodRegistry.mock.isValidPeriod.returns(true);
   await periodRegistry.mock.getPeriodStartAndEnd.returns(0, 0);
 
@@ -71,7 +72,8 @@ module.exports = async ({
     },
   });
   await deploy(CONTRACT_NAMES.Details, {
-    ...baseOptions  });
+    ...baseOptions
+  });
 };
 
 module.exports.tags = [DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE];

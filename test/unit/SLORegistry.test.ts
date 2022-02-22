@@ -1,8 +1,6 @@
 const hre = require('hardhat');
 import {
-	Details,
 	ERC20PresetMinterPauser,
-	SLA,
 	SLARegistry,
 	SLORegistry,
 	SLORegistry__factory,
@@ -20,7 +18,7 @@ import { expect } from '../chai-setup';
 import { PERIOD_TYPE } from '../../constants';
 import { deployMockContract } from 'ethereum-waffle';
 import { toWei } from 'web3-utils';
-import { BytesLike } from 'ethers';
+import { BigNumber, BytesLike } from 'ethers';
 
 interface SLAConfig {
 	sloValue: number,
@@ -29,7 +27,7 @@ interface SLAConfig {
 	periodType: PERIOD_TYPE,
 	initialPeriodId: number,
 	finalPeriodId: number,
-	extraData: BytesLike[],
+	extraData: BytesLike[]
 }
 
 const baseSLAConfig = {
@@ -40,10 +38,7 @@ const baseSLAConfig = {
 	initialPeriodId: 0,
 	finalPeriodId: 10,
 	extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
-	governance: {
-		leverage: 10,
-		cap: 1,
-	},
+	leverage: 10,
 };
 const mintAmount = '1000000';
 
@@ -98,7 +93,7 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 		slaConfig.finalPeriodId,
 		'dummy-ipfs-hash',
 		slaConfig.extraData,
-		baseSLAConfig.governance
+		baseSLAConfig.leverage
 	)
 	await tx.wait();
 }
@@ -107,6 +102,10 @@ type Fixture = {
 	sloRegistry: SLORegistry;
 	slaRegistry: SLARegistry;
 };
+
+const getDeviation = (sloValue: number, sliValue: number, precision: number) => {
+	return Math.floor(Math.abs(sliValue - sloValue) * precision / ((sloValue + sliValue) / 2));
+}
 
 describe(CONTRACT_NAMES.SLORegistry, function () {
 	let fixture: Fixture;
@@ -157,7 +156,7 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 			baseSLAConfig.finalPeriodId,
 			'dummy-ipfs-hash',
 			baseSLAConfig.extraData,
-			baseSLAConfig.governance
+			baseSLAConfig.leverage
 		)).to.emit(sloRegistry, "SLORegistered");
 	})
 
@@ -237,6 +236,130 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 			expect(await sloRegistry.isRespected(baseSLAConfig.sloValue, slaAddress)).to.be.true;
 			expect(await sloRegistry.isRespected(baseSLAConfig.sloValue + 1, slaAddress)).to.be.true;
 			expect(await sloRegistry.isRespected(baseSLAConfig.sloValue - 1, slaAddress)).to.be.false;
+		})
+	})
+	describe("checks deviations - getDeviation", () => {
+		const config = {
+			sloValue: baseSLAConfig.sloValue,
+			sloType: baseSLAConfig.sloType,
+			whitelisted: baseSLAConfig.whitelisted,
+			periodType: baseSLAConfig.periodType,
+			initialPeriodId: baseSLAConfig.initialPeriodId,
+			finalPeriodId: baseSLAConfig.finalPeriodId,
+			extraData: baseSLAConfig.extraData,
+		}
+		const sloValue = baseSLAConfig.sloValue;
+		const precision = 10000;
+		it("EqualTo", async () => {
+			await deploySLA({
+				...config,
+				sloType: SLO_TYPE.EqualTo,
+			})
+			const { slaRegistry, sloRegistry } = fixture;
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sliValue = 45 * 10 ** 3;
+			const deviation = await sloRegistry.getDeviation(
+				sliValue,
+				slaAddress,
+				10000,
+			)
+			expect(deviation).to.be.equal(BigNumber.from(1 * 100));
+		})
+		it("NotEqualTo", async () => {
+			await deploySLA({
+				...config,
+				sloType: SLO_TYPE.NotEqualTo,
+			})
+			const { slaRegistry, sloRegistry } = fixture;
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sliValue = 45 * 10 ** 3;
+			const deviation = await sloRegistry.getDeviation(
+				sliValue,
+				slaAddress,
+				10000,
+			)
+			expect(deviation).to.be.equal(BigNumber.from(1 * 100));
+		})
+		it("GreaterThan", async () => {
+			await deploySLA(config);
+			const { slaRegistry, sloRegistry } = fixture;
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+
+			const sliValue = 45 * 10 ** 3;
+			const deviation = await sloRegistry.getDeviation(
+				sliValue,
+				slaAddress,
+				10000,
+			)
+			expect(deviation).to.be.equal(BigNumber.from(getDeviation(sloValue, sliValue, precision)));
+			expect(await sloRegistry.getDeviation(
+				sliValue / 2,
+				slaAddress,
+				10000,
+			)).to.be.equal(BigNumber.from(25).mul(precision).div(100));
+		})
+		it("GreaterOrEqualTo", async () => {
+			await deploySLA({
+				...config,
+				sloType: SLO_TYPE.GreaterOrEqualTo,
+			})
+			const { slaRegistry, sloRegistry } = fixture;
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+
+			const sliValue = 45 * 10 ** 3;
+			const deviation = await sloRegistry.getDeviation(
+				sliValue,
+				slaAddress,
+				10000,
+			)
+			expect(deviation).to.be.equal(BigNumber.from(getDeviation(sloValue, sliValue, precision)));
+			expect(await sloRegistry.getDeviation(
+				sliValue / 2,
+				slaAddress,
+				10000,
+			)).to.be.equal(BigNumber.from(25).mul(precision).div(100));
+		})
+		it("SmallerThan", async () => {
+			await deploySLA({
+				...config,
+				sloType: SLO_TYPE.SmallerThan,
+			})
+			const { slaRegistry, sloRegistry } = fixture;
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+
+			const sliValue = 45 * 10 ** 3;
+			const deviation = await sloRegistry.getDeviation(
+				sliValue,
+				slaAddress,
+				10000,
+			)
+			expect(deviation).to.be.equal(BigNumber.from(getDeviation(sloValue, sliValue, precision)));
+			expect(await sloRegistry.getDeviation(
+				sliValue / 2,
+				slaAddress,
+				10000,
+			)).to.be.equal(BigNumber.from(25).mul(precision).div(100));
+		})
+		it("SmallerOrEqualTo", async () => {
+			await deploySLA({
+				...config,
+				sloType: SLO_TYPE.SmallerOrEqualTo,
+			})
+			const { slaRegistry, sloRegistry } = fixture;
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+
+			const sliValue = 45 * 10 ** 3;
+			const deviation = await sloRegistry.getDeviation(
+				sliValue,
+				slaAddress,
+				10000,
+			)
+			expect(deviation).to.be.equal(BigNumber.from(getDeviation(sloValue, sliValue, precision)));
+			expect(await sloRegistry.getDeviation(
+				sliValue / 2,
+				slaAddress,
+				10000,
+			)).to.be.equal(BigNumber.from(25).mul(precision).div(100));
 		})
 	})
 })
