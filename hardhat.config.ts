@@ -2,6 +2,7 @@ import '@typechain/hardhat';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import 'hardhat-deploy';
+import 'solidity-coverage';
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
