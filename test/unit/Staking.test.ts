@@ -130,6 +130,28 @@ const setup = deployments.createFixture(async () => {
       expect(totalStake).equals(stakeAmount.toString());
     });
 
+    it('should perform staking short position', async () => {
+      const { sla, dslaToken, details } = fixture;
+      let tx = await sla.addAllowedTokens(dslaToken.address);
+      await dslaToken.approve(sla.address, mintAmount);
+      let stakeAmount = 100000;
+      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'short'))
+        .to.emit(sla, 'Stake')
+        .withArgs(
+          dslaToken.address,
+          await sla.nextVerifiablePeriod(),
+          deployer,
+          stakeAmount,
+          'short'
+        );
+      let detailsarrs = (
+        await details.getSLADetailsArrays(sla.address)
+      )
+      
+      let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+      expect(totalStake).equals(stakeAmount.toString());
+    });
+
     it('should prevent staking in case of invalid token address', async () => {
       const { sla, dslaToken, details } = fixture;
       await dslaToken.approve(sla.address, mintAmount);
