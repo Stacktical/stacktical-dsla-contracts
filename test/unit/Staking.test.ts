@@ -6,6 +6,7 @@ import{
     SLARegistry,
     StakeRegistry,
     Details,
+    IMessenger
 } from '../../typechain';
 const { ethers, waffle, deployments, getNamedAccounts } = hre;
 import {
@@ -81,13 +82,13 @@ const setup = deployments.createFixture(async () => {
     await tx.wait();
     const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
     const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
-    tx = await sla.addAllowedTokens(dslaToken.address);
     await tx.wait();
     return {
       slaRegistry,
       sla,
       dslaToken,
       details,
+      mockMessenger
     };
   });
   
@@ -96,6 +97,7 @@ const setup = deployments.createFixture(async () => {
     sla: SLA;
     dslaToken: ERC20PresetMinterPauser;
     details: Details;
+    mockMessenger: IMessenger;
   };
 
   describe(CONTRACT_NAMES.Staking, function () {
@@ -111,6 +113,7 @@ const setup = deployments.createFixture(async () => {
     
     it('should perform staking long position', async () => {
       const { sla, dslaToken, details } = fixture;
+      let tx = await sla.addAllowedTokens(dslaToken.address);
       await dslaToken.approve(sla.address, mintAmount);
       let stakeAmount = 100000;
       await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
@@ -147,24 +150,37 @@ const setup = deployments.createFixture(async () => {
       .to.be.reverted;
     });
 
-    it('should generate a reward after reached SL staking period', async () => {
-      const { sla, dslaToken, details } = fixture;
-      const sliValueReached = baseSLAConfig['sloValue'] + 1
-      const finalPeriodId = baseSLAConfig['finalPeriodId']
-      //mockMessenger.address
+    it('should prevent creation of a stacking contract if incorrect leverage', async() =>{
+      const { slaRegistry, dslaToken, mockMessenger } = fixture;
+      let badLeverageSLAConfig = { governance: {
+        leverage: 101,
+        cap: 1,
+      }}
 
-      // should use the messenger to register sli ?
-      let sliRegistered = await sla.registerSLI(sliValueReached, finalPeriodId);
-
-      expect(sliRegistered)
-      .to.emit(sla, 'ProviderRewardGenerated')
-      .withArgs(
-        await sla.nextVerifiablePeriod(), // await sla.nextVerifiablePeriod()
-        dslaToken.address
-      );
+      await expect(slaRegistry.createSLA(
+        baseSLAConfig.sloValue,
+        baseSLAConfig.sloType,
+        baseSLAConfig.whitelisted,
+        mockMessenger.address,
+        baseSLAConfig.periodType,
+        baseSLAConfig.initialPeriodId,
+        baseSLAConfig.finalPeriodId,
+        'dummy-ipfs-hash',
+        baseSLAConfig.extraData,
+        badLeverageSLAConfig.governance
+      )).to.be.reverted;
     });
 
+    it('should add allowed tokens in list if not yet present then perform staking', async() =>{
+      const { sla, dslaToken, details } = fixture;
+      expect(sla.addAllowedTokens(dslaToken.address))
+        .to.emit(sla, 'DTokensCreated');
+    });
 
+    it('should revert if token already present in allowedTokens', async() =>{
+      const { sla, dslaToken, details } = fixture;
+      let tx = await sla.addAllowedTokens(dslaToken.address);
+      await expect(sla.addAllowedTokens(dslaToken.address)).to.be.revertedWith('already added');
+    });
 
 });
-  
