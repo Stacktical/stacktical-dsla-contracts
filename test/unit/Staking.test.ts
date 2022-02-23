@@ -3,6 +3,7 @@ import{
     ERC20PresetMinterPauser,
     ERC20PresetMinterPauser__factory,
     SLA,
+    SLA__factory,
     SLARegistry,
     StakeRegistry,
     Details,
@@ -108,11 +109,12 @@ const setup = deployments.createFixture(async () => {
     });
 
     
-    it('should perform staking long position', async () => {
+    it('should perform staking long position for deployer', async () => {
       const { sla, dslaToken, details } = fixture;
       let tx = await sla.addAllowedTokens(dslaToken.address);
       await dslaToken.approve(sla.address, mintAmount);
       let stakeAmount = 100000;
+
       await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
         .to.emit(sla, 'Stake')
         .withArgs(
@@ -125,31 +127,95 @@ const setup = deployments.createFixture(async () => {
       let detailsarrs = (
         await details.getSLADetailsArrays(sla.address)
       )
-      
+
       let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
       expect(totalStake).equals(stakeAmount.toString());
     });
 
-    it('should perform staking short position', async () => {
+    it('should perform staking short position for deployer when user have long position in pool', async () => {
       const { sla, dslaToken, details } = fixture;
+      let amount = 10000;
+      const numberOfStakingEntity = 2
+      const targetStakeAmount = (amount * leverage) * numberOfStakingEntity
       let tx = await sla.addAllowedTokens(dslaToken.address);
-      await dslaToken.approve(sla.address, mintAmount);
-      let stakeAmount = 100000;
-      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'short'))
+      await dslaToken.approve(sla.address, amount);
+
+      // user long stake
+      const notDeployerSLA = SLA__factory.connect(
+        sla.address,
+        await ethers.getSigner(notDeployer)
+      );
+
+      const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+        dslaToken.address,
+        await ethers.getSigner(notDeployer)
+      );
+
+      await notDeployerDSLA.approve(sla.address, amount * leverage);
+      await notDeployerSLA.stakeTokens(
+        amount * leverage,
+        dslaToken.address,
+        'long'
+      );
+
+      // provider long stake
+      const deployerSLA = SLA__factory.connect(
+        sla.address,
+        await ethers.getSigner(deployer)
+      );
+      const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
+        dslaToken.address,
+        await ethers.getSigner(deployer)
+      );
+
+
+      await deployerDSLA.approve(sla.address, amount * leverage);
+      await expect(deployerSLA.stakeTokens(amount * leverage, dslaToken.address, 'short'))
         .to.emit(sla, 'Stake')
         .withArgs(
           dslaToken.address,
           await sla.nextVerifiablePeriod(),
           deployer,
-          stakeAmount,
+          amount * leverage,
           'short'
         );
+
       let detailsarrs = (
         await details.getSLADetailsArrays(sla.address)
       )
       
       let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
-      expect(totalStake).equals(stakeAmount.toString());
+      expect(totalStake).equals(targetStakeAmount.toString());
+    });
+
+
+    it('should prevent staking short position for deployer if insufficient long position present in staking pool', async () => {
+      const { sla, dslaToken, details } = fixture;
+      let tx = await sla.addAllowedTokens(dslaToken.address);
+      await dslaToken.approve(sla.address, mintAmount);
+      let stakeAmount = 100000;
+
+      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'short'))
+        .to.be.revertedWith('user stake')
+    });
+
+    it('should prevent staking in case of amount exceeds allowance', async () => {
+      const { sla, dslaToken, details } = fixture;
+      let tx = await sla.addAllowedTokens(dslaToken.address);
+      await dslaToken.approve(sla.address, mintAmount);
+      let stakeAmount = 100000000;
+
+      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+        .to.be.revertedWith('ERC20: transfer amount exceeds allowance')
+    });
+
+    it('should prevent staking if token not allowed', async () => {
+      const { sla, dslaToken, details } = fixture;
+      await dslaToken.approve(sla.address, mintAmount);
+      let stakeAmount = 100000;
+
+      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+        .to.be.revertedWith('token not allowed')
     });
 
     it('should prevent staking in case of invalid token address', async () => {
