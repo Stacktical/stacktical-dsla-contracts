@@ -1,7 +1,7 @@
 const hre = require('hardhat');
 const { ethers, deployments, getNamedAccounts } = hre;
 import { expect } from '../chai-setup';
-import { BigNumber, BytesLike } from 'ethers';
+import { BigNumber, BytesLike, ethers as Ethers } from 'ethers';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS, SENetworkNamesBytes32, SENetworks, PERIOD_TYPE, SLO_TYPE } from '../../constants';
 import { deployMockContract } from 'ethereum-waffle';
 import { toWei } from 'web3-utils';
@@ -250,5 +250,37 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		// receive userReward + platformReward + messengerRewards since all txs made from deployer
 		expect(await dslaToken.balanceOf(deployer))
 			.to.be.eq(BigNumber.from(10).pow(18).mul(750).add(dslaBalance));
+	})
+	it("should verify period when distributing rewards", async () => {
+		const { slaRegistry, stakeRegistry } = fixture;
+		const signer = await ethers.getSigner(deployer);
+		await deploySLA(baseSLAConfig);
+		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+		const sla = await SLA__factory.connect(slaAddress, signer);
+		const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+		await slaRegistry.requestSLI(
+			Number(nextVerifiablePeriod),
+			slaAddress,
+			false
+		)
+		expect(await stakeRegistry.periodIsVerified(slaAddress, nextVerifiablePeriod))
+			.to.be.true;
+	})
+	it("should return locked value when returning from slaRegistry", async () => {
+		// TODO: can't cover this function since we use mock contract for messenger
+	});
+	it("should allow only owner to set staking parameters", async () => {
+		const { stakeRegistry } = fixture;
+		await expect(stakeRegistry.setStakingParameters(
+			Ethers.constants.Zero,
+			Ethers.constants.Zero,
+			Ethers.constants.Zero,
+			Ethers.constants.Zero,
+			Ethers.constants.Zero,
+			Ethers.constants.Zero,
+			Ethers.constants.Zero,
+			Ethers.constants.Zero,
+			true
+		)).to.emit(stakeRegistry, 'StakingParametersModified');
 	})
 })
