@@ -106,6 +106,11 @@ describe(CONTRACT_NAMES.SLA, function () {
     fixture = await setup();
   });
 
+  it('should not allow staking 0 amount', async () => {
+    const { sla, dslaToken } = fixture;
+    await expect(sla.stakeTokens(0, dslaToken.address, 'long'))
+      .to.be.revertedWith('zero staking not allowed.');
+  })
   it('should not let notDeployer withdraw tokens if the contract is not finished', async function () {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
