@@ -34,6 +34,9 @@ const baseSLAConfig = {
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
   leverage: 1,
 };
+let activeWlSLAConfig = baseSLAConfig
+activeWlSLAConfig['whitelisted'] = true
+
 const mintAmount = '1000000';
 
 const setup = deployments.createFixture(async () => {
@@ -63,6 +66,11 @@ const setup = deployments.createFixture(async () => {
       await ethers.getSigner(deployer),
       iMessengerArtifact.abi
     );
+
+    const mockMessengerBis = await deployMockContract(
+      await ethers.getSigner(deployer),
+      iMessengerArtifact.abi
+    );
   
     let tx = await slaRegistry.createSLA(
       baseSLAConfig.sloValue,
@@ -81,9 +89,36 @@ const setup = deployments.createFixture(async () => {
     const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
     const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
     await tx.wait();
+
+    let tx_wl = await slaRegistry.createSLA(
+      activeWlSLAConfig.sloValue,
+      activeWlSLAConfig.sloType,
+      activeWlSLAConfig.whitelisted,
+      mockMessengerBis.address,
+      activeWlSLAConfig.periodType,
+      activeWlSLAConfig.initialPeriodId,
+      activeWlSLAConfig.finalPeriodId,
+      'dummy-ipfs-hash',
+      activeWlSLAConfig.extraData,
+      activeWlSLAConfig.leverage
+    );
+
+    await tx_wl.wait();
+    const allSLAs = (await slaRegistry.allSLAs()); //temp debug
+    const awlSlaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+    const sla_wl: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, awlSlaAddress);
+    await tx_wl.wait();
+
+
+    console.log('allSLAs')
+    console.log(allSLAs)
+    console.log('Not whitelist activated sla.address : ' + slaAddress)
+    console.log('whitelist activated sla.address : ' + awlSlaAddress)
+
     return {
       slaRegistry,
       sla,
+      sla_wl,
       dslaToken,
       details,
       mockMessenger
@@ -93,6 +128,7 @@ const setup = deployments.createFixture(async () => {
   type Fixture = {
     slaRegistry: SLARegistry;
     sla: SLA;
+    sla_wl: SLA;
     dslaToken: ERC20PresetMinterPauser;
     details: Details;
     mockMessenger: IMessenger;
@@ -134,10 +170,27 @@ const setup = deployments.createFixture(async () => {
 
     it('should perform staking short position for deployer when user have long position in pool', async () => {
       const { sla, dslaToken, details } = fixture;
+
+      console.log('Not whitelist activated sla.address : ' + sla.address)
+
+      console.log("deployer")
+      console.log(deployer)
+
+
       let amount = 10000;
       const numberOfStakingEntity = 2
       const targetStakeAmount = (amount * leverage) * numberOfStakingEntity
       let tx = await sla.addAllowedTokens(dslaToken.address);
+      
+      //let usersToAddInWl = []
+      //usersToAddInWl.push(deployer)
+      //usersToAddInWl.push(notDeployer)
+
+      //console.log("usersToAddInWl")
+      //console.log(usersToAddInWl)
+      //await sla.addUsersToWhitelist(usersToAddInWl)
+
+
       await dslaToken.approve(sla.address, amount);
 
       // user long stake
@@ -266,6 +319,24 @@ const setup = deployments.createFixture(async () => {
       const { sla, dslaToken, details } = fixture;
       let tx = await sla.addAllowedTokens(dslaToken.address);
       await expect(sla.addAllowedTokens(dslaToken.address)).to.be.revertedWith('already added');
+    });
+
+    describe("whitelist", function () {
+      it('should perform staking for not whitelisted user if whitelist not activated', async() =>{
+        const { sla, sla_wl, dslaToken, details } = fixture;
+        //let tx = await sla.addAllowedTokens(dslaToken.address);
+        expect(false).to.be.equal(true); // NO yet Implemented
+      });
+
+      it('should prevent staking for not whitelisted user if whitelist is activated', async() =>{
+        const { sla, dslaToken, details } = fixture;
+        expect(false).to.be.equal(true); // NO yet Implemented
+      });
+
+      it('should perform staking for whitelisted user if whitelist is activated', async() =>{
+        const { sla, dslaToken, details } = fixture;
+        expect(false).to.be.equal(true); // NO yet Implemented
+      });
     });
 
 });
