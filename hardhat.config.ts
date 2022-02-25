@@ -2,11 +2,15 @@ import '@typechain/hardhat';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import 'hardhat-deploy';
+import 'solidity-coverage';
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
+  typechain: {
+    target: 'ethers-v5',
+  },
   solidity: {
     compilers: [
       {

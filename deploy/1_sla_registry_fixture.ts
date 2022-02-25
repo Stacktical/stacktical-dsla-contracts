@@ -28,6 +28,7 @@ module.exports = async ({
     periodRegistryArtifact.abi
   );
   await periodRegistry.mock.isInitializedPeriod.returns(true);
+  await periodRegistry.mock.periodIsFinished.returns(true);
   await periodRegistry.mock.isValidPeriod.returns(true);
   await periodRegistry.mock.getPeriodStartAndEnd.returns(0, 0);
 
@@ -69,6 +70,9 @@ module.exports = async ({
     libraries: {
       StringUtils: stringUtils.address,
     },
+  });
+  await deploy(CONTRACT_NAMES.Details, {
+    ...baseOptions
   });
 };
 

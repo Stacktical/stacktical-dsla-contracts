@@ -1,8 +1,21 @@
-# dsla-protocol
+# dsla-protocol-contracts
 
 DSLA Protocol is a risk management framework that enables developers and infrastructure operators to reduce their users exposure to service delays, interruptions and financial losses, using self-executing service level agreements, bonus-malus insurance policies, and crowdfunded liquidity pools.
 
-# Usage
+![Tests status](https://github.com/Stacktical/stacktical-dsla-contracts/actions/workflows/test.yml/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/Stacktical/stacktical-dsla-contracts/badge.svg)](https://coveralls.io/github/Stacktical/stacktical-dsla-contracts)
+
+# Getting Started
+
+`yarn install`
+
+## Tests
+
+### Unit tests
+
+`npx hardhat test`
+
+### Usage
 
 Import the contracts on your Solidity code like:
 ```

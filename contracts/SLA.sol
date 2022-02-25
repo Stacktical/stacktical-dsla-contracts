@@ -51,7 +51,8 @@ contract SLA is Staking {
         address indexed tokenAddress,
         uint256 indexed periodId,
         address indexed caller,
-        uint256 amount
+        uint256 amount,
+        string position
     );
     event ProviderWithdraw(
         address indexed tokenAddress,
@@ -171,7 +172,7 @@ contract SLA is Staking {
         bool isContractFinished = contractFinished();
         require(!isContractFinished, 'finished contract');
         _stake(_amount, _token, position);
-        emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount);
+        emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount, position);
         IStakeRegistry stakeRegistry = IStakeRegistry(
             _slaRegistry.stakeRegistry()
         );

@@ -173,7 +173,7 @@ contract SLARegistry is ISLARegistry {
                 lastPeriodStatus != SLA.Status.NotVerified),
             'not finished contract'
         );
-        ReturnLockedValue(address(_sla), msg.sender);
+        emit ReturnLockedValue(address(_sla), msg.sender);
         IStakeRegistry(_stakeRegistry).returnLockedValue(address(_sla));
     }
 
