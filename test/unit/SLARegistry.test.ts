@@ -196,7 +196,6 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 
 		const sla = await SLA__factory.connect(slaAddress, signer);
 		const lastPeriodId = await sla.finalPeriodId();
-		console.log(lastPeriodId);
 		// TODO: Complete returnLockedValue - Can't cover this function at the moment cause we use mock messenger contract
 	})
 	it("should return checkPastPeriod as set on constructor", async () => {
