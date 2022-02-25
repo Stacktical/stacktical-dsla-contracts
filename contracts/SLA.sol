@@ -168,6 +168,7 @@ contract SLA is Staking {
         address _token,
         string calldata _position
     ) external {
+        require(_amount > 0, "zero staking not allowed.");
         string memory position = _position;
         bool isContractFinished = contractFinished();
         require(!isContractFinished, 'finished contract');
