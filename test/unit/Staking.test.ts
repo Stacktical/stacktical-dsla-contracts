@@ -23,7 +23,6 @@ const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
 
-const leverage = 10;
 const baseSLAConfig = {
   sloValue: 50 * 10 ** 3,
   sloType: SLO_TYPE.GreaterThan,
@@ -34,8 +33,17 @@ const baseSLAConfig = {
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
   leverage: 1,
 };
-let activeWlSLAConfig = baseSLAConfig
-activeWlSLAConfig['whitelisted'] = true
+
+let activeWlSLAConfig = {
+  sloValue: 50 * 10 ** 3,
+  sloType: SLO_TYPE.GreaterThan,
+  whitelisted: true,
+  periodType: PERIOD_TYPE.WEEKLY,
+  initialPeriodId: 0,
+  finalPeriodId: 10,
+  extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
+  leverage: 1,
+};
 
 const mintAmount = '1000000';
 
@@ -104,16 +112,9 @@ const setup = deployments.createFixture(async () => {
     );
 
     await tx_wl.wait();
-    const allSLAs = (await slaRegistry.allSLAs()); //temp debug
     const awlSlaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
     const sla_wl: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, awlSlaAddress);
     await tx_wl.wait();
-
-
-    console.log('allSLAs')
-    console.log(allSLAs)
-    console.log('Not whitelist activated sla.address : ' + slaAddress)
-    console.log('whitelist activated sla.address : ' + awlSlaAddress)
 
     return {
       slaRegistry,
@@ -170,27 +171,12 @@ const setup = deployments.createFixture(async () => {
 
     it('should perform staking short position for deployer when user have long position in pool', async () => {
       const { sla, dslaToken, details } = fixture;
-
-      console.log('Not whitelist activated sla.address : ' + sla.address)
-
-      console.log("deployer")
-      console.log(deployer)
-
-
       let amount = 10000;
+      let leverage = baseSLAConfig['leverage']
+
       const numberOfStakingEntity = 2
       const targetStakeAmount = (amount * leverage) * numberOfStakingEntity
       let tx = await sla.addAllowedTokens(dslaToken.address);
-      
-      //let usersToAddInWl = []
-      //usersToAddInWl.push(deployer)
-      //usersToAddInWl.push(notDeployer)
-
-      //console.log("usersToAddInWl")
-      //console.log(usersToAddInWl)
-      //await sla.addUsersToWhitelist(usersToAddInWl)
-
-
       await dslaToken.approve(sla.address, amount);
 
       // user long stake
@@ -324,19 +310,151 @@ const setup = deployments.createFixture(async () => {
     describe("whitelist", function () {
       it('should perform staking for not whitelisted user if whitelist not activated', async() =>{
         const { sla, sla_wl, dslaToken, details } = fixture;
-        //let tx = await sla.addAllowedTokens(dslaToken.address);
-        expect(false).to.be.equal(true); // NO yet Implemented
+        let tx = await sla.addAllowedTokens(dslaToken.address);
+        await dslaToken.approve(sla.address, mintAmount);
+        let stakeAmount = 100000;
+  
+        await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+          .to.emit(sla, 'Stake')
+          .withArgs(
+            dslaToken.address,
+            await sla.nextVerifiablePeriod(),
+            deployer,
+            stakeAmount,
+            'long'
+          );
+        let detailsarrs = (
+          await details.getSLADetailsArrays(sla.address)
+        )
+  
+        let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+        expect(totalStake).equals(stakeAmount.toString());
+
       });
 
+      it('should perform staking for contract owner even if whitelist is activated', async() =>{
+        // Contract Owner is added by default in whitelist, it's not needed to add it after contract creation
+        const {sla_wl, dslaToken, details } = fixture;
+
+        let tx = await sla_wl.addAllowedTokens(dslaToken.address);
+        await dslaToken.approve(sla_wl.address, mintAmount);
+        let stakeAmount = 100000;
+  
+        await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+          .to.emit(sla_wl, 'Stake')
+          .withArgs(
+            dslaToken.address,
+            await sla_wl.nextVerifiablePeriod(),
+            deployer,
+            stakeAmount,
+            'long'
+          );
+        let detailsarrs = (
+          await details.getSLADetailsArrays(sla_wl.address)
+        )
+  
+        let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+        expect(totalStake).equals(stakeAmount.toString());
+      });
+
+
       it('should prevent staking for not whitelisted user if whitelist is activated', async() =>{
-        const { sla, dslaToken, details } = fixture;
-        expect(false).to.be.equal(true); // NO yet Implemented
+        const {sla_wl, dslaToken, details } = fixture;
+        let stakeAmount = 100000;
+        await dslaToken.approve(sla_wl.address, stakeAmount);
+
+        // user long stake
+        const notDeployerSLA = SLA__factory.connect(
+          sla_wl.address,
+          await ethers.getSigner(notDeployer)
+        );
+        const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+          dslaToken.address,
+          await ethers.getSigner(notDeployer)
+        );
+
+        await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
+        await sla_wl.addAllowedTokens(dslaToken.address);
+        await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+        .to.be.revertedWith('not whitelisted');
       });
 
       it('should perform staking for whitelisted user if whitelist is activated', async() =>{
-        const { sla, dslaToken, details } = fixture;
-        expect(false).to.be.equal(true); // NO yet Implemented
+        const {sla_wl, dslaToken, details } = fixture;
+        let stakeAmount = 100000;
+        await dslaToken.approve(sla_wl.address, stakeAmount);
+
+        // user long stake
+        const notDeployerSLA = SLA__factory.connect(
+          sla_wl.address,
+          await ethers.getSigner(notDeployer)
+        );
+    
+        const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+          dslaToken.address,
+          await ethers.getSigner(notDeployer)
+        );
+    
+        await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
+        await sla_wl.addAllowedTokens(dslaToken.address);
+        await sla_wl.addUsersToWhitelist([notDeployer])
+
+        await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+          .to.emit(sla_wl, 'Stake')
+          .withArgs(
+            dslaToken.address,
+            await sla_wl.nextVerifiablePeriod(),
+            deployer,
+            stakeAmount,
+            'long'
+          );
+        let detailsarrs = (
+          await details.getSLADetailsArrays(sla_wl.address)
+        )
+  
+        let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+        expect(totalStake).equals(stakeAmount.toString());
+      });
+
+      it('should perform staking for whitelisted user then deny staking after removal from whitelist if it is activated', async() =>{
+        const {sla_wl, dslaToken, details } = fixture;
+        let stakeAmount = 100000;
+        await dslaToken.approve(sla_wl.address, stakeAmount);
+
+        // user long stake
+        const notDeployerSLA = SLA__factory.connect(
+          sla_wl.address,
+          await ethers.getSigner(notDeployer)
+        );
+    
+        const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+          dslaToken.address,
+          await ethers.getSigner(notDeployer)
+        );
+    
+        await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
+        await sla_wl.addAllowedTokens(dslaToken.address);
+        await sla_wl.addUsersToWhitelist([notDeployer])
+
+        await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+          .to.emit(sla_wl, 'Stake')
+          .withArgs(
+            dslaToken.address,
+            await sla_wl.nextVerifiablePeriod(),
+            deployer,
+            stakeAmount,
+            'long'
+          );
+        let detailsarrs = (
+          await details.getSLADetailsArrays(sla_wl.address)
+        )
+  
+        let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+        expect(totalStake).equals(stakeAmount.toString());
+
+        await sla_wl.removeUsersFromWhitelist([notDeployer])
+        await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+        .to.be.revertedWith('not whitelisted');
       });
     });
-
 });
