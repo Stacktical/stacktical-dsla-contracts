@@ -53,6 +53,9 @@ contract Details {
         leverage = sla.leverage();
     }
 
+    /**
+     * @dev external view function that returns static agreement information
+     */
     function getSLAStaticDetails(address _slaAddress, SLORegistry _sloRegistry)
         external
         view
@@ -83,6 +86,11 @@ contract Details {
         finalPeriodId = sla.finalPeriodId();
     }
 
+    /**
+     * @dev external view function that returns agreement information in two arrays
+     * @return periodSLIs : details of each period
+     * @return tokensStake : details of each allowed tokens stake
+     */
     function getSLADetailsArrays(address _slaAddress)
         external
         view
@@ -120,6 +128,11 @@ contract Details {
         }
     }
 
+    /**
+     * @dev public view function that returns position tokens details
+     * @return dpTokens : details of each token named DSLA-LONG with DSLA-LP symbol
+     * @return duTokens : details of each token named DSLA-SHORT with DSLA-SP symbol
+     */
     function getDTokensDetails(address _slaAddress, address _owner)
         public
         view
