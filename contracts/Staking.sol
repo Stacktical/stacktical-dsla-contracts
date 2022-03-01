@@ -11,6 +11,10 @@ import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './StringUtils.sol';
 
+/**
+ * @title Staking
+ * @dev Staking is a contract used to perform and manage staking
+ */
 contract Staking is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for ERC20;
@@ -155,6 +159,9 @@ contract Staking is Ownable {
         }
     }
 
+    /**
+     * @dev external function that allow LONG or SHORT tokens to be staked for current sla
+     */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
         (, , , , , , uint256 maxTokenLength, , ) = _stakeRegistry
             .getStakingParameters();
@@ -196,6 +203,9 @@ contract Staking is Ownable {
         );
     }
 
+    /**
+     * @dev external function that perform staking of specific amount of a token according to selected position side
+     */
     function _stake(
         uint256 _amount,
         address _tokenAddress,
@@ -222,6 +232,7 @@ contract Staking is Ownable {
                 providerPool[_tokenAddress],
                 usersPool[_tokenAddress]
             );
+            // Short allowed only if there is long x leverage in the pool
             require(
                 usersStake.add(_amount).mul(leverage) <= providerStake,
                 'user stake'
@@ -269,7 +280,10 @@ contract Staking is Ownable {
             stakers.push(msg.sender);
         }
     }
-
+    /**
+     * @dev internal function that update user and provider pool when provider respect sla for a period
+     * calculated reward amount is removed from the user pool, the same amount is added to the provider pool
+     */
     function _setRespectedPeriodReward(
         uint256 _periodId,
         uint256 _rewardPercentage,
@@ -294,6 +308,10 @@ contract Staking is Ownable {
         }
     }
 
+    /**
+     * @dev internal function that update user and provider pool when provider breach sla for a period
+     * calculated reward amount is added to the user pool, the same amount is removed from provider pool
+     */
     function _setUsersCompensation(
         uint256 _periodId,
         uint256 _rewardPercentage,
@@ -324,6 +342,10 @@ contract Staking is Ownable {
         }
     }
 
+    /**
+     * @dev internal function that perform a withdraw of provider tokens
+     * This withdraw must be performed only if the sla contract is finished
+     */
     function _withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
@@ -339,6 +361,10 @@ contract Staking is Ownable {
         ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
 
+    /**
+     * @dev internal function that perform a withdraw of user tokens
+     * This withdraw must be performed only if the sla contract is finished
+     */
     function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
