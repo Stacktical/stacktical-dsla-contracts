@@ -3,12 +3,12 @@ pragma solidity 0.6.6;
 
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
-import '@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
+import './dToken.sol';
 import './StringUtils.sol';
 
 contract Staking is Ownable {
@@ -31,9 +31,9 @@ contract Staking is Ownable {
     mapping(address => uint256) public usersPool;
 
     ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for users
-    mapping(address => ERC20PresetMinterPauser) public duTokenRegistry;
+    mapping(address => dToken) public duTokenRegistry;
     ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for provider
-    mapping(address => ERC20PresetMinterPauser) public dpTokenRegistry;
+    mapping(address => dToken) public dpTokenRegistry;
 
     /// @dev address[] of the stakers of the SLA contract
     address[] public stakers;
@@ -175,12 +175,13 @@ contract Staking is Ownable {
         string memory dpTokenSymbol = string(
             abi.encodePacked('DSLA-LP-', dTokenID)
         );
+        uint8 decimals = ERC20(_tokenAddress).decimals();
 
-        ERC20PresetMinterPauser duToken = ERC20PresetMinterPauser(
-            _stakeRegistry.createDToken(duTokenName, duTokenSymbol)
+        dToken duToken = dToken(
+            _stakeRegistry.createDToken(duTokenName, duTokenSymbol, decimals)
         );
-        ERC20PresetMinterPauser dpToken = ERC20PresetMinterPauser(
-            _stakeRegistry.createDToken(dpTokenName, dpTokenSymbol)
+        dToken dpToken = dToken(
+            _stakeRegistry.createDToken(dpTokenName, dpTokenSymbol, decimals)
         );
 
         dpTokenRegistry[_tokenAddress] = dpToken;
@@ -226,7 +227,7 @@ contract Staking is Ownable {
                 usersStake.add(_amount).mul(leverage) <= providerStake,
                 'user stake'
             );
-            ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
+            dToken duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
 
             // If there are no minted tokens, then mint them 1:1
@@ -247,7 +248,7 @@ contract Staking is Ownable {
             keccak256(abi.encodePacked(_position)) ==
             keccak256(abi.encodePacked('long'))
         ) {
-            ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
+            dToken dpToken = dpTokenRegistry[_tokenAddress];
             uint256 p0 = dpToken.totalSupply();
 
             if (p0 == 0) {
@@ -328,7 +329,7 @@ contract Staking is Ownable {
         internal
         onlyAllowedToken(_tokenAddress)
     {
-        ERC20PresetMinterPauser dpToken = dpTokenRegistry[_tokenAddress];
+        dToken dpToken = dpTokenRegistry[_tokenAddress];
         uint256 p0 = dpToken.totalSupply();
         uint256 t0 = providerPool[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the Provider Pool / DSLA-SP Pool average
@@ -343,7 +344,7 @@ contract Staking is Ownable {
         internal
         onlyAllowedToken(_tokenAddress)
     {
-        ERC20PresetMinterPauser duToken = duTokenRegistry[_tokenAddress];
+        dToken duToken = duTokenRegistry[_tokenAddress];
         uint256 p0 = duToken.totalSupply();
         uint256 t0 = usersPool[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the User Pool / DSLA-SP Pool average

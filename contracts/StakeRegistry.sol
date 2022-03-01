@@ -4,11 +4,11 @@ pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import '@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './SLA.sol';
+import './dToken.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
@@ -249,7 +249,7 @@ contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
      *@param _name 1. token name
      *@param _symbol 2. token symbol
      */
-    function createDToken(string calldata _name, string calldata _symbol)
+    function createDToken(string calldata _name, string calldata _symbol, uint8 decimals)
         external
         override
         returns (address)
@@ -258,13 +258,10 @@ contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
             slaRegistry.isRegisteredSLA(msg.sender),
             'Only for registered SLAs'
         );
-        ERC20PresetMinterPauser dToken = new ERC20PresetMinterPauser(
-            _name,
-            _symbol
-        );
-        dToken.grantRole(dToken.MINTER_ROLE(), msg.sender);
-        emit DTokenCreated(address(dToken), msg.sender, _name, _symbol);
-        return address(dToken);
+        dToken newDToken = new dToken(_name, _symbol, decimals);
+        newDToken.grantRole(newDToken.MINTER_ROLE(), msg.sender);
+        emit DTokenCreated(address(newDToken), msg.sender, _name, _symbol);
+        return address(newDToken);
     }
 
     function lockDSLAValue(
