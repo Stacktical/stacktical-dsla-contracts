@@ -6,6 +6,7 @@ import { CONTRACT_NAMES, DEPLOYMENT_TAGS, SENetworkNamesBytes32, SENetworks, PER
 import { deployMockContract } from 'ethereum-waffle';
 import { toWei } from 'web3-utils';
 import {
+	DToken,
 	ERC20PresetMinterPauser,
 	PeriodRegistry,
 	SLA,
@@ -177,6 +178,11 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 
 		await expect(sla.addAllowedTokens(dslaToken.address))
 			.to.emit(stakeRegistry, "DTokenCreated");
+
+		const duTokenAddr = await sla.duTokenRegistry(dslaToken.address);
+		const duToken: DToken = await ethers.getContractAt(CONTRACT_NAMES.dToken, duTokenAddr);
+		const dslaDecimal = await dslaToken.decimals();
+		expect(await duToken.decimals()).to.be.eq(dslaDecimal);
 	})
 	it("should lock dsla when creating sla on slaRegistry", async () => {
 		const { slaRegistry, stakeRegistry, dslaToken } = fixture;
