@@ -138,19 +138,19 @@ contract SLORegistry {
         ).mul(precision).div(sliValue.add(sloValue).div(2));
 
         // Enforces a deviation capped at 25%
-        if (deviation > precision.div(100).mul(25)) {
-            deviation = precision.div(100).mul(25);
+        if (deviation > precision.mul(25).div(100)) {
+            deviation = precision.mul(25).div(100);
         }
 
         if (sloType == SLOType.EqualTo) {
             // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = precision.div(100).mul(1);
+            deviation = precision.mul(1).div(100);
             return deviation;
         }
 
         if (sloType == SLOType.NotEqualTo) {
             // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = precision.div(100).mul(1);
+            deviation = precision.mul(1).div(100);
             return deviation;
         }
 
