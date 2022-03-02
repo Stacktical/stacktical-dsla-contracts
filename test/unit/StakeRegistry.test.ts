@@ -178,6 +178,13 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 
 		await expect(sla.addAllowedTokens(dslaToken.address))
 			.to.emit(stakeRegistry, "DTokenCreated");
+	})
+	it("should create dTokens with same decimals as registered token", async () => {
+		const { slaRegistry, dslaToken } = fixture;
+		await deploySLA(baseSLAConfig);
+		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+		const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
+		await sla.addAllowedTokens(dslaToken.address);
 
 		const duTokenAddr = await sla.duTokenRegistry(dslaToken.address);
 		const duToken: DToken = await ethers.getContractAt(CONTRACT_NAMES.dToken, duTokenAddr);
