@@ -53,7 +53,7 @@ contract Staking is Ownable {
     uint64 public immutable leverage;
 
     modifier onlyAllowedToken(address _token) {
-        require(isAllowedToken(_token) == true, 'token not allowed');
+        require(isAllowedToken(_token), 'token not allowed');
         _;
     }
 
@@ -69,8 +69,8 @@ contract Staking is Ownable {
     }
 
     modifier onlyWhitelisted() {
-        if (whitelistedContract == true) {
-            require(whitelist[msg.sender] == true, 'not whitelisted');
+        if (whitelistedContract) {
+            require(whitelist[msg.sender], 'not whitelisted');
         }
         _;
     }
@@ -138,7 +138,7 @@ contract Staking is Ownable {
         onlyOwner
     {
         for (uint256 index = 0; index < _userAddresses.length; index++) {
-            if (whitelist[_userAddresses[index]] == false) {
+            if (!whitelist[_userAddresses[index]]) {
                 whitelist[_userAddresses[index]] = true;
             }
         }
@@ -149,7 +149,7 @@ contract Staking is Ownable {
         onlyOwner
     {
         for (uint256 index = 0; index < _userAddresses.length; index++) {
-            if (whitelist[_userAddresses[index]] == true) {
+            if (whitelist[_userAddresses[index]]) {
                 whitelist[_userAddresses[index]] = false;
             }
         }
@@ -265,7 +265,7 @@ contract Staking is Ownable {
             );
         }
 
-        if (registeredStakers[msg.sender] == false) {
+        if (!registeredStakers[msg.sender]) {
             registeredStakers[msg.sender] = true;
             stakers.push(msg.sender);
         }
