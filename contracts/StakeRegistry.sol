@@ -159,6 +159,10 @@ contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
         allowedTokens.push(_dslaTokenAddress);
     }
 
+    function owner() public view override(IStakeRegistry, Ownable) returns (address) {
+        return super.owner();
+    }
+
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
     modifier onlySLARegistry() {
         require(

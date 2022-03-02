@@ -52,6 +52,10 @@ contract Staking is Ownable {
 
     uint64 public immutable leverage;
 
+    /// @dev claiming fees when a user claim tokens, should by divided by 10000
+    uint private ownerFeeRate = 30; // 0.3%
+    uint private stakeRegistryFeeRate = 15; // 0.15%
+
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token) == true, 'token not allowed');
         _;
@@ -153,6 +157,15 @@ contract Staking is Ownable {
                 whitelist[_userAddresses[index]] = false;
             }
         }
+    }
+
+    function setClaimFeeParams(
+        uint ownerFee,
+        uint stakeRegistryFee
+    ) external onlyOwner {
+        require(ownerFee.add(stakeRegistryFee) < 10000, "Invalid claim fees");
+        ownerFeeRate = ownerFee;
+        stakeRegistryFeeRate = stakeRegistryFee;
     }
 
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
@@ -337,7 +350,8 @@ contract Staking is Ownable {
         uint256 burnedDPTokens = _amount.mul(p0).div(t0);
         dpToken.burnFrom(msg.sender, burnedDPTokens);
         providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
+        uint restAmount = _distributeClaimFees(_amount, _tokenAddress);
+        ERC20(_tokenAddress).safeTransfer(msg.sender, restAmount);
     }
 
     function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
@@ -352,7 +366,19 @@ contract Staking is Ownable {
         uint256 burnedDUTokens = _amount.mul(p0).div(t0);
         duToken.burnFrom(msg.sender, burnedDUTokens);
         usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
+        uint restAmount = _distributeClaimFees(_amount, _tokenAddress);
+        ERC20(_tokenAddress).safeTransfer(msg.sender, restAmount);
+    }
+
+    function _distributeClaimFees(
+        uint _amount,
+        address _tokenAddress
+    ) internal returns (uint256) {
+        uint ownerFee = _amount.mul(ownerFeeRate).div(10000);
+        uint stakingRegistryFee = _amount.mul(stakeRegistryFeeRate).div(10000);
+        ERC20(_tokenAddress).safeTransfer(owner(), ownerFee);
+        ERC20(_tokenAddress).safeTransfer(_stakeRegistry.owner(), stakingRegistryFee);
+        return _amount.div(ownerFee).div(stakingRegistryFee);
     }
 
     function getAllowedTokensLength() external view returns (uint256) {

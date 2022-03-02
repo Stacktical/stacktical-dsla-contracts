@@ -42,4 +42,6 @@ interface IStakeRegistry {
     function createDToken(string calldata _name, string calldata _symbol, uint8 decimals)
         external
         returns (address);
+
+    function owner() external view returns (address);
 }
