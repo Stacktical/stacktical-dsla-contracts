@@ -18,6 +18,7 @@ export const SENetworkNames = Object.keys(SENetworks).filter((key: any) =>
 export const SENetworkNamesBytes32 = SENetworkNames.map(formatBytes32String);
 
 export enum CONTRACT_NAMES {
+  dToken = 'dToken',
   DSLA = 'DSLA',
   DAI = 'DAI',
   USDC = 'USDC',
