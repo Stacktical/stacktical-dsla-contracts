@@ -39,7 +39,6 @@ contract SLA is Staking {
     /// @dev extra data for customized workflows
     bytes32[] public extraData;
 
-    bool public userWithdrawLocked = true;
     uint256 public nextVerifiablePeriod;
 
     /// @dev periodId=>PeriodSLI mapping
