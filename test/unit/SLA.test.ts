@@ -175,6 +175,16 @@ describe(CONTRACT_NAMES.SLA, function () {
     expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
   });
 
+  it("should distribute claiming fees to sla owner and stakeRegistry owner", async () => {
+    const { sla, dslaToken, details } = fixture;
+    let stakeAmount = 100000;
+    await dslaToken.approve(sla.address, stakeAmount);
+    await sla.stakeTokens(stakeAmount, dslaToken.address, 'long');
+    await expect(
+      sla.withdrawProviderTokens(mintAmount, dslaToken.address)
+    ).to.be.revertedWith('not finished');
+  })
+
   it('should check that a normal amount of token can be staked', async () => {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
