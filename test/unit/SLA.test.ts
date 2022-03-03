@@ -175,14 +175,15 @@ describe(CONTRACT_NAMES.SLA, function () {
     expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
   });
 
-  it("should distribute claiming fees to sla owner and stakeRegistry owner", async () => {
-    const { sla, dslaToken, details } = fixture;
+  it("should distribute rewards to sla owner and protocol owner when claiming tokens", async () => {
+    const { sla, dslaToken } = fixture;
     let stakeAmount = 100000;
     await dslaToken.approve(sla.address, stakeAmount);
     await sla.stakeTokens(stakeAmount, dslaToken.address, 'long');
     await expect(
       sla.withdrawProviderTokens(mintAmount, dslaToken.address)
     ).to.be.revertedWith('not finished');
+    // TODO: Complete withdrawProviderTokens - Can't cover this function at the moment cause we use mock messenger contract
   })
 
   it('should check that a normal amount of token can be staked', async () => {

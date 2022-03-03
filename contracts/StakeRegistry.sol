@@ -19,7 +19,7 @@ import './StringUtils.sol';
  * @dev StakeRegistry is a contract to register the staking activity of the platform, along
  with controlling certain admin privileged parameters
  */
-contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
+contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     using SafeERC20 for ERC20;
     using SafeMath for uint256;
 
@@ -157,10 +157,6 @@ contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
         );
         _DSLATokenAddress = _dslaTokenAddress;
         allowedTokens.push(_dslaTokenAddress);
-    }
-
-    function owner() public view override(IStakeRegistry, Ownable) returns (address) {
-        return super.owner();
     }
 
     /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.

@@ -53,8 +53,8 @@ contract Staking is Ownable {
     uint64 public immutable leverage;
 
     /// @dev claiming fees when a user claim tokens, should by divided by 10000
-    uint private ownerFeeRate = 30; // 0.3%
-    uint private stakeRegistryFeeRate = 15; // 0.15%
+    uint private ownerRewardsRate = 30; // 0.3%
+    uint private protocolRewardsRate = 15; // 0.15%
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token) == true, 'token not allowed');
@@ -157,15 +157,6 @@ contract Staking is Ownable {
                 whitelist[_userAddresses[index]] = false;
             }
         }
-    }
-
-    function setClaimFeeParams(
-        uint ownerFee,
-        uint stakeRegistryFee
-    ) external onlyOwner {
-        require(ownerFee.add(stakeRegistryFee) < 10000, "Invalid claim fees");
-        ownerFeeRate = ownerFee;
-        stakeRegistryFeeRate = stakeRegistryFee;
     }
 
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
@@ -374,11 +365,11 @@ contract Staking is Ownable {
         uint _amount,
         address _tokenAddress
     ) internal returns (uint256) {
-        uint ownerFee = _amount.mul(ownerFeeRate).div(10000);
-        uint stakingRegistryFee = _amount.mul(stakeRegistryFeeRate).div(10000);
-        ERC20(_tokenAddress).safeTransfer(owner(), ownerFee);
-        ERC20(_tokenAddress).safeTransfer(_stakeRegistry.owner(), stakingRegistryFee);
-        return _amount.div(ownerFee).div(stakingRegistryFee);
+        uint slaOwnerRewards = _amount.mul(ownerRewardsRate).div(10000);
+        uint protocolRewards = _amount.mul(protocolRewardsRate).div(10000);
+        ERC20(_tokenAddress).safeTransfer(owner(), slaOwnerRewards);
+        ERC20(_tokenAddress).safeTransfer(_stakeRegistry.owner(), protocolRewards);
+        return _amount.div(slaOwnerRewards).div(protocolRewards);
     }
 
     function getAllowedTokensLength() external view returns (uint256) {
