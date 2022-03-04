@@ -341,8 +341,8 @@ contract Staking is Ownable {
         uint256 burnedDPTokens = _amount.mul(p0).div(t0);
         dpToken.burnFrom(msg.sender, burnedDPTokens);
         providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
-        uint restAmount = _distributeClaimFees(_amount, _tokenAddress);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, restAmount);
+        uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
+        ERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
     }
 
     function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
@@ -357,11 +357,11 @@ contract Staking is Ownable {
         uint256 burnedDUTokens = _amount.mul(p0).div(t0);
         duToken.burnFrom(msg.sender, burnedDUTokens);
         usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
-        uint restAmount = _distributeClaimFees(_amount, _tokenAddress);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, restAmount);
+        uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
+        ERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
     }
 
-    function _distributeClaimFees(
+    function _distributeClaimingRewards(
         uint _amount,
         address _tokenAddress
     ) internal returns (uint256) {
