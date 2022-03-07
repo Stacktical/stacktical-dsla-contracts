@@ -369,7 +369,7 @@ contract Staking is Ownable {
         uint protocolRewards = _amount.mul(protocolRewardsRate).div(10000);
         ERC20(_tokenAddress).safeTransfer(owner(), slaOwnerRewards);
         ERC20(_tokenAddress).safeTransfer(_stakeRegistry.owner(), protocolRewards);
-        return _amount.div(slaOwnerRewards).div(protocolRewards);
+        return _amount.sub(slaOwnerRewards).sub(protocolRewards);
     }
 
     function getAllowedTokensLength() external view returns (uint256) {
