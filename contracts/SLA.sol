@@ -169,8 +169,12 @@ contract SLA is Staking {
     ) external {
         require(_amount > 0, "zero staking not allowed.");
         string memory position = _position;
-        bool isContractFinished = contractFinished();
-        require(!isContractFinished, 'finished contract');
+        (, uint256 endOfLastValidPeriod) = _periodRegistry.getPeriodStartAndEnd(
+            periodType,
+            finalPeriodId
+        );
+        require(block.timestamp < endOfLastValidPeriod, "Staking disabled after the last period");
+        require(periodSLIs[finalPeriodId].status == Status.NotVerified, "Last period verfied, staking disabled");
         _stake(_amount, _token, position);
         emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount, position);
         IStakeRegistry stakeRegistry = IStakeRegistry(
