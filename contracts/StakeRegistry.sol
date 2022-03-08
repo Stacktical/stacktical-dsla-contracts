@@ -19,7 +19,7 @@ import './StringUtils.sol';
  * @dev StakeRegistry is a contract to register the staking activity of the platform, along
  with controlling certain admin privileged parameters
  */
-contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
+contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     using SafeERC20 for ERC20;
     using SafeMath for uint256;
 
