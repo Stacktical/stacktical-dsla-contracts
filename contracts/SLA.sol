@@ -130,20 +130,14 @@ contract SLA is Staking {
             precision
         );
 
-        uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
-
-        uint256 rewardPercentage = deviation.mul(normalizedPeriodId).div(
-            finalPeriodId - initialPeriodId + 1
-        );
-
         if (_sloRegistry.isRespected(sliValue, address(this))) {
             periodSLI.status = Status.Respected;
 
-            _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
+            _setProviderReward(_periodId, deviation, precision);
         } else {
             periodSLI.status = Status.NotRespected;
 
-            _setUsersCompensation(_periodId, rewardPercentage, precision);
+            _setUserReward(_periodId, deviation, precision);
         }
     }
 
