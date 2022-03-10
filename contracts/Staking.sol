@@ -275,7 +275,7 @@ contract Staking is Ownable {
         }
     }
 
-    function _setRespectedPeriodReward(
+    function _setProviderReward(
         uint256 _periodId,
         uint256 _rewardPercentage,
         uint256 _precision
@@ -299,7 +299,7 @@ contract Staking is Ownable {
         }
     }
 
-    function _setUsersCompensation(
+    function _setUserReward(
         uint256 _periodId,
         uint256 _rewardPercentage,
         uint256 _precision
