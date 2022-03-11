@@ -30,7 +30,9 @@ module.exports = async ({
   await periodRegistry.mock.isInitializedPeriod.returns(true);
   await periodRegistry.mock.periodIsFinished.returns(true);
   await periodRegistry.mock.isValidPeriod.returns(true);
-  await periodRegistry.mock.getPeriodStartAndEnd.returns(0, 0);
+  const periodStartTimestamp = Math.floor(Date.now() / 1000);
+  const periodEndTimestamp = Math.floor(Date.now() / 1000) + 60 * 60 * 24; // Tomorrow
+  await periodRegistry.mock.getPeriodStartAndEnd.returns(periodStartTimestamp, periodEndTimestamp);
 
   const messengerRegistryArtifact = await deployments.getArtifact(
     CONTRACT_NAMES.MessengerRegistry
