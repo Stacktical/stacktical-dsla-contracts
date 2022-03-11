@@ -92,7 +92,7 @@ contract SLARegistry is ISLARegistry {
         }
         bool registeredMessenger = IMessengerRegistry(_messengerRegistry)
             .registeredMessengers(messengerAddress_);
-        require(registeredMessenger == true, 'invalid messenger');
+        require(registeredMessenger, 'invalid messenger');
 
         SLA sla = new SLA(
             msg.sender,
