@@ -1,6 +1,7 @@
 import { DeployOptionsBase } from 'hardhat-deploy/dist/types';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS } from '../constants';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { currentTimestamp, ONE_DAY } from '../test/helper';
 
 module.exports = async ({
   getNamedAccounts,
@@ -30,9 +31,7 @@ module.exports = async ({
   await periodRegistry.mock.isInitializedPeriod.returns(true);
   await periodRegistry.mock.periodIsFinished.returns(true);
   await periodRegistry.mock.isValidPeriod.returns(true);
-  const periodStartTimestamp = Math.floor(Date.now() / 1000);
-  const periodEndTimestamp = Math.floor(Date.now() / 1000) + 60 * 60 * 24; // Tomorrow
-  await periodRegistry.mock.getPeriodStartAndEnd.returns(periodStartTimestamp, periodEndTimestamp);
+  await periodRegistry.mock.getPeriodStartAndEnd.returns(currentTimestamp, currentTimestamp + ONE_DAY);
 
   const messengerRegistryArtifact = await deployments.getArtifact(
     CONTRACT_NAMES.MessengerRegistry
