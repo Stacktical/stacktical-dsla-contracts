@@ -171,7 +171,7 @@ contract SLA is Staking {
         string memory position = _position;
         bool isContractFinished = contractFinished();
         require(!isContractFinished, 'finished contract');
-        _stake(_amount, _token, position);
+        _stake(_token, nextVerifiablePeriod, _amount, position);
         emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount, position);
         IStakeRegistry stakeRegistry = IStakeRegistry(
             _slaRegistry.stakeRegistry()

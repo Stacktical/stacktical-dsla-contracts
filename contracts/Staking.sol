@@ -17,8 +17,10 @@ contract Staking is Ownable {
 
     /// @dev StakeRegistry contract
     IStakeRegistry private _stakeRegistry;
+
     /// @dev SLARegistry contract
     IPeriodRegistry private immutable _periodRegistry;
+
     /// @dev DSLA token address to burn fees
     address private immutable _dslaTokenAddress;
 
@@ -27,18 +29,28 @@ contract Staking is Ownable {
 
     /// @dev (tokenAddress=>uint256) total pooled token balance
     mapping(address => uint256) public providerPool;
-    /// @dev (tokenAddress=>uint256) total pooled token balance
+
+    /// @dev (userAddress=>uint256) provider staking activity
+    mapping(address => uint256) public lastProviderStake;
+
+    /// @dev (tokenAddress=>uint256) user staking
     mapping(address => uint256) public usersPool;
+
+    /// @dev (userAddress=>uint256) user staking activity
+    mapping(address => uint256) public lastUserStake;
 
     ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for users
     mapping(address => dToken) public duTokenRegistry;
+
     ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for provider
     mapping(address => dToken) public dpTokenRegistry;
 
     /// @dev address[] of the stakers of the SLA contract
     address[] public stakers;
+
     /// @dev (slaOwner=>bool)
     mapping(address => bool) public registeredStakers;
+
     /// @dev array with the allowed tokens addresses for the current SLA
     address[] public allowedTokens;
 
@@ -47,14 +59,15 @@ contract Staking is Ownable {
 
     /// @dev boolean to declare if contract is whitelisted
     bool public immutable whitelistedContract;
+
     /// @dev (userAddress=bool) to declare whitelisted addresses
     mapping(address => bool) public whitelist;
 
     uint64 public immutable leverage;
 
     /// @dev claiming fees when a user claim tokens, should by divided by 10000
-    uint private ownerRewardsRate = 30; // 0.3%
-    uint private protocolRewardsRate = 15; // 0.15%
+    uint256 private ownerRewardsRate = 30; // 0.3%
+    uint256 private protocolRewardsRate = 15; // 0.15%
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token) == true, 'token not allowed');
@@ -202,8 +215,9 @@ contract Staking is Ownable {
     }
 
     function _stake(
-        uint256 _amount,
         address _tokenAddress,
+        uint256 _nextVerifiablePeriod,
+        uint256 _amount,
         string memory _position
     )
         internal
@@ -244,6 +258,8 @@ contract Staking is Ownable {
                 duToken.mint(msg.sender, mintedDUTokens);
             }
             usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
+
+            lastUserStake[msg.sender] = _nextVerifiablePeriod;
         }
 
         // DSLA-LP proofs of SLA Position
@@ -267,6 +283,8 @@ contract Staking is Ownable {
             providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
                 _amount
             );
+
+            lastProviderStake[msg.sender] = _nextVerifiablePeriod;
         }
 
         if (registeredStakers[msg.sender] == false) {
@@ -341,7 +359,10 @@ contract Staking is Ownable {
         uint256 burnedDPTokens = _amount.mul(p0).div(t0);
         dpToken.burnFrom(msg.sender, burnedDPTokens);
         providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
-        uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
+        uint256 outstandingAmount = _distributeClaimingRewards(
+            _amount,
+            _tokenAddress
+        );
         ERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
     }
 
@@ -357,18 +378,24 @@ contract Staking is Ownable {
         uint256 burnedDUTokens = _amount.mul(p0).div(t0);
         duToken.burnFrom(msg.sender, burnedDUTokens);
         usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
-        uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
+        uint256 outstandingAmount = _distributeClaimingRewards(
+            _amount,
+            _tokenAddress
+        );
         ERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
     }
 
-    function _distributeClaimingRewards(
-        uint _amount,
-        address _tokenAddress
-    ) internal returns (uint256) {
-        uint slaOwnerRewards = _amount.mul(ownerRewardsRate).div(10000);
-        uint protocolRewards = _amount.mul(protocolRewardsRate).div(10000);
+    function _distributeClaimingRewards(uint256 _amount, address _tokenAddress)
+        internal
+        returns (uint256)
+    {
+        uint256 slaOwnerRewards = _amount.mul(ownerRewardsRate).div(10000);
+        uint256 protocolRewards = _amount.mul(protocolRewardsRate).div(10000);
         ERC20(_tokenAddress).safeTransfer(owner(), slaOwnerRewards);
-        ERC20(_tokenAddress).safeTransfer(_stakeRegistry.owner(), protocolRewards);
+        ERC20(_tokenAddress).safeTransfer(
+            _stakeRegistry.owner(),
+            protocolRewards
+        );
         return _amount.sub(slaOwnerRewards).sub(protocolRewards);
     }
 

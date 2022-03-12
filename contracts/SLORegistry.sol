@@ -131,7 +131,7 @@ contract SLORegistry {
         uint256 sloValue = slo.sloValue;
         uint256 precision = _precision;
 
-        // Ensures a positive deviation for greater / small comparisions
+        // Ensures a positive deviation for greater / small comparisons
         // The deviation is the percentage difference between SLI and SLO
         uint256 deviation = (
             _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)
