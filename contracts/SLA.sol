@@ -8,7 +8,7 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
-import './SLORegistry.sol';
+import './interfaces/ISLORegistry.sol';
 import './Staking.sol';
 
 contract SLA is Staking {
@@ -30,7 +30,7 @@ contract SLA is Staking {
     string public ipfsHash;
     address public immutable messengerAddress;
     ISLARegistry private _slaRegistry;
-    SLORegistry private immutable _sloRegistry;
+    ISLORegistry private immutable _sloRegistry;
     uint256 public immutable creationBlockNumber;
     uint128 public immutable initialPeriodId;
     uint128 public immutable finalPeriodId;
@@ -100,7 +100,7 @@ contract SLA is Staking {
         ipfsHash = _ipfsHash;
         messengerAddress = _messengerAddress;
         _slaRegistry = ISLARegistry(msg.sender);
-        _sloRegistry = SLORegistry(_slaRegistry.sloRegistry());
+        _sloRegistry = ISLORegistry(_slaRegistry.sloRegistry());
         creationBlockNumber = block.number;
         initialPeriodId = _initialPeriodId;
         finalPeriodId = _finalPeriodId;

@@ -79,7 +79,7 @@ const setup = deployments.createFixture(async () => {
   await tx.wait();
   const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
   const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
-  tx = await sla.addAllowedTokens(dslaToken.address);
+  tx = await sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
   await tx.wait();
   return {
     slaRegistry,

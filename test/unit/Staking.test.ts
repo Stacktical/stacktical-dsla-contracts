@@ -1,23 +1,23 @@
 const hre = require('hardhat');
-import{
-    ERC20PresetMinterPauser,
-    ERC20PresetMinterPauser__factory,
-    SLA,
-    SLA__factory,
-    SLARegistry,
-    StakeRegistry,
-    Details,
-    IMessenger
+import {
+  ERC20PresetMinterPauser,
+  ERC20PresetMinterPauser__factory,
+  SLA,
+  SLA__factory,
+  SLARegistry,
+  StakeRegistry,
+  Details,
+  IMessenger
 } from '../../typechain';
 const { ethers, waffle, deployments, getNamedAccounts } = hre;
 import {
-    CONTRACT_NAMES,
-    DEPLOYMENT_TAGS,
-    PERIOD_TYPE,
-    SENetworkNames,
-    SENetworkNamesBytes32,
-    SENetworks,
-    SLO_TYPE,
+  CONTRACT_NAMES,
+  DEPLOYMENT_TAGS,
+  PERIOD_TYPE,
+  SENetworkNames,
+  SENetworkNamesBytes32,
+  SENetworks,
+  SLO_TYPE,
 } from '../../constants';
 const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
@@ -48,39 +48,240 @@ let activeWlSLAConfig = {
 const mintAmount = '1000000';
 
 const setup = deployments.createFixture(async () => {
-    const { deployments } = hre;
-    const { deployer, notDeployer } = await getNamedAccounts();
-    await deployments.fixture(DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE);
-    const dslaToken: ERC20PresetMinterPauser = await ethers.getContract(
-      CONTRACT_NAMES.DSLA
-    );
-  
-    const slaRegistry: SLARegistry = await ethers.getContract(
-      CONTRACT_NAMES.SLARegistry
+  const { deployments } = hre;
+  const { deployer, notDeployer } = await getNamedAccounts();
+  await deployments.fixture(DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE);
+  const dslaToken: ERC20PresetMinterPauser = await ethers.getContract(
+    CONTRACT_NAMES.DSLA
+  );
+
+  const slaRegistry: SLARegistry = await ethers.getContract(
+    CONTRACT_NAMES.SLARegistry
+  );
+
+  const details: Details = await ethers.getContract(CONTRACT_NAMES.Details);
+
+  const stakeRegistry: StakeRegistry = await ethers.getContract(
+    CONTRACT_NAMES.StakeRegistry
+  );
+  await dslaToken.mint(deployer, toWei(mintAmount));
+  await dslaToken.mint(notDeployer, toWei(mintAmount));
+  await dslaToken.approve(stakeRegistry.address, toWei(mintAmount));
+  const iMessengerArtifact = await deployments.getArtifact(
+    CONTRACT_NAMES.IMessenger
+  );
+  const mockMessenger = await deployMockContract(
+    await ethers.getSigner(deployer),
+    iMessengerArtifact.abi
+  );
+
+  const mockMessengerBis = await deployMockContract(
+    await ethers.getSigner(deployer),
+    iMessengerArtifact.abi
+  );
+
+  let tx = await slaRegistry.createSLA(
+    baseSLAConfig.sloValue,
+    baseSLAConfig.sloType,
+    baseSLAConfig.whitelisted,
+    mockMessenger.address,
+    baseSLAConfig.periodType,
+    baseSLAConfig.initialPeriodId,
+    baseSLAConfig.finalPeriodId,
+    'dummy-ipfs-hash',
+    baseSLAConfig.extraData,
+    baseSLAConfig.leverage
+  );
+
+  await tx.wait();
+  const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+  const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
+  await tx.wait();
+
+  let tx_wl = await slaRegistry.createSLA(
+    activeWlSLAConfig.sloValue,
+    activeWlSLAConfig.sloType,
+    activeWlSLAConfig.whitelisted,
+    mockMessengerBis.address,
+    activeWlSLAConfig.periodType,
+    activeWlSLAConfig.initialPeriodId,
+    activeWlSLAConfig.finalPeriodId,
+    'dummy-ipfs-hash',
+    activeWlSLAConfig.extraData,
+    activeWlSLAConfig.leverage
+  );
+
+  await tx_wl.wait();
+  const awlSlaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+  const sla_wl: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, awlSlaAddress);
+  await tx_wl.wait();
+
+  return {
+    slaRegistry,
+    sla,
+    sla_wl,
+    dslaToken,
+    details,
+    mockMessenger
+  };
+});
+
+type Fixture = {
+  slaRegistry: SLARegistry;
+  sla: SLA;
+  sla_wl: SLA;
+  dslaToken: ERC20PresetMinterPauser;
+  details: Details;
+  mockMessenger: IMessenger;
+};
+
+describe(CONTRACT_NAMES.Staking, function () {
+  let fixture: Fixture;
+  let deployer: string;
+  let notDeployer: string;
+  beforeEach(async function () {
+    deployer = (await getNamedAccounts()).deployer;
+    notDeployer = (await getNamedAccounts()).notDeployer;
+    fixture = await setup();
+  });
+
+
+  it('should perform staking long position for deployer', async () => {
+    const { sla, dslaToken, details } = fixture;
+    let tx = await sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
+    await dslaToken.approve(sla.address, mintAmount);
+    let stakeAmount = 100000;
+
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      .to.emit(sla, 'Stake')
+      .withArgs(
+        dslaToken.address,
+        await sla.nextVerifiablePeriod(),
+        deployer,
+        stakeAmount,
+        'long'
+      );
+    let detailsarrs = (
+      await details.getSLADetailsArrays(sla.address)
+    )
+
+    let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+    expect(totalStake).equals(stakeAmount.toString());
+  });
+
+  it('should perform staking short position for deployer when user have long position in pool', async () => {
+    const { sla, dslaToken, details } = fixture;
+    let amount = 10000;
+    let leverage = baseSLAConfig['leverage']
+
+    const numberOfStakingEntity = 2
+    const targetStakeAmount = (amount * leverage) * numberOfStakingEntity
+    let tx = await sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
+    await dslaToken.approve(sla.address, amount);
+
+    // user long stake
+    const notDeployerSLA = SLA__factory.connect(
+      sla.address,
+      await ethers.getSigner(notDeployer)
     );
 
-    const details: Details = await ethers.getContract(CONTRACT_NAMES.Details);
-  
-    const stakeRegistry: StakeRegistry = await ethers.getContract(
-      CONTRACT_NAMES.StakeRegistry
-    );
-    await dslaToken.mint(deployer, toWei(mintAmount));
-    await dslaToken.mint(notDeployer, toWei(mintAmount));
-    await dslaToken.approve(stakeRegistry.address, toWei(mintAmount));
-    const iMessengerArtifact = await deployments.getArtifact(
-      CONTRACT_NAMES.IMessenger
-    );
-    const mockMessenger = await deployMockContract(
-      await ethers.getSigner(deployer),
-      iMessengerArtifact.abi
+    const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+      dslaToken.address,
+      await ethers.getSigner(notDeployer)
     );
 
-    const mockMessengerBis = await deployMockContract(
-      await ethers.getSigner(deployer),
-      iMessengerArtifact.abi
+    await notDeployerDSLA.approve(sla.address, amount * leverage);
+    await notDeployerSLA.stakeTokens(
+      amount * leverage,
+      dslaToken.address,
+      'long'
     );
-  
-    let tx = await slaRegistry.createSLA(
+
+    // provider long stake
+    const deployerSLA = SLA__factory.connect(
+      sla.address,
+      await ethers.getSigner(deployer)
+    );
+    const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
+      dslaToken.address,
+      await ethers.getSigner(deployer)
+    );
+
+
+    await deployerDSLA.approve(sla.address, amount * leverage);
+    await expect(deployerSLA.stakeTokens(amount * leverage, dslaToken.address, 'short'))
+      .to.emit(sla, 'Stake')
+      .withArgs(
+        dslaToken.address,
+        await sla.nextVerifiablePeriod(),
+        deployer,
+        amount * leverage,
+        'short'
+      );
+
+    let detailsarrs = (
+      await details.getSLADetailsArrays(sla.address)
+    )
+
+    let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+    expect(totalStake).equals(targetStakeAmount.toString());
+  });
+
+
+  it('should prevent staking short position for deployer if insufficient long position present in staking pool', async () => {
+    const { sla, dslaToken, details } = fixture;
+    let tx = await sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
+    await dslaToken.approve(sla.address, mintAmount);
+    let stakeAmount = 100000;
+
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'short'))
+      .to.be.revertedWith('user stake')
+  });
+
+  it('should prevent staking in case of amount exceeds allowance', async () => {
+    const { sla, dslaToken, details } = fixture;
+    let tx = await sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
+    await dslaToken.approve(sla.address, mintAmount);
+    let stakeAmount = 100000000;
+
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      .to.be.revertedWith('ERC20: transfer amount exceeds allowance')
+  });
+
+  it('should prevent staking if token not allowed', async () => {
+    const { sla, dslaToken, details } = fixture;
+    await dslaToken.approve(sla.address, mintAmount);
+    let stakeAmount = 100000;
+
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      .to.be.revertedWith('token not allowed')
+  });
+
+  it('should prevent staking in case of invalid token address', async () => {
+    const { sla, dslaToken, details } = fixture;
+    await dslaToken.approve(sla.address, mintAmount);
+    let stakeAmount = 100000;
+    const invalidTokenAddress = "0x61A12"
+    await expect(sla.stakeTokens(stakeAmount, invalidTokenAddress, 'long'))
+      .to.be.reverted;
+  });
+
+  it('should prevent staking in case of invalid position side', async () => {
+    const { sla, dslaToken, details } = fixture;
+    await dslaToken.approve(sla.address, mintAmount);
+    let stakeAmount = 100000;
+    const invalidPositionSide = 'longshort'
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, invalidPositionSide))
+      .to.be.reverted;
+  });
+
+  it('should prevent creation of a stacking contract if incorrect leverage', async () => {
+    const { slaRegistry, dslaToken, mockMessenger } = fixture;
+    let badLeverageSLAConfig = {
+      leverage: 101
+    }
+
+    await expect(slaRegistry.createSLA(
       baseSLAConfig.sloValue,
       baseSLAConfig.sloType,
       baseSLAConfig.whitelisted,
@@ -90,65 +291,27 @@ const setup = deployments.createFixture(async () => {
       baseSLAConfig.finalPeriodId,
       'dummy-ipfs-hash',
       baseSLAConfig.extraData,
-      baseSLAConfig.leverage
-    );
-  
-    await tx.wait();
-    const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-    const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
-    await tx.wait();
-
-    let tx_wl = await slaRegistry.createSLA(
-      activeWlSLAConfig.sloValue,
-      activeWlSLAConfig.sloType,
-      activeWlSLAConfig.whitelisted,
-      mockMessengerBis.address,
-      activeWlSLAConfig.periodType,
-      activeWlSLAConfig.initialPeriodId,
-      activeWlSLAConfig.finalPeriodId,
-      'dummy-ipfs-hash',
-      activeWlSLAConfig.extraData,
-      activeWlSLAConfig.leverage
-    );
-
-    await tx_wl.wait();
-    const awlSlaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-    const sla_wl: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, awlSlaAddress);
-    await tx_wl.wait();
-
-    return {
-      slaRegistry,
-      sla,
-      sla_wl,
-      dslaToken,
-      details,
-      mockMessenger
-    };
+      badLeverageSLAConfig.leverage
+    )).to.be.reverted;
   });
-  
-  type Fixture = {
-    slaRegistry: SLARegistry;
-    sla: SLA;
-    sla_wl: SLA;
-    dslaToken: ERC20PresetMinterPauser;
-    details: Details;
-    mockMessenger: IMessenger;
-  };
 
-  describe(CONTRACT_NAMES.Staking, function () {
-    let fixture: Fixture;
-    let deployer: string;
-    let notDeployer: string;
-    beforeEach(async function () {
-      deployer = (await getNamedAccounts()).deployer;
-      notDeployer = (await getNamedAccounts()).notDeployer;
-      fixture = await setup();
-    });
+  it('should add allowed tokens in list if not yet present then perform staking', async () => {
+    const { sla, dslaToken, details } = fixture;
+    expect(sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF"))
+      .to.emit(sla, 'DTokensCreated');
+  });
 
-    
-    it('should perform staking long position for deployer', async () => {
-      const { sla, dslaToken, details } = fixture;
-      let tx = await sla.addAllowedTokens(dslaToken.address);
+  it('should revert if token already present in allowedTokens', async () => {
+    const { sla, dslaToken, details } = fixture;
+    let tx = await sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
+    await expect(sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF"))
+      .to.be.revertedWith('already added');
+  });
+
+  describe("whitelist", function () {
+    it('should perform staking for not whitelisted user if whitelist not activated', async () => {
+      const { sla, sla_wl, dslaToken, details } = fixture;
+      let tx = await sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
       await dslaToken.approve(sla.address, mintAmount);
       let stakeAmount = 100000;
 
@@ -167,21 +330,64 @@ const setup = deployments.createFixture(async () => {
 
       let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
       expect(totalStake).equals(stakeAmount.toString());
+
     });
 
-    it('should perform staking short position for deployer when user have long position in pool', async () => {
-      const { sla, dslaToken, details } = fixture;
-      let amount = 10000;
-      let leverage = baseSLAConfig['leverage']
+    it('should perform staking for contract owner even if whitelist is activated', async () => {
+      // Contract Owner is added by default in whitelist, it's not needed to add it after contract creation
+      const { sla_wl, dslaToken, details } = fixture;
 
-      const numberOfStakingEntity = 2
-      const targetStakeAmount = (amount * leverage) * numberOfStakingEntity
-      let tx = await sla.addAllowedTokens(dslaToken.address);
-      await dslaToken.approve(sla.address, amount);
+      let tx = await sla_wl.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
+      await dslaToken.approve(sla_wl.address, mintAmount);
+      let stakeAmount = 100000;
+
+      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+        .to.emit(sla_wl, 'Stake')
+        .withArgs(
+          dslaToken.address,
+          await sla_wl.nextVerifiablePeriod(),
+          deployer,
+          stakeAmount,
+          'long'
+        );
+      let detailsarrs = (
+        await details.getSLADetailsArrays(sla_wl.address)
+      )
+
+      let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+      expect(totalStake).equals(stakeAmount.toString());
+    });
+
+
+    it('should prevent staking for not whitelisted user if whitelist is activated', async () => {
+      const { sla_wl, dslaToken, details } = fixture;
+      let stakeAmount = 100000;
+      await dslaToken.approve(sla_wl.address, stakeAmount);
 
       // user long stake
       const notDeployerSLA = SLA__factory.connect(
-        sla.address,
+        sla_wl.address,
+        await ethers.getSigner(notDeployer)
+      );
+      const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+        dslaToken.address,
+        await ethers.getSigner(notDeployer)
+      );
+
+      await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
+      await sla_wl.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
+      await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+        .to.be.revertedWith('not whitelisted');
+    });
+
+    it('should perform staking for whitelisted user if whitelist is activated', async () => {
+      const { sla_wl, dslaToken, details } = fixture;
+      let stakeAmount = 100000;
+      await dslaToken.approve(sla_wl.address, stakeAmount);
+
+      // user long stake
+      const notDeployerSLA = SLA__factory.connect(
+        sla_wl.address,
         await ethers.getSigner(notDeployer)
       );
 
@@ -190,271 +396,66 @@ const setup = deployments.createFixture(async () => {
         await ethers.getSigner(notDeployer)
       );
 
-      await notDeployerDSLA.approve(sla.address, amount * leverage);
-      await notDeployerSLA.stakeTokens(
-        amount * leverage,
-        dslaToken.address,
-        'long'
-      );
+      await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
+      await sla_wl.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
+      await sla_wl.addUsersToWhitelist([notDeployer])
 
-      // provider long stake
-      const deployerSLA = SLA__factory.connect(
-        sla.address,
-        await ethers.getSigner(deployer)
-      );
-      const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
-        dslaToken.address,
-        await ethers.getSigner(deployer)
-      );
-
-
-      await deployerDSLA.approve(sla.address, amount * leverage);
-      await expect(deployerSLA.stakeTokens(amount * leverage, dslaToken.address, 'short'))
-        .to.emit(sla, 'Stake')
+      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+        .to.emit(sla_wl, 'Stake')
         .withArgs(
           dslaToken.address,
-          await sla.nextVerifiablePeriod(),
+          await sla_wl.nextVerifiablePeriod(),
           deployer,
-          amount * leverage,
-          'short'
+          stakeAmount,
+          'long'
         );
-
       let detailsarrs = (
-        await details.getSLADetailsArrays(sla.address)
+        await details.getSLADetailsArrays(sla_wl.address)
       )
-      
+
       let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
-      expect(totalStake).equals(targetStakeAmount.toString());
+      expect(totalStake).equals(stakeAmount.toString());
     });
 
-
-    it('should prevent staking short position for deployer if insufficient long position present in staking pool', async () => {
-      const { sla, dslaToken, details } = fixture;
-      let tx = await sla.addAllowedTokens(dslaToken.address);
-      await dslaToken.approve(sla.address, mintAmount);
+    it('should perform staking for whitelisted user then deny staking after removal from whitelist if it is activated', async () => {
+      const { sla_wl, dslaToken, details } = fixture;
       let stakeAmount = 100000;
+      await dslaToken.approve(sla_wl.address, stakeAmount);
 
-      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'short'))
-        .to.be.revertedWith('user stake')
-    });
+      // user long stake
+      const notDeployerSLA = SLA__factory.connect(
+        sla_wl.address,
+        await ethers.getSigner(notDeployer)
+      );
 
-    it('should prevent staking in case of amount exceeds allowance', async () => {
-      const { sla, dslaToken, details } = fixture;
-      let tx = await sla.addAllowedTokens(dslaToken.address);
-      await dslaToken.approve(sla.address, mintAmount);
-      let stakeAmount = 100000000;
+      const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+        dslaToken.address,
+        await ethers.getSigner(notDeployer)
+      );
 
-      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
-        .to.be.revertedWith('ERC20: transfer amount exceeds allowance')
-    });
+      await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
+      await sla_wl.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
+      await sla_wl.addUsersToWhitelist([notDeployer])
 
-    it('should prevent staking if token not allowed', async () => {
-      const { sla, dslaToken, details } = fixture;
-      await dslaToken.approve(sla.address, mintAmount);
-      let stakeAmount = 100000;
-
-      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
-        .to.be.revertedWith('token not allowed')
-    });
-
-    it('should prevent staking in case of invalid token address', async () => {
-      const { sla, dslaToken, details } = fixture;
-      await dslaToken.approve(sla.address, mintAmount);
-      let stakeAmount = 100000;
-      const invalidTokenAddress = "0x61A12"
-      await expect(sla.stakeTokens(stakeAmount, invalidTokenAddress, 'long'))
-      .to.be.reverted;
-    });
-    
-    it('should prevent staking in case of invalid position side', async () => {
-      const { sla, dslaToken, details } = fixture;
-      await dslaToken.approve(sla.address, mintAmount);
-      let stakeAmount = 100000;
-      const invalidPositionSide = 'longshort'
-      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, invalidPositionSide))
-      .to.be.reverted;
-    });
-
-    it('should prevent creation of a stacking contract if incorrect leverage', async() =>{
-      const { slaRegistry, dslaToken, mockMessenger } = fixture;
-      let badLeverageSLAConfig = {
-        leverage: 101
-      }
-
-      await expect(slaRegistry.createSLA(
-        baseSLAConfig.sloValue,
-        baseSLAConfig.sloType,
-        baseSLAConfig.whitelisted,
-        mockMessenger.address,
-        baseSLAConfig.periodType,
-        baseSLAConfig.initialPeriodId,
-        baseSLAConfig.finalPeriodId,
-        'dummy-ipfs-hash',
-        baseSLAConfig.extraData,
-        badLeverageSLAConfig.leverage
-      )).to.be.reverted;
-    });
-
-    it('should add allowed tokens in list if not yet present then perform staking', async() =>{
-      const { sla, dslaToken, details } = fixture;
-      expect(sla.addAllowedTokens(dslaToken.address))
-        .to.emit(sla, 'DTokensCreated');
-    });
-
-    it('should revert if token already present in allowedTokens', async() =>{
-      const { sla, dslaToken, details } = fixture;
-      let tx = await sla.addAllowedTokens(dslaToken.address);
-      await expect(sla.addAllowedTokens(dslaToken.address)).to.be.revertedWith('already added');
-    });
-
-    describe("whitelist", function () {
-      it('should perform staking for not whitelisted user if whitelist not activated', async() =>{
-        const { sla, sla_wl, dslaToken, details } = fixture;
-        let tx = await sla.addAllowedTokens(dslaToken.address);
-        await dslaToken.approve(sla.address, mintAmount);
-        let stakeAmount = 100000;
-  
-        await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
-          .to.emit(sla, 'Stake')
-          .withArgs(
-            dslaToken.address,
-            await sla.nextVerifiablePeriod(),
-            deployer,
-            stakeAmount,
-            'long'
-          );
-        let detailsarrs = (
-          await details.getSLADetailsArrays(sla.address)
-        )
-  
-        let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
-        expect(totalStake).equals(stakeAmount.toString());
-
-      });
-
-      it('should perform staking for contract owner even if whitelist is activated', async() =>{
-        // Contract Owner is added by default in whitelist, it's not needed to add it after contract creation
-        const {sla_wl, dslaToken, details } = fixture;
-
-        let tx = await sla_wl.addAllowedTokens(dslaToken.address);
-        await dslaToken.approve(sla_wl.address, mintAmount);
-        let stakeAmount = 100000;
-  
-        await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
-          .to.emit(sla_wl, 'Stake')
-          .withArgs(
-            dslaToken.address,
-            await sla_wl.nextVerifiablePeriod(),
-            deployer,
-            stakeAmount,
-            'long'
-          );
-        let detailsarrs = (
-          await details.getSLADetailsArrays(sla_wl.address)
-        )
-  
-        let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
-        expect(totalStake).equals(stakeAmount.toString());
-      });
-
-
-      it('should prevent staking for not whitelisted user if whitelist is activated', async() =>{
-        const {sla_wl, dslaToken, details } = fixture;
-        let stakeAmount = 100000;
-        await dslaToken.approve(sla_wl.address, stakeAmount);
-
-        // user long stake
-        const notDeployerSLA = SLA__factory.connect(
-          sla_wl.address,
-          await ethers.getSigner(notDeployer)
-        );
-        const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+        .to.emit(sla_wl, 'Stake')
+        .withArgs(
           dslaToken.address,
-          await ethers.getSigner(notDeployer)
+          await sla_wl.nextVerifiablePeriod(),
+          deployer,
+          stakeAmount,
+          'long'
         );
+      let detailsarrs = (
+        await details.getSLADetailsArrays(sla_wl.address)
+      )
 
-        await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
-        await sla_wl.addAllowedTokens(dslaToken.address);
-        await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+      expect(totalStake).equals(stakeAmount.toString());
+
+      await sla_wl.removeUsersFromWhitelist([notDeployer])
+      await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, 'long'))
         .to.be.revertedWith('not whitelisted');
-      });
-
-      it('should perform staking for whitelisted user if whitelist is activated', async() =>{
-        const {sla_wl, dslaToken, details } = fixture;
-        let stakeAmount = 100000;
-        await dslaToken.approve(sla_wl.address, stakeAmount);
-
-        // user long stake
-        const notDeployerSLA = SLA__factory.connect(
-          sla_wl.address,
-          await ethers.getSigner(notDeployer)
-        );
-    
-        const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
-          dslaToken.address,
-          await ethers.getSigner(notDeployer)
-        );
-    
-        await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
-        await sla_wl.addAllowedTokens(dslaToken.address);
-        await sla_wl.addUsersToWhitelist([notDeployer])
-
-        await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
-          .to.emit(sla_wl, 'Stake')
-          .withArgs(
-            dslaToken.address,
-            await sla_wl.nextVerifiablePeriod(),
-            deployer,
-            stakeAmount,
-            'long'
-          );
-        let detailsarrs = (
-          await details.getSLADetailsArrays(sla_wl.address)
-        )
-  
-        let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
-        expect(totalStake).equals(stakeAmount.toString());
-      });
-
-      it('should perform staking for whitelisted user then deny staking after removal from whitelist if it is activated', async() =>{
-        const {sla_wl, dslaToken, details } = fixture;
-        let stakeAmount = 100000;
-        await dslaToken.approve(sla_wl.address, stakeAmount);
-
-        // user long stake
-        const notDeployerSLA = SLA__factory.connect(
-          sla_wl.address,
-          await ethers.getSigner(notDeployer)
-        );
-    
-        const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
-          dslaToken.address,
-          await ethers.getSigner(notDeployer)
-        );
-    
-        await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
-        await sla_wl.addAllowedTokens(dslaToken.address);
-        await sla_wl.addUsersToWhitelist([notDeployer])
-
-        await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
-          .to.emit(sla_wl, 'Stake')
-          .withArgs(
-            dslaToken.address,
-            await sla_wl.nextVerifiablePeriod(),
-            deployer,
-            stakeAmount,
-            'long'
-          );
-        let detailsarrs = (
-          await details.getSLADetailsArrays(sla_wl.address)
-        )
-  
-        let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
-        expect(totalStake).equals(stakeAmount.toString());
-
-        await sla_wl.removeUsersFromWhitelist([notDeployer])
-        await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, 'long'))
-        .to.be.revertedWith('not whitelisted');
-      });
     });
+  });
 });

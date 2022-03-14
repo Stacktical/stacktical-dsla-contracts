@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import './SLA.sol';
-import './SLORegistry.sol';
+import './interfaces/ISLORegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessengerRegistry.sol';
 import './interfaces/IStakeRegistry.sol';
@@ -31,7 +31,10 @@ contract SLARegistry is ISLARegistry {
     // value to lock past periods on SLA deployment
     bool private immutable _checkPastPeriod;
 
-    event SLACreated(SLA indexed sla, address indexed owner);
+    event SLACreated(
+        SLA indexed sla,
+        address indexed owner
+    );
 
     event SLIRequested(
         uint256 periodId,
@@ -39,7 +42,10 @@ contract SLARegistry is ISLARegistry {
         address indexed caller
     );
 
-    event ReturnLockedValue(address indexed sla, address indexed caller);
+    event ReturnLockedValue(
+        address indexed sla,
+        address indexed caller
+    );
 
     constructor(
         address sloRegistry_,
@@ -49,7 +55,7 @@ contract SLARegistry is ISLARegistry {
         bool checkPastPeriod_
     ) public {
         _sloRegistry = sloRegistry_;
-        SLORegistry(_sloRegistry).setSLARegistry();
+        ISLORegistry(_sloRegistry).setSLARegistry();
         _periodRegistry = periodRegistry_;
         _stakeRegistry = stakeRegistry_;
         IStakeRegistry(_stakeRegistry).setSLARegistry();
@@ -60,7 +66,7 @@ contract SLARegistry is ISLARegistry {
 
     function createSLA(
         uint256 sloValue_,
-        SLORegistry.SLOType sloType_,
+        ISLORegistry.SLOType sloType_,
         bool whitelisted_,
         address messengerAddress_,
         IPeriodRegistry.PeriodType periodType_,
@@ -70,29 +76,24 @@ contract SLARegistry is ISLARegistry {
         bytes32[] memory extraData_,
         uint64 leverage_
     ) public {
-        bool validPeriod = IPeriodRegistry(_periodRegistry).isValidPeriod(
+        require(IPeriodRegistry(_periodRegistry).isValidPeriod(
             periodType_,
             initialPeriodId_
-        );
-        require(validPeriod, 'first id invalid');
-        validPeriod = IPeriodRegistry(_periodRegistry).isValidPeriod(
+        ), 'first id invalid');
+        require(IPeriodRegistry(_periodRegistry).isValidPeriod(
             periodType_,
             finalPeriodId_
-        );
-        require(validPeriod, 'final id invalid');
-        bool initializedPeriod = IPeriodRegistry(_periodRegistry)
-            .isInitializedPeriod(periodType_);
-        require(initializedPeriod, 'period not initialized');
+        ), 'final id invalid');
+        require(IPeriodRegistry(_periodRegistry)
+            .isInitializedPeriod(periodType_), 'period not initialized');
         require(finalPeriodId_ >= initialPeriodId_, 'invalid final/initial');
 
         if (_checkPastPeriod) {
-            bool periodHasStarted = IPeriodRegistry(_periodRegistry)
-                .periodHasStarted(periodType_, initialPeriodId_);
-            require(!periodHasStarted, 'past period');
+            require(!IPeriodRegistry(_periodRegistry)
+                .periodHasStarted(periodType_, initialPeriodId_), 'past period');
         }
-        bool registeredMessenger = IMessengerRegistry(_messengerRegistry)
-            .registeredMessengers(messengerAddress_);
-        require(registeredMessenger, 'invalid messenger');
+        require(IMessengerRegistry(_messengerRegistry)
+            .registeredMessengers(messengerAddress_), 'invalid messenger');
 
         SLA sla = new SLA(
             msg.sender,
@@ -107,7 +108,7 @@ contract SLARegistry is ISLARegistry {
             leverage_
         );
 
-        SLORegistry(_sloRegistry).registerSLO(
+        ISLORegistry(_sloRegistry).registerSLO(
             sloValue_,
             sloType_,
             address(sla)
@@ -119,8 +120,7 @@ contract SLARegistry is ISLARegistry {
         );
         SLAs.push(sla);
         _registeredSLAs[address(sla)] = true;
-        uint256 index = SLAs.length.sub(1);
-        _userToSLAIndexes[msg.sender].push(index);
+        _userToSLAIndexes[msg.sender].push(SLAs.length.sub(1));
         emit SLACreated(sla, msg.sender);
     }
 
@@ -190,14 +190,10 @@ contract SLARegistry is ISLARegistry {
     }
 
     function userSLAs(address _user) public view returns (SLA[] memory) {
-        uint256 count = _userToSLAIndexes[_user].length;
-        SLA[] memory SLAList = new SLA[](count);
-        uint256[] memory userSLAIndexes = _userToSLAIndexes[_user];
-
-        for (uint256 i = 0; i < count; i++) {
-            SLAList[i] = (SLAs[userSLAIndexes[i]]);
+        SLA[] memory SLAList = new SLA[](_userToSLAIndexes[_user].length);
+        for (uint256 i = 0; i < _userToSLAIndexes[_user].length; i++) {
+            SLAList[i] = (SLAs[_userToSLAIndexes[_user][i]]);
         }
-
         return (SLAList);
     }
 

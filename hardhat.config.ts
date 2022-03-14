@@ -1,8 +1,11 @@
 import '@typechain/hardhat';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
-import 'hardhat-deploy';
 import 'solidity-coverage';
+import 'hardhat-abi-exporter';
+import 'hardhat-contract-sizer';
+import 'hardhat-gas-reporter';
+import 'hardhat-deploy';
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -31,5 +34,11 @@ module.exports = {
     notDeployer: {
       default: 1,
     },
+  },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: false,
   },
 };

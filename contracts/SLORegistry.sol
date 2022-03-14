@@ -3,24 +3,15 @@ pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
+import './interfaces/ISLORegistry.sol';
 
 /**
  * @title SLORegistry
  * @dev SLORegistry is a contract for handling creation of service level
  * objectives and querying those service level objectives
  */
-contract SLORegistry {
+contract SLORegistry is ISLORegistry {
     using SafeMath for uint256;
-    using SafeMath for int256;
-
-    enum SLOType {
-        EqualTo,
-        NotEqualTo,
-        SmallerThan,
-        SmallerOrEqualTo,
-        GreaterThan,
-        GreaterOrEqualTo
-    }
 
     struct SLO {
         uint256 sloValue;
@@ -45,7 +36,7 @@ contract SLORegistry {
         _;
     }
 
-    function setSLARegistry() public {
+    function setSLARegistry() public override {
         // Only able to trigger this function once
         require(
             address(slaRegistry) == address(0),
@@ -64,7 +55,7 @@ contract SLORegistry {
         uint256 _sloValue,
         SLOType _sloType,
         address _slaAddress
-    ) public onlySLARegistry {
+    ) public override onlySLARegistry {
         registeredSLO[_slaAddress] = SLO({
             sloValue: _sloValue,
             sloType: _sloType
@@ -79,6 +70,7 @@ contract SLORegistry {
      */
     function isRespected(uint256 _value, address _slaAddress)
         public
+        override
         view
         returns (bool)
     {
@@ -124,33 +116,30 @@ contract SLORegistry {
         uint256 _sli,
         address _slaAddress,
         uint256 _precision
-    ) public view returns (uint256) {
-        uint256 sliValue = _sli;
-        SLO memory slo = registeredSLO[_slaAddress];
-        SLOType sloType = slo.sloType;
-        uint256 sloValue = slo.sloValue;
-        uint256 precision = _precision;
+    ) public view override returns (uint256) {
+        SLOType sloType = registeredSLO[_slaAddress].sloType;
+        uint256 sloValue = registeredSLO[_slaAddress].sloValue;
 
         // Ensures a positive deviation for greater / small comparisions
         // The deviation is the percentage difference between SLI and SLO
         uint256 deviation = (
             _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)
-        ).mul(precision).div(sliValue.add(sloValue).div(2));
+        ).mul(_precision).div(_sli.add(sloValue).div(2));
 
         // Enforces a deviation capped at 25%
-        if (deviation > precision.mul(25).div(100)) {
-            deviation = precision.mul(25).div(100);
+        if (deviation > _precision.mul(25).div(100)) {
+            deviation = _precision.mul(25).div(100);
         }
 
         if (sloType == SLOType.EqualTo) {
             // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = precision.mul(1).div(100);
+            deviation = _precision.mul(1).div(100);
             return deviation;
         }
 
         if (sloType == SLOType.NotEqualTo) {
             // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = precision.mul(1).div(100);
+            deviation = _precision.mul(1).div(100);
             return deviation;
         }
 

@@ -164,7 +164,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		await expect(stakeRegistry.registerStakedSla(deployer)).to.be.revertedWith(
 			'Only for registered SLAs'
 		);
-		await sla.addAllowedTokens(dslaToken.address);
+		await sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
 		await dslaToken.approve(slaAddress, mintAmount);
 		await sla.stakeTokens(mintAmount, dslaToken.address, 'long');
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, slaAddress)).to.be.true;
@@ -176,7 +176,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 		const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
 
-		await expect(sla.addAllowedTokens(dslaToken.address))
+		await expect(sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF"))
 			.to.emit(stakeRegistry, "DTokenCreated");
 	})
 	it("should create dTokens with same decimals as registered token", async () => {
@@ -184,7 +184,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		await deploySLA(baseSLAConfig);
 		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 		const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
-		await sla.addAllowedTokens(dslaToken.address);
+		await sla.addAllowedTokens(dslaToken.address, "Inflation Service Credit", "INF");
 
 		const duTokenAddr = await sla.duTokenRegistry(dslaToken.address);
 		const duToken: DToken = await ethers.getContractAt(CONTRACT_NAMES.dToken, duTokenAddr);
