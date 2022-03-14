@@ -2,8 +2,8 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
-import './SLA.sol';
-import './SLORegistry.sol';
+import './interfaces/ISLA.sol';
+import './interfaces/ISLORegistry.sol';
 import './Staking.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
@@ -47,13 +47,13 @@ contract Details {
             uint64 leverage
         )
     {
-        SLA sla = SLA(_slaAddress);
+        ISLA sla = ISLA(_slaAddress);
         stakersCount = sla.getStakersLength();
         nextVerifiablePeriod = sla.nextVerifiablePeriod();
         leverage = sla.leverage();
     }
 
-    function getSLAStaticDetails(address _slaAddress, SLORegistry _sloRegistry)
+    function getSLAStaticDetails(address _slaAddress, ISLORegistry _sloRegistry)
         external
         view
         returns (
@@ -66,16 +66,17 @@ contract Details {
             uint128 finalPeriodId,
             bool whiteListed,
             IPeriodRegistry.PeriodType periodType,
-            SLORegistry.SLOType sloType,
+            ISLORegistry.SLOType sloType,
             string memory ipfsHash
         )
     {
-        SLA sla = SLA(_slaAddress);
+        ISLA sla = ISLA(_slaAddress);
         slaOwner = sla.owner();
         messengerAddress = sla.messengerAddress();
         whiteListed = sla.whitelistedContract();
         periodType = sla.periodType();
-        (sloValue, sloType) = _sloRegistry.registeredSLO(_slaAddress);
+        sloValue = _sloRegistry.registeredSLO(_slaAddress).sloValue;
+        sloType = _sloRegistry.registeredSLO(_slaAddress).sloType;
         creationBlockNumber = sla.creationBlockNumber();
         slaId = sla.slaID();
         ipfsHash = sla.ipfsHash();
@@ -87,24 +88,18 @@ contract Details {
         external
         view
         returns (
-            SLA.PeriodSLI[] memory periodSLIs,
+            ISLA.PeriodSLI[] memory periodSLIs,
             TokenStake[] memory tokensStake
         )
     {
-        SLA sla = SLA(_slaAddress);
+        ISLA sla = ISLA(_slaAddress);
         uint256 initialPeriodId = sla.initialPeriodId();
         uint256 finalPeriodId = sla.finalPeriodId();
         uint256 periodIdsLength = finalPeriodId - initialPeriodId + 1;
-        periodSLIs = new SLA.PeriodSLI[](periodIdsLength);
+        periodSLIs = new ISLA.PeriodSLI[](periodIdsLength);
         for (uint256 index = 0; index < periodIdsLength; index++) {
             uint256 periodId = initialPeriodId + index;
-            (uint256 timestamp, uint256 sli, SLA.Status status) = sla
-            .periodSLIs(periodId);
-            periodSLIs[index] = SLA.PeriodSLI({
-                status: status,
-                sli: sli,
-                timestamp: timestamp
-            });
+            periodSLIs[index] = sla.periodSLIs(periodId);
         }
         uint256 allowedTokensLength = sla.getAllowedTokensLength();
         tokensStake = new TokenStake[](allowedTokensLength);
@@ -129,13 +124,13 @@ contract Details {
         )
     {
         bool fromOwner = _owner != address(0x0);
-        SLA sla = SLA(_slaAddress);
+        ISLA sla = ISLA(_slaAddress);
         uint256 allowedTokensLength = sla.getAllowedTokensLength();
         dpTokens = new DtokenDetails[](allowedTokensLength);
         duTokens = new DtokenDetails[](allowedTokensLength);
         for (uint256 index = 0; index < allowedTokensLength; index++) {
             address tokenAddress = sla.allowedTokens(index);
-            address dpTokenAddress = address(sla.dpTokenRegistry(tokenAddress));
+            address dpTokenAddress = sla.dpTokenRegistry(tokenAddress);
             dpTokens[index] = DtokenDetails({
                 dTokenAddress: dpTokenAddress,
                 tokenAddress: tokenAddress,

@@ -3,13 +3,14 @@ pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import './SLA.sol';
+import './interfaces/ISLA.sol';
 import './interfaces/ISLORegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessengerRegistry.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/ISLARegistry.sol';
+import './interfaces/ISLAFactory.sol';
 
 contract SLARegistry is ISLARegistry {
     using SafeMath for uint256;
@@ -22,8 +23,10 @@ contract SLARegistry is ISLARegistry {
     address private _messengerRegistry;
     /// @dev Stake registry
     address private _stakeRegistry;
+    /// @dev Stake registry
+    address private _slaFactory;
     /// @dev stores the addresses of created SLAs
-    SLA[] public SLAs;
+    address[] public SLAs;
     /// @dev stores the indexes of service level agreements owned by an user
     mapping(address => uint256[]) private _userToSLAIndexes;
     /// @dev to check if registered SLA
@@ -32,7 +35,7 @@ contract SLARegistry is ISLARegistry {
     bool private immutable _checkPastPeriod;
 
     event SLACreated(
-        SLA indexed sla,
+        address indexed sla,
         address indexed owner
     );
 
@@ -52,6 +55,7 @@ contract SLARegistry is ISLARegistry {
         address periodRegistry_,
         address messengerRegistry_,
         address stakeRegistry_,
+        address slaFactory_,
         bool checkPastPeriod_
     ) public {
         _sloRegistry = sloRegistry_;
@@ -62,6 +66,7 @@ contract SLARegistry is ISLARegistry {
         _messengerRegistry = messengerRegistry_;
         IMessengerRegistry(_messengerRegistry).setSLARegistry();
         _checkPastPeriod = checkPastPeriod_;
+        _slaFactory = slaFactory_;
     }
 
     function createSLA(
@@ -95,7 +100,7 @@ contract SLARegistry is ISLARegistry {
         require(IMessengerRegistry(_messengerRegistry)
             .registeredMessengers(messengerAddress_), 'invalid messenger');
 
-        SLA sla = new SLA(
+        address newSLA = ISLAFactory(_slaFactory).createSLA(
             msg.sender,
             whitelisted_,
             periodType_,
@@ -111,70 +116,70 @@ contract SLARegistry is ISLARegistry {
         ISLORegistry(_sloRegistry).registerSLO(
             sloValue_,
             sloType_,
-            address(sla)
+            newSLA
         );
         IStakeRegistry(_stakeRegistry).lockDSLAValue(
             msg.sender,
-            address(sla),
+            newSLA,
             finalPeriodId_ - initialPeriodId_ + 1
         );
-        SLAs.push(sla);
-        _registeredSLAs[address(sla)] = true;
+        SLAs.push(newSLA);
+        _registeredSLAs[newSLA] = true;
         _userToSLAIndexes[msg.sender].push(SLAs.length.sub(1));
-        emit SLACreated(sla, msg.sender);
+        emit SLACreated(newSLA, msg.sender);
     }
 
     function requestSLI(
         uint256 _periodId,
-        SLA _sla,
+        address _sla,
         bool _ownerApproval
     ) public {
-        require(isRegisteredSLA(address(_sla)), 'invalid SLA');
+        require(isRegisteredSLA(_sla), 'invalid SLA');
         require(
-            _periodId == _sla.nextVerifiablePeriod(),
+            _periodId == ISLA(_sla).nextVerifiablePeriod(),
             'not nextVerifiablePeriod'
         );
-        (, , SLA.Status status) = _sla.periodSLIs(_periodId);
-        require(status == SLA.Status.NotVerified, 'invalid SLA status');
-        bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
+        ISLA.PeriodSLI memory periodSli = ISLA(_sla).periodSLIs(_periodId);
+        require(periodSli.status == ISLA.Status.NotVerified, 'invalid SLA status');
+        bool slaAllowedPeriodId = ISLA(_sla).isAllowedPeriod(_periodId);
         require(slaAllowedPeriodId, 'invalid period');
-        IPeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
+        IPeriodRegistry.PeriodType slaPeriodType = ISLA(_sla).periodType();
         bool periodFinished = IPeriodRegistry(_periodRegistry).periodIsFinished(
             slaPeriodType,
             _periodId
         );
         require(periodFinished, 'period unfinished');
-        address slaMessenger = _sla.messengerAddress();
-        emit SLIRequested(_periodId, address(_sla), msg.sender);
+        address slaMessenger = ISLA(_sla).messengerAddress();
+        emit SLIRequested(_periodId, _sla, msg.sender);
         IMessenger(slaMessenger).requestSLI(
             _periodId,
-            address(_sla),
+            _sla,
             _ownerApproval,
             msg.sender
         );
         IStakeRegistry(_stakeRegistry).distributeVerificationRewards(
-            address(_sla),
+            _sla,
             msg.sender,
             _periodId
         );
     }
 
-    function returnLockedValue(SLA _sla) public {
-        require(isRegisteredSLA(address(_sla)), 'invalid SLA');
-        require(msg.sender == _sla.owner(), 'msg.sender not owner');
-        uint256 lastValidPeriodId = _sla.finalPeriodId();
-        IPeriodRegistry.PeriodType periodType = _sla.periodType();
+    function returnLockedValue(address _sla) public {
+        require(isRegisteredSLA(_sla), 'invalid SLA');
+        require(msg.sender == ISLA(_sla).owner(), 'msg.sender not owner');
+        uint256 lastValidPeriodId = ISLA(_sla).finalPeriodId();
+        IPeriodRegistry.PeriodType periodType = ISLA(_sla).periodType();
         (, uint256 endOfLastValidPeriod) = IPeriodRegistry(_periodRegistry)
             .getPeriodStartAndEnd(periodType, lastValidPeriodId);
 
-        (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(lastValidPeriodId);
+        ISLA.PeriodSLI memory lastPeriodSLI = ISLA(_sla).periodSLIs(lastValidPeriodId);
         require(
             (block.timestamp >= endOfLastValidPeriod &&
-                lastPeriodStatus != SLA.Status.NotVerified),
+                lastPeriodSLI.status != ISLA.Status.NotVerified),
             'not finished contract'
         );
-        emit ReturnLockedValue(address(_sla), msg.sender);
-        IStakeRegistry(_stakeRegistry).returnLockedValue(address(_sla));
+        emit ReturnLockedValue(_sla, msg.sender);
+        IStakeRegistry(_stakeRegistry).returnLockedValue(_sla);
     }
 
     function registerMessenger(
@@ -189,15 +194,15 @@ contract SLARegistry is ISLARegistry {
         );
     }
 
-    function userSLAs(address _user) public view returns (SLA[] memory) {
-        SLA[] memory SLAList = new SLA[](_userToSLAIndexes[_user].length);
+    function userSLAs(address _user) public view returns (address[] memory) {
+        address[] memory SLAList = new address[](_userToSLAIndexes[_user].length);
         for (uint256 i = 0; i < _userToSLAIndexes[_user].length; i++) {
             SLAList[i] = (SLAs[_userToSLAIndexes[_user][i]]);
         }
         return (SLAList);
     }
 
-    function allSLAs() public view returns (SLA[] memory) {
+    function allSLAs() public view returns (address[] memory) {
         return (SLAs);
     }
 

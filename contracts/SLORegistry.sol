@@ -13,10 +13,6 @@ import './interfaces/ISLORegistry.sol';
 contract SLORegistry is ISLORegistry {
     using SafeMath for uint256;
 
-    struct SLO {
-        uint256 sloValue;
-        SLOType sloType;
-    }
     /**
      * @dev SLO Registered event
      * @param sla 1. -
@@ -26,7 +22,7 @@ contract SLORegistry is ISLORegistry {
     event SLORegistered(address indexed sla, uint256 sloValue, SLOType sloType);
 
     address private slaRegistry;
-    mapping(address => SLO) public registeredSLO;
+    mapping(address => SLO) private _registeredSLO;
 
     modifier onlySLARegistry() {
         require(
@@ -56,11 +52,15 @@ contract SLORegistry is ISLORegistry {
         SLOType _sloType,
         address _slaAddress
     ) public override onlySLARegistry {
-        registeredSLO[_slaAddress] = SLO({
+        _registeredSLO[_slaAddress] = SLO({
             sloValue: _sloValue,
             sloType: _sloType
         });
         emit SLORegistered(_slaAddress, _sloValue, _sloType);
+    }
+
+    function registeredSLO(address sla) public override view returns (SLO memory) {
+        return _registeredSLO[sla];
     }
 
     /**
@@ -74,7 +74,7 @@ contract SLORegistry is ISLORegistry {
         view
         returns (bool)
     {
-        SLO memory slo = registeredSLO[_slaAddress];
+        SLO memory slo = _registeredSLO[_slaAddress];
         SLOType sloType = slo.sloType;
         uint256 sloValue = slo.sloValue;
 
@@ -117,8 +117,8 @@ contract SLORegistry is ISLORegistry {
         address _slaAddress,
         uint256 _precision
     ) public view override returns (uint256) {
-        SLOType sloType = registeredSLO[_slaAddress].sloType;
-        uint256 sloValue = registeredSLO[_slaAddress].sloValue;
+        SLOType sloType = _registeredSLO[_slaAddress].sloType;
+        uint256 sloValue = _registeredSLO[_slaAddress].sloValue;
 
         // Ensures a positive deviation for greater / small comparisions
         // The deviation is the percentage difference between SLI and SLO

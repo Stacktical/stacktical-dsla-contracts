@@ -32,9 +32,9 @@ contract Staking is Ownable {
     mapping(address => uint256) public usersPool;
 
     ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for users
-    mapping(address => dToken) public duTokenRegistry;
+    mapping(address => address) public duTokenRegistry;
     ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for provider
-    mapping(address => dToken) public dpTokenRegistry;
+    mapping(address => address) public dpTokenRegistry;
 
     /// @dev address[] of the stakers of the SLA contract
     address[] public stakers;
@@ -175,8 +175,8 @@ contract Staking is Ownable {
         dToken duToken = dToken(createDToken(_name, _symbol, decimals, true));
         dToken dpToken = dToken(createDToken(_name, _symbol, decimals, false));
 
-        dpTokenRegistry[_tokenAddress] = dpToken;
-        duTokenRegistry[_tokenAddress] = duToken;
+        dpTokenRegistry[_tokenAddress] = address(dpToken);
+        duTokenRegistry[_tokenAddress] = address(duToken);
         emit DTokensCreated(
             _tokenAddress,
             address(dpToken),
@@ -237,7 +237,7 @@ contract Staking is Ownable {
                 usersStake.add(_amount).mul(leverage) <= providerStake,
                 'user stake'
             );
-            dToken duToken = duTokenRegistry[_tokenAddress];
+            dToken duToken = dToken(duTokenRegistry[_tokenAddress]);
             uint256 p0 = duToken.totalSupply();
 
             // If there are no minted tokens, then mint them 1:1
@@ -258,7 +258,7 @@ contract Staking is Ownable {
             keccak256(abi.encodePacked(_position)) ==
             keccak256(abi.encodePacked('long'))
         ) {
-            dToken dpToken = dpTokenRegistry[_tokenAddress];
+            dToken dpToken = dToken(dpTokenRegistry[_tokenAddress]);
             uint256 p0 = dpToken.totalSupply();
 
             if (p0 == 0) {
@@ -339,7 +339,7 @@ contract Staking is Ownable {
         internal
         onlyAllowedToken(_tokenAddress)
     {
-        dToken dpToken = dpTokenRegistry[_tokenAddress];
+        dToken dpToken = dToken(dpTokenRegistry[_tokenAddress]);
         uint256 p0 = dpToken.totalSupply();
         uint256 t0 = providerPool[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the Provider Pool / DSLA-SP Pool average
@@ -354,7 +354,7 @@ contract Staking is Ownable {
         internal
         onlyAllowedToken(_tokenAddress)
     {
-        dToken duToken = duTokenRegistry[_tokenAddress];
+        dToken duToken = dToken(duTokenRegistry[_tokenAddress]);
         uint256 p0 = duToken.totalSupply();
         uint256 t0 = usersPool[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the User Pool / DSLA-SP Pool average
