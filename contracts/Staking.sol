@@ -18,7 +18,7 @@ contract Staking is Ownable {
     /// @dev StakeRegistry contract
     IStakeRegistry private _stakeRegistry;
     /// @dev SLARegistry contract
-    IPeriodRegistry private immutable _periodRegistry;
+    IPeriodRegistry internal immutable _periodRegistry;
     /// @dev DSLA token address to burn fees
     address private immutable _dslaTokenAddress;
 
