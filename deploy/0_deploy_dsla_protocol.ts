@@ -15,6 +15,7 @@ module.exports = async ({
   };
 
   await deploy(CONTRACT_NAMES.StringUtils, baseOptions);
+  await deploy(CONTRACT_NAMES.SLAFactory, baseOptions);
   await deploy(CONTRACT_NAMES.PeriodRegistry, baseOptions);
   await deploy(CONTRACT_NAMES.SLORegistry, baseOptions);
   await deploy(CONTRACT_NAMES.MessengerRegistry, baseOptions);
@@ -34,6 +35,7 @@ module.exports = async ({
   const messengerRegistry = await get(CONTRACT_NAMES.MessengerRegistry);
   const stakeRegistry = await get(CONTRACT_NAMES.StakeRegistry);
   const stringUtils = await get(CONTRACT_NAMES.StringUtils);
+  const slaFactory = await get(CONTRACT_NAMES.SLAFactory);
 
   const checkPastPeriods = false;
   await deploy(CONTRACT_NAMES.SLARegistry, {
@@ -44,6 +46,7 @@ module.exports = async ({
       periodRegistry.address,
       messengerRegistry.address,
       stakeRegistry.address,
+      slaFactory.address,
       checkPastPeriods,
     ],
     libraries: {

@@ -19,7 +19,7 @@ module.exports = async ({
   };
 
   await deploy(CONTRACT_NAMES.StringUtils, baseOptions);
-
+  await deploy(CONTRACT_NAMES.SLAFactory, baseOptions);
   await deploy(CONTRACT_NAMES.PeriodRegistry, baseOptions);
   const periodRegistryArtifact = await deployments.getArtifact(
     CONTRACT_NAMES.PeriodRegistry
@@ -58,7 +58,9 @@ module.exports = async ({
   const sloRegistry = await ethers.getContract(CONTRACT_NAMES.SLORegistry);
   const stakeRegistry = await ethers.getContract(CONTRACT_NAMES.StakeRegistry);
   const stringUtils = await ethers.getContract(CONTRACT_NAMES.StringUtils);
+  const slaFactory = await ethers.getContract(CONTRACT_NAMES.SLAFactory);
   const checkPastPeriods = false;
+
   await deploy(CONTRACT_NAMES.SLARegistry, {
     ...baseOptions,
     args: [
@@ -66,6 +68,7 @@ module.exports = async ({
       periodRegistry.address,
       messengerRegistry.address,
       stakeRegistry.address,
+      slaFactory.address,
       checkPastPeriods,
     ],
     libraries: {

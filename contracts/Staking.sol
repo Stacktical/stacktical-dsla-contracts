@@ -107,14 +107,14 @@ contract Staking is Ownable {
     );
 
     constructor(
-        ISLARegistry slaRegistry_,
+        address slaRegistry_,
         bool whitelistedContract_,
         uint128 slaID_,
         uint64 leverage_,
         address contractOwner_
     ) public {
-        _stakeRegistry = IStakeRegistry(slaRegistry_.stakeRegistry());
-        _periodRegistry = IPeriodRegistry(slaRegistry_.periodRegistry());
+        _stakeRegistry = IStakeRegistry(ISLARegistry(slaRegistry_).stakeRegistry());
+        _periodRegistry = IPeriodRegistry(ISLARegistry(slaRegistry_).periodRegistry());
         whitelistedContract = whitelistedContract_;
         (
             uint256 _DSLAburnRate,
@@ -194,17 +194,15 @@ contract Staking is Ownable {
         uint8 _decimals,
         bool direction
     ) internal returns (address) {
-        string memory name;
-        string memory symbol;
         string memory dTokenID = StringUtils.uintToStr(slaID);
         if(direction) { // DOWN
-            name = string(abi.encodePacked(_name, ' (DOWN)'));
-            symbol = string(abi.encodePacked(_symbol ,'-DOWN-', dTokenID));
+            _name = string(abi.encodePacked(_name, ' (DOWN)'));
+            _symbol = string(abi.encodePacked(_symbol ,'-DOWN-', dTokenID));
         } else {        // UP
-            name = string(abi.encodePacked(_name, ' (UP)'));
-            symbol = string(abi.encodePacked(_symbol, '-UP-', dTokenID));
+            _name = string(abi.encodePacked(_name, ' (UP)'));
+            _symbol = string(abi.encodePacked(_symbol, '-UP-', dTokenID));
         }
-        return _stakeRegistry.createDToken(name, symbol, _decimals);
+        return _stakeRegistry.createDToken(_name, _symbol, _decimals);
     }
 
     function _stake(

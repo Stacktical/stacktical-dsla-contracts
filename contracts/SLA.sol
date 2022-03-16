@@ -89,7 +89,7 @@ contract SLA is Staking {
     )
         public
         Staking(
-            ISLARegistry(msg.sender),
+            msg.sender,
             _whitelisted,
             _slaID,
             _leverage,

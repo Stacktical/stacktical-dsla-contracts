@@ -3,14 +3,14 @@ pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import './interfaces/ISLA.sol';
-import './interfaces/ISLORegistry.sol';
-import './interfaces/IPeriodRegistry.sol';
-import './interfaces/IMessengerRegistry.sol';
-import './interfaces/IStakeRegistry.sol';
 import './interfaces/IMessenger.sol';
+import './interfaces/IMessengerRegistry.sol';
+import './interfaces/IPeriodRegistry.sol';
+import './interfaces/ISLA.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/ISLAFactory.sol';
+import './interfaces/ISLORegistry.sol';
+import './interfaces/IStakeRegistry.sol';
 
 contract SLARegistry is ISLARegistry {
     using SafeMath for uint256;
@@ -67,6 +67,7 @@ contract SLARegistry is ISLARegistry {
         IMessengerRegistry(_messengerRegistry).setSLARegistry();
         _checkPastPeriod = checkPastPeriod_;
         _slaFactory = slaFactory_;
+        ISLAFactory(_slaFactory).setSLARegistry();
     }
 
     function createSLA(

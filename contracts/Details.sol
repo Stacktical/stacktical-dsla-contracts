@@ -4,11 +4,10 @@ pragma experimental ABIEncoderV2;
 
 import './interfaces/ISLA.sol';
 import './interfaces/ISLORegistry.sol';
-import './Staking.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessengerRegistry.sol';
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import './interfaces/IERC20Query.sol';
 
 /**
  * @title Details
@@ -134,28 +133,28 @@ contract Details {
             dpTokens[index] = DtokenDetails({
                 dTokenAddress: dpTokenAddress,
                 tokenAddress: tokenAddress,
-                totalSupply: ERC20(dpTokenAddress).totalSupply(),
-                dTokenSymbol: ERC20(dpTokenAddress).symbol(),
-                dTokenName: ERC20(dpTokenAddress).name(),
+                totalSupply: IERC20Query(dpTokenAddress).totalSupply(),
+                dTokenSymbol: IERC20Query(dpTokenAddress).symbol(),
+                dTokenName: IERC20Query(dpTokenAddress).name(),
                 balance: fromOwner
-                    ? ERC20(dpTokenAddress).balanceOf(_owner)
+                    ? IERC20Query(dpTokenAddress).balanceOf(_owner)
                     : 0,
                 allowance: fromOwner
-                    ? ERC20(dpTokenAddress).allowance(_owner, _slaAddress)
+                    ? IERC20Query(dpTokenAddress).allowance(_owner, _slaAddress)
                     : 0
             });
             address duTokenAddress = address(sla.duTokenRegistry(tokenAddress));
             duTokens[index] = DtokenDetails({
                 dTokenAddress: duTokenAddress,
                 tokenAddress: tokenAddress,
-                totalSupply: ERC20(duTokenAddress).totalSupply(),
-                dTokenSymbol: ERC20(duTokenAddress).symbol(),
-                dTokenName: ERC20(duTokenAddress).name(),
+                totalSupply: IERC20Query(duTokenAddress).totalSupply(),
+                dTokenSymbol: IERC20Query(duTokenAddress).symbol(),
+                dTokenName: IERC20Query(duTokenAddress).name(),
                 balance: fromOwner
-                    ? ERC20(duTokenAddress).balanceOf(_owner)
+                    ? IERC20Query(duTokenAddress).balanceOf(_owner)
                     : 0,
                 allowance: fromOwner
-                    ? ERC20(duTokenAddress).allowance(_owner, _slaAddress)
+                    ? IERC20Query(duTokenAddress).allowance(_owner, _slaAddress)
                     : 0
             });
         }

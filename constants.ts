@@ -33,6 +33,7 @@ export enum CONTRACT_NAMES {
   PeriodRegistry = 'PeriodRegistry',
   SEMessenger = 'SEMessenger',
   SLA = 'SLA',
+  SLAFactory = 'SLAFactory',
   SLORegistry = 'SLORegistry',
   SLARegistry = 'SLARegistry',
   StakeRegistry = 'StakeRegistry',

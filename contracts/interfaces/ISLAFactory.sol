@@ -9,4 +9,6 @@ interface ISLAFactory {
 		address, uint128, uint128, uint128,
 		string calldata, bytes32[] calldata, uint64
 	) external returns (address);
+
+	function setSLARegistry() external;
 }
