@@ -95,9 +95,11 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 		await ethers.getSigner(deployer),
 		iMessengerArtifact.abi
 	);
-	mockMessenger.mock.requestSLI.returns();
-	mockMessenger.mock.owner.returns(deployer);
-	mockMessenger.mock.setSLARegistry.returns();
+	await mockMessenger.mock.lpName.returns('UPTIME.ok');
+	await mockMessenger.mock.spName.returns('UPTIME.ko');
+	await mockMessenger.mock.requestSLI.returns();
+	await mockMessenger.mock.owner.returns(deployer);
+	await mockMessenger.mock.setSLARegistry.returns();
 
 	let tx = await slaRegistry.createSLA(
 		slaConfig.sloValue,
