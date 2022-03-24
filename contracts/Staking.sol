@@ -8,6 +8,7 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
+import './interfaces/IMessenger.sol';
 import './dToken.sol';
 import './StringUtils.sol';
 
@@ -21,7 +22,8 @@ contract Staking is Ownable {
     IPeriodRegistry internal immutable _periodRegistry;
     /// @dev DSLA token address to burn fees
     address private immutable _dslaTokenAddress;
-
+    /// @dev messenger address
+    address public immutable messengerAddress;
     /// @dev current SLA id
     uint128 public immutable slaID;
 
@@ -110,7 +112,8 @@ contract Staking is Ownable {
         bool whitelistedContract_,
         uint128 slaID_,
         uint64 leverage_,
-        address contractOwner_
+        address contractOwner_,
+        address messengerAddress_
     ) public {
         _stakeRegistry = IStakeRegistry(slaRegistry_.stakeRegistry());
         _periodRegistry = IPeriodRegistry(slaRegistry_.periodRegistry());
@@ -135,6 +138,7 @@ contract Staking is Ownable {
             'incorrect leverage'
         );
         leverage = leverage_;
+        messengerAddress = messengerAddress_;
     }
 
     function addUsersToWhitelist(address[] memory _userAddresses)
@@ -167,15 +171,11 @@ contract Staking is Ownable {
         allowedTokens.push(_tokenAddress);
         require(maxTokenLength >= allowedTokens.length, 'max token length');
         string memory dTokenID = StringUtils.uintToStr(slaID);
-        string memory duTokenName = string(
-            abi.encodePacked('DSLA-SHORT-', dTokenID)
-        );
+        string memory duTokenName = IMessenger(messengerAddress).spName();
         string memory duTokenSymbol = string(
             abi.encodePacked('DSLA-SP-', dTokenID)
         );
-        string memory dpTokenName = string(
-            abi.encodePacked('DSLA-LONG-', dTokenID)
-        );
+        string memory dpTokenName = IMessenger(messengerAddress).lpName();
         string memory dpTokenSymbol = string(
             abi.encodePacked('DSLA-LP-', dTokenID)
         );
@@ -194,10 +194,10 @@ contract Staking is Ownable {
             _tokenAddress,
             address(dpToken),
             dpTokenName,
-            dpTokenName,
+            dpTokenSymbol,
             address(duToken),
             duTokenName,
-            duTokenName
+            duTokenSymbol
         );
     }
 

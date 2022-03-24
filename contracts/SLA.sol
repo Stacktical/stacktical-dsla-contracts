@@ -28,7 +28,6 @@ contract SLA is Staking {
 
     //
     string public ipfsHash;
-    address public immutable messengerAddress;
     ISLARegistry private _slaRegistry;
     SLORegistry private immutable _sloRegistry;
     uint256 public immutable creationBlockNumber;
@@ -93,12 +92,12 @@ contract SLA is Staking {
             _whitelisted,
             _slaID,
             _leverage,
-            _owner
+            _owner,
+            _messengerAddress
         )
     {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;
-        messengerAddress = _messengerAddress;
         _slaRegistry = ISLARegistry(msg.sender);
         _sloRegistry = SLORegistry(_slaRegistry.sloRegistry());
         creationBlockNumber = block.number;
