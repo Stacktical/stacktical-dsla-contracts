@@ -163,19 +163,38 @@ contract SLA is Staking {
     }
 
     function stakeTokens(
+        address _tokenAddress,
         uint256 _amount,
-        address _token,
         string calldata _position
     ) external {
-        require(_amount > 0, "zero staking not allowed.");
+        require(_amount > 0, 'Stake must be greater than 0.');
+
         string memory position = _position;
-        bool isContractFinished = contractFinished();
-        require(!isContractFinished, 'finished contract');
-        _stake(_token, nextVerifiablePeriod, _amount, position);
-        emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount, position);
+
+        (, uint256 finalPeriodEnd) = _periodRegistry.getPeriodStartAndEnd(
+            periodType,
+            finalPeriodId
+        );
+
+        require(
+            block.timestamp < finalPeriodEnd,
+            'Staking disabled after the last period.'
+        );
+
+        _stake(_tokenAddress, nextVerifiablePeriod, _amount, _position);
+
+        emit Stake(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount,
+            position
+        );
+
         IStakeRegistry stakeRegistry = IStakeRegistry(
             _slaRegistry.stakeRegistry()
         );
+
         stakeRegistry.registerStakedSla(msg.sender);
     }
 
@@ -191,7 +210,7 @@ contract SLA is Staking {
             msg.sender,
             _amount
         );
-        _withdrawProviderTokens(_amount, _tokenAddress);
+        _withdrawProviderTokens(_amount, _tokenAddress, nextVerifiablePeriod);
     }
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
@@ -206,7 +225,7 @@ contract SLA is Staking {
             msg.sender,
             _amount
         );
-        _withdrawUserTokens(_amount, _tokenAddress);
+        _withdrawUserTokens(_amount, _tokenAddress, nextVerifiablePeriod);
     }
 
     function getStakersLength() external view returns (uint256) {

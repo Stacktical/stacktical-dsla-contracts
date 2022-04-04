@@ -70,7 +70,7 @@ contract Staking is Ownable {
     uint256 private protocolRewardsRate = 15; // 0.15%
 
     modifier onlyAllowedToken(address _token) {
-        require(isAllowedToken(_token) == true, 'token not allowed');
+        require(isAllowedToken(_token), 'token not allowed');
         _;
     }
 
@@ -86,8 +86,8 @@ contract Staking is Ownable {
     }
 
     modifier onlyWhitelisted() {
-        if (whitelistedContract == true) {
-            require(whitelist[msg.sender] == true, 'not whitelisted');
+        if (whitelistedContract) {
+            require(whitelist[msg.sender], 'not whitelisted');
         }
         _;
     }
@@ -155,7 +155,7 @@ contract Staking is Ownable {
         onlyOwner
     {
         for (uint256 index = 0; index < _userAddresses.length; index++) {
-            if (whitelist[_userAddresses[index]] == false) {
+            if (!whitelist[_userAddresses[index]]) {
                 whitelist[_userAddresses[index]] = true;
             }
         }
@@ -166,7 +166,7 @@ contract Staking is Ownable {
         onlyOwner
     {
         for (uint256 index = 0; index < _userAddresses.length; index++) {
-            if (whitelist[_userAddresses[index]] == true) {
+            if (whitelist[_userAddresses[index]]) {
                 whitelist[_userAddresses[index]] = false;
             }
         }
@@ -241,10 +241,12 @@ contract Staking is Ownable {
                 providerPool[_tokenAddress],
                 usersPool[_tokenAddress]
             );
+
             require(
                 usersStake.add(_amount).mul(leverage) <= providerStake,
-                'user stake'
+                'Stake exceeds leveraged cap.'
             );
+
             dToken duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
 
@@ -287,7 +289,7 @@ contract Staking is Ownable {
             lastProviderStake[msg.sender] = _nextVerifiablePeriod;
         }
 
-        if (registeredStakers[msg.sender] == false) {
+        if (!registeredStakers[msg.sender]) {
             registeredStakers[msg.sender] = true;
             stakers.push(msg.sender);
         }
@@ -347,10 +349,22 @@ contract Staking is Ownable {
         }
     }
 
-    function _withdrawProviderTokens(uint256 _amount, address _tokenAddress)
-        internal
-        onlyAllowedToken(_tokenAddress)
-    {
+    function _withdrawProviderTokens(
+        uint256 _amount,
+        address _tokenAddress,
+        uint256 _nextVerifiablePeriod
+    ) internal onlyAllowedToken(_tokenAddress) {
+        require(
+            lastProviderStake[msg.sender] < _nextVerifiablePeriod,
+            'Provider lock-up until the next verification.'
+        );
+
+        require(
+            providerPool[_tokenAddress].sub(_amount) >=
+                usersPool[_tokenAddress].mul(leverage),
+            'Withdrawal exceeds leveraged cap.'
+        );
+
         dToken dpToken = dpTokenRegistry[_tokenAddress];
         uint256 p0 = dpToken.totalSupply();
         uint256 t0 = providerPool[_tokenAddress];
@@ -366,10 +380,16 @@ contract Staking is Ownable {
         ERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
     }
 
-    function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
-        internal
-        onlyAllowedToken(_tokenAddress)
-    {
+    function _withdrawUserTokens(
+        uint256 _amount,
+        address _tokenAddress,
+        uint256 _nextVerifiablePeriod
+    ) internal onlyAllowedToken(_tokenAddress) {
+        require(
+            lastUserStake[msg.sender] < _nextVerifiablePeriod,
+            'User lock-up until the next verification.'
+        );
+
         dToken duToken = duTokenRegistry[_tokenAddress];
         uint256 p0 = duToken.totalSupply();
         uint256 t0 = usersPool[_tokenAddress];

@@ -21,6 +21,7 @@ import {
 const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
+import { currentTimestamp, evm_increaseTime, ONE_DAY } from '../helper';
 
 const leverage = 10;
 const baseSLAConfig = {
@@ -110,6 +111,12 @@ describe(CONTRACT_NAMES.SLA, function () {
     const { sla, dslaToken } = fixture;
     await expect(sla.stakeTokens(0, dslaToken.address, 'long'))
       .to.be.revertedWith('zero staking not allowed.');
+  })
+  it('should not allow staking after the end of last period', async () => {
+    const { sla, dslaToken } = fixture;
+    await evm_increaseTime(currentTimestamp + ONE_DAY * 3);
+    await expect(sla.stakeTokens(mintAmount, dslaToken.address, 'long'))
+      .to.be.revertedWith('Staking disabled after the last period');
   })
   it('should not let notDeployer withdraw tokens if the contract is not finished', async function () {
     const { sla, dslaToken, details } = fixture;
