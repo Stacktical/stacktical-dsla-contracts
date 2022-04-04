@@ -19,8 +19,12 @@ contract Staking is Ownable {
     IStakeRegistry private _stakeRegistry;
 
     /// @dev SLARegistry contract
+<<<<<<< HEAD
     IPeriodRegistry private immutable _periodRegistry;
 
+=======
+    IPeriodRegistry internal immutable _periodRegistry;
+>>>>>>> feature/3.0.0-alpha-2
     /// @dev DSLA token address to burn fees
     address private immutable _dslaTokenAddress;
 
@@ -295,7 +299,7 @@ contract Staking is Ownable {
         }
     }
 
-    function _setRespectedPeriodReward(
+    function _setProviderReward(
         uint256 _periodId,
         uint256 _rewardPercentage,
         uint256 _precision
@@ -319,7 +323,7 @@ contract Staking is Ownable {
         }
     }
 
-    function _setUsersCompensation(
+    function _setUserReward(
         uint256 _periodId,
         uint256 _rewardPercentage,
         uint256 _precision

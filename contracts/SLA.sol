@@ -30,7 +30,6 @@ contract SLA is Staking {
     string public ipfsHash;
     address public immutable messengerAddress;
     ISLARegistry private _slaRegistry;
-    IPeriodRegistry private immutable _periodRegistry;
     SLORegistry private immutable _sloRegistry;
     uint256 public immutable creationBlockNumber;
     uint128 public immutable initialPeriodId;
@@ -101,7 +100,6 @@ contract SLA is Staking {
         ipfsHash = _ipfsHash;
         messengerAddress = _messengerAddress;
         _slaRegistry = ISLARegistry(msg.sender);
-        _periodRegistry = IPeriodRegistry(_slaRegistry.periodRegistry());
         _sloRegistry = SLORegistry(_slaRegistry.sloRegistry());
         creationBlockNumber = block.number;
         initialPeriodId = _initialPeriodId;
@@ -130,20 +128,14 @@ contract SLA is Staking {
             precision
         );
 
-        uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
-
-        uint256 rewardPercentage = deviation.mul(normalizedPeriodId).div(
-            finalPeriodId - initialPeriodId + 1
-        );
-
         if (_sloRegistry.isRespected(sliValue, address(this))) {
             periodSLI.status = Status.Respected;
 
-            _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
+            _setProviderReward(_periodId, deviation, precision);
         } else {
             periodSLI.status = Status.NotRespected;
 
-            _setUsersCompensation(_periodId, rewardPercentage, precision);
+            _setUserReward(_periodId, deviation, precision);
         }
     }
 
