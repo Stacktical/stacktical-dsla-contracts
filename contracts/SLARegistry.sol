@@ -3,6 +3,7 @@ pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
+import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './SLA.sol';
 import './SLORegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
@@ -11,7 +12,7 @@ import './interfaces/IStakeRegistry.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/ISLARegistry.sol';
 
-contract SLARegistry is ISLARegistry {
+contract SLARegistry is ISLARegistry, ReentrancyGuard {
     using SafeMath for uint256;
 
     /// @dev SLO registry
@@ -69,7 +70,7 @@ contract SLARegistry is ISLARegistry {
         string memory ipfsHash_,
         bytes32[] memory extraData_,
         uint64 leverage_
-    ) public {
+    ) public nonReentrant {
         bool validPeriod = IPeriodRegistry(_periodRegistry).isValidPeriod(
             periodType_,
             initialPeriodId_

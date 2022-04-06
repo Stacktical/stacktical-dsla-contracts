@@ -5,6 +5,7 @@ import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
+import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
@@ -12,7 +13,7 @@ import './interfaces/IMessenger.sol';
 import './dToken.sol';
 import './StringUtils.sol';
 
-contract Staking is Ownable {
+contract Staking is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for ERC20;
 
@@ -210,6 +211,7 @@ contract Staking is Ownable {
         onlyAllowedToken(_tokenAddress)
         onlyAllowedPosition(_position)
         onlyWhitelisted
+        nonReentrant
     {
         ERC20(_tokenAddress).safeTransferFrom(
             msg.sender,
@@ -231,6 +233,8 @@ contract Staking is Ownable {
                 usersStake.add(_amount).mul(leverage) <= providerStake,
                 'user stake'
             );
+            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
+
             dToken duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
 
@@ -243,7 +247,6 @@ contract Staking is Ownable {
                 uint256 mintedDUTokens = _amount.mul(p0).div(t0);
                 duToken.mint(msg.sender, mintedDUTokens);
             }
-            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
         }
 
         // DSLA-LP proofs of SLA Position
@@ -252,6 +255,10 @@ contract Staking is Ownable {
             keccak256(abi.encodePacked(_position)) ==
             keccak256(abi.encodePacked('long'))
         ) {
+            providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
+                _amount
+            );
+
             dToken dpToken = dpTokenRegistry[_tokenAddress];
             uint256 p0 = dpToken.totalSupply();
 
@@ -263,10 +270,6 @@ contract Staking is Ownable {
                 uint256 mintedDPTokens = _amount.mul(p0).div(t0);
                 dpToken.mint(msg.sender, mintedDPTokens);
             }
-
-            providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
-                _amount
-            );
         }
 
         if (!registeredStakers[msg.sender]) {
@@ -332,6 +335,7 @@ contract Staking is Ownable {
     function _withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
+        nonReentrant
     {
         dToken dpToken = dpTokenRegistry[_tokenAddress];
         uint256 p0 = dpToken.totalSupply();
@@ -348,6 +352,7 @@ contract Staking is Ownable {
     function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
+        nonReentrant
     {
         dToken duToken = duTokenRegistry[_tokenAddress];
         uint256 p0 = duToken.totalSupply();
