@@ -193,10 +193,9 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
     function userSLAs(address _user) public view returns (SLA[] memory) {
         uint256 count = _userToSLAIndexes[_user].length;
         SLA[] memory SLAList = new SLA[](count);
-        uint256[] memory userSLAIndexes = _userToSLAIndexes[_user];
 
         for (uint256 i = 0; i < count; i++) {
-            SLAList[i] = (SLAs[userSLAIndexes[i]]);
+            SLAList[i] = (SLAs[_userToSLAIndexes[_user][i]]);
         }
 
         return (SLAList);

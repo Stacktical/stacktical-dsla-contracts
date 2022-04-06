@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.6;
 
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
@@ -10,12 +10,13 @@ import './interfaces/IStakeRegistry.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessenger.sol';
+import './interfaces/IERC20Query.sol';
 import './dToken.sol';
 import './StringUtils.sol';
 
 contract Staking is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
-    using SafeERC20 for ERC20;
+    using SafeERC20 for IERC20;
 
     /// @dev StakeRegistry contract
     IStakeRegistry private _stakeRegistry;
@@ -180,7 +181,7 @@ contract Staking is Ownable, ReentrancyGuard {
         string memory dpTokenSymbol = string(
             abi.encodePacked('DSLA-LP-', dTokenID)
         );
-        uint8 decimals = ERC20(_tokenAddress).decimals();
+        uint8 decimals = IERC20Query(_tokenAddress).decimals();
 
         dToken duToken = dToken(
             _stakeRegistry.createDToken(duTokenName, duTokenSymbol, decimals)
@@ -213,7 +214,7 @@ contract Staking is Ownable, ReentrancyGuard {
         onlyWhitelisted
         nonReentrant
     {
-        ERC20(_tokenAddress).safeTransferFrom(
+        IERC20(_tokenAddress).safeTransferFrom(
             msg.sender,
             address(this),
             _amount
@@ -346,7 +347,7 @@ contract Staking is Ownable, ReentrancyGuard {
         dpToken.burnFrom(msg.sender, burnedDPTokens);
         providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
         uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
+        IERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
     }
 
     function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
@@ -363,7 +364,7 @@ contract Staking is Ownable, ReentrancyGuard {
         duToken.burnFrom(msg.sender, burnedDUTokens);
         usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
         uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
+        IERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
     }
 
     function _distributeClaimingRewards(
@@ -372,8 +373,8 @@ contract Staking is Ownable, ReentrancyGuard {
     ) internal returns (uint256) {
         uint slaOwnerRewards = _amount.mul(ownerRewardsRate).div(10000);
         uint protocolRewards = _amount.mul(protocolRewardsRate).div(10000);
-        ERC20(_tokenAddress).safeTransfer(owner(), slaOwnerRewards);
-        ERC20(_tokenAddress).safeTransfer(_stakeRegistry.owner(), protocolRewards);
+        IERC20(_tokenAddress).safeTransfer(owner(), slaOwnerRewards);
+        IERC20(_tokenAddress).safeTransfer(_stakeRegistry.owner(), protocolRewards);
         return _amount.sub(slaOwnerRewards).sub(protocolRewards);
     }
 
