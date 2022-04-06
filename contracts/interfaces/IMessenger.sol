@@ -92,6 +92,16 @@ abstract contract IMessenger is Ownable {
      */
     function fulfillsCounter() external view virtual returns (uint256);
 
+    /**
+     * @dev returns the name of DSLA-LP token
+     */
+    function lpName() external view virtual returns (string memory);
+
+    /**
+     * @dev returns the name of DSLA-SP token
+     */
+    function spName() external view virtual returns (string memory);
+
     function setChainlinkJobID(bytes32 _newJobId, uint256 _feeMultiplier)
         external
         virtual;
