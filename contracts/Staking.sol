@@ -123,7 +123,6 @@ contract Staking is Ownable, ReentrancyGuard {
             ,
             ,
             uint64 _maxLeverage,
-
         ) = _stakeRegistry.getStakingParameters();
         _dslaTokenAddress = _stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
@@ -216,12 +215,8 @@ contract Staking is Ownable, ReentrancyGuard {
         // DSLA-SP proofs of SLA Position
         // string memory short = 'short';
         if (_position == Position.SHORT) {
-            (uint256 providerStake, uint256 usersStake) = (
-                providerPool[_tokenAddress],
-                usersPool[_tokenAddress]
-            );
             require(
-                usersStake.add(_amount).mul(leverage) <= providerStake,
+                usersPool[_tokenAddress].add(_amount).mul(leverage) <= providerPool[_tokenAddress],
                 'user stake'
             );
             usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
@@ -233,10 +228,11 @@ contract Staking is Ownable, ReentrancyGuard {
             if (p0 == 0) {
                 duToken.mint(msg.sender, _amount);
             } else {
-                uint256 t0 = usersPool[_tokenAddress];
                 // mint dTokens proportionally
-                uint256 mintedDUTokens = _amount.mul(p0).div(t0);
-                duToken.mint(msg.sender, mintedDUTokens);
+                duToken.mint(
+                    msg.sender,
+                    _amount.mul(p0).div(usersPool[_tokenAddress])
+                );
             }
         }
 
@@ -253,10 +249,11 @@ contract Staking is Ownable, ReentrancyGuard {
             if (p0 == 0) {
                 dpToken.mint(msg.sender, _amount);
             } else {
-                uint256 t0 = providerPool[_tokenAddress];
                 // mint dTokens proportionally
-                uint256 mintedDPTokens = _amount.mul(p0).div(t0);
-                dpToken.mint(msg.sender, mintedDPTokens);
+                dpToken.mint(
+                    msg.sender,
+                    _amount.mul(p0).div(providerPool[_tokenAddress])
+                );
             }
         }
 
@@ -326,15 +323,17 @@ contract Staking is Ownable, ReentrancyGuard {
         nonReentrant
     {
         dToken dpToken = dpTokenRegistry[_tokenAddress];
-        uint256 p0 = dpToken.totalSupply();
-        uint256 t0 = providerPool[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the Provider Pool / DSLA-SP Pool average
         // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
-        uint256 burnedDPTokens = _amount.mul(p0).div(t0);
-        dpToken.burnFrom(msg.sender, burnedDPTokens);
+        dpToken.burnFrom(
+            msg.sender,
+            _amount.mul(dpToken.totalSupply()).div(providerPool[_tokenAddress])
+        );
         providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
-        uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
-        IERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
+        IERC20(_tokenAddress).safeTransfer(
+            msg.sender,
+            _distributeClaimingRewards(_amount, _tokenAddress)
+        );
     }
 
     function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
@@ -343,15 +342,17 @@ contract Staking is Ownable, ReentrancyGuard {
         nonReentrant
     {
         dToken duToken = duTokenRegistry[_tokenAddress];
-        uint256 p0 = duToken.totalSupply();
-        uint256 t0 = usersPool[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the User Pool / DSLA-SP Pool average
         // t0/p0 = (t0-_amount)/(p0-burnedDUTokens)
-        uint256 burnedDUTokens = _amount.mul(p0).div(t0);
-        duToken.burnFrom(msg.sender, burnedDUTokens);
+        duToken.burnFrom(
+            msg.sender,
+            _amount.mul(duToken.totalSupply()).div(usersPool[_tokenAddress])
+        );
         usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
-        uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
-        IERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
+        IERC20(_tokenAddress).safeTransfer(
+            msg.sender,
+            _distributeClaimingRewards(_amount, _tokenAddress)
+        );
     }
 
     function _distributeClaimingRewards(

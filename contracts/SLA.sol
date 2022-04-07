@@ -112,36 +112,29 @@ contract SLA is Staking {
         external
         onlyMessenger
     {
-        uint256 sliValue = _sli;
-        uint256 precision = 10000;
-
-        emit SLICreated(block.timestamp, sliValue, _periodId);
+        emit SLICreated(block.timestamp, _sli, _periodId);
         nextVerifiablePeriod = _periodId + 1;
         PeriodSLI storage periodSLI = periodSLIs[_periodId];
-        periodSLI.sli = sliValue;
+        periodSLI.sli = _sli;
         periodSLI.timestamp = block.timestamp;
 
         uint256 deviation = _sloRegistry.getDeviation(
-            sliValue,
+            _sli,
             address(this),
-            precision
+            10000
         );
 
-        if (_sloRegistry.isRespected(sliValue, address(this))) {
+        if (_sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
-
-            _setProviderReward(_periodId, deviation, precision);
+            _setProviderReward(_periodId, deviation, 10000);
         } else {
             periodSLI.status = Status.NotRespected;
-
-            _setUserReward(_periodId, deviation, precision);
+            _setUserReward(_periodId, deviation, 10000);
         }
     }
 
     function isAllowedPeriod(uint256 _periodId) external view returns (bool) {
-        if (_periodId < initialPeriodId) return false;
-        if (_periodId > finalPeriodId) return false;
-        return true;
+        return _periodId >= initialPeriodId && _periodId <= finalPeriodId;
     }
 
     function contractFinished() public view returns (bool) {
@@ -167,18 +160,15 @@ contract SLA is Staking {
         require(periodSLIs[finalPeriodId].status == Status.NotVerified, "Last period verfied, staking disabled");
         _stake(_amount, _token, _position);
         emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount, _position);
-        IStakeRegistry stakeRegistry = IStakeRegistry(
+        IStakeRegistry(
             _slaRegistry.stakeRegistry()
-        );
-        stakeRegistry.registerStakedSla(msg.sender);
+        ).registerStakedSla(msg.sender);
     }
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        bool isContractFinished = contractFinished();
-        require(isContractFinished, 'not finished');
-
+        require(contractFinished(), 'not finished');
         emit ProviderWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
@@ -191,9 +181,7 @@ contract SLA is Staking {
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        bool isContractFinished = contractFinished();
-        require(isContractFinished, 'not finished');
-
+        require(contractFinished(), 'not finished');
         emit UserWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
