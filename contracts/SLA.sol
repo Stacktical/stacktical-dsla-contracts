@@ -49,7 +49,7 @@ contract SLA is Staking {
         uint256 indexed periodId,
         address indexed caller,
         uint256 amount,
-        string position
+        Position position
     );
     event ProviderWithdraw(
         address indexed tokenAddress,
@@ -156,18 +156,17 @@ contract SLA is Staking {
     function stakeTokens(
         uint256 _amount,
         address _token,
-        string calldata _position
+        Position _position
     ) external {
         require(_amount > 0, "zero staking not allowed.");
-        string memory position = _position;
         (, uint256 endOfLastValidPeriod) = _periodRegistry.getPeriodStartAndEnd(
             periodType,
             finalPeriodId
         );
         require(block.timestamp < endOfLastValidPeriod, "Staking disabled after the last period");
         require(periodSLIs[finalPeriodId].status == Status.NotVerified, "Last period verfied, staking disabled");
-        _stake(_amount, _token, position);
-        emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount, position);
+        _stake(_amount, _token, _position);
+        emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount, _position);
         IStakeRegistry stakeRegistry = IStakeRegistry(
             _slaRegistry.stakeRegistry()
         );

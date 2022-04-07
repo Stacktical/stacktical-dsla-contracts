@@ -18,6 +18,11 @@ contract Staking is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
+    enum Position {
+        LONG,
+        SHORT
+    }
+
     /// @dev StakeRegistry contract
     IStakeRegistry private _stakeRegistry;
     /// @dev SLARegistry contract
@@ -62,17 +67,6 @@ contract Staking is Ownable, ReentrancyGuard {
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token), 'token not allowed');
-        _;
-    }
-
-    modifier onlyAllowedPosition(string memory _position) {
-        require(
-            keccak256(abi.encodePacked(_position)) ==
-                keccak256(abi.encodePacked('long')) ||
-                keccak256(abi.encodePacked(_position)) ==
-                keccak256(abi.encodePacked('short')),
-            'position not allowed'
-        );
         _;
     }
 
@@ -206,11 +200,10 @@ contract Staking is Ownable, ReentrancyGuard {
     function _stake(
         uint256 _amount,
         address _tokenAddress,
-        string memory _position
+        Position _position
     )
         internal
         onlyAllowedToken(_tokenAddress)
-        onlyAllowedPosition(_position)
         onlyWhitelisted
         nonReentrant
     {
@@ -222,10 +215,7 @@ contract Staking is Ownable, ReentrancyGuard {
 
         // DSLA-SP proofs of SLA Position
         // string memory short = 'short';
-        if (
-            keccak256(abi.encodePacked(_position)) ==
-            keccak256(abi.encodePacked('short'))
-        ) {
+        if (_position == Position.SHORT) {
             (uint256 providerStake, uint256 usersStake) = (
                 providerPool[_tokenAddress],
                 usersPool[_tokenAddress]
@@ -252,10 +242,7 @@ contract Staking is Ownable, ReentrancyGuard {
 
         // DSLA-LP proofs of SLA Position
         // string memory long = 'long';
-        if (
-            keccak256(abi.encodePacked(_position)) ==
-            keccak256(abi.encodePacked('long'))
-        ) {
+        if (_position == Position.LONG) {
             providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
                 _amount
             );
