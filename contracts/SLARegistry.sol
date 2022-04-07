@@ -71,29 +71,24 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         bytes32[] memory extraData_,
         uint64 leverage_
     ) public nonReentrant {
-        bool validPeriod = IPeriodRegistry(_periodRegistry).isValidPeriod(
+        require(IPeriodRegistry(_periodRegistry).isValidPeriod(
             periodType_,
             initialPeriodId_
-        );
-        require(validPeriod, 'first id invalid');
-        validPeriod = IPeriodRegistry(_periodRegistry).isValidPeriod(
+        ), 'first id invalid');
+        require(IPeriodRegistry(_periodRegistry).isValidPeriod(
             periodType_,
             finalPeriodId_
-        );
-        require(validPeriod, 'final id invalid');
-        bool initializedPeriod = IPeriodRegistry(_periodRegistry)
-            .isInitializedPeriod(periodType_);
-        require(initializedPeriod, 'period not initialized');
+        ), 'final id invalid');
+        require(IPeriodRegistry(_periodRegistry)
+            .isInitializedPeriod(periodType_), 'period not initialized');
         require(finalPeriodId_ >= initialPeriodId_, 'invalid final/initial');
 
         if (_checkPastPeriod) {
-            bool periodHasStarted = IPeriodRegistry(_periodRegistry)
-                .periodHasStarted(periodType_, initialPeriodId_);
-            require(!periodHasStarted, 'past period');
+            require(!IPeriodRegistry(_periodRegistry)
+                .periodHasStarted(periodType_, initialPeriodId_), 'past period');
         }
-        bool registeredMessenger = IMessengerRegistry(_messengerRegistry)
-            .registeredMessengers(messengerAddress_);
-        require(registeredMessenger, 'invalid messenger');
+        require(IMessengerRegistry(_messengerRegistry)
+            .registeredMessengers(messengerAddress_), 'invalid messenger');
 
         SLA sla = new SLA(
             msg.sender,
@@ -164,9 +159,8 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         require(isRegisteredSLA(address(_sla)), 'invalid SLA');
         require(msg.sender == _sla.owner(), 'msg.sender not owner');
         uint256 lastValidPeriodId = _sla.finalPeriodId();
-        IPeriodRegistry.PeriodType periodType = _sla.periodType();
         (, uint256 endOfLastValidPeriod) = IPeriodRegistry(_periodRegistry)
-            .getPeriodStartAndEnd(periodType, lastValidPeriodId);
+            .getPeriodStartAndEnd(_sla.periodType(), lastValidPeriodId);
 
         (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(lastValidPeriodId);
         require(
@@ -190,15 +184,13 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         );
     }
 
-    function userSLAs(address _user) public view returns (SLA[] memory) {
+    function userSLAs(address _user) public view returns (SLA[] memory SLAList) {
         uint256 count = _userToSLAIndexes[_user].length;
-        SLA[] memory SLAList = new SLA[](count);
+        SLAList = new SLA[](count);
 
         for (uint256 i = 0; i < count; i++) {
             SLAList[i] = (SLAs[_userToSLAIndexes[_user][i]]);
         }
-
-        return (SLAList);
     }
 
     function allSLAs() public view returns (SLA[] memory) {
