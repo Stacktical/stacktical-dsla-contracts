@@ -23,6 +23,10 @@ const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
 
+enum POSITION {
+  LONG,
+  SHORT,
+}
 const baseSLAConfig = {
   sloValue: 50 * 10 ** 3,
   sloType: SLO_TYPE.GreaterThan,
@@ -156,14 +160,14 @@ describe(CONTRACT_NAMES.Staking, function () {
     await dslaToken.approve(sla.address, mintAmount);
     let stakeAmount = 100000;
 
-    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG))
       .to.emit(sla, 'Stake')
       .withArgs(
         dslaToken.address,
         await sla.nextVerifiablePeriod(),
         deployer,
         stakeAmount,
-        'long'
+        POSITION.LONG
       );
     let detailsarrs = (
       await details.getSLADetailsArrays(sla.address)
@@ -198,7 +202,7 @@ describe(CONTRACT_NAMES.Staking, function () {
     await notDeployerSLA.stakeTokens(
       amount * leverage,
       dslaToken.address,
-      'long'
+      POSITION.LONG
     );
 
     // provider long stake
@@ -213,14 +217,14 @@ describe(CONTRACT_NAMES.Staking, function () {
 
 
     await deployerDSLA.approve(sla.address, amount * leverage);
-    await expect(deployerSLA.stakeTokens(amount * leverage, dslaToken.address, 'short'))
+    await expect(deployerSLA.stakeTokens(amount * leverage, dslaToken.address, POSITION.SHORT))
       .to.emit(sla, 'Stake')
       .withArgs(
         dslaToken.address,
         await sla.nextVerifiablePeriod(),
         deployer,
         amount * leverage,
-        'short'
+        POSITION.SHORT
       );
 
     let detailsarrs = (
@@ -238,7 +242,7 @@ describe(CONTRACT_NAMES.Staking, function () {
     await dslaToken.approve(sla.address, mintAmount);
     let stakeAmount = 100000;
 
-    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'short'))
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.SHORT))
       .to.be.revertedWith('user stake')
   });
 
@@ -248,7 +252,7 @@ describe(CONTRACT_NAMES.Staking, function () {
     await dslaToken.approve(sla.address, mintAmount);
     let stakeAmount = 100000000;
 
-    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG))
       .to.be.revertedWith('ERC20: transfer amount exceeds allowance')
   });
 
@@ -257,7 +261,7 @@ describe(CONTRACT_NAMES.Staking, function () {
     await dslaToken.approve(sla.address, mintAmount);
     let stakeAmount = 100000;
 
-    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG))
       .to.be.revertedWith('token not allowed')
   });
 
@@ -266,7 +270,7 @@ describe(CONTRACT_NAMES.Staking, function () {
     await dslaToken.approve(sla.address, mintAmount);
     let stakeAmount = 100000;
     const invalidTokenAddress = "0x61A12"
-    await expect(sla.stakeTokens(stakeAmount, invalidTokenAddress, 'long'))
+    await expect(sla.stakeTokens(stakeAmount, invalidTokenAddress, POSITION.LONG))
       .to.be.reverted;
   });
 
@@ -318,14 +322,14 @@ describe(CONTRACT_NAMES.Staking, function () {
       await dslaToken.approve(sla.address, mintAmount);
       let stakeAmount = 100000;
 
-      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG))
         .to.emit(sla, 'Stake')
         .withArgs(
           dslaToken.address,
           await sla.nextVerifiablePeriod(),
           deployer,
           stakeAmount,
-          'long'
+          POSITION.LONG
         );
       let detailsarrs = (
         await details.getSLADetailsArrays(sla.address)
@@ -344,14 +348,14 @@ describe(CONTRACT_NAMES.Staking, function () {
       await dslaToken.approve(sla_wl.address, mintAmount);
       let stakeAmount = 100000;
 
-      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG))
         .to.emit(sla_wl, 'Stake')
         .withArgs(
           dslaToken.address,
           await sla_wl.nextVerifiablePeriod(),
           deployer,
           stakeAmount,
-          'long'
+          POSITION.LONG
         );
       let detailsarrs = (
         await details.getSLADetailsArrays(sla_wl.address)
@@ -379,7 +383,7 @@ describe(CONTRACT_NAMES.Staking, function () {
 
       await notDeployerDSLA.approve(sla_wl.address, stakeAmount);
       await sla_wl.addAllowedTokens(dslaToken.address);
-      await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG))
         .to.be.revertedWith('not whitelisted');
     });
 
@@ -403,14 +407,14 @@ describe(CONTRACT_NAMES.Staking, function () {
       await sla_wl.addAllowedTokens(dslaToken.address);
       await sla_wl.addUsersToWhitelist([notDeployer])
 
-      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG))
         .to.emit(sla_wl, 'Stake')
         .withArgs(
           dslaToken.address,
           await sla_wl.nextVerifiablePeriod(),
           deployer,
           stakeAmount,
-          'long'
+          POSITION.LONG
         );
       let detailsarrs = (
         await details.getSLADetailsArrays(sla_wl.address)
@@ -440,14 +444,14 @@ describe(CONTRACT_NAMES.Staking, function () {
       await sla_wl.addAllowedTokens(dslaToken.address);
       await sla_wl.addUsersToWhitelist([notDeployer])
 
-      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG))
         .to.emit(sla_wl, 'Stake')
         .withArgs(
           dslaToken.address,
           await sla_wl.nextVerifiablePeriod(),
           deployer,
           stakeAmount,
-          'long'
+          POSITION.LONG
         );
       let detailsarrs = (
         await details.getSLADetailsArrays(sla_wl.address)
@@ -457,7 +461,7 @@ describe(CONTRACT_NAMES.Staking, function () {
       expect(totalStake).equals(stakeAmount.toString());
 
       await sla_wl.removeUsersFromWhitelist([notDeployer])
-      await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, 'long'))
+      await expect(notDeployerSLA.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG))
         .to.be.revertedWith('not whitelisted');
     });
   });
