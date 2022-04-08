@@ -89,7 +89,7 @@ contract MessengerRegistry is IMessengerRegistry {
         _ownerMessengers[messengerOwner].push(id);
 
         require(
-            precision % 100 == 0 || precision != 0,
+            precision % 100 == 0 && precision != 0,
             'invalid messenger precision, cannot register messanger'
         );
 
@@ -128,7 +128,7 @@ contract MessengerRegistry is IMessengerRegistry {
         );
 
         require(
-            precision % 100 == 0 || precision != 0,
+            precision % 100 == 0 && precision != 0,
             'invalid messenger precision, cannot modify messanger'
         );
 
