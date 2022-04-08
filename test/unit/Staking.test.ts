@@ -235,7 +235,7 @@ const setup = deployments.createFixture(async () => {
       let stakeAmount = 100000;
 
       await expect(sla.stakeTokens(stakeAmount, dslaToken.address, 'short'))
-        .to.be.revertedWith('user stake')
+        .to.be.revertedWith('Stake exceeds leveraged cap.')
     });
 
     it('should prevent staking in case of amount exceeds allowance', async () => {

@@ -19,12 +19,8 @@ contract Staking is Ownable {
     IStakeRegistry private _stakeRegistry;
 
     /// @dev SLARegistry contract
-<<<<<<< HEAD
-    IPeriodRegistry private immutable _periodRegistry;
-
-=======
     IPeriodRegistry internal immutable _periodRegistry;
->>>>>>> feature/3.0.0-alpha-2
+
     /// @dev DSLA token address to burn fees
     address private immutable _dslaTokenAddress;
 
@@ -75,17 +71,6 @@ contract Staking is Ownable {
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token), 'token not allowed');
-        _;
-    }
-
-    modifier onlyAllowedPosition(string memory _position) {
-        require(
-            keccak256(abi.encodePacked(_position)) ==
-                keccak256(abi.encodePacked('long')) ||
-                keccak256(abi.encodePacked(_position)) ==
-                keccak256(abi.encodePacked('short')),
-            'position not allowed'
-        );
         _;
     }
 
@@ -223,12 +208,8 @@ contract Staking is Ownable {
         uint256 _nextVerifiablePeriod,
         uint256 _amount,
         string memory _position
-    )
-        internal
-        onlyAllowedToken(_tokenAddress)
-        onlyAllowedPosition(_position)
-        onlyWhitelisted
-    {
+    ) internal onlyAllowedToken(_tokenAddress) onlyWhitelisted {
+
         ERC20(_tokenAddress).safeTransferFrom(
             msg.sender,
             address(this),

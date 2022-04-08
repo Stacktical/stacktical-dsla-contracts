@@ -155,8 +155,8 @@ contract SLA is Staking {
     }
 
     function stakeTokens(
-        address _tokenAddress,
         uint256 _amount,
+        address _tokenAddress,
         string calldata _position
     ) external {
         require(_amount > 0, 'Stake must be greater than 0.');

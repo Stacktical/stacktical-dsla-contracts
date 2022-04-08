@@ -110,7 +110,7 @@ describe(CONTRACT_NAMES.SLA, function () {
   it('should not allow staking 0 amount', async () => {
     const { sla, dslaToken } = fixture;
     await expect(sla.stakeTokens(0, dslaToken.address, 'long'))
-      .to.be.revertedWith('zero staking not allowed.');
+      .to.be.revertedWith('Stake must be greater than 0.');
   })
   it('should not allow staking after the end of last period', async () => {
     const { sla, dslaToken } = fixture;
