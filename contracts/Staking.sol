@@ -1,20 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.6;
 
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
+import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessenger.sol';
+import './interfaces/IERC20Query.sol';
 import './dToken.sol';
 import './StringUtils.sol';
 
-contract Staking is Ownable {
+contract Staking is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
-    using SafeERC20 for ERC20;
+    using SafeERC20 for IERC20;
+
+    enum Position {
+        LONG,
+        SHORT
+    }
 
     /// @dev StakeRegistry contract
     IStakeRegistry private _stakeRegistry;
@@ -60,17 +67,6 @@ contract Staking is Ownable {
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token), 'token not allowed');
-        _;
-    }
-
-    modifier onlyAllowedPosition(string memory _position) {
-        require(
-            keccak256(abi.encodePacked(_position)) ==
-                keccak256(abi.encodePacked('long')) ||
-                keccak256(abi.encodePacked(_position)) ==
-                keccak256(abi.encodePacked('short')),
-            'position not allowed'
-        );
         _;
     }
 
@@ -127,7 +123,6 @@ contract Staking is Ownable {
             ,
             ,
             uint64 _maxLeverage,
-
         ) = _stakeRegistry.getStakingParameters();
         _dslaTokenAddress = _stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
@@ -179,7 +174,7 @@ contract Staking is Ownable {
         string memory dpTokenSymbol = string(
             abi.encodePacked('DSLA-LP-', dTokenID)
         );
-        uint8 decimals = ERC20(_tokenAddress).decimals();
+        uint8 decimals = IERC20Query(_tokenAddress).decimals();
 
         dToken duToken = dToken(
             _stakeRegistry.createDToken(duTokenName, duTokenSymbol, decimals)
@@ -204,14 +199,14 @@ contract Staking is Ownable {
     function _stake(
         uint256 _amount,
         address _tokenAddress,
-        string memory _position
+        Position _position
     )
         internal
         onlyAllowedToken(_tokenAddress)
-        onlyAllowedPosition(_position)
         onlyWhitelisted
+        nonReentrant
     {
-        ERC20(_tokenAddress).safeTransferFrom(
+        IERC20(_tokenAddress).safeTransferFrom(
             msg.sender,
             address(this),
             _amount
@@ -219,18 +214,13 @@ contract Staking is Ownable {
 
         // DSLA-SP proofs of SLA Position
         // string memory short = 'short';
-        if (
-            keccak256(abi.encodePacked(_position)) ==
-            keccak256(abi.encodePacked('short'))
-        ) {
-            (uint256 providerStake, uint256 usersStake) = (
-                providerPool[_tokenAddress],
-                usersPool[_tokenAddress]
-            );
+        if (_position == Position.SHORT) {
             require(
-                usersStake.add(_amount).mul(leverage) <= providerStake,
+                usersPool[_tokenAddress].add(_amount).mul(leverage) <= providerPool[_tokenAddress],
                 'user stake'
             );
+            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
+
             dToken duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
 
@@ -238,35 +228,33 @@ contract Staking is Ownable {
             if (p0 == 0) {
                 duToken.mint(msg.sender, _amount);
             } else {
-                uint256 t0 = usersPool[_tokenAddress];
                 // mint dTokens proportionally
-                uint256 mintedDUTokens = _amount.mul(p0).div(t0);
-                duToken.mint(msg.sender, mintedDUTokens);
+                duToken.mint(
+                    msg.sender,
+                    _amount.mul(p0).div(usersPool[_tokenAddress])
+                );
             }
-            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
         }
 
         // DSLA-LP proofs of SLA Position
         // string memory long = 'long';
-        if (
-            keccak256(abi.encodePacked(_position)) ==
-            keccak256(abi.encodePacked('long'))
-        ) {
+        if (_position == Position.LONG) {
+            providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
+                _amount
+            );
+
             dToken dpToken = dpTokenRegistry[_tokenAddress];
             uint256 p0 = dpToken.totalSupply();
 
             if (p0 == 0) {
                 dpToken.mint(msg.sender, _amount);
             } else {
-                uint256 t0 = providerPool[_tokenAddress];
                 // mint dTokens proportionally
-                uint256 mintedDPTokens = _amount.mul(p0).div(t0);
-                dpToken.mint(msg.sender, mintedDPTokens);
+                dpToken.mint(
+                    msg.sender,
+                    _amount.mul(p0).div(providerPool[_tokenAddress])
+                );
             }
-
-            providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
-                _amount
-            );
         }
 
         if (!registeredStakers[msg.sender]) {
@@ -332,33 +320,39 @@ contract Staking is Ownable {
     function _withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
+        nonReentrant
     {
         dToken dpToken = dpTokenRegistry[_tokenAddress];
-        uint256 p0 = dpToken.totalSupply();
-        uint256 t0 = providerPool[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the Provider Pool / DSLA-SP Pool average
         // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
-        uint256 burnedDPTokens = _amount.mul(p0).div(t0);
-        dpToken.burnFrom(msg.sender, burnedDPTokens);
+        dpToken.burnFrom(
+            msg.sender,
+            _amount.mul(dpToken.totalSupply()).div(providerPool[_tokenAddress])
+        );
         providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
-        uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
+        IERC20(_tokenAddress).safeTransfer(
+            msg.sender,
+            _distributeClaimingRewards(_amount, _tokenAddress)
+        );
     }
 
     function _withdrawUserTokens(uint256 _amount, address _tokenAddress)
         internal
         onlyAllowedToken(_tokenAddress)
+        nonReentrant
     {
         dToken duToken = duTokenRegistry[_tokenAddress];
-        uint256 p0 = duToken.totalSupply();
-        uint256 t0 = usersPool[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the User Pool / DSLA-SP Pool average
         // t0/p0 = (t0-_amount)/(p0-burnedDUTokens)
-        uint256 burnedDUTokens = _amount.mul(p0).div(t0);
-        duToken.burnFrom(msg.sender, burnedDUTokens);
+        duToken.burnFrom(
+            msg.sender,
+            _amount.mul(duToken.totalSupply()).div(usersPool[_tokenAddress])
+        );
         usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
-        uint outstandingAmount = _distributeClaimingRewards(_amount, _tokenAddress);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
+        IERC20(_tokenAddress).safeTransfer(
+            msg.sender,
+            _distributeClaimingRewards(_amount, _tokenAddress)
+        );
     }
 
     function _distributeClaimingRewards(
@@ -367,8 +361,8 @@ contract Staking is Ownable {
     ) internal returns (uint256) {
         uint slaOwnerRewards = _amount.mul(ownerRewardsRate).div(10000);
         uint protocolRewards = _amount.mul(protocolRewardsRate).div(10000);
-        ERC20(_tokenAddress).safeTransfer(owner(), slaOwnerRewards);
-        ERC20(_tokenAddress).safeTransfer(_stakeRegistry.owner(), protocolRewards);
+        IERC20(_tokenAddress).safeTransfer(owner(), slaOwnerRewards);
+        IERC20(_tokenAddress).safeTransfer(_stakeRegistry.owner(), protocolRewards);
         return _amount.sub(slaOwnerRewards).sub(protocolRewards);
     }
 

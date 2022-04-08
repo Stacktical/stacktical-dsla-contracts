@@ -117,9 +117,8 @@ contract MessengerRegistry is IMessengerRegistry {
         uint256 _messengerId
     ) external {
         Messenger storage storedMessenger = _messengers[_messengerId];
-        IMessenger messenger = IMessenger(storedMessenger.messengerAddress);
         require(
-            msg.sender == messenger.owner(),
+            msg.sender == IMessenger(storedMessenger.messengerAddress).owner(),
             'Can only be modified by the owner'
         );
         storedMessenger.specificationUrl = _specificationUrl;
@@ -141,15 +140,13 @@ contract MessengerRegistry is IMessengerRegistry {
             IMessenger messenger = IMessenger(
                 _messengers[index].messengerAddress
             );
-            uint256 requestsCounter = messenger.requestsCounter();
-            uint256 fulfillsCounter = messenger.fulfillsCounter();
             returnMessengers[index] = Messenger({
                 ownerAddress: _messengers[index].ownerAddress,
                 messengerAddress: _messengers[index].messengerAddress,
                 specificationUrl: _messengers[index].specificationUrl,
                 precision: _messengers[index].precision,
-                requestsCounter: requestsCounter,
-                fulfillsCounter: fulfillsCounter,
+                requestsCounter: messenger.requestsCounter(),
+                fulfillsCounter: messenger.fulfillsCounter(),
                 id: _messengers[index].id
             });
         }

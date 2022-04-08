@@ -32,6 +32,10 @@ interface SLAConfig {
 	finalPeriodId: number,
 	extraData: BytesLike[]
 }
+enum POSITION {
+	LONG,
+	SHORT,
+}
 const baseSLAConfig = {
 	sloValue: 50 * 10 ** 3,
 	sloType: SLO_TYPE.GreaterThan,
@@ -168,7 +172,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		);
 		await sla.addAllowedTokens(dslaToken.address);
 		await dslaToken.approve(slaAddress, mintAmount);
-		await sla.stakeTokens(mintAmount, dslaToken.address, 'long');
+		await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.LONG);
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, slaAddress)).to.be.true;
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, deployer)).to.be.false;
 	})

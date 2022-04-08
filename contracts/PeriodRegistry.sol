@@ -137,10 +137,7 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
         override
         returns (bool initialized)
     {
-        PeriodDefinition memory periodDefinition = periodDefinitions[
-            _periodType
-        ];
-        initialized = periodDefinition.initialized;
+        initialized = periodDefinitions[_periodType].initialized;
     }
 
     /**
@@ -154,10 +151,7 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
         override
         returns (bool valid)
     {
-        PeriodDefinition memory periodDefinition = periodDefinitions[
-            _periodType
-        ];
-        valid = periodDefinition.starts.length.sub(1) >= _periodId;
+        valid = periodDefinitions[_periodType].starts.length.sub(1) >= _periodId;
     }
 
     /**
