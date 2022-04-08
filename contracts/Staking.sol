@@ -219,8 +219,6 @@ contract Staking is Ownable, ReentrancyGuard {
                 usersPool[_tokenAddress].add(_amount).mul(leverage) <= providerPool[_tokenAddress],
                 'user stake'
             );
-            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
-
             dToken duToken = duTokenRegistry[_tokenAddress];
             uint256 p0 = duToken.totalSupply();
 
@@ -234,15 +232,12 @@ contract Staking is Ownable, ReentrancyGuard {
                     _amount.mul(p0).div(usersPool[_tokenAddress])
                 );
             }
+            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
         }
 
         // DSLA-LP proofs of SLA Position
         // string memory long = 'long';
         if (_position == Position.LONG) {
-            providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
-                _amount
-            );
-
             dToken dpToken = dpTokenRegistry[_tokenAddress];
             uint256 p0 = dpToken.totalSupply();
 
@@ -255,6 +250,9 @@ contract Staking is Ownable, ReentrancyGuard {
                     _amount.mul(p0).div(providerPool[_tokenAddress])
                 );
             }
+            providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
+                _amount
+            );
         }
 
         if (!registeredStakers[msg.sender]) {
