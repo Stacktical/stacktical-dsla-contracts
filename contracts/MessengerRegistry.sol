@@ -88,6 +88,11 @@ contract MessengerRegistry is IMessengerRegistry {
         uint256 id = _messengers.length;
         _ownerMessengers[messengerOwner].push(id);
 
+        require(
+            precision % 100 == 0 || precision != 0,
+            'invalid messenger precision, cannot register messanger'
+        );
+
         _messengers.push(
             Messenger({
                 ownerAddress: messengerOwner,
@@ -121,6 +126,12 @@ contract MessengerRegistry is IMessengerRegistry {
             msg.sender == IMessenger(storedMessenger.messengerAddress).owner(),
             'Can only be modified by the owner'
         );
+
+        require(
+            precision % 100 == 0 || precision != 0,
+            'invalid messenger precision, cannot modify messanger'
+        );
+
         storedMessenger.specificationUrl = _specificationUrl;
         storedMessenger.ownerAddress = msg.sender;
         emit MessengerModified(
