@@ -127,11 +127,6 @@ contract MessengerRegistry is IMessengerRegistry {
             'Can only be modified by the owner'
         );
 
-        require(
-            precision % 100 == 0 && precision != 0,
-            'invalid messenger precision, cannot modify messanger'
-        );
-
         storedMessenger.specificationUrl = _specificationUrl;
         storedMessenger.ownerAddress = msg.sender;
         emit MessengerModified(
