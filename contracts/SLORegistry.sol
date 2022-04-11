@@ -82,9 +82,8 @@ contract SLORegistry {
         view
         returns (bool)
     {
-        SLO memory slo = registeredSLO[_slaAddress];
-        SLOType sloType = slo.sloType;
-        uint256 sloValue = slo.sloValue;
+        SLOType sloType = registeredSLO[_slaAddress].sloType;
+        uint256 sloValue = registeredSLO[_slaAddress].sloValue;
 
         if (sloType == SLOType.EqualTo) {
             return _value == sloValue;
@@ -125,32 +124,29 @@ contract SLORegistry {
         address _slaAddress,
         uint256 _precision
     ) public view returns (uint256) {
-        uint256 sliValue = _sli;
-        SLO memory slo = registeredSLO[_slaAddress];
-        SLOType sloType = slo.sloType;
-        uint256 sloValue = slo.sloValue;
-        uint256 precision = _precision;
+        SLOType sloType = registeredSLO[_slaAddress].sloType;
+        uint256 sloValue = registeredSLO[_slaAddress].sloValue;
 
         // Ensures a positive deviation for greater / small comparisons
         // The deviation is the percentage difference between SLI and SLO
         uint256 deviation = (
             _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)
-        ).mul(precision).div(sliValue.add(sloValue).div(2));
+        ).mul(_precision).div(_sli.add(sloValue).div(2));
 
         // Enforces a deviation capped at 25%
-        if (deviation > precision.mul(25).div(100)) {
-            deviation = precision.mul(25).div(100);
+        if (deviation > _precision.mul(25).div(100)) {
+            deviation = _precision.mul(25).div(100);
         }
 
         if (sloType == SLOType.EqualTo) {
             // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = precision.mul(1).div(100);
+            deviation = _precision.mul(1).div(100);
             return deviation;
         }
 
         if (sloType == SLOType.NotEqualTo) {
             // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = precision.mul(1).div(100);
+            deviation = _precision.mul(1).div(100);
             return deviation;
         }
 

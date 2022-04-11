@@ -4,12 +4,15 @@ pragma experimental ABIEncoderV2;
 
 import './interfaces/IMessenger.sol';
 import './interfaces/IMessengerRegistry.sol';
+import '@openzeppelin/contracts/math/SafeMath.sol';
 
 /**
  * @title MessengerRegistry
  * @dev MessengerRegistry is a contract to register openly distributed Messengers
  */
 contract MessengerRegistry is IMessengerRegistry {
+    using SafeMath for uint256;
+
     struct Messenger {
         address ownerAddress;
         address messengerAddress;
@@ -88,6 +91,11 @@ contract MessengerRegistry is IMessengerRegistry {
         uint256 id = _messengers.length;
         _ownerMessengers[messengerOwner].push(id);
 
+        require(
+            precision.mod(100) == 0 && precision != 0,
+            'invalid messenger precision, cannot register messanger'
+        );
+
         _messengers.push(
             Messenger({
                 ownerAddress: messengerOwner,
@@ -117,9 +125,8 @@ contract MessengerRegistry is IMessengerRegistry {
         uint256 _messengerId
     ) external {
         Messenger storage storedMessenger = _messengers[_messengerId];
-        IMessenger messenger = IMessenger(storedMessenger.messengerAddress);
         require(
-            msg.sender == messenger.owner(),
+            msg.sender == IMessenger(storedMessenger.messengerAddress).owner(),
             'Can only be modified by the owner'
         );
         storedMessenger.specificationUrl = _specificationUrl;
@@ -141,15 +148,13 @@ contract MessengerRegistry is IMessengerRegistry {
             IMessenger messenger = IMessenger(
                 _messengers[index].messengerAddress
             );
-            uint256 requestsCounter = messenger.requestsCounter();
-            uint256 fulfillsCounter = messenger.fulfillsCounter();
             returnMessengers[index] = Messenger({
                 ownerAddress: _messengers[index].ownerAddress,
                 messengerAddress: _messengers[index].messengerAddress,
                 specificationUrl: _messengers[index].specificationUrl,
                 precision: _messengers[index].precision,
-                requestsCounter: requestsCounter,
-                fulfillsCounter: fulfillsCounter,
+                requestsCounter: messenger.requestsCounter(),
+                fulfillsCounter: messenger.fulfillsCounter(),
                 id: _messengers[index].id
             });
         }

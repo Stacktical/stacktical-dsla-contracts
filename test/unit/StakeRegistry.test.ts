@@ -32,6 +32,10 @@ interface SLAConfig {
 	finalPeriodId: number,
 	extraData: BytesLike[]
 }
+enum POSITION {
+	LONG,
+	SHORT,
+}
 const baseSLAConfig = {
 	sloValue: 50 * 10 ** 3,
 	sloType: SLO_TYPE.GreaterThan,
@@ -95,9 +99,11 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 		await ethers.getSigner(deployer),
 		iMessengerArtifact.abi
 	);
-	mockMessenger.mock.requestSLI.returns();
-	mockMessenger.mock.owner.returns(deployer);
-	mockMessenger.mock.setSLARegistry.returns();
+	await mockMessenger.mock.lpName.returns('UPTIME.ok');
+	await mockMessenger.mock.spName.returns('UPTIME.ko');
+	await mockMessenger.mock.requestSLI.returns();
+	await mockMessenger.mock.owner.returns(deployer);
+	await mockMessenger.mock.setSLARegistry.returns();
 
 	let tx = await slaRegistry.createSLA(
 		slaConfig.sloValue,
@@ -166,7 +172,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		);
 		await sla.addAllowedTokens(dslaToken.address);
 		await dslaToken.approve(slaAddress, mintAmount);
-		await sla.stakeTokens(mintAmount, dslaToken.address, 'long');
+		await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.LONG);
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, slaAddress)).to.be.true;
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, deployer)).to.be.false;
 	})
