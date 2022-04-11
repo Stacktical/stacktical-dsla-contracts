@@ -115,15 +115,19 @@ describe(CONTRACT_NAMES.SLA, function () {
 
   it('should not allow staking 0 amount', async () => {
     const { sla, dslaToken } = fixture;
-    await expect(sla.stakeTokens(0, dslaToken.address, POSITION.LONG))
-      .to.be.revertedWith('Stake must be greater than 0.');
-  })
+    await expect(
+      sla.stakeTokens(0, dslaToken.address, POSITION.LONG)
+    ).to.be.revertedWith('Stake must be greater than 0.');
+  });
+
   it('should not allow staking after the end of last period', async () => {
     const { sla, dslaToken } = fixture;
     await evm_increaseTime(currentTimestamp + ONE_DAY * 3);
-    await expect(sla.stakeTokens(mintAmount, dslaToken.address, POSITION.LONG))
-      .to.be.revertedWith('Staking disabled after the last period');
-  })
+    await expect(
+      sla.stakeTokens(mintAmount, dslaToken.address, POSITION.LONG)
+    ).to.be.revertedWith('Staking disabled after the last period');
+  });
+
   it('should not let notDeployer withdraw tokens if the contract is not finished', async function () {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
@@ -138,7 +142,11 @@ describe(CONTRACT_NAMES.SLA, function () {
       await ethers.getSigner(notDeployer)
     );
     await notDeployerDSLA.approve(sla.address, mintAmount);
-    await notDeployerSLA.stakeTokens(mintAmount, dslaToken.address, POSITION.LONG);
+    await notDeployerSLA.stakeTokens(
+      mintAmount,
+      dslaToken.address,
+      POSITION.LONG
+    );
     const duTokenAddress = await sla.duTokenRegistry(dslaToken.address);
     const duToken: ERC20PresetMinterPauser = await ethers.getContractAt(
       'ERC20PresetMinterPauser',
@@ -188,7 +196,7 @@ describe(CONTRACT_NAMES.SLA, function () {
     expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
   });
 
-  it("should distribute rewards to sla owner and protocol owner when claiming tokens", async () => {
+  it('should distribute rewards to sla owner and protocol owner when claiming tokens', async () => {
     const { sla, dslaToken } = fixture;
     let stakeAmount = 100000;
     await dslaToken.approve(sla.address, stakeAmount);
@@ -197,7 +205,7 @@ describe(CONTRACT_NAMES.SLA, function () {
       sla.withdrawProviderTokens(mintAmount, dslaToken.address)
     ).to.be.revertedWith('not finished');
     // TODO: Complete withdrawProviderTokens - Can't cover this function at the moment cause we use mock messenger contract
-  })
+  });
 
   it('should check that a normal amount of token can be staked', async () => {
     const { sla, dslaToken, details } = fixture;
@@ -234,8 +242,8 @@ describe(CONTRACT_NAMES.SLA, function () {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
     let bigNumber = 10 ** 100000000000000000000000000000000;
-    await expect(sla.stakeTokens(bigNumber, dslaToken.address, POSITION.LONG)).to.be
-      .reverted;
+    await expect(sla.stakeTokens(bigNumber, dslaToken.address, POSITION.LONG))
+      .to.be.reverted;
 
     let totalStake = (
       await details.getSLADetailsArrays(sla.address)
@@ -359,7 +367,8 @@ describe(CONTRACT_NAMES.SLA, function () {
     );
 
     await deployerDSLA.approve(sla.address, amount);
-    await expect(deployerSLA.stakeTokens(amount, dslaToken.address, POSITION.SHORT)).to
-      .be.reverted;
+    await expect(
+      deployerSLA.stakeTokens(amount, dslaToken.address, POSITION.SHORT)
+    ).to.be.reverted;
   });
 });
