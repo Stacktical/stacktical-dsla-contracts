@@ -203,7 +203,7 @@ describe(CONTRACT_NAMES.SLA, function () {
     await sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.LONG);
     await expect(
       sla.withdrawProviderTokens(mintAmount, dslaToken.address)
-    ).to.be.revertedWith('not finished');
+    ).to.be.revertedWith('Provider lock-up until the next verification.');
     // TODO: Complete withdrawProviderTokens - Can't cover this function at the moment cause we use mock messenger contract
   });
 

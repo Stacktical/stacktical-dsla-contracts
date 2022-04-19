@@ -163,7 +163,10 @@ contract SLA is Staking {
             'Staking disabled after the last period.'
         );
 
-        require(periodSLIs[finalPeriodId].status == Status.NotVerified, "Last period verfied, staking disabled");
+        require(
+            periodSLIs[finalPeriodId].status == Status.NotVerified,
+            'Staking disabled after the last verification.'
+        );
 
         _stake(_tokenAddress, nextVerifiablePeriod, _amount, _position);
 
@@ -185,7 +188,6 @@ contract SLA is Staking {
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        require(contractFinished(), 'not finished');
         emit ProviderWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
@@ -198,7 +200,6 @@ contract SLA is Staking {
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        require(contractFinished(), 'not finished');
         emit UserWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,

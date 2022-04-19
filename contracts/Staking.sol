@@ -78,6 +78,12 @@ contract Staking is Ownable, ReentrancyGuard {
     uint256 private ownerRewardsRate = 30; // 0.3%
     uint256 private protocolRewardsRate = 15; // 0.15%
 
+    /// @dev periodId=>providerReward mapping
+    mapping(uint256 => uint256) public providerRewards;
+
+    /// @dev periodId=>userReward mapping
+    mapping(uint256 => uint256) public userRewards;
+
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token), 'token not allowed');
         _;
@@ -136,6 +142,7 @@ contract Staking is Ownable, ReentrancyGuard {
             ,
             ,
             uint64 _maxLeverage,
+
         ) = _stakeRegistry.getStakingParameters();
         _dslaTokenAddress = _stakeRegistry.DSLATokenAddress();
         DSLAburnRate = _DSLAburnRate;
@@ -214,12 +221,7 @@ contract Staking is Ownable, ReentrancyGuard {
         uint256 _nextVerifiablePeriod,
         uint256 _amount,
         Position _position
-    )
-        internal
-        onlyAllowedToken(_tokenAddress)
-        onlyWhitelisted
-        nonReentrant
-    {
+    ) internal onlyAllowedToken(_tokenAddress) onlyWhitelisted nonReentrant {
         IERC20(_tokenAddress).safeTransferFrom(
             msg.sender,
             address(this),
@@ -230,7 +232,8 @@ contract Staking is Ownable, ReentrancyGuard {
         // string memory short = 'short';
         if (_position == Position.SHORT) {
             require(
-                usersPool[_tokenAddress].add(_amount).mul(leverage) <= providerPool[_tokenAddress],
+                usersPool[_tokenAddress].add(_amount).mul(leverage) <=
+                    providerPool[_tokenAddress],
                 'Stake exceeds leveraged cap.'
             );
 
@@ -294,6 +297,8 @@ contract Staking is Ownable, ReentrancyGuard {
 
             providerPool[tokenAddress] = providerPool[tokenAddress].add(reward);
 
+            providerRewards[_periodId] = reward;
+
             emit ProviderRewardGenerated(
                 _periodId,
                 tokenAddress,
@@ -323,6 +328,8 @@ contract Staking is Ownable, ReentrancyGuard {
             );
 
             usersPool[tokenAddress] = usersPool[tokenAddress].add(compensation);
+
+            userRewards[_periodId] = compensation;
 
             emit UserCompensationGenerated(
                 _periodId,
