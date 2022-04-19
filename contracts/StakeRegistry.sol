@@ -4,11 +4,11 @@ pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import '@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './SLA.sol';
+import './dToken.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
@@ -19,17 +19,9 @@ import './StringUtils.sol';
  * @dev StakeRegistry is a contract to register the staking activity of the platform, along
  with controlling certain admin privileged parameters
  */
-contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
+contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     using SafeERC20 for ERC20;
     using SafeMath for uint256;
-
-    /// @dev struct to return on getActivePool function.
-    struct ActivePool {
-        address SLAAddress;
-        uint256 stake;
-        string assetName;
-        address assetAddress;
-    }
 
     struct LockedValue {
         uint256 lockedValue;
@@ -257,7 +249,7 @@ contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
      *@param _name 1. token name
      *@param _symbol 2. token symbol
      */
-    function createDToken(string calldata _name, string calldata _symbol)
+    function createDToken(string calldata _name, string calldata _symbol, uint8 decimals)
         external
         override
         returns (address)
@@ -266,13 +258,10 @@ contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
             slaRegistry.isRegisteredSLA(msg.sender),
             'Only for registered SLAs'
         );
-        ERC20PresetMinterPauser dToken = new ERC20PresetMinterPauser(
-            _name,
-            _symbol
-        );
-        dToken.grantRole(dToken.MINTER_ROLE(), msg.sender);
-        emit DTokenCreated(address(dToken), msg.sender, _name, _symbol);
-        return address(dToken);
+        dToken newDToken = new dToken(_name, _symbol, decimals);
+        newDToken.grantRole(newDToken.MINTER_ROLE(), msg.sender);
+        emit DTokenCreated(address(newDToken), msg.sender, _name, _symbol);
+        return address(newDToken);
     }
 
     function lockDSLAValue(
@@ -358,62 +347,6 @@ contract StakeRegistry is IStakeRegistry, Ownable, ReentrancyGuard {
             remainingBalance
         );
         emit LockedValueReturned(_sla, SLA(_sla).owner(), remainingBalance);
-    }
-
-    /**
-     * @dev returns the active pools owned by a user.
-     * @param _slaOwner 1. owner of the active pool
-     * @return ActivePool[], array of structs: {SLAAddress,stake,assetName}
-     */
-    function getActivePool(address _slaOwner)
-        external
-        view
-        returns (ActivePool[] memory)
-    {
-        bytes4 NAME_SELECTOR = bytes4(keccak256(bytes('name()')));
-        uint256 stakeCounter = 0;
-        // Count the stakes of the user, checking every SLA staked
-        for (
-            uint256 index = 0;
-            index < userStakedSlas[_slaOwner].length;
-            index++
-        ) {
-            SLA currentSLA = SLA(userStakedSlas[_slaOwner][index]);
-            stakeCounter = stakeCounter.add(
-                currentSLA.getAllowedTokensLength()
-            );
-        }
-
-        ActivePool[] memory activePools = new ActivePool[](stakeCounter);
-        // to insert on activePools array
-        uint256 stakePosition = 0;
-        for (
-            uint256 index = 0;
-            index < userStakedSlas[_slaOwner].length;
-            index++
-        ) {
-            SLA currentSLA = userStakedSlas[_slaOwner][index];
-            for (
-                uint256 tokenIndex = 0;
-                tokenIndex < currentSLA.getAllowedTokensLength();
-                tokenIndex++
-            ) {
-                (address tokenAddress, uint256 stake) = currentSLA
-                .getTokenStake(_slaOwner, tokenIndex);
-                (, bytes memory tokenNameBytes) = tokenAddress.staticcall(
-                    abi.encodeWithSelector(NAME_SELECTOR)
-                );
-                ActivePool memory currentActivePool = ActivePool({
-                    SLAAddress: address(currentSLA),
-                    stake: stake,
-                    assetName: string(tokenNameBytes),
-                    assetAddress: tokenAddress
-                });
-                activePools[stakePosition] = currentActivePool;
-                stakePosition = stakePosition.add(1);
-            }
-        }
-        return activePools;
     }
 
     //_______ OnlyOwner functions _______

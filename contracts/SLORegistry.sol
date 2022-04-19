@@ -2,12 +2,17 @@
 pragma solidity 0.6.6;
 pragma experimental ABIEncoderV2;
 
+import '@openzeppelin/contracts/math/SafeMath.sol';
+
 /**
  * @title SLORegistry
  * @dev SLORegistry is a contract for handling creation of service level
  * objectives and querying those service level objectives
  */
 contract SLORegistry {
+    using SafeMath for uint256;
+    using SafeMath for int256;
+
     enum SLOType {
         EqualTo,
         NotEqualTo,
@@ -32,7 +37,7 @@ contract SLORegistry {
     address private slaRegistry;
     mapping(address => SLO) public registeredSLO;
 
-    modifier onlySLARegistry {
+    modifier onlySLARegistry() {
         require(
             msg.sender == slaRegistry,
             'Should only be called using the SLARegistry contract'
@@ -69,17 +74,16 @@ contract SLORegistry {
 
     /**
      * @dev external view function to check a value against the SLO
-     * @param _value The SLI value to check against the SL
-     * @return boolean with the SLO honored state
+     * @param _value The SLI value to check against the SLO
+     * @return boolean with the SLO honoured state
      */
     function isRespected(uint256 _value, address _slaAddress)
         public
         view
         returns (bool)
     {
-        SLO memory slo = registeredSLO[_slaAddress];
-        SLOType sloType = slo.sloType;
-        uint256 sloValue = slo.sloValue;
+        SLOType sloType = registeredSLO[_slaAddress].sloType;
+        uint256 sloValue = registeredSLO[_slaAddress].sloValue;
 
         if (sloType == SLOType.EqualTo) {
             return _value == sloValue;
@@ -104,6 +108,64 @@ contract SLORegistry {
         if (sloType == SLOType.GreaterOrEqualTo) {
             return _value >= sloValue;
         }
+
         revert("isRespected wasn't executed properly");
+    }
+
+    /**
+     * @dev external view function to get the percentage difference between SLI and SLO
+     * @param _sli The SLI value to check against the SLO
+     * @param _slaAddress The SLO value to check against the SLI
+     * @param _precision The precision for the calculation
+     * @return uint256 with the deviation value for the selected sli and sla
+     */
+    function getDeviation(
+        uint256 _sli,
+        address _slaAddress,
+        uint256 _precision
+    ) public view returns (uint256) {
+        SLOType sloType = registeredSLO[_slaAddress].sloType;
+        uint256 sloValue = registeredSLO[_slaAddress].sloValue;
+
+        // Ensures a positive deviation for greater / small comparisons
+        // The deviation is the percentage difference between SLI and SLO
+        uint256 deviation = (
+            _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)
+        ).mul(_precision).div(_sli.add(sloValue).div(2));
+
+        // Enforces a deviation capped at 25%
+        if (deviation > _precision.mul(25).div(100)) {
+            deviation = _precision.mul(25).div(100);
+        }
+
+        if (sloType == SLOType.EqualTo) {
+            // Fixed deviation for this comparison, the reward percentage fully driven by verification period
+            deviation = _precision.mul(1).div(100);
+            return deviation;
+        }
+
+        if (sloType == SLOType.NotEqualTo) {
+            // Fixed deviation for this comparison, the reward percentage fully driven by verification period
+            deviation = _precision.mul(1).div(100);
+            return deviation;
+        }
+
+        if (sloType == SLOType.SmallerThan) {
+            return deviation;
+        }
+
+        if (sloType == SLOType.SmallerOrEqualTo) {
+            return deviation;
+        }
+
+        if (sloType == SLOType.GreaterThan) {
+            return deviation;
+        }
+
+        if (sloType == SLOType.GreaterOrEqualTo) {
+            return deviation;
+        }
+
+        revert("getDeviation wasn't executed properly");
     }
 }

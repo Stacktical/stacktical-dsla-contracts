@@ -28,9 +28,7 @@ contract SLA is Staking {
 
     //
     string public ipfsHash;
-    address public immutable messengerAddress;
     ISLARegistry private _slaRegistry;
-    IPeriodRegistry private immutable _periodRegistry;
     SLORegistry private immutable _sloRegistry;
     uint256 public immutable creationBlockNumber;
     uint128 public immutable initialPeriodId;
@@ -39,8 +37,6 @@ contract SLA is Staking {
     /// @dev extra data for customized workflows
     bytes32[] public extraData;
 
-    bool private _breachedContract = false;
-    bool public userWithdrawLocked = true;
     uint256 public nextVerifiablePeriod;
 
     /// @dev periodId=>PeriodSLI mapping
@@ -52,7 +48,8 @@ contract SLA is Staking {
         address indexed tokenAddress,
         uint256 indexed periodId,
         address indexed caller,
-        uint256 amount
+        uint256 amount,
+        Position position
     );
     event ProviderWithdraw(
         address indexed tokenAddress,
@@ -95,14 +92,13 @@ contract SLA is Staking {
             _whitelisted,
             _slaID,
             _leverage,
-            _owner
+            _owner,
+            _messengerAddress
         )
     {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;
-        messengerAddress = _messengerAddress;
         _slaRegistry = ISLARegistry(msg.sender);
-        _periodRegistry = IPeriodRegistry(_slaRegistry.periodRegistry());
         _sloRegistry = SLORegistry(_slaRegistry.sloRegistry());
         creationBlockNumber = block.number;
         initialPeriodId = _initialPeriodId;
@@ -121,29 +117,24 @@ contract SLA is Staking {
         PeriodSLI storage periodSLI = periodSLIs[_periodId];
         periodSLI.sli = _sli;
         periodSLI.timestamp = block.timestamp;
-        (uint256 sloValue, ) = _sloRegistry.registeredSLO(address(this));
+
+        uint256 deviation = _sloRegistry.getDeviation(
+            _sli,
+            address(this),
+            10000
+        );
+
         if (_sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
-            uint256 precision = 10000;
-            uint256 deviation = _sli.sub(sloValue).mul(precision).div(
-                _sli.add(sloValue).div(2)
-            );
-            uint256 normalizedPeriodId = _periodId.sub(initialPeriodId).add(1);
-            uint256 rewardPercentage = deviation.mul(normalizedPeriodId).div(
-                finalPeriodId - initialPeriodId + 1
-            );
-            _setRespectedPeriodReward(_periodId, rewardPercentage, precision);
+            _setProviderReward(_periodId, deviation, 10000);
         } else {
             periodSLI.status = Status.NotRespected;
-            _setUsersCompensation(_periodId);
-            _breachedContract = true;
+            _setUserReward(_periodId, deviation, 10000);
         }
     }
 
     function isAllowedPeriod(uint256 _periodId) external view returns (bool) {
-        if (_periodId < initialPeriodId) return false;
-        if (_periodId > finalPeriodId) return false;
-        return true;
+        return _periodId >= initialPeriodId && _periodId <= finalPeriodId;
     }
 
     function contractFinished() public view returns (bool) {
@@ -151,61 +142,74 @@ contract SLA is Staking {
             periodType,
             finalPeriodId
         );
-        return
-            _breachedContract == true ||
-            (block.timestamp >= endOfLastValidPeriod &&
-                periodSLIs[finalPeriodId].status != Status.NotVerified);
+        return (block.timestamp >= endOfLastValidPeriod &&
+            periodSLIs[finalPeriodId].status != Status.NotVerified);
     }
 
-    function stakeTokens(uint256 _amount, address _token) external {
-        bool isContractFinished = contractFinished();
-        require(!isContractFinished, 'finished contract');
-        _stake(_amount, _token);
-        emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount);
+    function stakeTokens(
+        uint256 _amount,
+        address _tokenAddress,
+        Position _position
+    ) external {
+        require(_amount > 0, 'Stake must be greater than 0.');
+
+        (, uint256 finalPeriodEnd) = _periodRegistry.getPeriodStartAndEnd(
+            periodType,
+            finalPeriodId
+        );
+
+        require(
+            block.timestamp < finalPeriodEnd,
+            'Staking disabled after the last period.'
+        );
+
+        require(
+            periodSLIs[finalPeriodId].status == Status.NotVerified,
+            'Staking disabled after the last verification.'
+        );
+
+        _stake(_tokenAddress, nextVerifiablePeriod, _amount, _position);
+
+        emit Stake(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount,
+            _position
+        );
+
         IStakeRegistry stakeRegistry = IStakeRegistry(
             _slaRegistry.stakeRegistry()
         );
+
         stakeRegistry.registerStakedSla(msg.sender);
     }
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        bool isContractFinished = contractFinished();
         emit ProviderWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
             msg.sender,
             _amount
         );
-        _withdrawProviderTokens(_amount, _tokenAddress, isContractFinished);
+        _withdrawProviderTokens(_amount, _tokenAddress, nextVerifiablePeriod);
     }
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        if (msg.sender != owner() && userWithdrawLocked) {
-            bool isContractFinished = contractFinished();
-            require(isContractFinished, 'not finished');
-        }
         emit UserWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
             msg.sender,
             _amount
         );
-        _withdrawUserTokens(_amount, _tokenAddress);
-    }
-
-    function toggleUserWithdrawLocked() external onlyOwner {
-        userWithdrawLocked = !userWithdrawLocked;
+        _withdrawUserTokens(_amount, _tokenAddress, nextVerifiablePeriod);
     }
 
     function getStakersLength() external view returns (uint256) {
         return stakers.length;
-    }
-
-    function breachedContract() external view returns (bool) {
-        return _breachedContract;
     }
 }

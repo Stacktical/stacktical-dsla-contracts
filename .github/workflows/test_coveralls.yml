@@ -1,0 +1,28 @@
+name: Test Coveralls
+on: ["pull_request"]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: yarn install
+        run: yarn install
+
+      - name: Compile
+        run: npx hardhat compile
+
+      - name: run coverage
+        run: npx hardhat coverage
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,9 +1,9 @@
-// solhint-disable-line
+// SPDX-License-Identifier: MIT
 pragma solidity 0.6.6;
 
 library StringUtils {
     function addressToString(address _address)
-        external
+        internal
         pure
         returns (string memory)
     {
@@ -20,7 +20,7 @@ library StringUtils {
     }
 
     function bytes32ToStr(bytes32 _bytes32)
-        external
+        internal
         pure
         returns (string memory)
     {
@@ -35,8 +35,8 @@ library StringUtils {
         return string(bytesArray);
     }
 
-    function bytesToUint(bytes calldata b)
-        external
+    function bytesToUint(bytes memory b)
+        internal
         pure
         returns (uint256 result)
     {
@@ -70,7 +70,7 @@ library StringUtils {
         THE SOFTWARE.
     */
     function uintToStr(uint256 _i)
-        external
+        internal
         pure
         returns (string memory _uintAsString)
     {

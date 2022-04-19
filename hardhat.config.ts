@@ -1,12 +1,18 @@
 import '@typechain/hardhat';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
+import 'solidity-coverage';
+import 'hardhat-abi-exporter';
+import 'hardhat-contract-sizer';
 import 'hardhat-deploy';
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
+  typechain: {
+    target: 'ethers-v5',
+  },
   solidity: {
     compilers: [
       {
@@ -27,5 +33,11 @@ module.exports = {
     notDeployer: {
       default: 1,
     },
+  },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: false,
   },
 };
