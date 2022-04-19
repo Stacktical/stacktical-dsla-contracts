@@ -148,47 +148,65 @@ contract SLA is Staking {
 
     function stakeTokens(
         uint256 _amount,
-        address _token,
+        address _tokenAddress,
         Position _position
     ) external {
-        require(_amount > 0, "zero staking not allowed.");
-        (, uint256 endOfLastValidPeriod) = _periodRegistry.getPeriodStartAndEnd(
+        require(_amount > 0, 'Stake must be greater than 0.');
+
+        (, uint256 finalPeriodEnd) = _periodRegistry.getPeriodStartAndEnd(
             periodType,
             finalPeriodId
         );
-        require(block.timestamp < endOfLastValidPeriod, "Staking disabled after the last period");
-        require(periodSLIs[finalPeriodId].status == Status.NotVerified, "Last period verfied, staking disabled");
-        _stake(_amount, _token, _position);
-        emit Stake(_token, nextVerifiablePeriod, msg.sender, _amount, _position);
-        IStakeRegistry(
+
+        require(
+            block.timestamp < finalPeriodEnd,
+            'Staking disabled after the last period.'
+        );
+
+        require(
+            periodSLIs[finalPeriodId].status == Status.NotVerified,
+            'Staking disabled after the last verification.'
+        );
+
+        _stake(_tokenAddress, nextVerifiablePeriod, _amount, _position);
+
+        emit Stake(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount,
+            _position
+        );
+
+        IStakeRegistry stakeRegistry = IStakeRegistry(
             _slaRegistry.stakeRegistry()
-        ).registerStakedSla(msg.sender);
+        );
+
+        stakeRegistry.registerStakedSla(msg.sender);
     }
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        require(contractFinished(), 'not finished');
         emit ProviderWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
             msg.sender,
             _amount
         );
-        _withdrawProviderTokens(_amount, _tokenAddress);
+        _withdrawProviderTokens(_amount, _tokenAddress, nextVerifiablePeriod);
     }
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        require(contractFinished(), 'not finished');
         emit UserWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
             msg.sender,
             _amount
         );
-        _withdrawUserTokens(_amount, _tokenAddress);
+        _withdrawUserTokens(_amount, _tokenAddress, nextVerifiablePeriod);
     }
 
     function getStakersLength() external view returns (uint256) {

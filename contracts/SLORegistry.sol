@@ -127,7 +127,7 @@ contract SLORegistry {
         SLOType sloType = registeredSLO[_slaAddress].sloType;
         uint256 sloValue = registeredSLO[_slaAddress].sloValue;
 
-        // Ensures a positive deviation for greater / small comparisions
+        // Ensures a positive deviation for greater / small comparisons
         // The deviation is the percentage difference between SLI and SLO
         uint256 deviation = (
             _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)

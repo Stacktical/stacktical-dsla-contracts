@@ -243,7 +243,7 @@ describe(CONTRACT_NAMES.Staking, function () {
     let stakeAmount = 100000;
 
     await expect(sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.SHORT))
-      .to.be.revertedWith('user stake')
+      .to.be.revertedWith('Stake exceeds leveraged cap.')
   });
 
   it('should prevent staking in case of amount exceeds allowance', async () => {
