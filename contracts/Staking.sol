@@ -37,7 +37,7 @@ contract Staking is Ownable, ReentrancyGuard {
     uint128 public immutable slaID;
 
     /// @dev (tokenAddress=>uint256) total pooled token balance
-    mapping(address => uint256) public providerPool;
+    mapping(address => uint256) public providersPool;
 
     /// @dev (userAddress=>uint256) provider staking activity
     mapping(address => uint256) public lastProviderStake;
@@ -233,7 +233,7 @@ contract Staking is Ownable, ReentrancyGuard {
         if (_position == Position.SHORT) {
             require(
                 usersPool[_tokenAddress].add(_amount).mul(leverage) <=
-                    providerPool[_tokenAddress],
+                    providersPool[_tokenAddress],
                 'Stake exceeds leveraged cap.'
             );
 
@@ -267,10 +267,10 @@ contract Staking is Ownable, ReentrancyGuard {
                 // mint dTokens proportionally
                 dpToken.mint(
                     msg.sender,
-                    _amount.mul(p0).div(providerPool[_tokenAddress])
+                    _amount.mul(p0).div(providersPool[_tokenAddress])
                 );
             }
-            providerPool[_tokenAddress] = providerPool[_tokenAddress].add(
+            providersPool[_tokenAddress] = providersPool[_tokenAddress].add(
                 _amount
             );
 
@@ -290,12 +290,12 @@ contract Staking is Ownable, ReentrancyGuard {
     ) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
-            uint256 providerStake = providerPool[tokenAddress];
+            uint256 providerStake = providersPool[tokenAddress];
             uint256 reward = providerStake.mul(_rewardPercentage).div(_precision);
 
             usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
 
-            providerPool[tokenAddress] = providerPool[tokenAddress].add(reward);
+            providersPool[tokenAddress] = providersPool[tokenAddress].add(reward);
 
             providerRewards[_periodId] = reward;
 
@@ -323,7 +323,7 @@ contract Staking is Ownable, ReentrancyGuard {
                 .mul(_rewardPercentage)
                 .div(_precision);
 
-            providerPool[tokenAddress] = providerPool[tokenAddress].sub(
+            providersPool[tokenAddress] = providersPool[tokenAddress].sub(
                 compensation
             );
 
@@ -352,7 +352,7 @@ contract Staking is Ownable, ReentrancyGuard {
         );
 
         require(
-            providerPool[_tokenAddress].sub(_amount) >=
+            providersPool[_tokenAddress].sub(_amount) >=
                 usersPool[_tokenAddress].mul(leverage),
             'Withdrawal exceeds leveraged cap.'
         );
@@ -362,9 +362,9 @@ contract Staking is Ownable, ReentrancyGuard {
         // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
         dpToken.burnFrom(
             msg.sender,
-            _amount.mul(dpToken.totalSupply()).div(providerPool[_tokenAddress])
+            _amount.mul(dpToken.totalSupply()).div(providersPool[_tokenAddress])
         );
-        providerPool[_tokenAddress] = providerPool[_tokenAddress].sub(_amount);
+        providersPool[_tokenAddress] = providersPool[_tokenAddress].sub(_amount);
         uint256 outstandingAmount = _distributeClaimingRewards(
             _amount,
             _tokenAddress
