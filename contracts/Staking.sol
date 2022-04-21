@@ -290,8 +290,8 @@ contract Staking is Ownable, ReentrancyGuard {
     ) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
-            uint256 usersStake = usersPool[tokenAddress];
-            uint256 reward = usersStake.mul(_rewardPercentage).div(_precision);
+            uint256 providerStake = providerPool[tokenAddress];
+            uint256 reward = providerStake.mul(_rewardPercentage).div(_precision);
 
             usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
 
