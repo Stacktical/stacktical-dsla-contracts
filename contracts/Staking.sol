@@ -107,7 +107,7 @@ contract Staking is Ownable, ReentrancyGuard {
     event UserCompensationGenerated(
         uint256 indexed periodId,
         address indexed tokenAddress,
-        uint256 usersStake,
+        uint256 userStake,
         uint256 leverage,
         uint256 compensation
     );
@@ -316,9 +316,9 @@ contract Staking is Ownable, ReentrancyGuard {
     ) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
-            uint256 usersStake = usersPool[tokenAddress];
+            uint256 userStake = usersPool[tokenAddress];
 
-            uint256 compensation = usersStake
+            uint256 compensation = userStake
                 .mul(leverage)
                 .mul(_rewardPercentage)
                 .div(_precision);
@@ -334,7 +334,7 @@ contract Staking is Ownable, ReentrancyGuard {
             emit UserCompensationGenerated(
                 _periodId,
                 tokenAddress,
-                usersStake,
+                userStake,
                 leverage,
                 compensation
             );
