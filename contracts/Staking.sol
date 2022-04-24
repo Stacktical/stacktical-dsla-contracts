@@ -290,12 +290,22 @@ contract Staking is Ownable, ReentrancyGuard {
     ) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
-            uint256 providerStake = providersPool[tokenAddress];
-            uint256 reward = providerStake.mul(_rewardPercentage).div(_precision);
+
+            uint256 reward = providersPool[tokenAddress]
+                .div(leverage)
+                .mul(_rewardPercentage)
+                .div(_precision);
+
+            // Reward must be less than 25% of usersPool to ensure payout at all time
+            if (reward > usersPool[tokenAddress].mul(25).div(100)) {
+                reward = usersPool[tokenAddress].mul(_rewardPercentage).div(_precision);
+            }
 
             usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
 
-            providersPool[tokenAddress] = providersPool[tokenAddress].add(reward);
+            providersPool[tokenAddress] = providersPool[tokenAddress].add(
+                reward
+            );
 
             providerRewards[_periodId] = reward;
 
@@ -316,12 +326,16 @@ contract Staking is Ownable, ReentrancyGuard {
     ) internal {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
-            uint256 userStake = usersPool[tokenAddress];
 
-            uint256 compensation = userStake
+            uint256 compensation = usersPool[tokenAddress]
                 .mul(leverage)
                 .mul(_rewardPercentage)
                 .div(_precision);
+
+            // Compensation must be less than 25% of providersPool to ensure payout at all time
+            if (compensation > providersPool[tokenAddress].mul(25).div(100)) {
+                compensation = providersPool[tokenAddress].mul(_rewardPercentage).div(_precision);
+            }
 
             providersPool[tokenAddress] = providersPool[tokenAddress].sub(
                 compensation
@@ -334,7 +348,7 @@ contract Staking is Ownable, ReentrancyGuard {
             emit UserCompensationGenerated(
                 _periodId,
                 tokenAddress,
-                userStake,
+                usersPool[tokenAddress],
                 leverage,
                 compensation
             );
@@ -344,18 +358,22 @@ contract Staking is Ownable, ReentrancyGuard {
     function _withdrawProviderTokens(
         uint256 _amount,
         address _tokenAddress,
-        uint256 _nextVerifiablePeriod
+        uint256 _nextVerifiablePeriod,
+        bool _contractFinished
     ) internal onlyAllowedToken(_tokenAddress) nonReentrant {
-        require(
-            lastProviderStake[msg.sender] < _nextVerifiablePeriod,
-            'Provider lock-up until the next verification.'
-        );
+        if (!_contractFinished) {
+            require(
+                lastProviderStake[msg.sender] < _nextVerifiablePeriod,
+                'Provider lock-up until the next verification.'
+            );
 
-        require(
-            providersPool[_tokenAddress].sub(_amount) >=
-                usersPool[_tokenAddress].mul(leverage),
-            'Withdrawal exceeds leveraged cap.'
-        );
+            // Allow provider withdrawal as long as the provider user pool exceeds the provider pool
+            require(
+                providersPool[_tokenAddress].sub(_amount) >=
+                    usersPool[_tokenAddress].mul(leverage),
+                'Withdrawal exceeds leveraged cap.'
+            );
+        }
 
         dToken dpToken = dpTokenRegistry[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the Provider Pool / DSLA-SP Pool average
@@ -364,7 +382,9 @@ contract Staking is Ownable, ReentrancyGuard {
             msg.sender,
             _amount.mul(dpToken.totalSupply()).div(providersPool[_tokenAddress])
         );
-        providersPool[_tokenAddress] = providersPool[_tokenAddress].sub(_amount);
+        providersPool[_tokenAddress] = providersPool[_tokenAddress].sub(
+            _amount
+        );
         uint256 outstandingAmount = _distributeClaimingRewards(
             _amount,
             _tokenAddress
@@ -375,12 +395,22 @@ contract Staking is Ownable, ReentrancyGuard {
     function _withdrawUserTokens(
         uint256 _amount,
         address _tokenAddress,
-        uint256 _nextVerifiablePeriod
+        uint256 _nextVerifiablePeriod,
+        bool _contractFinished
     ) internal onlyAllowedToken(_tokenAddress) nonReentrant {
-        require(
-            lastUserStake[msg.sender] < _nextVerifiablePeriod,
-            'User lock-up until the next verification.'
-        );
+        if (!_contractFinished) {
+            require(
+                lastUserStake[msg.sender] < _nextVerifiablePeriod,
+                'User lock-up until the next verification.'
+            );
+
+            // Allow user withdrawal as long as the leveraged user pool exceeds the provider pool
+            require(
+                usersPool[_tokenAddress].sub(_amount) >=
+                    providersPool[_tokenAddress].div(leverage),
+                'Withdrawal exceeds leveraged cap.'
+            );
+        }
 
         dToken duToken = duTokenRegistry[_tokenAddress];
         // Burn duTokens in a way that doesn't affect the User Pool / DSLA-SP Pool average

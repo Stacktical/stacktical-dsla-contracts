@@ -188,25 +188,40 @@ contract SLA is Staking {
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
     {
+        bool isContractFinished = contractFinished();
+
         emit ProviderWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
             msg.sender,
             _amount
         );
-        _withdrawProviderTokens(_amount, _tokenAddress, nextVerifiablePeriod);
+
+        _withdrawProviderTokens(
+            _amount,
+            _tokenAddress,
+            nextVerifiablePeriod,
+            isContractFinished
+        );
     }
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
+        bool isContractFinished = contractFinished();
+
         emit UserWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
             msg.sender,
             _amount
         );
-        _withdrawUserTokens(_amount, _tokenAddress, nextVerifiablePeriod);
+        _withdrawUserTokens(
+            _amount,
+            _tokenAddress,
+            nextVerifiablePeriod,
+            isContractFinished
+        );
     }
 
     function getStakersLength() external view returns (uint256) {
