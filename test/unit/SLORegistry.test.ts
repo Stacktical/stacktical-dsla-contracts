@@ -265,7 +265,7 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 				slaAddress,
 				10000,
 			)
-			expect(deviation).to.be.equal(BigNumber.from(1 * 100));
+			expect(deviation).to.be.equal(BigNumber.from(1 * 2500));
 		})
 		it("NotEqualTo", async () => {
 			await deploySLA({
@@ -280,7 +280,7 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 				slaAddress,
 				10000,
 			)
-			expect(deviation).to.be.equal(BigNumber.from(1 * 100));
+			expect(deviation).to.be.equal(BigNumber.from(1 * 2500));
 		})
 		it("GreaterThan", async () => {
 			await deploySLA(config);
