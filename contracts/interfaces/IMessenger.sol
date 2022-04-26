@@ -100,7 +100,12 @@ abstract contract IMessenger is Ownable {
     /**
      * @dev returns the symbol of DSLA-LP token
      */
-    function lpSymbol(uint128 slaId) external view virtual returns (string memory);
+    function lpSymbol() external view virtual returns (string memory);
+
+    /**
+     * @dev returns the symbol of DSLA-LP token with slaId
+     */
+    function lpSymbolSlaId(uint128 slaId) external view virtual returns (string memory);
 
     /**
      * @dev returns the name of DSLA-SP token
@@ -110,7 +115,12 @@ abstract contract IMessenger is Ownable {
     /**
      * @dev returns the symbol of DSLA-SP token
      */
-    function spSymbol(uint128 slaId) external view virtual returns (string memory);
+    function spSymbol() external view virtual returns (string memory);
+
+    /**
+     * @dev returns the symbol of DSLA-SP token with slaId
+     */
+    function spSymbolSlaId(uint128 slaId) external view virtual returns (string memory);
 
     function setChainlinkJobID(bytes32 _newJobId, uint256 _feeMultiplier)
         external

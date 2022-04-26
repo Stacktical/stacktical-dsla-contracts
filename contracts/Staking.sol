@@ -186,9 +186,9 @@ contract Staking is Ownable, ReentrancyGuard {
         allowedTokens.push(_tokenAddress);
         require(maxTokenLength >= allowedTokens.length, 'max token length');
         string memory duTokenName = IMessenger(messengerAddress).spName();
-        string memory duTokenSymbol = IMessenger(messengerAddress).spSymbol(slaID);
+        string memory duTokenSymbol = IMessenger(messengerAddress).spSymbolSlaId(slaID);
         string memory dpTokenName = IMessenger(messengerAddress).lpName();
-        string memory dpTokenSymbol = IMessenger(messengerAddress).lpSymbol(slaID);
+        string memory dpTokenSymbol = IMessenger(messengerAddress).lpSymbolSlaId(slaID);
         uint8 decimals = IERC20Query(_tokenAddress).decimals();
 
         dToken duToken = dToken(
