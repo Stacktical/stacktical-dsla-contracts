@@ -151,22 +151,10 @@ contract SLA is Staking {
         address _tokenAddress,
         Position _position
     ) external {
+        bool isContractFinished = contractFinished();
+        require(!isContractFinished, 'This SLA has terminated.');
+
         require(_amount > 0, 'Stake must be greater than 0.');
-
-        (, uint256 finalPeriodEnd) = _periodRegistry.getPeriodStartAndEnd(
-            periodType,
-            finalPeriodId
-        );
-
-        require(
-            block.timestamp < finalPeriodEnd,
-            'Staking disabled after the last period.'
-        );
-
-        require(
-            periodSLIs[finalPeriodId].status == Status.NotVerified,
-            'Staking disabled after the last verification.'
-        );
 
         _stake(_tokenAddress, nextVerifiablePeriod, _amount, _position);
 

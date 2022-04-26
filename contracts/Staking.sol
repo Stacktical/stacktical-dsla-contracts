@@ -19,8 +19,8 @@ contract Staking is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     enum Position {
-        LONG,
-        SHORT
+        OK,
+        KO
     }
 
     /// @dev StakeRegistry contract
@@ -85,7 +85,7 @@ contract Staking is Ownable, ReentrancyGuard {
     mapping(uint256 => uint256) public userRewards;
 
     modifier onlyAllowedToken(address _token) {
-        require(isAllowedToken(_token), 'token not allowed');
+        require(isAllowedToken(_token), 'This token is not allowed.');
         _;
     }
 
@@ -181,24 +181,31 @@ contract Staking is Ownable, ReentrancyGuard {
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
         (, , , , , , uint256 maxTokenLength, , ) = _stakeRegistry
             .getStakingParameters();
-        require(!isAllowedToken(_tokenAddress), 'already added');
-        require(_stakeRegistry.isAllowedToken(_tokenAddress), 'not allowed');
+
+        require(!isAllowedToken(_tokenAddress), 'This token has been allowed already.');
+        
+        require(_stakeRegistry.isAllowedToken(_tokenAddress), 'This token is not allowed.');
         allowedTokens.push(_tokenAddress);
+        
         require(maxTokenLength >= allowedTokens.length, 'max token length');
+        
         string memory dTokenID = StringUtils.uintToStr(slaID);
         string memory duTokenName = IMessenger(messengerAddress).spName();
         string memory duTokenSymbol = string(
             abi.encodePacked('DSLA-SP-', dTokenID)
         );
+        
         string memory dpTokenName = IMessenger(messengerAddress).lpName();
         string memory dpTokenSymbol = string(
             abi.encodePacked('DSLA-LP-', dTokenID)
         );
+        
         uint8 decimals = IERC20Query(_tokenAddress).decimals();
 
         dToken duToken = dToken(
             _stakeRegistry.createDToken(duTokenName, duTokenSymbol, decimals)
         );
+        
         dToken dpToken = dToken(
             _stakeRegistry.createDToken(dpTokenName, dpTokenSymbol, decimals)
         );
@@ -229,8 +236,7 @@ contract Staking is Ownable, ReentrancyGuard {
         );
 
         // DSLA-SP proofs of SLA Position
-        // string memory short = 'short';
-        if (_position == Position.SHORT) {
+        if (_position == Position.KO) {
             require(
                 usersPool[_tokenAddress].add(_amount).mul(leverage) <=
                     providersPool[_tokenAddress],
@@ -256,8 +262,7 @@ contract Staking is Ownable, ReentrancyGuard {
         }
 
         // DSLA-LP proofs of SLA Position
-        // string memory long = 'long';
-        if (_position == Position.LONG) {
+        if (_position == Position.OK) {
             dToken dpToken = dpTokenRegistry[_tokenAddress];
             uint256 p0 = dpToken.totalSupply();
 
@@ -298,7 +303,9 @@ contract Staking is Ownable, ReentrancyGuard {
 
             // Reward must be less than 25% of usersPool to ensure payout at all time
             if (reward > usersPool[tokenAddress].mul(25).div(100)) {
-                reward = usersPool[tokenAddress].mul(_rewardPercentage).div(_precision);
+                reward = usersPool[tokenAddress].mul(_rewardPercentage).div(
+                    _precision
+                );
             }
 
             usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
@@ -334,7 +341,9 @@ contract Staking is Ownable, ReentrancyGuard {
 
             // Compensation must be less than 25% of providersPool to ensure payout at all time
             if (compensation > providersPool[tokenAddress].mul(25).div(100)) {
-                compensation = providersPool[tokenAddress].mul(_rewardPercentage).div(_precision);
+                compensation = providersPool[tokenAddress]
+                    .mul(_rewardPercentage)
+                    .div(_precision);
             }
 
             providersPool[tokenAddress] = providersPool[tokenAddress].sub(
@@ -402,13 +411,6 @@ contract Staking is Ownable, ReentrancyGuard {
             require(
                 lastUserStake[msg.sender] < _nextVerifiablePeriod,
                 'User lock-up until the next verification.'
-            );
-
-            // Allow user withdrawal as long as the leveraged user pool exceeds the provider pool
-            require(
-                usersPool[_tokenAddress].sub(_amount) >=
-                    providersPool[_tokenAddress].div(leverage),
-                'Withdrawal exceeds leveraged cap.'
             );
         }
 

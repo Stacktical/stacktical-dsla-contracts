@@ -125,13 +125,13 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         SLA _sla,
         bool _ownerApproval
     ) public {
-        require(isRegisteredSLA(address(_sla)), 'invalid SLA');
+        require(isRegisteredSLA(address(_sla)), 'This SLA is not valid.');
         require(
             _periodId == _sla.nextVerifiablePeriod(),
             'not nextVerifiablePeriod'
         );
         (, , SLA.Status status) = _sla.periodSLIs(_periodId);
-        require(status == SLA.Status.NotVerified, 'invalid SLA status');
+        require(status == SLA.Status.NotVerified, 'This SLA has already been verified.');
         bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
         require(slaAllowedPeriodId, 'invalid period');
         IPeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
@@ -154,19 +154,20 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
             _periodId
         );
     }
+    
 
     function returnLockedValue(SLA _sla) public {
-        require(isRegisteredSLA(address(_sla)), 'invalid SLA');
-        require(msg.sender == _sla.owner(), 'msg.sender not owner');
-        uint256 lastValidPeriodId = _sla.finalPeriodId();
+        require(isRegisteredSLA(address(_sla)), 'This SLA is not valid.');
+        require(msg.sender == _sla.owner(), 'Only the SLA owner can do this.');
+        uint256 finalPeriodId = _sla.finalPeriodId();
         (, uint256 endOfLastValidPeriod) = IPeriodRegistry(_periodRegistry)
-            .getPeriodStartAndEnd(_sla.periodType(), lastValidPeriodId);
+            .getPeriodStartAndEnd(_sla.periodType(), finalPeriodId);
 
-        (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(lastValidPeriodId);
+        (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(finalPeriodId);
         require(
             (block.timestamp >= endOfLastValidPeriod &&
                 lastPeriodStatus != SLA.Status.NotVerified),
-            'not finished contract'
+            'This SLA has not terminated.'
         );
         emit ReturnLockedValue(address(_sla), msg.sender);
         IStakeRegistry(_stakeRegistry).returnLockedValue(address(_sla));
