@@ -376,7 +376,7 @@ contract Staking is Ownable, ReentrancyGuard {
                 'Provider lock-up until the next verification.'
             );
 
-            // Allow provider withdrawal as long as the provider user pool exceeds the provider pool
+            // Allow provider withdrawal as long as the provider pool exceeds the leveraged user pool
             require(
                 providersPool[_tokenAddress].sub(_amount) >=
                     usersPool[_tokenAddress].mul(leverage),
