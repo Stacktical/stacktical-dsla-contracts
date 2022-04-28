@@ -132,17 +132,13 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         );
         (, , SLA.Status status) = _sla.periodSLIs(_periodId);
         require(status == SLA.Status.NotVerified, 'This SLA has already been verified.');
-        bool slaAllowedPeriodId = _sla.isAllowedPeriod(_periodId);
-        require(slaAllowedPeriodId, 'invalid period');
-        IPeriodRegistry.PeriodType slaPeriodType = _sla.periodType();
-        bool periodFinished = IPeriodRegistry(_periodRegistry).periodIsFinished(
-            slaPeriodType,
+        require(_sla.isAllowedPeriod(_periodId), 'invalid period');
+        require(IPeriodRegistry(_periodRegistry).periodIsFinished(
+            _sla.periodType(),
             _periodId
-        );
-        require(periodFinished, 'period unfinished');
-        address slaMessenger = _sla.messengerAddress();
+        ), 'period unfinished');
         emit SLIRequested(_periodId, address(_sla), msg.sender);
-        IMessenger(slaMessenger).requestSLI(
+        IMessenger(_sla.messengerAddress()).requestSLI(
             _periodId,
             address(_sla),
             _ownerApproval,

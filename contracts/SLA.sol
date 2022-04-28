@@ -151,8 +151,7 @@ contract SLA is Staking {
         address _tokenAddress,
         Position _position
     ) external {
-        bool isContractFinished = contractFinished();
-        require(!isContractFinished, 'This SLA has terminated.');
+        require(!contractFinished(), 'This SLA has terminated.');
 
         require(_amount > 0, 'Stake must be greater than 0.');
 
@@ -166,18 +165,12 @@ contract SLA is Staking {
             _position
         );
 
-        IStakeRegistry stakeRegistry = IStakeRegistry(
-            _slaRegistry.stakeRegistry()
-        );
-
-        stakeRegistry.registerStakedSla(msg.sender);
+        IStakeRegistry(_slaRegistry.stakeRegistry()).registerStakedSla(msg.sender);
     }
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        bool isContractFinished = contractFinished();
-
         emit ProviderWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
@@ -189,15 +182,13 @@ contract SLA is Staking {
             _amount,
             _tokenAddress,
             nextVerifiablePeriod,
-            isContractFinished
+            contractFinished()
         );
     }
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        bool isContractFinished = contractFinished();
-
         emit UserWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
@@ -208,7 +199,7 @@ contract SLA is Staking {
             _amount,
             _tokenAddress,
             nextVerifiablePeriod,
-            isContractFinished
+            contractFinished()
         );
     }
 
