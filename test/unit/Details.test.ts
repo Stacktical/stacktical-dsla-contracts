@@ -141,7 +141,7 @@ describe(CONTRACT_NAMES.Details, function () {
     expect(darr['tokensStake'][0]['tokenAddress']).to.be.properAddress;
     expect(darr['tokensStake'][0]).to.have.own.property('totalStake');
     expect(darr['tokensStake'][0]).to.have.own.property('usersPool');
-    expect(darr['tokensStake'][0]).to.have.own.property('providerPool');
+    expect(darr['tokensStake'][0]).to.have.own.property('providersPool');
   });
 
   it('should return DTokens Details array with required attributes and structure', async function () {

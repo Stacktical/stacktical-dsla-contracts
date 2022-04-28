@@ -187,7 +187,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      *@param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
-        require(!isAllowedToken(_tokenAddress), 'token already added');
+        require(!isAllowedToken(_tokenAddress), 'This token has been allowed already.');
         allowedTokens.push(_tokenAddress);
     }
 
