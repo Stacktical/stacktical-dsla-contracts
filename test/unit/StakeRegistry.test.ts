@@ -101,6 +101,8 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 	);
 	await mockMessenger.mock.lpName.returns('UPTIME.ok');
 	await mockMessenger.mock.spName.returns('UPTIME.ko');
+	await mockMessenger.mock.lpSymbolSlaId.returns('UPTIME.ok-0');
+	await mockMessenger.mock.spSymbolSlaId.returns('UPTIME.ko-0');
 	await mockMessenger.mock.requestSLI.returns();
 	await mockMessenger.mock.owner.returns(deployer);
 	await mockMessenger.mock.setSLARegistry.returns();

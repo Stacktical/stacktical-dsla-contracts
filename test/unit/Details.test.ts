@@ -64,6 +64,8 @@ const setup = deployments.createFixture(async () => {
   );
   await mockMessenger.mock.lpName.returns('UPTIME.ok');
   await mockMessenger.mock.spName.returns('UPTIME.ko');
+  await mockMessenger.mock.lpSymbolSlaId.returns('UPTIME.ok-0');
+  await mockMessenger.mock.spSymbolSlaId.returns('UPTIME.ko-0');
 
   let tx = await slaRegistry.createSLA(
     baseSLAConfig.sloValue,
