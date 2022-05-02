@@ -182,30 +182,32 @@ contract Staking is Ownable, ReentrancyGuard {
         (, , , , , , uint256 maxTokenLength, , ) = _stakeRegistry
             .getStakingParameters();
 
-        require(!isAllowedToken(_tokenAddress), 'This token has been allowed already.');
-        
-        require(_stakeRegistry.isAllowedToken(_tokenAddress), 'This token is not allowed.');
+        require(
+            !isAllowedToken(_tokenAddress),
+            'This token has been allowed already.'
+        );
+
+        require(
+            _stakeRegistry.isAllowedToken(_tokenAddress),
+            'This token is not allowed.'
+        );
         allowedTokens.push(_tokenAddress);
-        
+
         require(maxTokenLength >= allowedTokens.length, 'max token length');
-        
-        string memory dTokenID = StringUtils.uintToStr(slaID);
+
         string memory duTokenName = IMessenger(messengerAddress).spName();
-        string memory duTokenSymbol = string(
-            abi.encodePacked('DSLA-SP-', dTokenID)
-        );
-        
+        string memory duTokenSymbol = IMessenger(messengerAddress)
+            .spSymbolSlaId(slaID);
         string memory dpTokenName = IMessenger(messengerAddress).lpName();
-        string memory dpTokenSymbol = string(
-            abi.encodePacked('DSLA-LP-', dTokenID)
-        );
-        
+        string memory dpTokenSymbol = IMessenger(messengerAddress)
+            .lpSymbolSlaId(slaID);
+
         uint8 decimals = IERC20Query(_tokenAddress).decimals();
 
         dToken duToken = dToken(
             _stakeRegistry.createDToken(duTokenName, duTokenSymbol, decimals)
         );
-        
+
         dToken dpToken = dToken(
             _stakeRegistry.createDToken(dpTokenName, dpTokenSymbol, decimals)
         );
