@@ -33,8 +33,8 @@ interface SLAConfig {
 	extraData: BytesLike[]
 }
 enum POSITION {
-	LONG,
-	SHORT,
+	OK,
+	KO,
 }
 const baseSLAConfig = {
 	sloValue: 50 * 10 ** 3,
@@ -149,7 +149,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		const signer = await ethers.getSigner(notDeployer);
 
 		await expect(stakeRegistry.addAllowedTokens(dslaToken.address))
-			.to.be.revertedWith('token already added');
+			.to.be.revertedWith('This token has been allowed already.');
 		await stakeRegistry.addAllowedTokens(deployer);
 		expect(await stakeRegistry.allowedTokens(1)).to.be.eq(deployer);
 
@@ -172,7 +172,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		);
 		await sla.addAllowedTokens(dslaToken.address);
 		await dslaToken.approve(slaAddress, mintAmount);
-		await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.LONG);
+		await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, slaAddress)).to.be.true;
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, deployer)).to.be.false;
 	})

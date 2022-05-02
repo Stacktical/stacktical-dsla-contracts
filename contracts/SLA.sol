@@ -151,22 +151,9 @@ contract SLA is Staking {
         address _tokenAddress,
         Position _position
     ) external {
+        require(!contractFinished(), 'This SLA has terminated.');
+
         require(_amount > 0, 'Stake must be greater than 0.');
-
-        (, uint256 finalPeriodEnd) = _periodRegistry.getPeriodStartAndEnd(
-            periodType,
-            finalPeriodId
-        );
-
-        require(
-            block.timestamp < finalPeriodEnd,
-            'Staking disabled after the last period.'
-        );
-
-        require(
-            periodSLIs[finalPeriodId].status == Status.NotVerified,
-            'Staking disabled after the last verification.'
-        );
 
         _stake(_tokenAddress, nextVerifiablePeriod, _amount, _position);
 
@@ -178,11 +165,7 @@ contract SLA is Staking {
             _position
         );
 
-        IStakeRegistry stakeRegistry = IStakeRegistry(
-            _slaRegistry.stakeRegistry()
-        );
-
-        stakeRegistry.registerStakedSla(msg.sender);
+        IStakeRegistry(_slaRegistry.stakeRegistry()).registerStakedSla(msg.sender);
     }
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
@@ -194,7 +177,13 @@ contract SLA is Staking {
             msg.sender,
             _amount
         );
-        _withdrawProviderTokens(_amount, _tokenAddress, nextVerifiablePeriod);
+
+        _withdrawProviderTokens(
+            _amount,
+            _tokenAddress,
+            nextVerifiablePeriod,
+            contractFinished()
+        );
     }
 
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
@@ -206,7 +195,12 @@ contract SLA is Staking {
             msg.sender,
             _amount
         );
-        _withdrawUserTokens(_amount, _tokenAddress, nextVerifiablePeriod);
+        _withdrawUserTokens(
+            _amount,
+            _tokenAddress,
+            nextVerifiablePeriod,
+            contractFinished()
+        );
     }
 
     function getStakersLength() external view returns (uint256) {
