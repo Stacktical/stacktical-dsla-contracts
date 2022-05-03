@@ -139,14 +139,14 @@ contract SLORegistry {
         }
 
         if (sloType == SLOType.EqualTo) {
-            // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = _precision.mul(1).div(100);
+            // Fixed deviation for this comparison, the reward percentage is the cap
+            deviation = _precision.mul(25).div(100);
             return deviation;
         }
 
         if (sloType == SLOType.NotEqualTo) {
-            // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = _precision.mul(1).div(100);
+            // Fixed deviation for this comparison, the reward percentage is the cap
+            deviation = _precision.mul(25).div(100);
             return deviation;
         }
 

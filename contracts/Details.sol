@@ -19,7 +19,7 @@ contract Details {
         address tokenAddress;
         uint256 totalStake;
         uint256 usersPool;
-        uint256 providerPool;
+        uint256 providersPool;
     }
 
     struct DtokenDetails {
@@ -113,9 +113,9 @@ contract Details {
             tokensStake[index] = TokenStake({
                 tokenAddress: tokenAddress,
                 totalStake: sla.usersPool(sla.allowedTokens(index)) +
-                    sla.providerPool(sla.allowedTokens(index)),
+                    sla.providersPool(sla.allowedTokens(index)),
                 usersPool: sla.usersPool(sla.allowedTokens(index)),
-                providerPool: sla.providerPool(sla.allowedTokens(index))
+                providersPool: sla.providersPool(sla.allowedTokens(index))
             });
         }
     }

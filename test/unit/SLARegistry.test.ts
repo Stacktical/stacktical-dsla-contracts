@@ -168,7 +168,7 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 		const { slaRegistry } = fixture;
 		await expect(slaRegistry.returnLockedValue(
 			deployer
-		)).to.be.revertedWith("invalid SLA");
+		)).to.be.revertedWith("This SLA is not valid.");
 	})
 	it("should revert returning locked value when it is called from not-owner address", async () => {
 		const { slaRegistry } = fixture;
@@ -178,7 +178,7 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 		await expect(slaRegistry.connect(signer).returnLockedValue(
 			slaAddress
-		)).to.be.revertedWith("msg.sender not owner");
+		)).to.be.revertedWith("Only the SLA owner can do this.");
 	})
 	it("should revert returning locked value when sla contract is not finished yet.", async () => {
 		const { slaRegistry } = fixture;
@@ -187,7 +187,7 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 		await expect(slaRegistry.returnLockedValue(
 			slaAddress
-		)).to.be.revertedWith("not finished contract");
+		)).to.be.revertedWith("This SLA has not terminated.");
 	})
 	it("should return locked value after sla contract has finished", async () => {
 		const { slaRegistry } = fixture;

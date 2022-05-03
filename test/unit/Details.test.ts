@@ -64,6 +64,8 @@ const setup = deployments.createFixture(async () => {
   );
   await mockMessenger.mock.lpName.returns('UPTIME.ok');
   await mockMessenger.mock.spName.returns('UPTIME.ko');
+  await mockMessenger.mock.lpSymbolSlaId.returns('UPTIME.ok-0');
+  await mockMessenger.mock.spSymbolSlaId.returns('UPTIME.ko-0');
 
   let tx = await slaRegistry.createSLA(
     baseSLAConfig.sloValue,
@@ -141,7 +143,7 @@ describe(CONTRACT_NAMES.Details, function () {
     expect(darr['tokensStake'][0]['tokenAddress']).to.be.properAddress;
     expect(darr['tokensStake'][0]).to.have.own.property('totalStake');
     expect(darr['tokensStake'][0]).to.have.own.property('usersPool');
-    expect(darr['tokensStake'][0]).to.have.own.property('providerPool');
+    expect(darr['tokensStake'][0]).to.have.own.property('providersPool');
   });
 
   it('should return DTokens Details array with required attributes and structure', async function () {

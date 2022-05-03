@@ -33,8 +33,8 @@ interface SLAConfig {
 	extraData: BytesLike[]
 }
 enum POSITION {
-	LONG,
-	SHORT,
+	OK,
+	KO,
 }
 const baseSLAConfig = {
 	sloValue: 50 * 10 ** 3,
@@ -101,6 +101,8 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 	);
 	await mockMessenger.mock.lpName.returns('UPTIME.ok');
 	await mockMessenger.mock.spName.returns('UPTIME.ko');
+	await mockMessenger.mock.lpSymbolSlaId.returns('UPTIME.ok-0');
+	await mockMessenger.mock.spSymbolSlaId.returns('UPTIME.ko-0');
 	await mockMessenger.mock.requestSLI.returns();
 	await mockMessenger.mock.owner.returns(deployer);
 	await mockMessenger.mock.setSLARegistry.returns();
@@ -149,7 +151,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		const signer = await ethers.getSigner(notDeployer);
 
 		await expect(stakeRegistry.addAllowedTokens(dslaToken.address))
-			.to.be.revertedWith('token already added');
+			.to.be.revertedWith('This token has been allowed already.');
 		await stakeRegistry.addAllowedTokens(deployer);
 		expect(await stakeRegistry.allowedTokens(1)).to.be.eq(deployer);
 
@@ -172,7 +174,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		);
 		await sla.addAllowedTokens(dslaToken.address);
 		await dslaToken.approve(slaAddress, mintAmount);
-		await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.LONG);
+		await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, slaAddress)).to.be.true;
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, deployer)).to.be.false;
 	})
