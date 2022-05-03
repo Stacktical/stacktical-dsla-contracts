@@ -14,9 +14,10 @@ import './interfaces/IERC20Query.sol';
 import './dToken.sol';
 import './StringUtils.sol';
 
-/// @title Staking of user and provider pool rewards
-/// @author gmspacex
-/// @notice This is an abstract contract of SLA
+/**
+ * @title Staking
+ * @notice Staking of user and provider pool rewards
+ */
 contract Staking is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;

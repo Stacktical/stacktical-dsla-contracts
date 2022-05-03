@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 
 import './SLA.sol';
 import './SLORegistry.sol';
-import './Staking.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessengerRegistry.sol';
@@ -12,9 +11,11 @@ import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
 /**
  * @title Details
- * @dev Details is a contract to fetch details of contracts with a single RPC endpoint
+ * @notice Details is a contract to fetch details of contracts with a single RPC endpoint
+ * @dev this contract just provides interfaces to the protocol, no write functions
  */
 contract Details {
+    /// @notice A struct to represent staking info of token
     struct TokenStake {
         address tokenAddress;
         uint256 totalStake;
@@ -22,6 +23,7 @@ contract Details {
         uint256 providersPool;
     }
 
+    /// @notice A struct to represent dToken info
     struct DtokenDetails {
         address tokenAddress;
         uint256 totalSupply;
@@ -34,10 +36,11 @@ contract Details {
 
     /**
      * @dev external view function that returns all dynamic agreement information
-     * @return stakersCount 2. amount of stakers
-     * @return nextVerifiablePeriod 3. amount of stakers
+     * @param _slaAddress Address of SLA
+     * @return stakersCount 1. amount of stakers
+     * @return nextVerifiablePeriod 2. next verifiable period id
+     * @return leverage 3. leverage
      */
-
     function getSLADynamicDetails(address _slaAddress)
         external
         view
@@ -53,6 +56,22 @@ contract Details {
         leverage = sla.leverage();
     }
 
+    /**
+     * @dev external view function that returns all details of SLA
+     * @param _slaAddress Address of SLA
+     * @param _sloRegistry Address of SLORegistry
+     * @return slaOwner owner of sla
+     * @return messengerAddress messenger address
+     * @return sloValue slo value
+     * @return creationBlockNumber blocknumber that sla created
+     * @return slaId id of sla
+     * @return initialPeriodId starting period id
+     * @return finalPeriodId ending period id
+     * @return whiteListed is whitelisted
+     * @return periodType period type
+     * @return sloType slo type
+     * @return ipfsHash ipfshash
+     */
     function getSLAStaticDetails(address _slaAddress, SLORegistry _sloRegistry)
         external
         view
@@ -83,6 +102,12 @@ contract Details {
         finalPeriodId = sla.finalPeriodId();
     }
 
+    /**
+     * @notice external view function that returns slis and staking info for all periods
+     * @param _slaAddress Address of SLA
+     * @return periodSLIs array of slis for all periods
+     * @return tokensStake array of tokenstake for all periods
+     */
     function getSLADetailsArrays(address _slaAddress)
         external
         view
@@ -99,7 +124,7 @@ contract Details {
         for (uint256 index = 0; index < periodIdsLength; index++) {
             uint256 periodId = initialPeriodId + index;
             (uint256 timestamp, uint256 sli, SLA.Status status) = sla
-            .periodSLIs(periodId);
+                .periodSLIs(periodId);
             periodSLIs[index] = SLA.PeriodSLI({
                 status: status,
                 sli: sli,
@@ -120,6 +145,13 @@ contract Details {
         }
     }
 
+    /**
+     * @notice external view function that returns all dToken details of SLA
+     * @param _slaAddress Address of SLA
+     * @param _owner user address
+     * @return dpTokens array of provider tokens
+     * @return duTokens array of user tokens
+     */
     function getDTokensDetails(address _slaAddress, address _owner)
         public
         view
