@@ -78,7 +78,7 @@ contract SLORegistry {
      * @return boolean with the SLO honoured state
      */
     function isRespected(uint256 _value, address _slaAddress)
-        public
+        external
         view
         returns (bool)
     {
@@ -123,7 +123,7 @@ contract SLORegistry {
         uint256 _sli,
         address _slaAddress,
         uint256 _precision
-    ) public view returns (uint256) {
+    ) external view returns (uint256) {
         SLOType sloType = registeredSLO[_slaAddress].sloType;
         uint256 sloValue = registeredSLO[_slaAddress].sloValue;
 

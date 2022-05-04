@@ -8,7 +8,7 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
-import './SLORegistry.sol';
+import './interfaces/ISLORegistry.sol';
 import './Staking.sol';
 
 contract SLA is Staking {
@@ -29,7 +29,7 @@ contract SLA is Staking {
     //
     string public ipfsHash;
     ISLARegistry private _slaRegistry;
-    SLORegistry private immutable _sloRegistry;
+    ISLORegistry private immutable _sloRegistry;
     uint256 public immutable creationBlockNumber;
     uint128 public immutable initialPeriodId;
     uint128 public immutable finalPeriodId;
@@ -69,8 +69,8 @@ contract SLA is Staking {
         _;
     }
 
-    modifier onlyISLARegistry() {
-        require(msg.sender == address(_slaRegistry), 'not ISLARegistry');
+    modifier onlySLARegistry() {
+        require(msg.sender == address(_slaRegistry), 'not SLARegistry');
         _;
     }
 
@@ -99,7 +99,7 @@ contract SLA is Staking {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;
         _slaRegistry = ISLARegistry(msg.sender);
-        _sloRegistry = SLORegistry(_slaRegistry.sloRegistry());
+        _sloRegistry = ISLORegistry(_slaRegistry.sloRegistry());
         creationBlockNumber = block.number;
         initialPeriodId = _initialPeriodId;
         finalPeriodId = _finalPeriodId;
@@ -165,7 +165,9 @@ contract SLA is Staking {
             _position
         );
 
-        IStakeRegistry(_slaRegistry.stakeRegistry()).registerStakedSla(msg.sender);
+        IStakeRegistry(_slaRegistry.stakeRegistry()).registerStakedSla(
+            msg.sender
+        );
     }
 
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)

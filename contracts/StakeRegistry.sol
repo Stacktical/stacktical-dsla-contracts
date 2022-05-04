@@ -150,9 +150,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
-                .add(_dslaMessengerReward)
-                .add(_dslaUserReward)
-                .add(_dslaBurnedByVerification),
+                    .add(_dslaMessengerReward)
+                    .add(_dslaUserReward)
+                    .add(_dslaBurnedByVerification),
             'Staking parameters should match on summation'
         );
         _DSLATokenAddress = _dslaTokenAddress;
@@ -187,7 +187,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      *@param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
-        require(!isAllowedToken(_tokenAddress), 'This token has been allowed already.');
+        require(
+            !isAllowedToken(_tokenAddress),
+            'This token has been allowed already.'
+        );
         allowedTokens.push(_tokenAddress);
     }
 
@@ -249,11 +252,11 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      *@param _name 1. token name
      *@param _symbol 2. token symbol
      */
-    function createDToken(string calldata _name, string calldata _symbol, uint8 decimals)
-        external
-        override
-        returns (address)
-    {
+    function createDToken(
+        string calldata _name,
+        string calldata _symbol,
+        uint8 decimals
+    ) external override returns (address) {
         require(
             slaRegistry.isRegisteredSLA(msg.sender),
             'Only for registered SLAs'
@@ -287,6 +290,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         emit ValueLocked(_sla, _slaOwner, lockedValue);
     }
 
+    /**
+     @dev only SLARegistry can call this function
+     */
     function distributeVerificationRewards(
         address _sla,
         address _verificationRewardReceiver,
@@ -373,9 +379,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
-                .add(_dslaMessengerReward)
-                .add(_dslaUserReward)
-                .add(_dslaBurnedByVerification),
+                    .add(_dslaMessengerReward)
+                    .add(_dslaUserReward)
+                    .add(_dslaBurnedByVerification),
             'Staking parameters should match on summation'
         );
         emit StakingParametersModified(

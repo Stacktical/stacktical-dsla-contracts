@@ -62,7 +62,8 @@ contract MessengerRegistry is IMessengerRegistry {
     }
 
     /**
-     * @dev function to register a new Messenger
+     * @notice function to register a new Messenger
+     * @dev this function should be called by SLARegistry
      */
     function registerMessenger(
         address callerAddress_,
