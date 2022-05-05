@@ -19,34 +19,34 @@ import './interfaces/ISLARegistry.sol';
 contract SLARegistry is ISLARegistry, ReentrancyGuard {
     using SafeMath for uint256;
 
-    /// @dev SLO registry
+    /// @notice SLO registry
     address private _sloRegistry;
-    /// @dev Periods registry
+    /// @notice Periods registry
     address private _periodRegistry;
-    /// @dev Messengers registry
+    /// @notice Messengers registry
     address private _messengerRegistry;
-    /// @dev Stake registry
+    /// @notice Stake registry
     address private _stakeRegistry;
-    /// @dev stores the addresses of created SLAs
+    /// @notice stores the addresses of created SLAs
     SLA[] public SLAs;
-    /// @dev stores the indexes of service level agreements owned by an user
+    /// @notice stores the indexes of service level agreements owned by an user
     mapping(address => uint256[]) private _userToSLAIndexes;
-    /// @dev to check if registered SLA
+    /// @notice to check if registered SLA
     mapping(address => bool) private _registeredSLAs;
-    /// @dev value to lock past periods on SLA deployment
+    /// @notice value to lock past periods on SLA deployment
     bool private immutable _checkPastPeriod;
 
     /// @notice An event that emitted when creating a new SLA
     event SLACreated(SLA indexed sla, address indexed owner);
 
-    /// @notice An event that emitted when requesting SLI
+    /// @notice An event that is emitted when requesting SLI
     event SLIRequested(
         uint256 periodId,
         address indexed sla,
         address indexed caller
     );
 
-    /// @notice An event that emitted when returning locked tokens back to sla owner
+    /// @notice An event that is emitted when returning locked tokens back to sla owner
     event ReturnLockedValue(address indexed sla, address indexed caller);
 
     /**
@@ -167,8 +167,8 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
 
     /**
      * @notice function to request sli for specific period id
-     * @dev requested period should be finished && sla shouldn't be verified, and 
-            it distributes verification rewards to the caller
+     * @dev requested period should be finished && sla shouldn't be verified, and
+     * it distributes verification rewards to the caller
      * @param _periodId period id to request
      * @param _sla address of SLA
      * @param _ownerApproval owner approval
@@ -233,7 +233,7 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
     }
 
     /**
-     * @notice Register messenger
+     * @notice function to register a new messenger
      * @param _messengerAddress address of messenger to register
      * @param _specificationUrl specification url of messenger
      */

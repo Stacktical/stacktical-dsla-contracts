@@ -7,42 +7,42 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import './interfaces/IPeriodRegistry.sol';
 
 /**
- * @title SLARegistry
- * @dev SLARegistry is a contract for handling creation of service level
- * agreements and keeping track of the created agreements
+ * @title PeriodRegistry
+ * @notice PeriodRegistry is a contract for management of period definitions
  */
 contract PeriodRegistry is IPeriodRegistry, Ownable {
     using SafeMath for uint256;
 
-    /// @dev struct to store the definition of a period
+    /// @notice struct to store the definition of a period
     struct PeriodDefinition {
         bool initialized;
         uint256[] starts;
         uint256[] ends;
     }
 
-    /// @dev (periodType=>PeriodDefinition) hourly/weekly/biWeekly/monthly/yearly are periodTypes
+    /// @notice (periodType=>PeriodDefinition) period definitions by period type
+    /// @dev period types are hourly / weekly / biWeekly / monthly / yearly
     mapping(PeriodType => PeriodDefinition) public periodDefinitions;
 
     /**
-     * @dev event to log a new period initialized
-     *@param periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
-     *@param periodsAdded 2. amount of periods added
+     * @notice event to log a new period initialized
+     * @param periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
+     * @param periodsAdded 2. amount of periods added
      */
     event PeriodInitialized(PeriodType periodType, uint256 periodsAdded);
 
     /**
-     * @dev event to log a new period initialized
-     *@param periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
-     *@param periodsAdded 2. amount of periods added
+     * @dev event to log a new period modified
+     * @param periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
+     * @param periodsAdded 2. amount of periods added
      */
     event PeriodModified(PeriodType periodType, uint256 periodsAdded);
 
     /**
-     * @dev public function for creating canonical service level agreements
-     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
-     *@param _periodStarts 2. array of the starts of the period
-     *@param _periodEnds 3. array of the ends of the period
+     * @notice public function for creating canonical service level agreements
+     * @param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
+     * @param _periodStarts 2. array of the starts of the period
+     * @param _periodEnds 3. array of the ends of the period
      */
     function initializePeriod(
         PeriodType _periodType,
@@ -80,10 +80,11 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
     }
 
     /**
-     * @dev function to add new periods to certain period type
-     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
-     *@param _periodStarts 2. array of uint256 of the period starts to add
-     *@param _periodEnds 3. array of uint256 of the period starts to add
+     * @notice public function to add a new period definition
+     * @dev only owner can call this function
+     * @param _periodType type of period to add
+     * @param _periodStarts array of the period starting timestamps to add
+     * @param _periodEnds 3. array of the period ending timestamps to add
      */
     function addPeriodsToPeriodType(
         PeriodType _periodType,
@@ -113,9 +114,11 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
     }
 
     /**
-     * @dev public function to get the start and end of a period
-     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
-     *@param _periodId 2. period id to get start and end
+     * @notice public function to get the start and end of a period
+     * @param _periodType type of period to check
+     * @param _periodId id of period to check
+     * @return start starting timestamp
+     * @return end ending timestamp
      */
     function getPeriodStartAndEnd(PeriodType _periodType, uint256 _periodId)
         external
@@ -128,8 +131,9 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
     }
 
     /**
-     * @dev public function to check if a periodType id is initialized
-     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
+     * @notice public function to check if the period definition is initialized by period type
+     * @param _periodType type of period to check
+     * @return bool if initialized or not
      */
     function isInitializedPeriod(PeriodType _periodType)
         external
@@ -141,9 +145,10 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
     }
 
     /**
-     * @dev public function to check if a period id is valid i.e. it belongs to the added id array
-     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
-     *@param _periodId 2. period id to get start and end
+     * @notice public function to check if a period id is valid i.e. it belongs to the added id array
+     * @param _periodType type of period to check
+     * @param _periodId id of period to check
+     * @return bool if valid or invalid
      */
     function isValidPeriod(PeriodType _periodType, uint256 _periodId)
         public
@@ -151,13 +156,15 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
         override
         returns (bool valid)
     {
-        valid = periodDefinitions[_periodType].starts.length.sub(1) >= _periodId;
+        valid =
+            periodDefinitions[_periodType].starts.length.sub(1) >= _periodId;
     }
 
     /**
-     * @dev public function to check if a period has finished
-     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
-     *@param _periodId 2. period id to get start and end
+     * @notice public function to check if a period has finished
+     * @param _periodType type of period to check
+     * @param _periodId id of period to check
+     * @return bool if finished or not
      */
     function periodIsFinished(PeriodType _periodType, uint256 _periodId)
         external
@@ -174,9 +181,10 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
     }
 
     /**
-     * @dev public function to check if a period has started
-     *@param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
-     *@param _periodId 2. period id to get start and end
+     * @notice public function to check if a period has started
+     * @param _periodType type of period to check
+     * @param _periodId id of period to check
+     * @return bool if started or not
      */
     function periodHasStarted(PeriodType _periodType, uint256 _periodId)
         external
@@ -193,7 +201,8 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
     }
 
     /**
-     * @dev public function to get the periodDefinitions
+     * @notice public function to get the definitions of period for all period types
+     * @return array of period definitions
      */
     function getPeriodDefinitions()
         public

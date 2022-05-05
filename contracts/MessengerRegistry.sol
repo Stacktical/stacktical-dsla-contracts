@@ -8,11 +8,12 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 
 /**
  * @title MessengerRegistry
- * @dev MessengerRegistry is a contract to register openly distributed Messengers
+ * @notice MessengerRegistry is a contract to register openly distributed Messengers
  */
 contract MessengerRegistry is IMessengerRegistry {
     using SafeMath for uint256;
 
+    /// @notice struct to store the definition of Messenger
     struct Messenger {
         address ownerAddress;
         address messengerAddress;
@@ -23,14 +24,16 @@ contract MessengerRegistry is IMessengerRegistry {
         uint256 id;
     }
 
+    /// @notice messengers
     Messenger[] private _messengers;
-    /// @dev (messengerAddress=>bool) to check if the Messenger was
+    /// @notice (messengerAddress=>bool) to check if the Messenger was registered
     mapping(address => bool) private _registeredMessengers;
-    /// @dev (userAddress=>messengerAddress[]) to register the messengers of an owner
+    /// @notice (userAddress=>messengerAddress[]) to register the messengers of an owner
     mapping(address => uint256[]) private _ownerMessengers;
-
+    /// @notice SLARegistry address
     address private _slaRegistry;
 
+    /// @notice an event that is emitted when SLARegistry registers a new messenger
     event MessengerRegistered(
         address indexed ownerAddress,
         address indexed messengerAddress,
@@ -39,6 +42,7 @@ contract MessengerRegistry is IMessengerRegistry {
         uint256 id
     );
 
+    /// @notice an event that is emitted when Messenger owner modifies the messenger
     event MessengerModified(
         address indexed ownerAddress,
         address indexed messengerAddress,
@@ -48,8 +52,8 @@ contract MessengerRegistry is IMessengerRegistry {
     );
 
     /**
-     * @dev sets the SLARegistry contract address and can only be called
-     * once
+     * @notice function to set SLARegistry address
+     * @dev this function can be called only once
      */
     function setSLARegistry() external override {
         // Only able to trigger this function once
@@ -63,7 +67,10 @@ contract MessengerRegistry is IMessengerRegistry {
 
     /**
      * @notice function to register a new Messenger
-     * @dev this function should be called by SLARegistry
+     * @dev only SLARegistry can call this function
+     * @param callerAddress_ messenger owner address
+     * @param messengerAddress_ messenger address
+     * @param specificationUrl_ specification url of messenger
      */
     function registerMessenger(
         address callerAddress_,
@@ -119,7 +126,9 @@ contract MessengerRegistry is IMessengerRegistry {
     }
 
     /**
-     * @dev function to modifyMessenger a Messenger
+     * @notice function to modify messenger
+     * @dev only messenger owner can call this function
+     * @param _specificationUrl new specification url to update
      */
     function modifyMessenger(
         string calldata _specificationUrl,
@@ -141,6 +150,10 @@ contract MessengerRegistry is IMessengerRegistry {
         );
     }
 
+    /**
+     * @notice external view function that returns all registered messengers
+     * @return array of Messenger struct
+     */
     function getMessengers() external view returns (Messenger[] memory) {
         Messenger[] memory returnMessengers = new Messenger[](
             _messengers.length
@@ -162,10 +175,19 @@ contract MessengerRegistry is IMessengerRegistry {
         return returnMessengers;
     }
 
+    /**
+     * @notice external view function that returns the number of registered messengers
+     * @return number of registered messengers
+     */
     function getMessengersLength() external view returns (uint256) {
         return _messengers.length;
     }
 
+    /**
+     * @notice external view function that returns the registration state by address
+     * @param messengerAddress_ messenger address to check
+     * @return bool registered or not
+     */
     function registeredMessengers(address messengerAddress_)
         external
         view
