@@ -86,11 +86,11 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
 
     /**
      * @dev event to log modifications on the staking parameters
-     *@param DSLAburnRate 1. (DSLAburnRate/1000)% of DSLA to be burned after a reward/compensation is paid
-     *@param dslaDepositByPeriod 2. DSLA deposit by period to create SLA
-     *@param dslaPlatformReward 3. DSLA rewarded to Stacktical team
-     *@param dslaUserReward 4. DSLA rewarded to user calling the period verification
-     *@param dslaBurnedByVerification 5. DSLA burned after every period verification
+     * @param DSLAburnRate 1. (DSLAburnRate/1000)% of DSLA to be burned after a reward/compensation is paid
+     * @param dslaDepositByPeriod 2. DSLA deposit by period to create SLA
+     * @param dslaPlatformReward 3. DSLA rewarded to Stacktical team
+     * @param dslaUserReward 4. DSLA rewarded to user calling the period verification
+     * @param dslaBurnedByVerification 5. DSLA burned after every period verification
      */
     event StakingParametersModified(
         uint256 DSLAburnRate,
@@ -106,9 +106,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
 
     /**
      * @dev event to log modifications on the staking parameters
-     *@param sla 1. -
-     *@param owner 2. -
-     *@param amount 3. -
+     * @param sla 1. -
+     * @param owner 2. -
+     * @param amount 3. -
      */
 
     event LockedValueReturned(
@@ -119,10 +119,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
 
     /**
      * @dev event to log modifications on the staking parameters
-     *@param dTokenAddress 1. -
-     *@param sla 2. -
-     *@param name 3. -
-     *@param symbol 4. -
+     * @param dTokenAddress 1. -
+     * @param sla 2. -
+     * @param name 3. -
+     * @param symbol 4. -
      */
     event DTokenCreated(
         address indexed dTokenAddress,
@@ -133,9 +133,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
 
     /**
      * @dev event to log modifications on the staking parameters
-     *@param sla 1. -
-     *@param owner 2. -
-     *@param amount 3. -
+     * @param sla 1. -
+     * @param owner 2. -
+     * @param amount 3. -
      */
     event ValueLocked(
         address indexed sla,
@@ -144,6 +144,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     );
 
     /**
+     * @notice Constructor
      * @param _dslaTokenAddress 1. DSLA Token
      */
     constructor(address _dslaTokenAddress) public {
@@ -169,8 +170,8 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     }
 
     /**
-     * @dev sets the SLARegistry contract address and can only be called
-     * once
+     * @notice function to set the SLARegistry contract address
+     * @dev this function can only be called once
      */
     function setSLARegistry() external override {
         // Only able to trigger this function once
@@ -183,8 +184,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     }
 
     /**
-     *@dev add a token to ve allowed for staking
-     *@param _tokenAddress 1. address of the new allowed token
+     * @notice add a token to ve allowed for staking
+     * @dev only owner can call this function for non-registered tokens
+     * @param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
         require(
@@ -194,6 +196,11 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         allowedTokens.push(_tokenAddress);
     }
 
+    /**
+     * @notice function to check if the token is registered
+     * @param _tokenAddress token address to check
+     * @return true if registered
+     */
     function isAllowedToken(address _tokenAddress)
         public
         view
@@ -209,10 +216,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     }
 
     /**
-     *@dev public view function that returns true if the _owner has staked on _sla
-     *@param _user 1. address to check
-     *@param _sla 2. sla to check
-     *@return bool, true if _sla was staked by _user
+     * @dev public view function that returns true if the _owner has staked on _sla
+     * @param _user 1. address to check
+     * @param _sla 2. sla to check
+     * @return bool, true if _sla was staked by _user
      */
 
     function slaWasStakedByUser(address _user, address _sla)
@@ -229,8 +236,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     }
 
     /**
-     *@dev register the sending SLA contract as staked by _owner
-     *@param _owner 1. SLA contract to stake
+     * @notice function to register the sending SLA contract as staked by _owner
+     * @dev only registered SLA can call this function
+     * @param _owner 1. SLA contract to stake
      */
     function registerStakedSla(address _owner)
         external
@@ -248,25 +256,34 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     }
 
     /**
-     *@dev to create dTokens for staking
-     *@param _name 1. token name
-     *@param _symbol 2. token symbol
+     * @notice function to create dTokens for staking
+     * @dev only registered SLA can call this function
+     * @param _name 1. token name
+     * @param _symbol 2. token symbol
+     * @param _decimals 3. token decimals
      */
     function createDToken(
         string calldata _name,
         string calldata _symbol,
-        uint8 decimals
+        uint8 _decimals
     ) external override returns (address) {
         require(
             slaRegistry.isRegisteredSLA(msg.sender),
             'Only for registered SLAs'
         );
-        dToken newDToken = new dToken(_name, _symbol, decimals);
+        dToken newDToken = new dToken(_name, _symbol, _decimals);
         newDToken.grantRole(newDToken.MINTER_ROLE(), msg.sender);
         emit DTokenCreated(address(newDToken), msg.sender, _name, _symbol);
         return address(newDToken);
     }
 
+    /**
+     * @notice function to lock DSLA
+     * @dev only SLARegistry can call this function
+     * @param _slaOwner owner address of sla
+     * @param sla address of sla
+     * @param _periodIdsLength number of periods to lock
+     */
     function lockDSLAValue(
         address _slaOwner,
         address _sla,
@@ -291,7 +308,11 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     }
 
     /**
-     @dev only SLARegistry can call this function
+     * @notice function to distribute verification rewards to verifier
+     * @dev only SLARegistry can call this function
+     * @param _sla address of sla
+     * @param _verificationRewardReceiver verifier who verified the periodId
+     * @param _periodId verified period id by verifier
      */
     function distributeVerificationRewards(
         address _sla,
@@ -338,6 +359,11 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         );
     }
 
+    /**
+     * @notice function to return locked tokens back to sla owner
+     * @dev only SLARegistry can call this function
+     * @param _sla address of SLA
+     */
     function returnLockedValue(address _sla)
         external
         override
@@ -356,6 +382,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     }
 
     //_______ OnlyOwner functions _______
+    /**
+     * @notice external function that sets staking parameters
+     * @dev only owner can call this function
+     */
     function setStakingParameters(
         uint256 DSLAburnRate,
         uint256 dslaDepositByPeriod,
@@ -397,6 +427,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         );
     }
 
+    /**
+     * @notice external view function that returns staking parameters
+     */
     function getStakingParameters()
         external
         view
@@ -424,6 +457,12 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         burnDSLA = _burnDSLA;
     }
 
+    /**
+     * @notice external view function that checks the verification of period
+     * @param _sla address of SLA
+     * @param _periodId period id
+     * @return verified or not
+     */
     function periodIsVerified(address _sla, uint256 _periodId)
         external
         view
@@ -432,6 +471,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         return slaLockedValue[_sla].verifiedPeriods[_periodId];
     }
 
+    /**
+     * @notice external view function that returns DSLA token address
+     * @return address of DSLA token
+     */
     function DSLATokenAddress() external view override returns (address) {
         return _DSLATokenAddress;
     }
