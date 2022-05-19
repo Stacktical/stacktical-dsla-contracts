@@ -281,7 +281,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      * @notice function to lock DSLA
      * @dev only SLARegistry can call this function
      * @param _slaOwner owner address of sla
-     * @param sla address of sla
+     * @param _sla address of sla
      * @param _periodIdsLength number of periods to lock
      */
     function lockDSLAValue(

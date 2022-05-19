@@ -133,7 +133,7 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
     /**
      * @notice public function to check if the period definition is initialized by period type
      * @param _periodType type of period to check
-     * @return bool if initialized or not
+     * @return initialized if initialized or not
      */
     function isInitializedPeriod(PeriodType _periodType)
         external
@@ -148,7 +148,7 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
      * @notice public function to check if a period id is valid i.e. it belongs to the added id array
      * @param _periodType type of period to check
      * @param _periodId id of period to check
-     * @return bool if valid or invalid
+     * @return valid if valid or invalid
      */
     function isValidPeriod(PeriodType _periodType, uint256 _periodId)
         public
@@ -164,7 +164,7 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
      * @notice public function to check if a period has finished
      * @param _periodType type of period to check
      * @param _periodId id of period to check
-     * @return bool if finished or not
+     * @return finished if finished or not
      */
     function periodIsFinished(PeriodType _periodType, uint256 _periodId)
         external
@@ -184,7 +184,7 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
      * @notice public function to check if a period has started
      * @param _periodType type of period to check
      * @param _periodId id of period to check
-     * @return bool if started or not
+     * @return started if started or not
      */
     function periodHasStarted(PeriodType _periodType, uint256 _periodId)
         external
