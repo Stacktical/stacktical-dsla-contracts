@@ -6,6 +6,8 @@ interface IStakeRegistry {
 
     function setSLARegistry() external;
 
+    function setMetaverseFactory(address factory) external virtual;
+
     function lockDSLAValue(
         address slaOwner_,
         address sla_,

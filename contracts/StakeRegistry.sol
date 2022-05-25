@@ -9,6 +9,7 @@ import './dToken.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
+import './interfaces/IMetaverseFactory.sol';
 
 /**
  * @title StakeRegistry
@@ -31,6 +32,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
 
     address private _DSLATokenAddress;
     ISLARegistry public slaRegistry;
+    IMetaverseFactory public metaverseFactory;
 
     //______ onlyOwner modifiable parameters ______
 
@@ -183,6 +185,19 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
     }
 
     /**
+     * @dev sets the MetaverseFactory contract address and can only be called once
+     */
+    function setMetaverseFactory(address factory) external override {
+        // Only able to trigger this function once
+        require(
+            address(metaverseFactory) == address(0),
+            'MetaverseFactory address has already been set'
+        );
+
+        metaverseFactory = IMetaverseFactory(factory);
+    }
+
+    /**
      * @notice add a token to ve allowed for staking
      * @dev only owner can call this function for non-registered tokens
      * @param _tokenAddress 1. address of the new allowed token
@@ -245,6 +260,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
         );
         if (!slaWasStakedByUser(_owner, msg.sender)) {
             userStakedSlas[_owner][msg.sender] = true;
+            metaverseFactory.mintSkillNFT(
+                _owner,
+                IMetaverseFactory.SkillType.UserScroll
+            );
         }
         return true;
     }
