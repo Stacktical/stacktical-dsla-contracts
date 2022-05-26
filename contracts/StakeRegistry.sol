@@ -63,8 +63,8 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
 
-    /// @dev (userAddress => SLA[]) with user staked SLAs to get tokenPool
-    mapping(address => SLA[]) public userStakedSlas;
+    /// @dev (userAddress => (SLA address => registered)) with user staked SLAs to get tokenPool
+    mapping(address => mapping(address => bool)) public userStakedSlas;
 
     /**
      * @dev event to log a verifiation reward distributed
@@ -150,9 +150,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
-                .add(_dslaMessengerReward)
-                .add(_dslaUserReward)
-                .add(_dslaBurnedByVerification),
+                    .add(_dslaMessengerReward)
+                    .add(_dslaUserReward)
+                    .add(_dslaBurnedByVerification),
             'Staking parameters should match on summation'
         );
         _DSLATokenAddress = _dslaTokenAddress;
@@ -187,7 +187,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      *@param _tokenAddress 1. address of the new allowed token
      */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
-        require(!isAllowedToken(_tokenAddress), 'This token has been allowed already.');
+        require(
+            !isAllowedToken(_tokenAddress),
+            'This token has been allowed already.'
+        );
         allowedTokens.push(_tokenAddress);
     }
 
@@ -217,12 +220,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         view
         returns (bool)
     {
-        for (uint256 index = 0; index < userStakedSlas[_user].length; index++) {
-            if (address(userStakedSlas[_user][index]) == _sla) {
-                return true;
-            }
-        }
-        return false;
+        return userStakedSlas[_user][_sla];
     }
 
     /**
@@ -239,7 +237,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
             'Only for registered SLAs'
         );
         if (!slaWasStakedByUser(_owner, msg.sender)) {
-            userStakedSlas[_owner].push(SLA(msg.sender));
+            userStakedSlas[_owner][msg.sender] = true;
         }
         return true;
     }
@@ -249,11 +247,11 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      *@param _name 1. token name
      *@param _symbol 2. token symbol
      */
-    function createDToken(string calldata _name, string calldata _symbol, uint8 decimals)
-        external
-        override
-        returns (address)
-    {
+    function createDToken(
+        string calldata _name,
+        string calldata _symbol,
+        uint8 decimals
+    ) external override returns (address) {
         require(
             slaRegistry.isRegisteredSLA(msg.sender),
             'Only for registered SLAs'
@@ -373,9 +371,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward
-                .add(_dslaMessengerReward)
-                .add(_dslaUserReward)
-                .add(_dslaBurnedByVerification),
+                    .add(_dslaMessengerReward)
+                    .add(_dslaUserReward)
+                    .add(_dslaBurnedByVerification),
             'Staking parameters should match on summation'
         );
         emit StakingParametersModified(
