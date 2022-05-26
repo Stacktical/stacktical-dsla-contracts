@@ -8,7 +8,7 @@ import './Staking.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessengerRegistry.sol';
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import './dToken.sol';
 
 /**
  * @title Details
@@ -99,7 +99,7 @@ contract Details {
         for (uint256 index = 0; index < periodIdsLength; index++) {
             uint256 periodId = initialPeriodId + index;
             (uint256 timestamp, uint256 sli, SLA.Status status) = sla
-            .periodSLIs(periodId);
+                .periodSLIs(periodId);
             periodSLIs[index] = SLA.PeriodSLI({
                 status: status,
                 sli: sli,
@@ -112,10 +112,10 @@ contract Details {
             address tokenAddress = sla.allowedTokens(index);
             tokensStake[index] = TokenStake({
                 tokenAddress: tokenAddress,
-                totalStake: sla.usersPool(sla.allowedTokens(index)) +
-                    sla.providersPool(sla.allowedTokens(index)),
-                usersPool: sla.usersPool(sla.allowedTokens(index)),
-                providersPool: sla.providersPool(sla.allowedTokens(index))
+                totalStake: sla.usersPool(tokenAddress) +
+                    sla.providersPool(tokenAddress),
+                usersPool: sla.usersPool(tokenAddress),
+                providersPool: sla.providersPool(tokenAddress)
             });
         }
     }
@@ -135,32 +135,28 @@ contract Details {
         duTokens = new DtokenDetails[](allowedTokensLength);
         for (uint256 index = 0; index < allowedTokensLength; index++) {
             address tokenAddress = sla.allowedTokens(index);
-            address dpTokenAddress = address(sla.dpTokenRegistry(tokenAddress));
+            dToken dpToken = dToken(sla.dpTokenRegistry(tokenAddress));
             dpTokens[index] = DtokenDetails({
-                dTokenAddress: dpTokenAddress,
+                dTokenAddress: address(dpToken),
                 tokenAddress: tokenAddress,
-                totalSupply: ERC20(dpTokenAddress).totalSupply(),
-                dTokenSymbol: ERC20(dpTokenAddress).symbol(),
-                dTokenName: ERC20(dpTokenAddress).name(),
-                balance: fromOwner
-                    ? ERC20(dpTokenAddress).balanceOf(_owner)
-                    : 0,
+                totalSupply: dpToken.totalSupply(),
+                dTokenSymbol: dpToken.symbol(),
+                dTokenName: dpToken.name(),
+                balance: fromOwner ? dpToken.balanceOf(_owner) : 0,
                 allowance: fromOwner
-                    ? ERC20(dpTokenAddress).allowance(_owner, _slaAddress)
+                    ? dpToken.allowance(_owner, _slaAddress)
                     : 0
             });
-            address duTokenAddress = address(sla.duTokenRegistry(tokenAddress));
+            dToken duToken = dToken(sla.duTokenRegistry(tokenAddress));
             duTokens[index] = DtokenDetails({
-                dTokenAddress: duTokenAddress,
+                dTokenAddress: address(duToken),
                 tokenAddress: tokenAddress,
-                totalSupply: ERC20(duTokenAddress).totalSupply(),
-                dTokenSymbol: ERC20(duTokenAddress).symbol(),
-                dTokenName: ERC20(duTokenAddress).name(),
-                balance: fromOwner
-                    ? ERC20(duTokenAddress).balanceOf(_owner)
-                    : 0,
+                totalSupply: duToken.totalSupply(),
+                dTokenSymbol: duToken.symbol(),
+                dTokenName: duToken.name(),
+                balance: fromOwner ? duToken.balanceOf(_owner) : 0,
                 allowance: fromOwner
-                    ? ERC20(duTokenAddress).allowance(_owner, _slaAddress)
+                    ? duToken.allowance(_owner, _slaAddress)
                     : 0
             });
         }
