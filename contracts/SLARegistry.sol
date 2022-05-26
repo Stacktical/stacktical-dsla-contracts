@@ -71,24 +71,41 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         bytes32[] memory extraData_,
         uint64 leverage_
     ) public nonReentrant {
-        require(IPeriodRegistry(_periodRegistry).isValidPeriod(
-            periodType_,
-            initialPeriodId_
-        ), 'first id invalid');
-        require(IPeriodRegistry(_periodRegistry).isValidPeriod(
-            periodType_,
-            finalPeriodId_
-        ), 'final id invalid');
-        require(IPeriodRegistry(_periodRegistry)
-            .isInitializedPeriod(periodType_), 'period not initialized');
+        require(
+            IPeriodRegistry(_periodRegistry).isValidPeriod(
+                periodType_,
+                initialPeriodId_
+            ),
+            'first id invalid'
+        );
+        require(
+            IPeriodRegistry(_periodRegistry).isValidPeriod(
+                periodType_,
+                finalPeriodId_
+            ),
+            'final id invalid'
+        );
+        require(
+            IPeriodRegistry(_periodRegistry).isInitializedPeriod(periodType_),
+            'period not initialized'
+        );
         require(finalPeriodId_ >= initialPeriodId_, 'invalid final/initial');
 
         if (_checkPastPeriod) {
-            require(!IPeriodRegistry(_periodRegistry)
-                .periodHasStarted(periodType_, initialPeriodId_), 'past period');
+            require(
+                !IPeriodRegistry(_periodRegistry).periodHasStarted(
+                    periodType_,
+                    initialPeriodId_
+                ),
+                'past period'
+            );
         }
-        require(IMessengerRegistry(_messengerRegistry)
-            .registeredMessengers(messengerAddress_), 'invalid messenger');
+        require(
+            IMessengerRegistry(_messengerRegistry).registeredMessengers(
+                messengerAddress_
+            ),
+            'invalid messenger'
+        );
 
         SLA sla = new SLA(
             msg.sender,
@@ -124,19 +141,25 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         uint256 _periodId,
         SLA _sla,
         bool _ownerApproval
-    ) public {
+    ) public nonReentrant {
         require(isRegisteredSLA(address(_sla)), 'This SLA is not valid.');
         require(
             _periodId == _sla.nextVerifiablePeriod(),
             'not nextVerifiablePeriod'
         );
         (, , SLA.Status status) = _sla.periodSLIs(_periodId);
-        require(status == SLA.Status.NotVerified, 'This SLA has already been verified.');
+        require(
+            status == SLA.Status.NotVerified,
+            'This SLA has already been verified.'
+        );
         require(_sla.isAllowedPeriod(_periodId), 'invalid period');
-        require(IPeriodRegistry(_periodRegistry).periodIsFinished(
-            _sla.periodType(),
-            _periodId
-        ), 'period unfinished');
+        require(
+            IPeriodRegistry(_periodRegistry).periodIsFinished(
+                _sla.periodType(),
+                _periodId
+            ),
+            'period unfinished'
+        );
         emit SLIRequested(_periodId, address(_sla), msg.sender);
         IMessenger(_sla.messengerAddress()).requestSLI(
             _periodId,
@@ -150,7 +173,6 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
             _periodId
         );
     }
-    
 
     function returnLockedValue(SLA _sla) public {
         require(isRegisteredSLA(address(_sla)), 'This SLA is not valid.');
@@ -172,7 +194,7 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
     function registerMessenger(
         address _messengerAddress,
         string memory _specificationUrl
-    ) public {
+    ) public nonReentrant {
         IMessenger(_messengerAddress).setSLARegistry();
         IMessengerRegistry(_messengerRegistry).registerMessenger(
             msg.sender,
@@ -181,7 +203,11 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         );
     }
 
-    function userSLAs(address _user) public view returns (SLA[] memory SLAList) {
+    function userSLAs(address _user)
+        public
+        view
+        returns (SLA[] memory SLAList)
+    {
         uint256 count = _userToSLAIndexes[_user].length;
         SLAList = new SLA[](count);
 
