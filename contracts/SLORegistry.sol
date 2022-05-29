@@ -37,6 +37,7 @@ contract SLORegistry {
     address private slaRegistry;
     mapping(address => SLO) public registeredSLO;
 
+    /// @dev Modifier ensuring that certain function can only be called by SLARegistry
     modifier onlySLARegistry() {
         require(
             msg.sender == slaRegistry,
@@ -45,6 +46,10 @@ contract SLORegistry {
         _;
     }
 
+    /**
+     * @notice function to set SLARegistry address
+     * @dev this function can be called only once
+     */
     function setSLARegistry() public {
         // Only able to trigger this function once
         require(
@@ -55,7 +60,8 @@ contract SLORegistry {
     }
 
     /**
-     * @dev public function for creating service level objectives
+     * @notice public function for creating service level objectives
+     * @dev only SLARegistry can call this function
      * @param _sloValue 1. -
      * @param _sloType 2. -
      * @param _slaAddress 3. -
@@ -78,7 +84,7 @@ contract SLORegistry {
      * @return boolean with the SLO honoured state
      */
     function isRespected(uint256 _value, address _slaAddress)
-        public
+        external
         view
         returns (bool)
     {
@@ -123,7 +129,7 @@ contract SLORegistry {
         uint256 _sli,
         address _slaAddress,
         uint256 _precision
-    ) public view returns (uint256) {
+    ) external view returns (uint256) {
         SLOType sloType = registeredSLO[_slaAddress].sloType;
         uint256 sloValue = registeredSLO[_slaAddress].sloValue;
 
