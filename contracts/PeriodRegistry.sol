@@ -25,14 +25,14 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
     mapping(PeriodType => PeriodDefinition) public periodDefinitions;
 
     /**
-     * @notice event to log a new period initialized
+     * @notice event to log that a period is initialized
      * @param periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      * @param periodsAdded 2. amount of periods added
      */
     event PeriodInitialized(PeriodType periodType, uint256 periodsAdded);
 
     /**
-     * @dev event to log a new period modified
+     * @dev event to log that a period is modified
      * @param periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      * @param periodsAdded 2. amount of periods added
      */

@@ -12,10 +12,10 @@ import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 /**
  * @title Details
  * @notice Details is a contract to fetch details of contracts with a single RPC endpoint
- * @dev this contract just provides interfaces to the protocol, no write functions
+ * @dev this contract only provides interfaces to the protocol, no write functions
  */
 contract Details {
-    /// @notice A struct to represent staking info of token
+    /// @notice A struct to represent staking information of token
     struct TokenStake {
         address tokenAddress;
         uint256 totalStake;
@@ -23,7 +23,7 @@ contract Details {
         uint256 providersPool;
     }
 
-    /// @notice A struct to represent dToken info
+    /// @notice A struct to represent dToken information
     struct DtokenDetails {
         address tokenAddress;
         uint256 totalSupply;
@@ -57,13 +57,13 @@ contract Details {
     }
 
     /**
-     * @dev external view function that returns all details of SLA
+     * @dev external view function that returns all details of a SLA
      * @param _slaAddress Address of SLA
      * @param _sloRegistry Address of SLORegistry
      * @return slaOwner owner of sla
      * @return messengerAddress messenger address
      * @return sloValue slo value
-     * @return creationBlockNumber blocknumber that sla created
+     * @return creationBlockNumber blocknumber of sla creation
      * @return slaId id of sla
      * @return initialPeriodId starting period id
      * @return finalPeriodId ending period id
@@ -103,7 +103,7 @@ contract Details {
     }
 
     /**
-     * @notice external view function that returns slis and staking info for all periods
+     * @notice external view function that returns slis and staking information for all periods
      * @param _slaAddress Address of SLA
      * @return periodSLIs array of slis for all periods
      * @return tokensStake array of tokenstake for all periods

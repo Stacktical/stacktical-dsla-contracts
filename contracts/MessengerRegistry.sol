@@ -56,7 +56,6 @@ contract MessengerRegistry is IMessengerRegistry {
      * @dev this function can be called only once
      */
     function setSLARegistry() external override {
-        // Only able to trigger this function once
         require(
             address(_slaRegistry) == address(0),
             'SLARegistry address has already been set'

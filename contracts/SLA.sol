@@ -44,7 +44,7 @@ contract SLA is Staking {
     /// @dev periodId=>PeriodSLI mapping
     mapping(uint256 => PeriodSLI) public periodSLIs;
 
-    /// @notice An event that is emitted when creating new SLI
+    /// @notice An event that is emitted when creating a new SLI
     event SLICreated(uint256 timestamp, uint256 sli, uint256 periodId);
 
     /// @notice An event that is emitted when staking in User or Provider Pool
@@ -174,7 +174,7 @@ contract SLA is Staking {
     }
 
     /**
-     * @notice External function to stake tokens on User or Provider Pools
+     * @notice External function to stake tokens in User or Provider Pools
      * @param _amount amount to withdraw
      * @param _tokenAddress token address to withdraw
      * @param _position User or Provider pool
