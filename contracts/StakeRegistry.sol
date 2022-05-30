@@ -146,6 +146,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      */
     constructor(address _dslaTokenAddress) {
         require(
+            _dslaTokenAddress != address(0x0),
+            'invalid DSLA token address'
+        );
+        require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward +
                     _dslaMessengerReward +

@@ -58,11 +58,11 @@ contract Staking is Ownable, ReentrancyGuard {
     ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for provider
     mapping(address => dToken) public dpTokenRegistry;
 
-    /// @dev address[] of the stakers of the SLA contract
-    address[] public stakers;
-
     /// @dev (slaOwner=>bool)
     mapping(address => bool) public registeredStakers;
+
+    /// @dev number of stakers
+    uint256 public stakersNum;
 
     /// @dev array with the allowed tokens addresses for the current SLA
     address[] public allowedTokens;
@@ -146,6 +146,8 @@ contract Staking is Ownable, ReentrancyGuard {
         address contractOwner_,
         address messengerAddress_
     ) {
+        require(contractOwner_ != address(0x0), 'invalid owner address');
+        require(messengerAddress_ != address(0x0), 'invalid messenger address');
         _stakeRegistry = IStakeRegistry(slaRegistry_.stakeRegistry());
         _periodRegistry = IPeriodRegistry(slaRegistry_.periodRegistry());
         whitelistedContract = whitelistedContract_;
@@ -321,7 +323,7 @@ contract Staking is Ownable, ReentrancyGuard {
 
         if (!registeredStakers[msg.sender]) {
             registeredStakers[msg.sender] = true;
-            stakers.push(msg.sender);
+            stakersNum++;
         }
     }
 
@@ -506,6 +508,14 @@ contract Staking is Ownable, ReentrancyGuard {
      */
     function getAllowedTokensLength() external view returns (uint256) {
         return allowedTokens.length;
+    }
+
+    /**
+     * @notice External view function that returns the number of stakers
+     * @return Number of stakers
+     */
+    function getStakersLength() external view returns (uint256) {
+        return stakersNum;
     }
 
     /**

@@ -206,18 +206,17 @@ contract SLA is Staking {
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        emit ProviderWithdraw(
-            _tokenAddress,
-            nextVerifiablePeriod,
-            msg.sender,
-            _amount
-        );
-
         _withdrawProviderTokens(
             _amount,
             _tokenAddress,
             nextVerifiablePeriod,
             contractFinished()
+        );
+        emit ProviderWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
         );
     }
 
@@ -229,25 +228,17 @@ contract SLA is Staking {
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        emit UserWithdraw(
-            _tokenAddress,
-            nextVerifiablePeriod,
-            msg.sender,
-            _amount
-        );
         _withdrawUserTokens(
             _amount,
             _tokenAddress,
             nextVerifiablePeriod,
             contractFinished()
         );
-    }
-
-    /**
-     * @notice External view function that returns the number of stakers
-     * @return Uint256 number of stakers
-     */
-    function getStakersLength() external view returns (uint256) {
-        return stakers.length;
+        emit UserWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
+        );
     }
 }
