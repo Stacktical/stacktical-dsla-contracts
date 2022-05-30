@@ -177,7 +177,7 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         uint256 _periodId,
         SLA _sla,
         bool _ownerApproval
-    ) public {
+    ) public nonReentrant {
         require(isRegisteredSLA(address(_sla)), 'This SLA is not valid.');
         require(
             _periodId == _sla.nextVerifiablePeriod(),
@@ -240,7 +240,7 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
     function registerMessenger(
         address _messengerAddress,
         string memory _specificationUrl
-    ) public {
+    ) public nonReentrant {
         IMessenger(_messengerAddress).setSLARegistry();
         IMessengerRegistry(_messengerRegistry).registerMessenger(
             msg.sender,
