@@ -12,7 +12,7 @@ import './dToken.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
-import './StringUtils.sol';
+import './libraries/StringUtils.sol';
 
 /**
  * @title StakeRegistry

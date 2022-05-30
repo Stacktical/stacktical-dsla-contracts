@@ -11,8 +11,8 @@ import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/IERC20Query.sol';
+import './libraries/StringUtils.sol';
 import './dToken.sol';
-import './StringUtils.sol';
 
 /**
  * @title Staking
