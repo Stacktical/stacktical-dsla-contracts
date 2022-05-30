@@ -63,8 +63,8 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     /// @dev array with the allowed tokens addresses of the StakeRegistry
     address[] public allowedTokens;
 
-    /// @dev (userAddress => SLA[]) with user staked SLAs to get tokenPool
-    mapping(address => SLA[]) public userStakedSlas;
+    /// @dev (userAddress => (SLA address => registered)) with user staked SLAs to get tokenPool
+    mapping(address => mapping(address => bool)) public userStakedSlas;
 
     /**
      * @dev event to log a verifiation reward distributed
@@ -227,12 +227,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         view
         returns (bool)
     {
-        for (uint256 index = 0; index < userStakedSlas[_user].length; index++) {
-            if (address(userStakedSlas[_user][index]) == _sla) {
-                return true;
-            }
-        }
-        return false;
+        return userStakedSlas[_user][_sla];
     }
 
     /**
@@ -250,7 +245,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
             'Only for registered SLAs'
         );
         if (!slaWasStakedByUser(_owner, msg.sender)) {
-            userStakedSlas[_owner].push(SLA(msg.sender));
+            userStakedSlas[_owner][msg.sender] = true;
         }
         return true;
     }
