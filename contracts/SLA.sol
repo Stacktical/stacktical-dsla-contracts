@@ -8,9 +8,12 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
-import './SLORegistry.sol';
+import './interfaces/ISLORegistry.sol';
 import './Staking.sol';
 
+/**
+ @title Service Level Agreement Contract
+ */
 contract SLA is Staking {
     using SafeMath for uint256;
 
@@ -26,10 +29,9 @@ contract SLA is Staking {
         Status status;
     }
 
-    //
     string public ipfsHash;
     ISLARegistry private _slaRegistry;
-    SLORegistry private immutable _sloRegistry;
+    ISLORegistry private immutable _sloRegistry;
     uint256 public immutable creationBlockNumber;
     uint128 public immutable initialPeriodId;
     uint128 public immutable finalPeriodId;
@@ -42,8 +44,10 @@ contract SLA is Staking {
     /// @dev periodId=>PeriodSLI mapping
     mapping(uint256 => PeriodSLI) public periodSLIs;
 
+    /// @notice An event that is emitted when creating a new SLI
     event SLICreated(uint256 timestamp, uint256 sli, uint256 periodId);
 
+    /// @notice An event that is emitted when staking in User or Provider Pool
     event Stake(
         address indexed tokenAddress,
         uint256 indexed periodId,
@@ -51,12 +55,15 @@ contract SLA is Staking {
         uint256 amount,
         Position position
     );
+    /// @notice An event that is emitted when withdrawing from Provider Pool
     event ProviderWithdraw(
         address indexed tokenAddress,
         uint256 indexed periodId,
         address indexed caller,
         uint256 amount
     );
+
+    /// @notice An event that is emitted when withdrawing from User Pool
     event UserWithdraw(
         address indexed tokenAddress,
         uint256 indexed periodId,
@@ -64,16 +71,21 @@ contract SLA is Staking {
         uint256 amount
     );
 
+    /// @dev Modifier ensuring that certain function can only be called by Messenger
     modifier onlyMessenger() {
         require(msg.sender == messengerAddress, 'not messenger');
         _;
     }
 
-    modifier onlyISLARegistry() {
-        require(msg.sender == address(_slaRegistry), 'not ISLARegistry');
+    /// @dev Modifier ensuring that certain function can only be called by SLARegistry
+    modifier onlySLARegistry() {
+        require(msg.sender == address(_slaRegistry), 'not SLARegistry');
         _;
     }
 
+    /**
+     * @notice Constructor
+     */
     constructor(
         address _owner,
         bool _whitelisted,
@@ -99,7 +111,7 @@ contract SLA is Staking {
         transferOwnership(_owner);
         ipfsHash = _ipfsHash;
         _slaRegistry = ISLARegistry(msg.sender);
-        _sloRegistry = SLORegistry(_slaRegistry.sloRegistry());
+        _sloRegistry = ISLORegistry(_slaRegistry.sloRegistry());
         creationBlockNumber = block.number;
         initialPeriodId = _initialPeriodId;
         finalPeriodId = _finalPeriodId;
@@ -108,6 +120,11 @@ contract SLA is Staking {
         nextVerifiablePeriod = _initialPeriodId;
     }
 
+    /**
+     * @notice External function that registers new SLI
+     * @param _sli sli value to register
+     * @param _periodId period id of new sli
+     */
     function registerSLI(uint256 _sli, uint256 _periodId)
         external
         onlyMessenger
@@ -133,10 +150,20 @@ contract SLA is Staking {
         }
     }
 
+    /**
+     @notice External view function to see if a period id is allowed or not
+     @param _periodId period id to check
+     @return bool allowed or not
+     */
     function isAllowedPeriod(uint256 _periodId) external view returns (bool) {
         return _periodId >= initialPeriodId && _periodId <= finalPeriodId;
     }
 
+    /**
+     * @notice Public view function to check if the contract is terminated
+     * @dev finish condition = should pass last verified period and final period should not be verified.
+     * @return Bool whether finished or not
+     */
     function contractFinished() public view returns (bool) {
         (, uint256 endOfLastValidPeriod) = _periodRegistry.getPeriodStartAndEnd(
             periodType,
@@ -146,6 +173,12 @@ contract SLA is Staking {
             periodSLIs[finalPeriodId].status != Status.NotVerified);
     }
 
+    /**
+     * @notice External function to stake tokens in User or Provider Pools
+     * @param _amount amount to withdraw
+     * @param _tokenAddress token address to withdraw
+     * @param _position User or Provider pool
+     */
     function stakeTokens(
         uint256 _amount,
         address _tokenAddress,
@@ -165,9 +198,16 @@ contract SLA is Staking {
             _position
         );
 
-        IStakeRegistry(_slaRegistry.stakeRegistry()).registerStakedSla(msg.sender);
+        IStakeRegistry(_slaRegistry.stakeRegistry()).registerStakedSla(
+            msg.sender
+        );
     }
 
+    /**
+     * @notice External function to withdraw staked tokens from Provider Pool
+     * @param _amount amount to withdraw
+     * @param _tokenAddress token address to withdraw
+     */
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
     {
@@ -186,6 +226,11 @@ contract SLA is Staking {
         );
     }
 
+    /**
+     * @notice External function to withdraw staked tokens from User Pool
+     * @param _amount amount to withdraw
+     * @param _tokenAddress token address to withdraw
+     */
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
@@ -203,6 +248,10 @@ contract SLA is Staking {
         );
     }
 
+    /**
+     * @notice External view function that returns the number of stakers
+     * @return Uint256 number of stakers
+     */
     function getStakersLength() external view returns (uint256) {
         return stakers.length;
     }

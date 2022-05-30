@@ -14,10 +14,16 @@ import './interfaces/IERC20Query.sol';
 import './dToken.sol';
 import './StringUtils.sol';
 
+/**
+ * @title Staking
+ * @notice Staking of user and provider pool rewards
+ */
 contract Staking is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
+    /// @notice Position of staking
+    /// @dev OK => Provider Pool (LONG), KO => User Pool (SHORT)
     enum Position {
         OK,
         KO
@@ -96,6 +102,7 @@ contract Staking is Ownable, ReentrancyGuard {
         _;
     }
 
+    /// @notice An event that emitted when generating provider rewards
     event ProviderRewardGenerated(
         uint256 indexed periodId,
         address indexed tokenAddress,
@@ -104,6 +111,7 @@ contract Staking is Ownable, ReentrancyGuard {
         uint256 rewardAmount
     );
 
+    /// @notice An event that emitted when generating user rewards
     event UserCompensationGenerated(
         uint256 indexed periodId,
         address indexed tokenAddress,
@@ -112,6 +120,7 @@ contract Staking is Ownable, ReentrancyGuard {
         uint256 compensation
     );
 
+    /// @notice An event that emitted when owner adds new dTokens
     event DTokensCreated(
         address indexed tokenAddress,
         address indexed dpTokenAddress,
@@ -122,6 +131,15 @@ contract Staking is Ownable, ReentrancyGuard {
         string duTokenSymbol
     );
 
+    /**
+     * @notice Constructor
+     * @param slaRegistry_ SLARegistry address
+     * @param whitelistedContract_ Declare if contract is whitelisted
+     * @param slaID_ ID of SLA
+     * @param leverage_ Leverage of reward
+     * @param contractOwner_ SLA Owner address
+     * @param messengerAddress_ Messenger Address
+     */
     constructor(
         ISLARegistry slaRegistry_,
         bool whitelistedContract_,
@@ -156,6 +174,11 @@ contract Staking is Ownable, ReentrancyGuard {
         messengerAddress = messengerAddress_;
     }
 
+    /**
+     * @notice Add multiple addresses to whitelist
+     * @dev only owner can call this function
+     * @param _userAddresses Addresses to whitelist
+     */
     function addUsersToWhitelist(address[] memory _userAddresses)
         public
         onlyOwner
@@ -167,6 +190,11 @@ contract Staking is Ownable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Remove multiple addresses from whitelist
+     * @dev only owner can call this function
+     * @param _userAddresses Addresses to remove
+     */
     function removeUsersFromWhitelist(address[] calldata _userAddresses)
         external
         onlyOwner
@@ -178,6 +206,12 @@ contract Staking is Ownable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Add token to allowedTokens list
+     * @dev It creates dpToken(Provider) and duToken(User) that represents the position.
+            only owner can call this function
+     * @param _tokenAddress Token address to allow
+     */
     function addAllowedTokens(address _tokenAddress) external onlyOwner {
         (, , , , , , uint256 maxTokenLength, , ) = _stakeRegistry
             .getStakingParameters();
@@ -225,6 +259,13 @@ contract Staking is Ownable, ReentrancyGuard {
         );
     }
 
+    /**
+     * @notice Stake allowed assets in User or Provider pools until next period
+     * @param _tokenAddress Address of token to stake
+     * @param _nextVerifiablePeriod Next verifiable PeriodId
+     * @param _amount Amount of tokens to stake
+     * @param _position Staking position, OK or KO
+     */
     function _stake(
         address _tokenAddress,
         uint256 _nextVerifiablePeriod,
@@ -290,6 +331,12 @@ contract Staking is Ownable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Set rewards of provider pool for specific periodId
+     * @param _periodId Period ID to set rewards
+     * @param _rewardPercentage Percentage to allocate for rewards
+     * @param _precision Precision of Percentage
+     */
     function _setProviderReward(
         uint256 _periodId,
         uint256 _rewardPercentage,
@@ -328,6 +375,12 @@ contract Staking is Ownable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Set rewards of user pool for specific periodId
+     * @param _periodId Period ID to set rewards
+     * @param _rewardPercentage Percentage to allocate for rewards
+     * @param _precision Precision of Percentage
+     */
     function _setUserReward(
         uint256 _periodId,
         uint256 _rewardPercentage,
@@ -366,6 +419,13 @@ contract Staking is Ownable, ReentrancyGuard {
         }
     }
 
+    /**
+     * @notice Withdraw staked tokens from Provider Pool
+     * @param _amount Amount to withdraw
+     * @param _tokenAddress Token address to withdraw
+     * @param _nextVerifiablePeriod Next verifiable period id of current period
+     * @param _contractFinished Present if SLA is terminated or finished
+     */
     function _withdrawProviderTokens(
         uint256 _amount,
         address _tokenAddress,
@@ -403,6 +463,13 @@ contract Staking is Ownable, ReentrancyGuard {
         IERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
     }
 
+    /**
+     * @notice Withdraw staked tokens from User Pool
+     * @param _amount Amount to withdraw
+     * @param _tokenAddress Token address to withdraw
+     * @param _nextVerifiablePeriod Next verifiable period id of current period
+     * @param _contractFinished Present if SLA is terminated or finished
+     */
     function _withdrawUserTokens(
         uint256 _amount,
         address _tokenAddress,
@@ -431,6 +498,12 @@ contract Staking is Ownable, ReentrancyGuard {
         IERC20(_tokenAddress).safeTransfer(msg.sender, outstandingAmount);
     }
 
+    /**
+     * @notice Distribute rewards to owner and protocol when user claims
+     * @param _amount Amount to withdraw
+     * @param _tokenAddress Token address to withdraw
+     * @return outstandingAmount
+     */
     function _distributeClaimingRewards(uint256 _amount, address _tokenAddress)
         internal
         returns (uint256)
@@ -445,10 +518,19 @@ contract Staking is Ownable, ReentrancyGuard {
         return _amount.sub(slaOwnerRewards).sub(protocolRewards);
     }
 
+    /**
+     * @notice Get number of allowed tokens
+     * @return Number of allowed tokens
+     */
     function getAllowedTokensLength() external view returns (uint256) {
         return allowedTokens.length;
     }
 
+    /**
+     * @notice Check if the token is allowed or not
+     * @param _tokenAddress Token address to check allowance
+     * @return isAllowed
+     */
     function isAllowedToken(address _tokenAddress) public view returns (bool) {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             if (allowedTokens[index] == _tokenAddress) {
