@@ -1,18 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.9;
 
 import './interfaces/IMessenger.sol';
 import './interfaces/IMessengerRegistry.sol';
-import '@openzeppelin/contracts/math/SafeMath.sol';
 
 /**
  * @title MessengerRegistry
  * @notice MessengerRegistry is a contract to register openly distributed Messengers
  */
 contract MessengerRegistry is IMessengerRegistry {
-    using SafeMath for uint256;
-
     /// @notice struct to store the definition of Messenger
     struct Messenger {
         address ownerAddress;
@@ -99,7 +95,7 @@ contract MessengerRegistry is IMessengerRegistry {
         _ownerMessengers[messengerOwner].push(id);
 
         require(
-            precision.mod(100) == 0 && precision != 0,
+            precision % 100 == 0 && precision != 0,
             'invalid messenger precision, cannot register messanger'
         );
 

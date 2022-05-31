@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.9;
 
-import '@openzeppelin/contracts/math/SafeMath.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import './interfaces/IPeriodRegistry.sol';
 
@@ -11,8 +9,6 @@ import './interfaces/IPeriodRegistry.sol';
  * @notice PeriodRegistry is a contract for management of period definitions
  */
 contract PeriodRegistry is IPeriodRegistry, Ownable {
-    using SafeMath for uint256;
-
     /// @notice struct to store the definition of a period
     struct PeriodDefinition {
         bool initialized;
@@ -68,7 +64,7 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
             );
             if (index < _periodStarts.length - 1) {
                 require(
-                    _periodStarts[index + 1].sub(_periodEnds[index]) == 1,
+                    _periodStarts[index + 1] - _periodEnds[index] == 1,
                     'Start of a period should be 1 second after the end of the previous period'
                 );
             }
@@ -101,9 +97,9 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
                 _periodStarts[index] < _periodEnds[index],
                 'Start should be before end'
             );
-            if (index < _periodStarts.length.sub(1)) {
+            if (index < _periodStarts.length - 1) {
                 require(
-                    _periodStarts[index + 1].sub(_periodEnds[index]) == 1,
+                    _periodStarts[index + 1] - _periodEnds[index] == 1,
                     'Start of a period should be 1 second after the end of the previous period'
                 );
             }
@@ -156,8 +152,7 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
         override
         returns (bool valid)
     {
-        valid =
-            periodDefinitions[_periodType].starts.length.sub(1) >= _periodId;
+        valid = periodDefinitions[_periodType].starts.length - 1 >= _periodId;
     }
 
     /**

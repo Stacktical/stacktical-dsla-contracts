@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.9;
 
-import '@openzeppelin/contracts/math/SafeMath.sol';
-import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
+import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import './SLA.sol';
 import './SLORegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
@@ -17,8 +15,6 @@ import './interfaces/ISLARegistry.sol';
  * @notice This is a registry contract that deploy SLAs and manage them
  */
 contract SLARegistry is ISLARegistry, ReentrancyGuard {
-    using SafeMath for uint256;
-
     /// @notice SLO registry
     address private _sloRegistry;
     /// @notice Periods registry
@@ -63,7 +59,7 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         address messengerRegistry_,
         address stakeRegistry_,
         bool checkPastPeriod_
-    ) public {
+    ) {
         _sloRegistry = sloRegistry_;
         SLORegistry(_sloRegistry).setSLARegistry();
         _periodRegistry = periodRegistry_;
@@ -158,10 +154,9 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
             address(sla),
             finalPeriodId_ - initialPeriodId_ + 1
         );
+        _userToSLAIndexes[msg.sender].push(SLAs.length);
         SLAs.push(sla);
         _registeredSLAs[address(sla)] = true;
-        uint256 index = SLAs.length.sub(1);
-        _userToSLAIndexes[msg.sender].push(index);
         emit SLACreated(sla, msg.sender);
     }
 

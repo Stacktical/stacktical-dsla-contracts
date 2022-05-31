@@ -257,7 +257,7 @@ describe(CONTRACT_NAMES.Staking, function () {
     let stakeAmount = 100000000;
 
     await expect(sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
-      .to.be.revertedWith('ERC20: transfer amount exceeds allowance')
+      .to.be.revertedWith('ERC20: insufficient allowance')
   });
 
   it('should prevent staking if token not allowed', async () => {

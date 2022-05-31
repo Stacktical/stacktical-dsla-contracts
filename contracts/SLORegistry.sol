@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
-
-import '@openzeppelin/contracts/math/SafeMath.sol';
+pragma solidity 0.8.9;
 
 /**
  * @title SLORegistry
@@ -10,9 +7,6 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
  * objectives and querying those service level objectives
  */
 contract SLORegistry {
-    using SafeMath for uint256;
-    using SafeMath for int256;
-
     enum SLOType {
         EqualTo,
         NotEqualTo,
@@ -135,24 +129,24 @@ contract SLORegistry {
 
         // Ensures a positive deviation for greater / small comparisons
         // The deviation is the percentage difference between SLI and SLO
-        uint256 deviation = (
-            _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)
-        ).mul(_precision).div(_sli.add(sloValue).div(2));
+        uint256 deviation = ((
+            _sli >= sloValue ? _sli - sloValue : sloValue - _sli
+        ) * _precision) / ((_sli + sloValue) / 2);
 
         // Enforces a deviation capped at 25%
-        if (deviation > _precision.mul(25).div(100)) {
-            deviation = _precision.mul(25).div(100);
+        if (deviation > (_precision * 25) / 100) {
+            deviation = (_precision * 25) / 100;
         }
 
         if (sloType == SLOType.EqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            deviation = _precision.mul(25).div(100);
+            deviation = (_precision * 25) / 100;
             return deviation;
         }
 
         if (sloType == SLOType.NotEqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            deviation = _precision.mul(25).div(100);
+            deviation = (_precision * 25) / 100;
             return deviation;
         }
 

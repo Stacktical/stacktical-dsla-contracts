@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.9;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/math/SafeMath.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
@@ -15,8 +13,6 @@ import './Staking.sol';
  @title Service Level Agreement Contract
  */
 contract SLA is Staking {
-    using SafeMath for uint256;
-
     enum Status {
         NotVerified,
         Respected,
@@ -98,7 +94,6 @@ contract SLA is Staking {
         bytes32[] memory _extraData,
         uint64 _leverage
     )
-        public
         Staking(
             ISLARegistry(msg.sender),
             _whitelisted,

@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
+pragma solidity 0.8.9;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/math/SafeMath.sol';
-import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
+import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
@@ -19,7 +18,6 @@ import './dToken.sol';
  * @notice Staking of user and provider pool rewards
  */
 contract Staking is Ownable, ReentrancyGuard {
-    using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     /// @notice Position of staking
@@ -147,7 +145,7 @@ contract Staking is Ownable, ReentrancyGuard {
         uint64 leverage_,
         address contractOwner_,
         address messengerAddress_
-    ) public {
+    ) {
         _stakeRegistry = IStakeRegistry(slaRegistry_.stakeRegistry());
         _periodRegistry = IPeriodRegistry(slaRegistry_.periodRegistry());
         whitelistedContract = whitelistedContract_;
@@ -281,7 +279,7 @@ contract Staking is Ownable, ReentrancyGuard {
         // DSLA-SP proofs of SLA Position
         if (_position == Position.KO) {
             require(
-                usersPool[_tokenAddress].add(_amount).mul(leverage) <=
+                (usersPool[_tokenAddress] + _amount) * leverage <=
                     providersPool[_tokenAddress],
                 'Stake exceeds leveraged cap.'
             );
@@ -296,11 +294,10 @@ contract Staking is Ownable, ReentrancyGuard {
                 // mint dTokens proportionally
                 duToken.mint(
                     msg.sender,
-                    _amount.mul(p0).div(usersPool[_tokenAddress])
+                    (_amount * p0) / usersPool[_tokenAddress]
                 );
             }
-            usersPool[_tokenAddress] = usersPool[_tokenAddress].add(_amount);
-
+            usersPool[_tokenAddress] += _amount;
             lastUserStake[msg.sender] = _nextVerifiablePeriod;
         }
 
@@ -315,13 +312,10 @@ contract Staking is Ownable, ReentrancyGuard {
                 // mint dTokens proportionally
                 dpToken.mint(
                     msg.sender,
-                    _amount.mul(p0).div(providersPool[_tokenAddress])
+                    (_amount * p0) / providersPool[_tokenAddress]
                 );
             }
-            providersPool[_tokenAddress] = providersPool[_tokenAddress].add(
-                _amount
-            );
-
+            providersPool[_tokenAddress] += _amount;
             lastProviderStake[msg.sender] = _nextVerifiablePeriod;
         }
 
@@ -345,24 +339,18 @@ contract Staking is Ownable, ReentrancyGuard {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
 
-            uint256 reward = providersPool[tokenAddress]
-                .div(leverage)
-                .mul(_rewardPercentage)
-                .div(_precision);
+            uint256 reward = ((providersPool[tokenAddress] / leverage) *
+                _rewardPercentage) / _precision;
 
             // Reward must be less than 25% of usersPool to ensure payout at all time
-            if (reward > usersPool[tokenAddress].mul(25).div(100)) {
-                reward = usersPool[tokenAddress].mul(_rewardPercentage).div(
-                    _precision
-                );
+            if (reward > (usersPool[tokenAddress] * 25) / 100) {
+                reward =
+                    (usersPool[tokenAddress] * _rewardPercentage) /
+                    _precision;
             }
 
-            usersPool[tokenAddress] = usersPool[tokenAddress].sub(reward);
-
-            providersPool[tokenAddress] = providersPool[tokenAddress].add(
-                reward
-            );
-
+            usersPool[tokenAddress] -= reward;
+            providersPool[tokenAddress] += reward;
             providerRewards[_periodId] = reward;
 
             emit ProviderRewardGenerated(
@@ -389,24 +377,20 @@ contract Staking is Ownable, ReentrancyGuard {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
 
-            uint256 compensation = usersPool[tokenAddress]
-                .mul(leverage)
-                .mul(_rewardPercentage)
-                .div(_precision);
+            uint256 compensation = (usersPool[tokenAddress] *
+                leverage *
+                _rewardPercentage) / _precision;
 
             // Compensation must be less than 25% of providersPool to ensure payout at all time
-            if (compensation > providersPool[tokenAddress].mul(25).div(100)) {
-                compensation = providersPool[tokenAddress]
-                    .mul(_rewardPercentage)
-                    .div(_precision);
+            if (compensation > (providersPool[tokenAddress] * 25) / 100) {
+                compensation =
+                    providersPool[tokenAddress] *
+                    _rewardPercentage *
+                    _precision;
             }
 
-            providersPool[tokenAddress] = providersPool[tokenAddress].sub(
-                compensation
-            );
-
-            usersPool[tokenAddress] = usersPool[tokenAddress].add(compensation);
-
+            providersPool[tokenAddress] -= compensation;
+            usersPool[tokenAddress] += compensation;
             userRewards[_periodId] = compensation;
 
             emit UserCompensationGenerated(
@@ -440,8 +424,8 @@ contract Staking is Ownable, ReentrancyGuard {
 
             // Allow provider withdrawal as long as the provider pool exceeds the leveraged user pool
             require(
-                providersPool[_tokenAddress].sub(_amount) >=
-                    usersPool[_tokenAddress].mul(leverage),
+                providersPool[_tokenAddress] - _amount >=
+                    usersPool[_tokenAddress] * leverage,
                 'Withdrawal exceeds leveraged cap.'
             );
         }
@@ -451,11 +435,9 @@ contract Staking is Ownable, ReentrancyGuard {
         // t0/p0 = (t0-_amount)/(p0-burnedDPTokens)
         dpToken.burnFrom(
             msg.sender,
-            _amount.mul(dpToken.totalSupply()).div(providersPool[_tokenAddress])
+            (_amount * dpToken.totalSupply()) / providersPool[_tokenAddress]
         );
-        providersPool[_tokenAddress] = providersPool[_tokenAddress].sub(
-            _amount
-        );
+        providersPool[_tokenAddress] -= _amount;
         uint256 outstandingAmount = _distributeClaimingRewards(
             _amount,
             _tokenAddress
@@ -488,9 +470,9 @@ contract Staking is Ownable, ReentrancyGuard {
         // t0/p0 = (t0-_amount)/(p0-burnedDUTokens)
         duToken.burnFrom(
             msg.sender,
-            _amount.mul(duToken.totalSupply()).div(usersPool[_tokenAddress])
+            (_amount * duToken.totalSupply()) / usersPool[_tokenAddress]
         );
-        usersPool[_tokenAddress] = usersPool[_tokenAddress].sub(_amount);
+        usersPool[_tokenAddress] -= _amount;
         uint256 outstandingAmount = _distributeClaimingRewards(
             _amount,
             _tokenAddress
@@ -508,14 +490,14 @@ contract Staking is Ownable, ReentrancyGuard {
         internal
         returns (uint256)
     {
-        uint256 slaOwnerRewards = _amount.mul(ownerRewardsRate).div(10000);
-        uint256 protocolRewards = _amount.mul(protocolRewardsRate).div(10000);
+        uint256 slaOwnerRewards = (_amount * ownerRewardsRate) / 10000;
+        uint256 protocolRewards = (_amount * protocolRewardsRate) / 10000;
         IERC20(_tokenAddress).safeTransfer(owner(), slaOwnerRewards);
         IERC20(_tokenAddress).safeTransfer(
             _stakeRegistry.owner(),
             protocolRewards
         );
-        return _amount.sub(slaOwnerRewards).sub(protocolRewards);
+        return _amount - slaOwnerRewards - protocolRewards;
     }
 
     /**
