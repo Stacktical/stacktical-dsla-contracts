@@ -88,6 +88,10 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
         uint256[] memory _periodEnds
     ) public onlyOwner {
         require(_periodStarts.length > 0, "Period length can't be 0");
+        require(
+            _periodStarts.length == _periodEnds.length,
+            'Period length in start and end arrays should match'
+        );
         PeriodDefinition storage periodDefinition = periodDefinitions[
             _periodType
         ];
