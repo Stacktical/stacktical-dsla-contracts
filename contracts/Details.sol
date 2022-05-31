@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.9;
 
 import './SLA.sol';
 import './SLORegistry.sol';

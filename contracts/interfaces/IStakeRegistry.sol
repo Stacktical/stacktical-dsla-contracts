@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
+pragma solidity 0.8.9;
 import '@openzeppelin/contracts/access/Ownable.sol';
 
 abstract contract IStakeRegistry is Ownable {
@@ -15,8 +15,8 @@ abstract contract IStakeRegistry is Ownable {
 
     function getStakingParameters()
         external
-        virtual
         view
+        virtual
         returns (
             uint256 DSLAburnRate,
             uint256 dslaDepositByPeriod,
@@ -29,9 +29,13 @@ abstract contract IStakeRegistry is Ownable {
             bool burnDSLA
         );
 
-    function DSLATokenAddress() external virtual view returns (address);
+    function DSLATokenAddress() external view virtual returns (address);
 
-    function isAllowedToken(address tokenAddress_) external virtual view returns (bool);
+    function isAllowedToken(address tokenAddress_)
+        external
+        view
+        virtual
+        returns (bool);
 
     function returnLockedValue(address sla_) external virtual;
 
@@ -41,8 +45,9 @@ abstract contract IStakeRegistry is Ownable {
         uint256 _periodId
     ) external virtual;
 
-    function createDToken(string calldata _name, string calldata _symbol, uint8 decimals)
-        external
-        virtual
-        returns (address);
+    function createDToken(
+        string calldata _name,
+        string calldata _symbol,
+        uint8 decimals
+    ) external virtual returns (address);
 }

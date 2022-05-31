@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.9;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/math/SafeMath.sol';
-import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
+import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import './SLA.sol';
 import './dToken.sol';
 import './interfaces/IMessenger.sol';
@@ -21,7 +19,6 @@ import './libraries/StringUtils.sol';
  */
 contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
     using SafeERC20 for ERC20;
-    using SafeMath for uint256;
 
     struct LockedValue {
         uint256 lockedValue;
@@ -147,13 +144,13 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      * @notice Constructor
      * @param _dslaTokenAddress 1. DSLA Token
      */
-    constructor(address _dslaTokenAddress) public {
+    constructor(address _dslaTokenAddress) {
         require(
             _dslaDepositByPeriod ==
-                _dslaPlatformReward
-                    .add(_dslaMessengerReward)
-                    .add(_dslaUserReward)
-                    .add(_dslaBurnedByVerification),
+                _dslaPlatformReward +
+                    _dslaMessengerReward +
+                    _dslaUserReward +
+                    _dslaBurnedByVerification,
             'Staking parameters should match on summation'
         );
         _DSLATokenAddress = _dslaTokenAddress;
@@ -284,21 +281,20 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         address _sla,
         uint256 _periodIdsLength
     ) external override onlySLARegistry nonReentrant {
-        uint256 lockedValue = _dslaDepositByPeriod.mul(_periodIdsLength);
+        uint256 lockedValue = _dslaDepositByPeriod * _periodIdsLength;
         ERC20(_DSLATokenAddress).safeTransferFrom(
             _slaOwner,
             address(this),
             lockedValue
         );
-        slaLockedValue[_sla] = LockedValue({
-            lockedValue: lockedValue,
-            slaPeriodIdsLength: _periodIdsLength,
-            dslaDepositByPeriod: _dslaDepositByPeriod,
-            dslaPlatformReward: _dslaPlatformReward,
-            dslaMessengerReward: _dslaMessengerReward,
-            dslaUserReward: _dslaUserReward,
-            dslaBurnedByVerification: _dslaBurnedByVerification
-        });
+        LockedValue storage _lockedValue = slaLockedValue[_sla];
+        _lockedValue.lockedValue = lockedValue;
+        _lockedValue.slaPeriodIdsLength = _periodIdsLength;
+        _lockedValue.dslaDepositByPeriod = _dslaDepositByPeriod;
+        _lockedValue.dslaPlatformReward = _dslaPlatformReward;
+        _lockedValue.dslaMessengerReward = _dslaMessengerReward;
+        _lockedValue.dslaUserReward = _dslaUserReward;
+        _lockedValue.dslaBurnedByVerification = _dslaBurnedByVerification;
         emit ValueLocked(_sla, _slaOwner, lockedValue);
     }
 
@@ -320,9 +316,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
             'Period rewards already distributed'
         );
         _lockedValue.verifiedPeriods[_periodId] = true;
-        _lockedValue.lockedValue = _lockedValue.lockedValue.sub(
-            _lockedValue.dslaDepositByPeriod
-        );
+        _lockedValue.lockedValue =
+            _lockedValue.lockedValue -
+            _lockedValue.dslaDepositByPeriod;
         ERC20(_DSLATokenAddress).safeTransfer(
             _verificationRewardReceiver,
             _lockedValue.dslaUserReward
@@ -403,10 +399,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         _burnDSLA = burnDSLA;
         require(
             _dslaDepositByPeriod ==
-                _dslaPlatformReward
-                    .add(_dslaMessengerReward)
-                    .add(_dslaUserReward)
-                    .add(_dslaBurnedByVerification),
+                _dslaPlatformReward +
+                    _dslaMessengerReward +
+                    _dslaUserReward +
+                    _dslaBurnedByVerification,
             'Staking parameters should match on summation'
         );
         emit StakingParametersModified(

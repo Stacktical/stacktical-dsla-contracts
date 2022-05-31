@@ -1,4 +1,5 @@
-pragma solidity 0.6.6;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.9;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 
@@ -105,7 +106,11 @@ abstract contract IMessenger is Ownable {
     /**
      * @dev returns the symbol of DSLA-LP token with slaId
      */
-    function lpSymbolSlaId(uint128 slaId) external view virtual returns (string memory);
+    function lpSymbolSlaId(uint128 slaId)
+        external
+        view
+        virtual
+        returns (string memory);
 
     /**
      * @dev returns the name of DSLA-SP token
@@ -120,7 +125,11 @@ abstract contract IMessenger is Ownable {
     /**
      * @dev returns the symbol of DSLA-SP token with slaId
      */
-    function spSymbolSlaId(uint128 slaId) external view virtual returns (string memory);
+    function spSymbolSlaId(uint128 slaId)
+        external
+        view
+        virtual
+        returns (string memory);
 
     function setChainlinkJobID(bytes32 _newJobId, uint256 _feeMultiplier)
         external
