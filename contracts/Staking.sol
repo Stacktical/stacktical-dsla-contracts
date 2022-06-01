@@ -335,11 +335,11 @@ contract Staking is Ownable, ReentrancyGuard {
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
 
-            uint256 reward = ((providersPool[tokenAddress] / leverage) *
-                _rewardPercentage) / _precision;
+            uint256 reward = (providersPool[tokenAddress] * _rewardPercentage) /
+                (leverage * _precision);
 
             // Reward must be less than 25% of usersPool to ensure payout at all time
-            if (reward > (usersPool[tokenAddress] * 25) / 100) {
+            if (reward > usersPool[tokenAddress] / 4) {
                 reward =
                     (usersPool[tokenAddress] * _rewardPercentage) /
                     _precision;
@@ -377,10 +377,9 @@ contract Staking is Ownable, ReentrancyGuard {
                 _rewardPercentage) / _precision;
 
             // Compensation must be less than 25% of providersPool to ensure payout at all time
-            if (compensation > (providersPool[tokenAddress] * 25) / 100) {
+            if (compensation > providersPool[tokenAddress] / 4) {
                 compensation =
-                    providersPool[tokenAddress] *
-                    _rewardPercentage *
+                    (providersPool[tokenAddress] * _rewardPercentage) /
                     _precision;
             }
 

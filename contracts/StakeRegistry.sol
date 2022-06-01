@@ -320,9 +320,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
             'Period rewards already distributed'
         );
         _lockedValue.verifiedPeriods[_periodId] = true;
-        _lockedValue.lockedValue =
-            _lockedValue.lockedValue -
-            _lockedValue.dslaDepositByPeriod;
+        _lockedValue.lockedValue -= _lockedValue.dslaDepositByPeriod;
         ERC20(_DSLATokenAddress).safeTransfer(
             _verificationRewardReceiver,
             _lockedValue.dslaUserReward
