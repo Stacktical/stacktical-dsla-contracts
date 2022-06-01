@@ -25,6 +25,8 @@ contract SLORegistry {
     /// @dev SLO Registered event
     event SLORegistered(address indexed sla, uint256 sloValue, SLOType sloType);
 
+    /// @notice maximum cap of deviation percent = 25%, base 10000
+    uint16 private constant deviationCapPercent = 2500;
     /// @notice address of SLARegistry contract
     address private slaRegistry;
     /// @dev sla address => SLO mapping
@@ -133,19 +135,19 @@ contract SLORegistry {
         ) * _precision) / ((_sli + sloValue) / 2);
 
         // Enforces a deviation capped at 25%
-        if (deviation > _precision / 4) {
-            deviation = _precision / 4;
+        if (deviation > (_precision * deviationCapPercent) / 10000) {
+            deviation = (_precision * deviationCapPercent) / 10000;
         }
 
         if (sloType == SLOType.EqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            deviation = _precision / 4;
+            deviation = (_precision * deviationCapPercent) / 10000;
             return deviation;
         }
 
         if (sloType == SLOType.NotEqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            deviation = _precision / 4;
+            deviation = (_precision * deviationCapPercent) / 10000;
             return deviation;
         }
 
