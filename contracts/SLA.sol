@@ -124,6 +124,7 @@ contract SLA is Staking {
         external
         onlyMessenger
     {
+        require(_periodId == nextVerifiablePeriod, 'invalid period id');
         emit SLICreated(block.timestamp, _sli, _periodId);
         nextVerifiablePeriod = _periodId + 1;
         PeriodSLI storage periodSLI = periodSLIs[_periodId];
