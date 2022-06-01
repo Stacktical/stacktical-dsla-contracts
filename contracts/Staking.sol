@@ -79,8 +79,8 @@ contract Staking is Ownable, ReentrancyGuard {
     uint64 public immutable leverage;
 
     /// @dev claiming fees when a user claim tokens, base 10000
-    uint256 private constant ownerRewardsRate = 30; // 0.3%, base 10000
-    uint256 private constant protocolRewardsRate = 15; // 0.15%, base 10000
+    uint16 private constant ownerRewardsRate = 30; // 0.3%, base 10000
+    uint16 private constant protocolRewardsRate = 15; // 0.15%, base 10000
 
     /// @dev periodId=>providerReward mapping
     mapping(uint256 => uint256) public providerRewards;
