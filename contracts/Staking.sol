@@ -78,9 +78,9 @@ contract Staking is Ownable, ReentrancyGuard {
 
     uint64 public immutable leverage;
 
-    /// @dev claiming fees when a user claim tokens, should by divided by 10000
-    uint256 private ownerRewardsRate = 30; // 0.3%
-    uint256 private protocolRewardsRate = 15; // 0.15%
+    /// @dev claiming fees when a user claim tokens, base 10000
+    uint16 private constant ownerRewardsRate = 30; // 0.3%, base 10000
+    uint16 private constant protocolRewardsRate = 15; // 0.15%, base 10000
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token), 'This token is not allowed.');
