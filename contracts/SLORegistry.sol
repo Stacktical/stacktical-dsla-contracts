@@ -127,6 +127,7 @@ contract SLORegistry {
     ) external view returns (uint256) {
         SLOType sloType = registeredSLO[_slaAddress].sloType;
         uint256 sloValue = registeredSLO[_slaAddress].sloValue;
+        uint256 cap = (_precision * deviationCapPercent) / 10000;
 
         // Ensures a positive deviation for greater / small comparisons
         // The deviation is the percentage difference between SLI and SLO
@@ -135,20 +136,18 @@ contract SLORegistry {
         ) * _precision) / ((_sli + sloValue) / 2);
 
         // Enforces a deviation capped at 25%
-        if (deviation > (_precision * deviationCapPercent) / 10000) {
-            deviation = (_precision * deviationCapPercent) / 10000;
+        if (deviation > cap) {
+            deviation = cap;
         }
 
         if (sloType == SLOType.EqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            deviation = (_precision * deviationCapPercent) / 10000;
-            return deviation;
+            return cap;
         }
 
         if (sloType == SLOType.NotEqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            deviation = (_precision * deviationCapPercent) / 10000;
-            return deviation;
+            return cap;
         }
 
         if (sloType == SLOType.SmallerThan) {
