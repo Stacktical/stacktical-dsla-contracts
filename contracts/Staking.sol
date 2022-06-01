@@ -82,12 +82,6 @@ contract Staking is Ownable, ReentrancyGuard {
     uint256 private ownerRewardsRate = 30; // 0.3%
     uint256 private protocolRewardsRate = 15; // 0.15%
 
-    /// @dev periodId=>providerReward mapping
-    mapping(uint256 => uint256) public providerRewards;
-
-    /// @dev periodId=>userReward mapping
-    mapping(uint256 => uint256) public userRewards;
-
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token), 'This token is not allowed.');
         _;
@@ -351,7 +345,6 @@ contract Staking is Ownable, ReentrancyGuard {
 
             usersPool[tokenAddress] -= reward;
             providersPool[tokenAddress] += reward;
-            providerRewards[_periodId] = reward;
 
             emit ProviderRewardGenerated(
                 _periodId,
@@ -391,7 +384,6 @@ contract Staking is Ownable, ReentrancyGuard {
 
             providersPool[tokenAddress] -= compensation;
             usersPool[tokenAddress] += compensation;
-            userRewards[_periodId] = compensation;
 
             emit UserCompensationGenerated(
                 _periodId,
