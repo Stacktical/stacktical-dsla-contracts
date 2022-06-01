@@ -17,7 +17,8 @@ contract SLORegistry {
     }
 
     struct SLO {
-        uint256 sloValue;
+        // half storage slot
+        uint120 sloValue;
         SLOType sloType;
     }
     /**
@@ -61,7 +62,7 @@ contract SLORegistry {
      * @param _slaAddress 3. -
      */
     function registerSLO(
-        uint256 _sloValue,
+        uint120 _sloValue,
         SLOType _sloType,
         address _slaAddress
     ) public onlySLARegistry {

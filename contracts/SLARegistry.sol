@@ -97,7 +97,7 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
      * @param leverage_ leverage
      */
     function createSLA(
-        uint256 sloValue_,
+        uint120 sloValue_,
         SLORegistry.SLOType sloType_,
         bool whitelisted_,
         address messengerAddress_,
