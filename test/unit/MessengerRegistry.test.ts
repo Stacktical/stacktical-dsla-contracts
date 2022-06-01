@@ -1,9 +1,10 @@
-const hre = require('hardhat');
 import { IMessenger, MessengerRegistry, SLARegistry } from '../../typechain';
-const { ethers, waffle, deployments, getNamedAccounts } = hre;
+import { ethers, waffle, deployments, getNamedAccounts } from 'hardhat';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS } from '../../constants';
 const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
+import { MockContract } from 'ethereum-waffle';
+import { ethers as Ethers } from 'ethers';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(DEPLOYMENT_TAGS.DSLA);
@@ -48,8 +49,8 @@ const setup = deployments.createFixture(async () => {
 type Fixture = {
   messengerRegistry: MessengerRegistry;
   slaRegistry: SLARegistry;
-  mockMessenger: IMessenger;
-  mockMessenger2: IMessenger;
+  mockMessenger: MockContract;
+  mockMessenger2: MockContract;
 };
 
 describe(CONTRACT_NAMES.MessengerRegistry, function () {
@@ -88,6 +89,10 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
     await expect(
       slaRegistry.registerMessenger(invalidAddress, dummySpecUrl)
     ).to.be.reverted;
+
+    await expect(
+      slaRegistry.registerMessenger(Ethers.constants.AddressZero, dummySpecUrl)
+    ).to.be.revertedWith('invalid messenger address')
   });
 
   it('should modify messengers with valid id and specUrl', async function () {

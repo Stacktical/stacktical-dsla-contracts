@@ -72,11 +72,11 @@ contract MessengerRegistry is IMessengerRegistry {
         address messengerAddress_,
         string calldata specificationUrl_
     ) external override {
-        require(messengerAddress_ != address(0x0), 'invalid messenger address');
         require(
             msg.sender == _slaRegistry,
             'Should only be called using the SLARegistry contract'
         );
+        require(messengerAddress_ != address(0x0), 'invalid messenger address');
         require(
             !_registeredMessengers[messengerAddress_],
             'messenger already registered'

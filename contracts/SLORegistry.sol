@@ -21,15 +21,13 @@ contract SLORegistry {
         uint120 sloValue;
         SLOType sloType;
     }
-    /**
-     * @dev SLO Registered event
-     * @param sla 1. -
-     * @param sloValue 2. -
-     * @param sloType 3. -
-     */
+
+    /// @dev SLO Registered event
     event SLORegistered(address indexed sla, uint256 sloValue, SLOType sloType);
 
+    /// @notice address of SLARegistry contract
     address private slaRegistry;
+    /// @dev sla address => SLO mapping
     mapping(address => SLO) public registeredSLO;
 
     /// @dev Modifier ensuring that certain function can only be called by SLARegistry

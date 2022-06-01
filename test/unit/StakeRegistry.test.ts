@@ -138,6 +138,14 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		expect(await stakeRegistry.DSLATokenAddress()).to.be.equal(dslaToken.address);
 		expect(await stakeRegistry.allowedTokens(0)).to.be.equal(dslaToken.address);
 	})
+	it("should revert constructor if DSLA token address is invalid", async () => {
+		const { deploy } = deployments
+		await expect(deploy(CONTRACT_NAMES.StakeRegistry, {
+			from: deployer,
+			log: true,
+			args: [Ethers.constants.AddressZero],
+		})).to.be.revertedWith('invalid DSLA token address');
+	})
 	it("should be able to set slaRegistry address once at first", async () => {
 		const { stakeRegistry, slaRegistry } = fixture;
 		const slaRegistryOnStake = await stakeRegistry.slaRegistry();

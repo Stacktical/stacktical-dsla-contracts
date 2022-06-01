@@ -249,12 +249,12 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         address _messengerAddress,
         string memory _specificationUrl
     ) public nonReentrant {
-        IMessenger(_messengerAddress).setSLARegistry();
         IMessengerRegistry(_messengerRegistry).registerMessenger(
             msg.sender,
             _messengerAddress,
             _specificationUrl
         );
+        IMessenger(_messengerAddress).setSLARegistry();
     }
 
     /**
