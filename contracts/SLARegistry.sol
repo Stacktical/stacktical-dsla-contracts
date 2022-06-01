@@ -60,6 +60,19 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         address stakeRegistry_,
         bool checkPastPeriod_
     ) {
+        require(sloRegistry_ != address(0x0), 'invalid sloRegistry address');
+        require(
+            periodRegistry_ != address(0x0),
+            'invalid periodRegistry address'
+        );
+        require(
+            messengerRegistry_ != address(0x0),
+            'invalid messengerRegistry address'
+        );
+        require(
+            stakeRegistry_ != address(0x0),
+            'invalid stakeRegistry address'
+        );
         _sloRegistry = sloRegistry_;
         SLORegistry(_sloRegistry).setSLARegistry();
         _periodRegistry = periodRegistry_;

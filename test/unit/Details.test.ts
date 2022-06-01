@@ -116,7 +116,7 @@ describe(CONTRACT_NAMES.Details, function () {
     const d = await details.getSLADynamicDetails(sla.address);
 
     expect(d).to.have.own.property('stakersCount');
-    expect(d['stakersCount']).to.equal(sla.stakers.length);
+    expect(d['stakersCount']).to.equal(await sla.getStakersLength());
 
     expect(d).to.have.own.property('nextVerifiablePeriod');
     expect(d['nextVerifiablePeriod']).to.equal(baseSLAConfig.initialPeriodId);
