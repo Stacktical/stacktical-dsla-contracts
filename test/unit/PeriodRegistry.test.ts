@@ -1,6 +1,5 @@
-const hre = require('hardhat');
 import { PeriodRegistry } from '../../typechain';
-const { ethers, deployments } = hre;
+import { ethers, deployments } from 'hardhat';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS } from '../../constants';
 import { expect } from '../chai-setup';
 import { PERIOD_TYPE } from '../../constants';
@@ -83,15 +82,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartMonthlyExpected],
         [periodEndMonthlyExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.MONTHLY, 1);
-
-    let period1 = await PeriodRegistry.getPeriodStartAndEnd(
-      PERIOD_TYPE.MONTHLY,
-      0
-    );
-
     let periodStartExpected = moment()
       .utc(0)
       .startOf('month')
@@ -147,14 +139,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartExpected],
         [periodEndExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.DAILY, 1);
-    let period = await PeriodRegistry.getPeriodStartAndEnd(
-      PERIOD_TYPE.DAILY,
-      0
-    );
-
     let isInitializedPeriod = await PeriodRegistry.isInitializedPeriod(
       PERIOD_TYPE.DAILY
     );
@@ -191,14 +177,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartExpected],
         [periodEndExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.DAILY, 1);
-    let period = await PeriodRegistry.getPeriodStartAndEnd(
-      PERIOD_TYPE.DAILY,
-      0
-    );
-
     let isValidPeriod = await PeriodRegistry.isValidPeriod(
       PERIOD_TYPE.DAILY,
       0
@@ -227,14 +207,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartExpected],
         [periodEndExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.DAILY, 1);
-    let period = await PeriodRegistry.getPeriodStartAndEnd(
-      PERIOD_TYPE.DAILY,
-      0
-    );
-
     let isValidPeriod = await PeriodRegistry.isValidPeriod(
       PERIOD_TYPE.DAILY,
       1
@@ -263,14 +237,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartExpected],
         [periodEndExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.DAILY, 1);
-    let period = await PeriodRegistry.getPeriodStartAndEnd(
-      PERIOD_TYPE.DAILY,
-      0
-    );
-
     let isPeriodIsFinished = await PeriodRegistry.periodIsFinished(
       PERIOD_TYPE.DAILY,
       0
@@ -299,14 +267,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartExpected],
         [periodEndExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.DAILY, 1);
-    let period = await PeriodRegistry.getPeriodStartAndEnd(
-      PERIOD_TYPE.DAILY,
-      0
-    );
-
     let isPeriodIsFinished = await PeriodRegistry.periodIsFinished(
       PERIOD_TYPE.DAILY,
       0
@@ -360,14 +322,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartExpected],
         [periodEndExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.DAILY, 1);
-    let period = await PeriodRegistry.getPeriodStartAndEnd(
-      PERIOD_TYPE.DAILY,
-      0
-    );
-
     let periodHasStarted = await PeriodRegistry.periodHasStarted(
       PERIOD_TYPE.DAILY,
       0
@@ -397,14 +353,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartExpected],
         [periodEndExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.DAILY, 1);
-    let period = await PeriodRegistry.getPeriodStartAndEnd(
-      PERIOD_TYPE.DAILY,
-      0
-    );
-
     let periodHasStarted = await PeriodRegistry.periodHasStarted(
       PERIOD_TYPE.DAILY,
       0
@@ -433,14 +383,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartMonthlyExpected],
         [periodEndMonthlyExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.MONTHLY, 1);
-
-    let period1 = await PeriodRegistry.getPeriodStartAndEnd(
-      PERIOD_TYPE.MONTHLY,
-      0
-    );
 
     let periodStartDailyExpected = moment()
       .utc(0)
@@ -480,4 +424,43 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
     expect(periodDefinition[1].starts[0]).to.be.equal(periodStartDailyExpected);
     expect(periodDefinition[1].ends[0]).to.be.equal(periodEndDailyExpected);
   });
+
+  it('should revert getting period start and end when period id does not exist', async function () {
+    const { PeriodRegistry } = fixture;
+    await expect(PeriodRegistry.getPeriodStartAndEnd(
+      PERIOD_TYPE.MONTHLY,
+      100
+    )).to.be.revertedWith('Invalid period id');
+
+    let periodStartExpected = moment()
+      .utc(0)
+      .startOf('month')
+      .add(1, 'month')
+      .startOf('month')
+      .unix();
+    let periodEndExpected = moment()
+      .utc(0)
+      .endOf('month')
+      .add(10, 'month')
+      .endOf('month')
+      .unix();
+    await expect(
+      PeriodRegistry.initializePeriod(
+        PERIOD_TYPE.MONTHLY,
+        [periodStartExpected],
+        [periodEndExpected]
+      )
+    )
+      .to.emit(PeriodRegistry, 'PeriodInitialized')
+      .withArgs(PERIOD_TYPE.MONTHLY, 1);
+    let period = await PeriodRegistry.getPeriodStartAndEnd(
+      PERIOD_TYPE.MONTHLY,
+      0
+    );
+
+    let periodStartActual = period.start.toNumber();
+    let periodEndActual = period.end.toNumber();
+    expect(periodStartActual).to.be.equal(periodStartExpected);
+    expect(periodEndActual).to.be.equal(periodEndExpected);
+  })
 });

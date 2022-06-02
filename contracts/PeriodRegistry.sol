@@ -126,6 +126,10 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
         override
         returns (uint256 start, uint256 end)
     {
+        require(
+            _periodId < periodDefinitions[_periodType].starts.length,
+            'Invalid period id'
+        );
         start = periodDefinitions[_periodType].starts[_periodId];
         end = periodDefinitions[_periodType].ends[_periodId];
     }
