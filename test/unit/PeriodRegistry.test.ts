@@ -19,6 +19,24 @@ type Fixture = {
   PeriodRegistry: PeriodRegistry;
 };
 
+const getPeriodStart = () => {
+  return moment()
+    .utc(0)
+    .startOf('month')
+    .add(1, 'month')
+    .startOf('month')
+    .unix();
+}
+
+const getPeriodEnd = () => {
+  return moment()
+    .utc(0)
+    .endOf('month')
+    .add(10, 'month')
+    .endOf('month')
+    .unix();
+}
+
 describe(CONTRACT_NAMES.PeriodRegistry, function () {
   let fixture: Fixture;
   let deployer: string;
@@ -29,53 +47,54 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
   it('should initialize a period with correct start and end', async function () {
     const { PeriodRegistry } = fixture;
 
-    let periodStartExpected = moment()
-      .utc(0)
-      .startOf('month')
-      .add(1, 'month')
-      .startOf('month')
-      .unix();
-    let periodEndExpected = moment()
-      .utc(0)
-      .endOf('month')
-      .add(10, 'month')
-      .endOf('month')
-      .unix();
+    const periodStartExpected = getPeriodStart();
+    const periodEndExpected = getPeriodEnd();
     await expect(
       PeriodRegistry.initializePeriod(
         PERIOD_TYPE.MONTHLY,
         [periodStartExpected],
         [periodEndExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodInitialized')
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.MONTHLY, 1);
     let period = await PeriodRegistry.getPeriodStartAndEnd(
       PERIOD_TYPE.MONTHLY,
       0
     );
 
-    let periodStartActual = period.start.toNumber();
-    let periodEndActual = period.end.toNumber();
+    const periodStartActual = period.start.toNumber();
+    const periodEndActual = period.end.toNumber();
     expect(periodStartActual).to.be.equal(periodStartExpected);
     expect(periodEndActual).to.be.equal(periodEndExpected);
+  });
+
+  it('should revert initialization if start of a period is not 1 second after the end of the previous period', async function () {
+    const { PeriodRegistry } = fixture;
+
+    const periodStartExpected = getPeriodStart();
+    const periodEndExpected = getPeriodEnd();
+    await expect(
+      PeriodRegistry.initializePeriod(
+        PERIOD_TYPE.MONTHLY,
+        [periodStartExpected, periodEndExpected + 2],
+        [periodEndExpected, periodEndExpected + 1000]
+      )
+    ).to.be.revertedWith('Start of a period should be 1 second after the end of the previous period');
+    await expect(
+      PeriodRegistry.initializePeriod(
+        PERIOD_TYPE.MONTHLY,
+        [periodStartExpected, periodEndExpected + 1],
+        [periodEndExpected, periodEndExpected + 1000]
+      )
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
+      .withArgs(PERIOD_TYPE.MONTHLY, 2);
   });
 
   it('should modify an already initialized period', async function () {
     const { PeriodRegistry } = fixture;
 
-    let periodStartMonthlyExpected = moment()
-      .utc(0)
-      .startOf('month')
-      .add(1, 'month')
-      .startOf('month')
-      .unix();
-    let periodEndMonthlyExpected = moment()
-      .utc(0)
-      .endOf('month')
-      .add(10, 'month')
-      .endOf('month')
-      .unix();
+    let periodStartMonthlyExpected = getPeriodStart();
+    let periodEndMonthlyExpected = getPeriodEnd();
     await expect(
       PeriodRegistry.initializePeriod(
         PERIOD_TYPE.MONTHLY,
@@ -103,9 +122,61 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
         [periodStartExpected],
         [periodEndExpected]
       )
-    )
-      .to.emit(PeriodRegistry, 'PeriodModified')
+    ).to.emit(PeriodRegistry, 'PeriodModified')
       .withArgs(PERIOD_TYPE.MONTHLY, 1);
+
+    let period = await PeriodRegistry.getPeriodStartAndEnd(
+      PERIOD_TYPE.MONTHLY,
+      1
+    );
+    let periodStartActual = period.start.toNumber();
+    let periodEndActual = period.end.toNumber();
+
+    expect(periodStartActual).to.be.equal(periodStartExpected);
+    expect(periodEndActual).to.be.equal(periodEndExpected);
+  });
+
+  it('should revert modification if start of a period is not 1 second after the end of the previous period', async function () {
+    const { PeriodRegistry } = fixture;
+
+    const periodStartMonthlyExpected = getPeriodStart()
+    const periodEndMonthlyExpected = getPeriodEnd()
+    await expect(
+      PeriodRegistry.initializePeriod(
+        PERIOD_TYPE.MONTHLY,
+        [periodStartMonthlyExpected],
+        [periodEndMonthlyExpected]
+      )
+    ).to.emit(PeriodRegistry, 'PeriodInitialized')
+      .withArgs(PERIOD_TYPE.MONTHLY, 1);
+    const periodStartExpected = moment()
+      .utc(0)
+      .startOf('month')
+      .add(11, 'month')
+      .startOf('month')
+      .unix();
+    const periodEndExpected = moment()
+      .utc(0)
+      .endOf('month')
+      .add(20, 'month')
+      .endOf('month')
+      .unix();
+
+    await expect(
+      PeriodRegistry.addPeriodsToPeriodType(
+        PERIOD_TYPE.MONTHLY,
+        [periodStartExpected, periodEndExpected + 2],
+        [periodEndExpected, periodEndExpected + 1000]
+      )
+    ).to.be.revertedWith('Start of a period should be 1 second after the end of the previous period');
+    await expect(
+      PeriodRegistry.addPeriodsToPeriodType(
+        PERIOD_TYPE.MONTHLY,
+        [periodStartExpected, periodEndExpected + 1],
+        [periodEndExpected, periodEndExpected + 1000]
+      )
+    ).to.emit(PeriodRegistry, 'PeriodModified')
+      .withArgs(PERIOD_TYPE.MONTHLY, 2);
 
     let period = await PeriodRegistry.getPeriodStartAndEnd(
       PERIOD_TYPE.MONTHLY,
@@ -121,18 +192,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
   it('should return true because the period is initialized', async function () {
     const { PeriodRegistry } = fixture;
 
-    let periodStartExpected = moment()
-      .utc(0)
-      .startOf('day')
-      .add(1, 'day')
-      .startOf('day')
-      .unix();
-    let periodEndExpected = moment()
-      .utc(0)
-      .endOf('day')
-      .add(10, 'day')
-      .endOf('day')
-      .unix();
+    let periodStartExpected = getPeriodStart();
+    let periodEndExpected = getPeriodEnd();
     await expect(
       PeriodRegistry.initializePeriod(
         PERIOD_TYPE.DAILY,
@@ -159,18 +220,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
   it('should return true because the period is valid', async function () {
     const { PeriodRegistry } = fixture;
 
-    let periodStartExpected = moment()
-      .utc(0)
-      .startOf('day')
-      .add(1, 'day')
-      .startOf('day')
-      .unix();
-    let periodEndExpected = moment()
-      .utc(0)
-      .endOf('day')
-      .add(10, 'day')
-      .endOf('day')
-      .unix();
+    let periodStartExpected = getPeriodStart();
+    let periodEndExpected = getPeriodEnd();
     await expect(
       PeriodRegistry.initializePeriod(
         PERIOD_TYPE.DAILY,
@@ -189,18 +240,8 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
   it('should return false because the period is not valid', async function () {
     const { PeriodRegistry } = fixture;
 
-    let periodStartExpected = moment()
-      .utc(0)
-      .startOf('day')
-      .add(1, 'day')
-      .startOf('day')
-      .unix();
-    let periodEndExpected = moment()
-      .utc(0)
-      .endOf('day')
-      .add(10, 'day')
-      .endOf('day')
-      .unix();
+    const periodStartExpected = getPeriodStart()
+    const periodEndExpected = getPeriodEnd()
     await expect(
       PeriodRegistry.initializePeriod(
         PERIOD_TYPE.DAILY,
@@ -209,7 +250,7 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
       )
     ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.DAILY, 1);
-    let isValidPeriod = await PeriodRegistry.isValidPeriod(
+    const isValidPeriod = await PeriodRegistry.isValidPeriod(
       PERIOD_TYPE.DAILY,
       1
     );
@@ -219,13 +260,13 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
   it('should return true because the period is finished', async function () {
     const { PeriodRegistry } = fixture;
 
-    let periodStartExpected = moment()
+    const periodStartExpected = moment()
       .utc(0)
       .startOf('day')
       .subtract(20, 'day')
       .startOf('day')
       .unix();
-    let periodEndExpected = moment()
+    const periodEndExpected = moment()
       .utc(0)
       .endOf('day')
       .subtract(10, 'day')
@@ -239,7 +280,7 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
       )
     ).to.emit(PeriodRegistry, 'PeriodInitialized')
       .withArgs(PERIOD_TYPE.DAILY, 1);
-    let isPeriodIsFinished = await PeriodRegistry.periodIsFinished(
+    const isPeriodIsFinished = await PeriodRegistry.periodIsFinished(
       PERIOD_TYPE.DAILY,
       0
     );
