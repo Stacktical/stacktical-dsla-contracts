@@ -79,6 +79,7 @@ contract Staking is Ownable, ReentrancyGuard {
     /// @dev claiming fees when a user claim tokens, base 10000
     uint16 private constant ownerRewardsRate = 30; // 0.3%, base 10000
     uint16 private constant protocolRewardsRate = 15; // 0.15%, base 10000
+    uint16 private constant rewardsCapRate = 2500;
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token), 'This token is not allowed.');
@@ -322,14 +323,12 @@ contract Staking is Ownable, ReentrancyGuard {
     /**
      * @notice Set rewards of provider pool for specific periodId
      * @param _periodId Period ID to set rewards
-     * @param _rewardPercentage Percentage to allocate for rewards
-     * @param _precision Precision of Percentage
+     * @param _rewardPercentage Percentage to allocate for rewards, base 10000
      */
-    function _setProviderReward(
-        uint256 _periodId,
-        uint256 _rewardPercentage,
-        uint256 _precision
-    ) internal {
+    function _setProviderReward(uint256 _periodId, uint256 _rewardPercentage)
+        internal
+    {
+        uint256 _precision = 10000;
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
 
@@ -359,14 +358,12 @@ contract Staking is Ownable, ReentrancyGuard {
     /**
      * @notice Set rewards of user pool for specific periodId
      * @param _periodId Period ID to set rewards
-     * @param _rewardPercentage Percentage to allocate for rewards
-     * @param _precision Precision of Percentage
+     * @param _rewardPercentage Percentage to allocate for rewards, base 10000
      */
-    function _setUserReward(
-        uint256 _periodId,
-        uint256 _rewardPercentage,
-        uint256 _precision
-    ) internal {
+    function _setUserReward(uint256 _periodId, uint256 _rewardPercentage)
+        internal
+    {
+        uint256 _precision = 10000;
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
 

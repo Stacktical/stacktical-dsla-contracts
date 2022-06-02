@@ -26,7 +26,7 @@ contract SLORegistry {
     event SLORegistered(address indexed sla, uint256 sloValue, SLOType sloType);
 
     /// @notice maximum cap of deviation percent = 25%, base 10000
-    uint16 private constant deviationCapPercent = 2500;
+    uint16 private constant deviationCapRate = 2500;
     /// @notice address of SLARegistry contract
     address private slaRegistry;
     /// @dev sla address => SLO mapping
@@ -117,37 +117,35 @@ contract SLORegistry {
      * @dev external view function to get the percentage difference between SLI and SLO
      * @param _sli The SLI value to check against the SLO
      * @param _slaAddress The SLO value to check against the SLI
-     * @param _precision The precision for the calculation
-     * @return uint256 with the deviation value for the selected sli and sla
+     * @return uint256 with the deviation value for the selected sli and sla, base 10000
      */
-    function getDeviation(
-        uint256 _sli,
-        address _slaAddress,
-        uint256 _precision
-    ) external view returns (uint256) {
+    function getDeviation(uint256 _sli, address _slaAddress)
+        external
+        view
+        returns (uint256)
+    {
         SLOType sloType = registeredSLO[_slaAddress].sloType;
         uint256 sloValue = registeredSLO[_slaAddress].sloValue;
-        uint256 cap = (_precision * deviationCapPercent) / 10000;
 
         // Ensures a positive deviation for greater / small comparisons
         // The deviation is the percentage difference between SLI and SLO
         uint256 deviation = ((
             _sli >= sloValue ? _sli - sloValue : sloValue - _sli
-        ) * _precision) / ((_sli + sloValue) / 2);
+        ) * 10000) / ((_sli + sloValue) / 2);
 
         // Enforces a deviation capped at 25%
-        if (deviation > cap) {
-            deviation = cap;
+        if (deviation > deviationCapRate) {
+            deviation = deviationCapRate;
         }
 
         if (sloType == SLOType.EqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            return cap;
+            return deviationCapRate;
         }
 
         if (sloType == SLOType.NotEqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            return cap;
+            return deviationCapRate;
         }
 
         if (sloType == SLOType.SmallerThan) {

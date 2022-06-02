@@ -131,18 +131,14 @@ contract SLA is Staking {
         periodSLI.sli = _sli;
         periodSLI.timestamp = block.timestamp;
 
-        uint256 deviation = _sloRegistry.getDeviation(
-            _sli,
-            address(this),
-            10000
-        );
+        uint256 deviation = _sloRegistry.getDeviation(_sli, address(this));
 
         if (_sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
-            _setProviderReward(_periodId, deviation, 10000);
+            _setProviderReward(_periodId, deviation);
         } else {
             periodSLI.status = Status.NotRespected;
-            _setUserReward(_periodId, deviation, 10000);
+            _setUserReward(_periodId, deviation);
         }
     }
 
