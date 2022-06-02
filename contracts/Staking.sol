@@ -79,7 +79,7 @@ contract Staking is Ownable, ReentrancyGuard {
     /// @dev claiming fees when a user claim tokens, base 10000
     uint16 private constant ownerRewardsRate = 30; // 0.3%, base 10000
     uint16 private constant protocolRewardsRate = 15; // 0.15%, base 10000
-    uint16 private constant rewardsCapRate = 2500;
+    uint16 private constant rewardsCapRate = 2500; // 25%, base 10000
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token), 'This token is not allowed.');
@@ -336,7 +336,9 @@ contract Staking is Ownable, ReentrancyGuard {
                 (leverage * _precision);
 
             // Reward must be less than 25% of usersPool to ensure payout at all time
-            if (reward > usersPool[tokenAddress] / 4) {
+            if (
+                reward > (usersPool[tokenAddress] * rewardsCapRate) / _precision
+            ) {
                 reward =
                     (usersPool[tokenAddress] * _rewardPercentage) /
                     _precision;
@@ -372,7 +374,10 @@ contract Staking is Ownable, ReentrancyGuard {
                 _rewardPercentage) / _precision;
 
             // Compensation must be less than 25% of providersPool to ensure payout at all time
-            if (compensation > providersPool[tokenAddress] / 4) {
+            if (
+                compensation >
+                (providersPool[tokenAddress] * rewardsCapRate) / _precision
+            ) {
                 compensation =
                     (providersPool[tokenAddress] * _rewardPercentage) /
                     _precision;

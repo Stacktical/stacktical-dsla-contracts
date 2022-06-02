@@ -129,9 +129,12 @@ contract SLORegistry {
 
         // Ensures a positive deviation for greater / small comparisons
         // The deviation is the percentage difference between SLI and SLO
+        //                          | sloValue - sli |
+        // formula =>  deviation = -------------------- %
+        //                          (sli + sloValue) / 2
         uint256 deviation = ((
             _sli >= sloValue ? _sli - sloValue : sloValue - _sli
-        ) * 10000) / ((_sli + sloValue) / 2);
+        ) * 20000) / (_sli + sloValue);
 
         // Enforces a deviation capped at 25%
         if (deviation > deviationCapRate) {
