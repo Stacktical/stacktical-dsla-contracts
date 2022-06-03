@@ -162,7 +162,7 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 		)).to.emit(slaRegistry, "SLIRequested");
 	})
 	it("should able to register new messenger", async () => {
-		// Can't test registerMessenger function cause we use mock contracts for both IMessenger and IMessageRegistry
+		// TODO: Can't test registerMessenger function cause we use mock contracts for both IMessenger and IMessageRegistry
 	})
 	it("should revert returning locked value when sla is not registered", async () => {
 		const { slaRegistry } = fixture;

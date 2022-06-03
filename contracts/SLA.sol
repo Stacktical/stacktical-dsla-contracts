@@ -73,12 +73,6 @@ contract SLA is Staking {
         _;
     }
 
-    /// @dev Modifier ensuring that certain function can only be called by SLARegistry
-    modifier onlySLARegistry() {
-        require(msg.sender == address(_slaRegistry), 'not SLARegistry');
-        _;
-    }
-
     /**
      * @notice Constructor
      */

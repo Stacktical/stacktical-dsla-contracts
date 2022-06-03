@@ -21,7 +21,7 @@ import {
 const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
-import { ethers as Ethers } from 'ethers';
+import { BigNumber, ethers as Ethers } from 'ethers';
 
 enum POSITION {
   OK,
@@ -200,7 +200,7 @@ describe(CONTRACT_NAMES.SLA, function () {
 
     await expect(
       deployerSLA.withdrawProviderTokens(mintAmount, dslaToken.address)
-    ).to.be.reverted;
+    ).to.be.revertedWith('Provider lock-up until the next verification.');
 
     let totalStake = (
       await details.getSLADetailsArrays(sla.address)
@@ -242,8 +242,8 @@ describe(CONTRACT_NAMES.SLA, function () {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
 
-    await expect(sla.stakeTokens(-1000, dslaToken.address, POSITION.OK)).to.be
-      .reverted;
+    await expect(sla.stakeTokens(0, dslaToken.address, POSITION.OK)).to.be
+      .revertedWith('Stake must be greater than 0.');
     let totalStake = (
       await details.getSLADetailsArrays(sla.address)
     ).tokensStake[0].totalStake.toString();
@@ -253,7 +253,7 @@ describe(CONTRACT_NAMES.SLA, function () {
   it('should revert if number is overflowing', async () => {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
-    let bigNumber = 10 ** 100000000000000000000000000000000;
+    const bigNumber = BigNumber.from(10).pow(32);
     await expect(sla.stakeTokens(bigNumber, dslaToken.address, POSITION.OK))
       .to.be.reverted;
 
@@ -273,17 +273,6 @@ describe(CONTRACT_NAMES.SLA, function () {
     const { sla } = fixture;
     let isAllowedPeriod = await sla.isAllowedPeriod(11);
     expect(isAllowedPeriod).to.be.false;
-  });
-
-  it('checks that allowed period is being reverted if period is negative ', async () => {
-    const { sla } = fixture;
-    await expect(sla.isAllowedPeriod(-1)).to.be.reverted;
-  });
-
-  it('checks that allowed period is being reverted if period is too large', async () => {
-    const { sla } = fixture;
-    let bigNumber = 10 ** 100000000000000000000000000000000;
-    await expect(sla.isAllowedPeriod(bigNumber)).to.be.reverted;
   });
 
   it('checks that the contract is not finished', async () => {
