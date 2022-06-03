@@ -147,18 +147,23 @@ contract MessengerRegistry is IMessengerRegistry {
     }
 
     /**
-     * @notice external view function that returns all registered messengers
+     * @notice external view function that returns registered messengers
      * @return array of Messenger struct
      */
-    function getMessengers() external view returns (Messenger[] memory) {
-        Messenger[] memory returnMessengers = new Messenger[](
-            _messengers.length
-        );
-        for (uint256 index = 0; index < _messengers.length; index++) {
+    function getMessengers(uint256 skip, uint256 num)
+        external
+        view
+        returns (Messenger[] memory)
+    {
+        if (skip >= _messengers.length) num = 0;
+        if (skip + num > _messengers.length) num = _messengers.length - skip;
+        Messenger[] memory returnMessengers = new Messenger[](num);
+
+        for (uint256 index = skip; index < skip + num; index++) {
             IMessenger messenger = IMessenger(
                 _messengers[index].messengerAddress
             );
-            returnMessengers[index] = Messenger({
+            returnMessengers[index - skip] = Messenger({
                 ownerAddress: _messengers[index].ownerAddress,
                 messengerAddress: _messengers[index].messengerAddress,
                 specificationUrl: _messengers[index].specificationUrl,
