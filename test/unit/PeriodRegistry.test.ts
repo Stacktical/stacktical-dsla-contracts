@@ -290,13 +290,13 @@ describe(CONTRACT_NAMES.PeriodRegistry, function () {
   it('should return false because the period is not finished', async function () {
     const { PeriodRegistry } = fixture;
 
-    let periodStartExpected = moment()
+    const periodStartExpected = moment()
       .utc(0)
       .startOf('day')
       .add(1, 'day')
       .startOf('day')
       .unix();
-    let periodEndExpected = moment()
+    const periodEndExpected = moment()
       .utc(0)
       .endOf('day')
       .add(10, 'day')
