@@ -17,18 +17,19 @@ contract SLORegistry {
     }
 
     struct SLO {
-        uint256 sloValue;
+        // half storage slot
+        uint120 sloValue;
         SLOType sloType;
     }
-    /**
-     * @dev SLO Registered event
-     * @param sla 1. -
-     * @param sloValue 2. -
-     * @param sloType 3. -
-     */
+
+    /// @dev SLO Registered event
     event SLORegistered(address indexed sla, uint256 sloValue, SLOType sloType);
 
+    /// @notice maximum cap of deviation percent = 25%, base 10000
+    uint16 private constant deviationCapRate = 2500;
+    /// @notice address of SLARegistry contract
     address private slaRegistry;
+    /// @dev sla address => SLO mapping
     mapping(address => SLO) public registeredSLO;
 
     /// @dev Modifier ensuring that certain function can only be called by SLARegistry
@@ -61,7 +62,7 @@ contract SLORegistry {
      * @param _slaAddress 3. -
      */
     function registerSLO(
-        uint256 _sloValue,
+        uint120 _sloValue,
         SLOType _sloType,
         address _slaAddress
     ) public onlySLARegistry {
@@ -116,38 +117,38 @@ contract SLORegistry {
      * @dev external view function to get the percentage difference between SLI and SLO
      * @param _sli The SLI value to check against the SLO
      * @param _slaAddress The SLO value to check against the SLI
-     * @param _precision The precision for the calculation
-     * @return uint256 with the deviation value for the selected sli and sla
+     * @return uint256 with the deviation value for the selected sli and sla, base 10000
      */
-    function getDeviation(
-        uint256 _sli,
-        address _slaAddress,
-        uint256 _precision
-    ) external view returns (uint256) {
+    function getDeviation(uint256 _sli, address _slaAddress)
+        external
+        view
+        returns (uint256)
+    {
         SLOType sloType = registeredSLO[_slaAddress].sloType;
         uint256 sloValue = registeredSLO[_slaAddress].sloValue;
 
         // Ensures a positive deviation for greater / small comparisons
         // The deviation is the percentage difference between SLI and SLO
+        //                          | sloValue - sli |
+        // formula =>  deviation = -------------------- %
+        //                          (sli + sloValue) / 2
         uint256 deviation = ((
             _sli >= sloValue ? _sli - sloValue : sloValue - _sli
-        ) * _precision) / ((_sli + sloValue) / 2);
+        ) * 20000) / (_sli + sloValue);
 
         // Enforces a deviation capped at 25%
-        if (deviation > (_precision * 25) / 100) {
-            deviation = (_precision * 25) / 100;
+        if (deviation > deviationCapRate) {
+            deviation = deviationCapRate;
         }
 
         if (sloType == SLOType.EqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            deviation = (_precision * 25) / 100;
-            return deviation;
+            return deviationCapRate;
         }
 
         if (sloType == SLOType.NotEqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
-            deviation = (_precision * 25) / 100;
-            return deviation;
+            return deviationCapRate;
         }
 
         if (sloType == SLOType.SmallerThan) {

@@ -21,7 +21,7 @@ import {
 const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
-import { currentTimestamp, evm_increaseTime, ONE_DAY } from '../helper';
+import { ethers as Ethers } from 'ethers';
 
 enum POSITION {
   OK,
@@ -114,6 +114,24 @@ describe(CONTRACT_NAMES.SLA, function () {
     notDeployer = (await getNamedAccounts()).notDeployer;
     fixture = await setup();
   });
+
+  it('should revert creating SLA if owner or messenger address is invalid', async () => {
+    const slaRegistry: SLARegistry = await ethers.getContract(
+      CONTRACT_NAMES.SLARegistry
+    );
+    await expect(slaRegistry.createSLA(
+      baseSLAConfig.sloValue,
+      baseSLAConfig.sloType,
+      baseSLAConfig.whitelisted,
+      Ethers.constants.AddressZero,
+      baseSLAConfig.periodType,
+      baseSLAConfig.initialPeriodId,
+      baseSLAConfig.finalPeriodId,
+      'dummy-ipfs-hash',
+      baseSLAConfig.extraData,
+      baseSLAConfig.leverage
+    )).to.be.revertedWith('invalid messenger address');
+  })
 
   it('should not allow staking 0 amount', async () => {
     const { sla, dslaToken } = fixture;
