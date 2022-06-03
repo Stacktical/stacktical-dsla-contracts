@@ -262,8 +262,7 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 			const sliValue = 45 * 10 ** 3;
 			const deviation = await sloRegistry.getDeviation(
 				sliValue,
-				slaAddress,
-				10000,
+				slaAddress
 			)
 			expect(deviation).to.be.equal(BigNumber.from(1 * 2500));
 		})
@@ -277,8 +276,7 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 			const sliValue = 45 * 10 ** 3;
 			const deviation = await sloRegistry.getDeviation(
 				sliValue,
-				slaAddress,
-				10000,
+				slaAddress
 			)
 			expect(deviation).to.be.equal(BigNumber.from(1 * 2500));
 		})
@@ -290,14 +288,12 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 			const sliValue = 45 * 10 ** 3;
 			const deviation = await sloRegistry.getDeviation(
 				sliValue,
-				slaAddress,
-				10000,
+				slaAddress
 			)
 			expect(deviation).to.be.equal(BigNumber.from(getDeviation(sloValue, sliValue, precision)));
 			expect(await sloRegistry.getDeviation(
 				sliValue / 2,
-				slaAddress,
-				10000,
+				slaAddress
 			)).to.be.equal(BigNumber.from(25).mul(precision).div(100));
 		})
 		it("GreaterOrEqualTo", async () => {
@@ -311,14 +307,12 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 			const sliValue = 45 * 10 ** 3;
 			const deviation = await sloRegistry.getDeviation(
 				sliValue,
-				slaAddress,
-				10000,
+				slaAddress
 			)
 			expect(deviation).to.be.equal(BigNumber.from(getDeviation(sloValue, sliValue, precision)));
 			expect(await sloRegistry.getDeviation(
 				sliValue / 2,
-				slaAddress,
-				10000,
+				slaAddress
 			)).to.be.equal(BigNumber.from(25).mul(precision).div(100));
 		})
 		it("SmallerThan", async () => {
@@ -332,14 +326,12 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 			const sliValue = 45 * 10 ** 3;
 			const deviation = await sloRegistry.getDeviation(
 				sliValue,
-				slaAddress,
-				10000,
+				slaAddress
 			)
 			expect(deviation).to.be.equal(BigNumber.from(getDeviation(sloValue, sliValue, precision)));
 			expect(await sloRegistry.getDeviation(
 				sliValue / 2,
-				slaAddress,
-				10000,
+				slaAddress
 			)).to.be.equal(BigNumber.from(25).mul(precision).div(100));
 		})
 		it("SmallerOrEqualTo", async () => {
@@ -353,14 +345,12 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 			const sliValue = 45 * 10 ** 3;
 			const deviation = await sloRegistry.getDeviation(
 				sliValue,
-				slaAddress,
-				10000,
+				slaAddress
 			)
 			expect(deviation).to.be.equal(BigNumber.from(getDeviation(sloValue, sliValue, precision)));
 			expect(await sloRegistry.getDeviation(
 				sliValue / 2,
-				slaAddress,
-				10000,
+				slaAddress
 			)).to.be.equal(BigNumber.from(25).mul(precision).div(100));
 		})
 	})

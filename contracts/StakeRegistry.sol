@@ -3,14 +3,12 @@ pragma solidity 0.8.9;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import './SLA.sol';
 import './dToken.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
-import './libraries/StringUtils.sol';
 
 /**
  * @title StakeRegistry
@@ -18,7 +16,7 @@ import './libraries/StringUtils.sol';
  with controlling certain admin privileged parameters
  */
 contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
-    using SafeERC20 for ERC20;
+    using SafeERC20 for IERC20;
 
     struct LockedValue {
         uint256 lockedValue;
@@ -145,6 +143,10 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      * @param _dslaTokenAddress 1. DSLA Token
      */
     constructor(address _dslaTokenAddress) {
+        require(
+            _dslaTokenAddress != address(0x0),
+            'invalid DSLA token address'
+        );
         require(
             _dslaDepositByPeriod ==
                 _dslaPlatformReward +
@@ -282,7 +284,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         uint256 _periodIdsLength
     ) external override onlySLARegistry nonReentrant {
         uint256 lockedValue = _dslaDepositByPeriod * _periodIdsLength;
-        ERC20(_DSLATokenAddress).safeTransferFrom(
+        IERC20(_DSLATokenAddress).safeTransferFrom(
             _slaOwner,
             address(this),
             lockedValue
@@ -316,18 +318,16 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
             'Period rewards already distributed'
         );
         _lockedValue.verifiedPeriods[_periodId] = true;
-        _lockedValue.lockedValue =
-            _lockedValue.lockedValue -
-            _lockedValue.dslaDepositByPeriod;
-        ERC20(_DSLATokenAddress).safeTransfer(
+        _lockedValue.lockedValue -= _lockedValue.dslaDepositByPeriod;
+        IERC20(_DSLATokenAddress).safeTransfer(
             _verificationRewardReceiver,
             _lockedValue.dslaUserReward
         );
-        ERC20(_DSLATokenAddress).safeTransfer(
+        IERC20(_DSLATokenAddress).safeTransfer(
             owner(),
             _lockedValue.dslaPlatformReward
         );
-        ERC20(_DSLATokenAddress).safeTransfer(
+        IERC20(_DSLATokenAddress).safeTransfer(
             IMessenger(SLA(_sla).messengerAddress()).owner(),
             _lockedValue.dslaMessengerReward
         );
@@ -365,7 +365,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         uint256 remainingBalance = _lockedValue.lockedValue;
         require(remainingBalance > 0, 'locked value is empty');
         _lockedValue.lockedValue = 0;
-        ERC20(_DSLATokenAddress).safeTransfer(
+        IERC20(_DSLATokenAddress).safeTransfer(
             SLA(_sla).owner(),
             remainingBalance
         );

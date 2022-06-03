@@ -1,9 +1,10 @@
-const hre = require('hardhat');
 import { IMessenger, MessengerRegistry, SLARegistry } from '../../typechain';
-const { ethers, waffle, deployments, getNamedAccounts } = hre;
+import { ethers, waffle, deployments, getNamedAccounts } from 'hardhat';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS } from '../../constants';
 const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
+import { MockContract } from 'ethereum-waffle';
+import { ethers as Ethers } from 'ethers';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(DEPLOYMENT_TAGS.DSLA);
@@ -48,8 +49,8 @@ const setup = deployments.createFixture(async () => {
 type Fixture = {
   messengerRegistry: MessengerRegistry;
   slaRegistry: SLARegistry;
-  mockMessenger: IMessenger;
-  mockMessenger2: IMessenger;
+  mockMessenger: MockContract;
+  mockMessenger2: MockContract;
 };
 
 describe(CONTRACT_NAMES.MessengerRegistry, function () {
@@ -88,6 +89,10 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
     await expect(
       slaRegistry.registerMessenger(invalidAddress, dummySpecUrl)
     ).to.be.reverted;
+
+    await expect(
+      slaRegistry.registerMessenger(Ethers.constants.AddressZero, dummySpecUrl)
+    ).to.be.revertedWith('invalid messenger address')
   });
 
   it('should modify messengers with valid id and specUrl', async function () {
@@ -137,7 +142,7 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
 
   it('should return empty list with no messengers ', async function () {
     const { messengerRegistry } = fixture;
-    let messengersList = await messengerRegistry.getMessengers();
+    let messengersList = await messengerRegistry.getMessengers(0, 5);
     expect(messengersList).to.deep.equal([]);
   });
 
@@ -160,8 +165,32 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
       .to.emit(messengerRegistry, 'MessengerRegistered')
       .withArgs(deployer, mockMessenger2.address, dummySpecUrl, 10000, 1);
 
-    let messengersList = await messengerRegistry.getMessengers();
+    let messengersList = await messengerRegistry.getMessengers(0, 5);
     expect(messengersList.length).to.equal(2);
+  });
+
+  it('should return a list of messengers with length 1 from 2nd using getMessengers', async function () {
+    const { messengerRegistry, mockMessenger, mockMessenger2, slaRegistry } =
+      fixture;
+    const dummySpecUrl = 'http://dummy.link';
+
+    // First has id 0
+    await expect(
+      slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl)
+    )
+      .to.emit(messengerRegistry, 'MessengerRegistered')
+      .withArgs(deployer, mockMessenger.address, dummySpecUrl, 10000, 0);
+
+    // Second has id 1
+    await expect(
+      slaRegistry.registerMessenger(mockMessenger2.address, dummySpecUrl)
+    )
+      .to.emit(messengerRegistry, 'MessengerRegistered')
+      .withArgs(deployer, mockMessenger2.address, dummySpecUrl, 10000, 1);
+
+    let messengersList = await messengerRegistry.getMessengers(1, 5);
+    expect(messengersList.length).to.equal(1);
+    expect(messengersList[0].messengerAddress).to.be.equal(mockMessenger2.address)
   });
 
   it('should return a list of messengers with length 2 using getMessengersLength', async function () {

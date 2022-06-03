@@ -124,24 +124,21 @@ contract SLA is Staking {
         external
         onlyMessenger
     {
+        require(_periodId == nextVerifiablePeriod, 'invalid period id');
         emit SLICreated(block.timestamp, _sli, _periodId);
         nextVerifiablePeriod = _periodId + 1;
         PeriodSLI storage periodSLI = periodSLIs[_periodId];
         periodSLI.sli = _sli;
         periodSLI.timestamp = block.timestamp;
 
-        uint256 deviation = _sloRegistry.getDeviation(
-            _sli,
-            address(this),
-            10000
-        );
+        uint256 deviation = _sloRegistry.getDeviation(_sli, address(this));
 
         if (_sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
-            _setProviderReward(_periodId, deviation, 10000);
+            _setProviderReward(_periodId, deviation);
         } else {
             periodSLI.status = Status.NotRespected;
-            _setUserReward(_periodId, deviation, 10000);
+            _setUserReward(_periodId, deviation);
         }
     }
 
@@ -206,18 +203,17 @@ contract SLA is Staking {
     function withdrawProviderTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        emit ProviderWithdraw(
-            _tokenAddress,
-            nextVerifiablePeriod,
-            msg.sender,
-            _amount
-        );
-
         _withdrawProviderTokens(
             _amount,
             _tokenAddress,
             nextVerifiablePeriod,
             contractFinished()
+        );
+        emit ProviderWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
         );
     }
 
@@ -229,25 +225,17 @@ contract SLA is Staking {
     function withdrawUserTokens(uint256 _amount, address _tokenAddress)
         external
     {
-        emit UserWithdraw(
-            _tokenAddress,
-            nextVerifiablePeriod,
-            msg.sender,
-            _amount
-        );
         _withdrawUserTokens(
             _amount,
             _tokenAddress,
             nextVerifiablePeriod,
             contractFinished()
         );
-    }
-
-    /**
-     * @notice External view function that returns the number of stakers
-     * @return Uint256 number of stakers
-     */
-    function getStakersLength() external view returns (uint256) {
-        return stakers.length;
+        emit UserWithdraw(
+            _tokenAddress,
+            nextVerifiablePeriod,
+            msg.sender,
+            _amount
+        );
     }
 }

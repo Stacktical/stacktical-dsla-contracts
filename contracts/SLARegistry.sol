@@ -60,6 +60,19 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         address stakeRegistry_,
         bool checkPastPeriod_
     ) {
+        require(sloRegistry_ != address(0x0), 'invalid sloRegistry address');
+        require(
+            periodRegistry_ != address(0x0),
+            'invalid periodRegistry address'
+        );
+        require(
+            messengerRegistry_ != address(0x0),
+            'invalid messengerRegistry address'
+        );
+        require(
+            stakeRegistry_ != address(0x0),
+            'invalid stakeRegistry address'
+        );
         _sloRegistry = sloRegistry_;
         SLORegistry(_sloRegistry).setSLARegistry();
         _periodRegistry = periodRegistry_;
@@ -84,7 +97,7 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
      * @param leverage_ leverage
      */
     function createSLA(
-        uint256 sloValue_,
+        uint120 sloValue_,
         SLORegistry.SLOType sloType_,
         bool whitelisted_,
         address messengerAddress_,
@@ -236,12 +249,12 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         address _messengerAddress,
         string memory _specificationUrl
     ) public nonReentrant {
-        IMessenger(_messengerAddress).setSLARegistry();
         IMessengerRegistry(_messengerRegistry).registerMessenger(
             msg.sender,
             _messengerAddress,
             _specificationUrl
         );
+        IMessenger(_messengerAddress).setSLARegistry();
     }
 
     /**

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.9;
 
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
@@ -10,7 +9,6 @@ import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/IERC20Query.sol';
-import './libraries/StringUtils.sol';
 import './dToken.sol';
 
 /**
@@ -58,11 +56,11 @@ contract Staking is Ownable, ReentrancyGuard {
     ///@dev (tokenAddress=>dTokenAddress) to keep track of dToken for provider
     mapping(address => dToken) public dpTokenRegistry;
 
-    /// @dev address[] of the stakers of the SLA contract
-    address[] public stakers;
-
     /// @dev (slaOwner=>bool)
     mapping(address => bool) public registeredStakers;
+
+    /// @dev number of stakers
+    uint256 public stakersNum;
 
     /// @dev array with the allowed tokens addresses for the current SLA
     address[] public allowedTokens;
@@ -78,15 +76,10 @@ contract Staking is Ownable, ReentrancyGuard {
 
     uint64 public immutable leverage;
 
-    /// @dev claiming fees when a user claim tokens, should by divided by 10000
-    uint256 private ownerRewardsRate = 30; // 0.3%
-    uint256 private protocolRewardsRate = 15; // 0.15%
-
-    /// @dev periodId=>providerReward mapping
-    mapping(uint256 => uint256) public providerRewards;
-
-    /// @dev periodId=>userReward mapping
-    mapping(uint256 => uint256) public userRewards;
+    /// @dev claiming fees when a user claim tokens, base 10000
+    uint16 private constant ownerRewardsRate = 30; // 0.3%, base 10000
+    uint16 private constant protocolRewardsRate = 15; // 0.15%, base 10000
+    uint16 private constant rewardsCapRate = 2500; // 25%, base 10000
 
     modifier onlyAllowedToken(address _token) {
         require(isAllowedToken(_token), 'This token is not allowed.');
@@ -146,6 +139,8 @@ contract Staking is Ownable, ReentrancyGuard {
         address contractOwner_,
         address messengerAddress_
     ) {
+        require(contractOwner_ != address(0x0), 'invalid owner address');
+        require(messengerAddress_ != address(0x0), 'invalid messenger address');
         _stakeRegistry = IStakeRegistry(slaRegistry_.stakeRegistry());
         _periodRegistry = IPeriodRegistry(slaRegistry_.periodRegistry());
         whitelistedContract = whitelistedContract_;
@@ -321,29 +316,29 @@ contract Staking is Ownable, ReentrancyGuard {
 
         if (!registeredStakers[msg.sender]) {
             registeredStakers[msg.sender] = true;
-            stakers.push(msg.sender);
+            stakersNum++;
         }
     }
 
     /**
      * @notice Set rewards of provider pool for specific periodId
      * @param _periodId Period ID to set rewards
-     * @param _rewardPercentage Percentage to allocate for rewards
-     * @param _precision Precision of Percentage
+     * @param _rewardPercentage Percentage to allocate for rewards, base 10000
      */
-    function _setProviderReward(
-        uint256 _periodId,
-        uint256 _rewardPercentage,
-        uint256 _precision
-    ) internal {
+    function _setProviderReward(uint256 _periodId, uint256 _rewardPercentage)
+        internal
+    {
+        uint256 _precision = 10000;
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
 
-            uint256 reward = ((providersPool[tokenAddress] / leverage) *
-                _rewardPercentage) / _precision;
+            uint256 reward = (providersPool[tokenAddress] * _rewardPercentage) /
+                (leverage * _precision);
 
             // Reward must be less than 25% of usersPool to ensure payout at all time
-            if (reward > (usersPool[tokenAddress] * 25) / 100) {
+            if (
+                reward > (usersPool[tokenAddress] * rewardsCapRate) / _precision
+            ) {
                 reward =
                     (usersPool[tokenAddress] * _rewardPercentage) /
                     _precision;
@@ -351,7 +346,6 @@ contract Staking is Ownable, ReentrancyGuard {
 
             usersPool[tokenAddress] -= reward;
             providersPool[tokenAddress] += reward;
-            providerRewards[_periodId] = reward;
 
             emit ProviderRewardGenerated(
                 _periodId,
@@ -366,14 +360,12 @@ contract Staking is Ownable, ReentrancyGuard {
     /**
      * @notice Set rewards of user pool for specific periodId
      * @param _periodId Period ID to set rewards
-     * @param _rewardPercentage Percentage to allocate for rewards
-     * @param _precision Precision of Percentage
+     * @param _rewardPercentage Percentage to allocate for rewards, base 10000
      */
-    function _setUserReward(
-        uint256 _periodId,
-        uint256 _rewardPercentage,
-        uint256 _precision
-    ) internal {
+    function _setUserReward(uint256 _periodId, uint256 _rewardPercentage)
+        internal
+    {
+        uint256 _precision = 10000;
         for (uint256 index = 0; index < allowedTokens.length; index++) {
             address tokenAddress = allowedTokens[index];
 
@@ -382,16 +374,17 @@ contract Staking is Ownable, ReentrancyGuard {
                 _rewardPercentage) / _precision;
 
             // Compensation must be less than 25% of providersPool to ensure payout at all time
-            if (compensation > (providersPool[tokenAddress] * 25) / 100) {
+            if (
+                compensation >
+                (providersPool[tokenAddress] * rewardsCapRate) / _precision
+            ) {
                 compensation =
-                    providersPool[tokenAddress] *
-                    _rewardPercentage *
+                    (providersPool[tokenAddress] * _rewardPercentage) /
                     _precision;
             }
 
             providersPool[tokenAddress] -= compensation;
             usersPool[tokenAddress] += compensation;
-            userRewards[_periodId] = compensation;
 
             emit UserCompensationGenerated(
                 _periodId,
@@ -506,6 +499,14 @@ contract Staking is Ownable, ReentrancyGuard {
      */
     function getAllowedTokensLength() external view returns (uint256) {
         return allowedTokens.length;
+    }
+
+    /**
+     * @notice External view function that returns the number of stakers
+     * @return Number of stakers
+     */
+    function getStakersLength() external view returns (uint256) {
+        return stakersNum;
     }
 
     /**
