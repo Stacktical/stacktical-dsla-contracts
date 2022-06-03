@@ -35,7 +35,7 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
     event PeriodModified(PeriodType periodType, uint256 periodsAdded);
 
     /**
-     * @notice public function for creating canonical service level agreements
+     * @notice External function for creating canonical service level agreements
      * @param _periodType 1. period type i.e. Hourly, Daily, Weekly, BiWeekly, Monthly, Yearly
      * @param _periodStarts 2. array of the starts of the period
      * @param _periodEnds 3. array of the ends of the period
@@ -44,19 +44,58 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
         PeriodType _periodType,
         uint256[] memory _periodStarts,
         uint256[] memory _periodEnds
-    ) public onlyOwner {
+    ) external onlyOwner {
+        _addPeriods(false, _periodType, _periodStarts, _periodEnds);
+        emit PeriodInitialized(_periodType, _periodStarts.length);
+    }
+
+    /**
+     * @notice External function to add a new period definition
+     * @dev only owner can call this function
+     * @param _periodType type of period to add
+     * @param _periodStarts array of the period starting timestamps to add
+     * @param _periodEnds 3. array of the period ending timestamps to add
+     */
+    function addPeriodsToPeriodType(
+        PeriodType _periodType,
+        uint256[] memory _periodStarts,
+        uint256[] memory _periodEnds
+    ) external onlyOwner {
+        _addPeriods(true, _periodType, _periodStarts, _periodEnds);
+        emit PeriodModified(_periodType, _periodStarts.length);
+    }
+
+    /**
+     * @notice Internal function that add or update a period definition
+     * @param _periodType type of period
+     * @param _periodStarts array of the period starting timestamps
+     * @param _periodEnds array of the period ending timestamps
+     */
+    function _addPeriods(
+        bool _initialized,
+        PeriodType _periodType,
+        uint256[] memory _periodStarts,
+        uint256[] memory _periodEnds
+    ) internal {
+        require(_periodStarts.length > 0, "Period length can't be 0");
+        require(
+            _periodStarts.length == _periodEnds.length,
+            'Period length in start and end arrays should match'
+        );
         PeriodDefinition storage periodDefinition = periodDefinitions[
             _periodType
         ];
-        require(
-            !periodDefinition.initialized,
-            'Period type already initialized'
-        );
-        require(
-            _periodStarts.length == _periodEnds.length,
-            'Period type starts and ends should match'
-        );
-        require(_periodStarts.length > 0, "Period length can't be 0");
+        if (_initialized)
+            require(
+                periodDefinition.initialized,
+                'Period was not initialized yet'
+            );
+        else
+            require(
+                !periodDefinition.initialized,
+                'Period type already initialized'
+            );
+
         for (uint256 index = 0; index < _periodStarts.length; index++) {
             require(
                 _periodStarts[index] < _periodEnds[index],
@@ -72,45 +111,6 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
             periodDefinition.ends.push(_periodEnds[index]);
         }
         periodDefinition.initialized = true;
-        emit PeriodInitialized(_periodType, _periodStarts.length);
-    }
-
-    /**
-     * @notice public function to add a new period definition
-     * @dev only owner can call this function
-     * @param _periodType type of period to add
-     * @param _periodStarts array of the period starting timestamps to add
-     * @param _periodEnds 3. array of the period ending timestamps to add
-     */
-    function addPeriodsToPeriodType(
-        PeriodType _periodType,
-        uint256[] memory _periodStarts,
-        uint256[] memory _periodEnds
-    ) public onlyOwner {
-        require(_periodStarts.length > 0, "Period length can't be 0");
-        require(
-            _periodStarts.length == _periodEnds.length,
-            'Period length in start and end arrays should match'
-        );
-        PeriodDefinition storage periodDefinition = periodDefinitions[
-            _periodType
-        ];
-        require(periodDefinition.initialized, 'Period was not initialized yet');
-        for (uint256 index = 0; index < _periodStarts.length; index++) {
-            require(
-                _periodStarts[index] < _periodEnds[index],
-                'Start should be before end'
-            );
-            if (index < _periodStarts.length - 1) {
-                require(
-                    _periodStarts[index + 1] - _periodEnds[index] == 1,
-                    'Start of a period should be 1 second after the end of the previous period'
-                );
-            }
-            periodDefinition.starts.push(_periodStarts[index]);
-            periodDefinition.ends.push(_periodEnds[index]);
-        }
-        emit PeriodModified(_periodType, _periodStarts.length);
     }
 
     /**
@@ -126,6 +126,10 @@ contract PeriodRegistry is IPeriodRegistry, Ownable {
         override
         returns (uint256 start, uint256 end)
     {
+        require(
+            _periodId < periodDefinitions[_periodType].starts.length,
+            'Invalid period id'
+        );
         start = periodDefinitions[_periodType].starts[_periodId];
         end = periodDefinitions[_periodType].ends[_periodId];
     }
