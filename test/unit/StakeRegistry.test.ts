@@ -1,5 +1,4 @@
-const hre = require('hardhat');
-const { ethers, deployments, getNamedAccounts } = hre;
+import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import { expect } from '../chai-setup';
 import { BigNumber, BytesLike, ethers as Ethers } from 'ethers';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS, SENetworkNamesBytes32, SENetworks, PERIOD_TYPE, SLO_TYPE } from '../../constants';
@@ -15,6 +14,7 @@ import {
 	SLORegistry,
 	StakeRegistry
 } from '../../typechain';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 type Fixture = {
 	sloRegistry: SLORegistry;
@@ -49,7 +49,6 @@ const baseSLAConfig = {
 const mintAmount = '1000000';
 
 const setup = deployments.createFixture(async () => {
-	const { deployments } = hre;
 	const { deployer, notDeployer } = await getNamedAccounts();
 	await deployments.fixture(DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE);
 	const slaRegistry: SLARegistry = await ethers.getContract(
@@ -125,9 +124,13 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 describe(CONTRACT_NAMES.StakeRegistry, function () {
 	let fixture: Fixture;
 	let deployer: string, notDeployer: string;
-	beforeEach(async function () {
+	let owner: SignerWithAddress;
+	before(async () => {
+		[owner,] = await ethers.getSigners();
 		deployer = (await getNamedAccounts()).deployer;
 		notDeployer = (await getNamedAccounts()).notDeployer;
+	})
+	beforeEach(async function () {
 		fixture = await setup();
 	});
 	it("should register dsla token at constructor", async () => {
@@ -232,84 +235,118 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 			baseSLAConfig.leverage
 		)).to.emit(stakeRegistry, "ValueLocked");
 	})
-	it("should distribute verification rewards when requesting sli on slaRegistry", async () => {
-		const { slaRegistry, stakeRegistry } = fixture;
-		const signer = await ethers.getSigner(deployer);
-		await deploySLA(baseSLAConfig);
-		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-		const sla = await SLA__factory.connect(slaAddress, signer);
-		const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
-		await expect(slaRegistry.requestSLI(
-			Number(nextVerifiablePeriod),
-			slaAddress,
-			false
-		)).to.emit(stakeRegistry, "VerificationRewardDistributed");
-	})
-	it("should revert when verfication rewards are already distrubuted", async () => {
-		const { slaRegistry, stakeRegistry } = fixture;
-		const signer = await ethers.getSigner(deployer);
-		await deploySLA(baseSLAConfig);
-		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-		const sla = await SLA__factory.connect(slaAddress, signer);
-		const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
-		await expect(slaRegistry.requestSLI(
-			Number(nextVerifiablePeriod),
-			slaAddress,
-			false
-		)).to.emit(stakeRegistry, "VerificationRewardDistributed");
-		await expect(slaRegistry.requestSLI(
-			Number(nextVerifiablePeriod),
-			slaAddress,
-			false
-		)).to.be.revertedWith("Period rewards already distributed");
-	})
-	it("should recieve verfication rewards", async () => {
-		const { slaRegistry, dslaToken } = fixture;
-		const signer = await ethers.getSigner(deployer);
-		await deploySLA(baseSLAConfig);
-		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-		const sla = await SLA__factory.connect(slaAddress, signer);
-		const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
-		const dslaBalance = await dslaToken.balanceOf(deployer);
-		await slaRegistry.requestSLI(
-			Number(nextVerifiablePeriod),
-			slaAddress,
-			false
-		)
-		// receive userReward + platformReward + messengerRewards since all txs made from deployer
-		expect(await dslaToken.balanceOf(deployer))
-			.to.be.eq(BigNumber.from(10).pow(18).mul(750).add(dslaBalance));
-	})
-	it("should verify period when distributing rewards", async () => {
-		const { slaRegistry, stakeRegistry } = fixture;
-		const signer = await ethers.getSigner(deployer);
-		await deploySLA(baseSLAConfig);
-		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-		const sla = await SLA__factory.connect(slaAddress, signer);
-		const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
-		await slaRegistry.requestSLI(
-			Number(nextVerifiablePeriod),
-			slaAddress,
-			false
-		)
-		expect(await stakeRegistry.periodIsVerified(slaAddress, nextVerifiablePeriod))
-			.to.be.true;
+	describe('Rewards Distribution', function () {
+		it("should distribute verification rewards when requesting sli on slaRegistry", async () => {
+			const { slaRegistry, stakeRegistry } = fixture;
+			const signer = await ethers.getSigner(deployer);
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sla = await SLA__factory.connect(slaAddress, signer);
+			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			await expect(slaRegistry.requestSLI(
+				Number(nextVerifiablePeriod),
+				slaAddress,
+				false
+			)).to.emit(stakeRegistry, "VerificationRewardDistributed");
+		})
+		it('should allow distribution only for SLARegistry', async () => {
+			const { slaRegistry, stakeRegistry } = fixture;
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sla = await SLA__factory.connect(slaAddress, owner);
+			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			await expect(stakeRegistry.connect(owner).distributeVerificationRewards(
+				slaAddress,
+				owner.address,
+				nextVerifiablePeriod,
+			)).to.be.revertedWith('Can only be called by SLARegistry')
+		})
+		it("should revert when verfication rewards are already distrubuted", async () => {
+			const { slaRegistry, stakeRegistry } = fixture;
+			const signer = await ethers.getSigner(deployer);
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sla = await SLA__factory.connect(slaAddress, signer);
+			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			await expect(slaRegistry.requestSLI(
+				Number(nextVerifiablePeriod),
+				slaAddress,
+				false
+			)).to.emit(stakeRegistry, "VerificationRewardDistributed");
+			await expect(slaRegistry.requestSLI(
+				Number(nextVerifiablePeriod),
+				slaAddress,
+				false
+			)).to.be.revertedWith("Period rewards already distributed");
+		})
+		it("should recieve verfication rewards", async () => {
+			const { slaRegistry, dslaToken } = fixture;
+			const signer = await ethers.getSigner(deployer);
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sla = await SLA__factory.connect(slaAddress, signer);
+			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			const dslaBalance = await dslaToken.balanceOf(deployer);
+			await slaRegistry.requestSLI(
+				Number(nextVerifiablePeriod),
+				slaAddress,
+				false
+			)
+			// receive userReward + platformReward + messengerRewards since all txs made from deployer
+			expect(await dslaToken.balanceOf(deployer))
+				.to.be.eq(BigNumber.from(10).pow(18).mul(750).add(dslaBalance));
+		})
+		it("should verify period when distributing rewards", async () => {
+			const { slaRegistry, stakeRegistry } = fixture;
+			const signer = await ethers.getSigner(deployer);
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sla = await SLA__factory.connect(slaAddress, signer);
+			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			await slaRegistry.requestSLI(
+				Number(nextVerifiablePeriod),
+				slaAddress,
+				false
+			)
+			expect(await stakeRegistry.periodIsVerified(slaAddress, nextVerifiablePeriod))
+				.to.be.true;
+		})
+		it("should burn DSLA when distributing rewards", async () => {
+			// TODO: cover later
+		});
 	})
 	it("should return locked value when returning from slaRegistry", async () => {
 		// TODO: can't cover this function since we use mock contract for messenger
 	});
-	it("should allow only owner to set staking parameters", async () => {
-		const { stakeRegistry } = fixture;
-		await expect(stakeRegistry.setStakingParameters(
-			Ethers.constants.Zero,
-			Ethers.constants.Zero,
-			Ethers.constants.Zero,
-			Ethers.constants.Zero,
-			Ethers.constants.Zero,
-			Ethers.constants.Zero,
-			Ethers.constants.Zero,
-			Ethers.constants.Zero,
-			true
-		)).to.emit(stakeRegistry, 'StakingParametersModified');
+	describe('Utils', function () {
+		it("should allow only owner to set staking parameters", async () => {
+			const { stakeRegistry } = fixture;
+			await expect(stakeRegistry.setStakingParameters(
+				Ethers.constants.Zero,
+				Ethers.constants.Zero,
+				Ethers.constants.Zero,
+				Ethers.constants.Zero,
+				Ethers.constants.Zero,
+				Ethers.constants.Zero,
+				Ethers.constants.Zero,
+				Ethers.constants.Zero,
+				true
+			)).to.emit(stakeRegistry, 'StakingParametersModified');
+		})
+
+		it("dslaDepositByPeriod = dslaPlatformReward + dslaMessengerReward + dslaUserReward + dslaBurnedByVerification", async () => {
+			const { stakeRegistry } = fixture;
+			await expect(stakeRegistry.setStakingParameters(
+				0, // burn rate
+				100, // dslaDepositByPeriod
+				15, // dslaPlatformReward
+				10, // dslaMessengerReward
+				5, // userReward
+				10, // dslaBurnedByVerification
+				Ethers.constants.Zero,
+				Ethers.constants.Zero,
+				true
+			)).to.be.revertedWith('Staking parameters should match on summation');
+		})
 	})
 })

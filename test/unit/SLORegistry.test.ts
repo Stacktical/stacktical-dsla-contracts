@@ -1,4 +1,4 @@
-const hre = require('hardhat');
+import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import {
 	ERC20PresetMinterPauser,
 	SLARegistry,
@@ -6,7 +6,6 @@ import {
 	SLORegistry__factory,
 	StakeRegistry
 } from '../../typechain';
-const { ethers, deployments, getNamedAccounts } = hre;
 import {
 	CONTRACT_NAMES,
 	DEPLOYMENT_TAGS,
@@ -18,7 +17,7 @@ import { expect } from '../chai-setup';
 import { PERIOD_TYPE } from '../../constants';
 import { deployMockContract } from 'ethereum-waffle';
 import { toWei } from 'web3-utils';
-import { BigNumber, BytesLike } from 'ethers';
+import { BigNumber, BytesLike, ethers as Ethers } from 'ethers';
 
 interface SLAConfig {
 	sloValue: number,
@@ -43,7 +42,6 @@ const baseSLAConfig = {
 const mintAmount = '1000000';
 
 const setup = deployments.createFixture(async () => {
-	const { deployments } = hre;
 	await deployments.fixture(DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE);
 	const sloRegistry: SLORegistry = await ethers.getContract(
 		CONTRACT_NAMES.SLORegistry
@@ -126,6 +124,16 @@ describe(CONTRACT_NAMES.SLORegistry, function () {
 		await expect(deployerSLO.setSLARegistry()).to.be.revertedWith(
 			"SLARegistry address has already been set"
 		);
+	})
+
+	it("SLO registration is only allowed for SLARegistry", async function () {
+		const { sloRegistry } = fixture;
+		const deployerSLO = SLORegistry__factory.connect(
+			sloRegistry.address,
+			await ethers.getSigner(deployer)
+		)
+		await expect(deployerSLO.registerSLO(0, 0, Ethers.constants.AddressZero))
+			.to.be.revertedWith("Should only be called using the SLARegistry contract");
 	})
 
 	it("should emit SLORegistered when creating SLA from SLARegistry", async () => {
