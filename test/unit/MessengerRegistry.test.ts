@@ -142,6 +142,17 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
   })
 
   describe('Modify Messenger', function () {
+    it('should allow messenger modification only to the messenger owner', async function () {
+      const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
+      await slaRegistry.registerMessenger(
+        mockMessenger.address,
+        dummySpecUrl
+      );
+
+      const dummySpecUrlModified = 'http://modifieddummy.link';
+      await expect(messengerRegistry.connect(user).modifyMessenger(dummySpecUrlModified, '0'))
+        .to.be.revertedWith('Can only be modified by the owner');
+    })
     it('should modify messengers with valid id and specUrl', async function () {
       const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
       // First has id 0
