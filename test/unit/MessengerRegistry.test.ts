@@ -1,11 +1,12 @@
 import { ethers, waffle, deployments, getNamedAccounts } from 'hardhat';
-import { IMessenger, MessengerRegistry, SLARegistry } from '../../typechain';
+import { MessengerRegistry, SLARegistry } from '../../typechain';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS } from '../../constants';
 import { expect } from '../chai-setup';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { MockContract } from 'ethereum-waffle';
 
 const { deployMockContract } = waffle;
+const dummySpecUrl = 'http://dummy.link';
 
 const setup = deployments.createFixture(async () => {
   await deployments.fixture(DEPLOYMENT_TAGS.DSLA);
@@ -75,7 +76,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
 
     it('only SLARegistry can register messengers', async function () {
       const { messengerRegistry, mockMessenger } = fixture;
-      const dummySpecUrl = 'http://dummy.link';
       await expect(
         messengerRegistry.registerMessenger(owner.address, mockMessenger.address, dummySpecUrl)
       ).to.be.revertedWith('Should only be called using the SLARegistry contract');
@@ -84,7 +84,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
     it('should register messengers with proper ids', async function () {
       const { messengerRegistry, mockMessenger, mockMessenger2, slaRegistry } =
         fixture;
-      const dummySpecUrl = 'http://dummy.link';
 
       // First has id 0
       await expect(
@@ -101,7 +100,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
 
     it('should revert messenger registration if it is already registered', async function () {
       const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
-      const dummySpecUrl = 'http://dummy.link';
 
       await expect(
         slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl)
@@ -114,7 +112,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
 
     it('should revert messenger registration if messenger address is invalid', async function () {
       const { slaRegistry } = fixture;
-      const dummySpecUrl = 'http://dummy.link';
       // First has id 0
       await expect(
         slaRegistry.registerMessenger(ethers.constants.AddressZero, dummySpecUrl)
@@ -123,18 +120,30 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
 
     it('should revert messenger registration if messenger owner is not the caller', async function () {
       const { slaRegistry, mockMessenger } = fixture;
-      const dummySpecUrl = 'http://dummy.link';
       // First has id 0
       await expect(
         slaRegistry.connect(user).registerMessenger(mockMessenger.address, dummySpecUrl)
       ).to.be.revertedWith('Should only be called by the messenger owner');
     });
+
+    it("should revert messenger registration if messenger precision is 0 or not multiple of 100", async function () {
+      const { mockMessenger, slaRegistry } = fixture;
+      await mockMessenger.mock.messengerPrecision.returns(10001);
+
+      await expect(
+        slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl)
+      ).to.be.revertedWith('invalid messenger precision, cannot register messanger');
+
+      await mockMessenger.mock.messengerPrecision.returns(0);
+      await expect(
+        slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl)
+      ).to.be.revertedWith('invalid messenger precision, cannot register messanger');
+    })
   })
 
   describe('Modify Messenger', function () {
     it('should modify messengers with valid id and specUrl', async function () {
       const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
-      const dummySpecUrl = 'http://dummy.link';
       // First has id 0
       await slaRegistry.registerMessenger(
         mockMessenger.address,
@@ -155,7 +164,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
 
     it('should revert messengers with valid non existent id', async function () {
       const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
-      const dummySpecUrl = 'http://dummy.link';
       // First has id 0
       await slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl);
       const dummySpecUrlModified = 'http://modifieddummy.link';
@@ -167,7 +175,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
 
     it('should revert messengers with non valid id', async function () {
       const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
-      const dummySpecUrl = 'http://dummy.link';
       // First has id 0
       await slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl);
       const dummySpecUrlModified = 'http://modifieddummy.link';
@@ -190,7 +197,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
     it('should return a list of messengers with length 2 using getMessengers', async function () {
       const { messengerRegistry, mockMessenger, mockMessenger2, slaRegistry } =
         fixture;
-      const dummySpecUrl = 'http://dummy.link';
 
       // First has id 0
       await expect(
@@ -213,7 +219,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
     it('should return a list of messengers with length 1 from 2nd using getMessengers', async function () {
       const { messengerRegistry, mockMessenger, mockMessenger2, slaRegistry } =
         fixture;
-      const dummySpecUrl = 'http://dummy.link';
 
       // First has id 0
       await expect(
@@ -237,7 +242,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
     it('should return a list of messengers with length 2 using getMessengersLength', async function () {
       const { messengerRegistry, mockMessenger, mockMessenger2, slaRegistry } =
         fixture;
-      const dummySpecUrl = 'http://dummy.link';
 
       // First has id 0
       await expect(
@@ -266,7 +270,6 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
     it('should return true because messenger is registered', async function () {
       const { messengerRegistry, mockMessenger, slaRegistry } = fixture;
 
-      const dummySpecUrl = 'http://dummy.link';
       // First has id 0
       await expect(
         slaRegistry.registerMessenger(mockMessenger.address, dummySpecUrl)
@@ -280,7 +283,7 @@ describe(CONTRACT_NAMES.MessengerRegistry, function () {
       expect(isRegisteredMessenger).to.be.true;
     });
 
-    it('should return false because messenger isnt registered', async function () {
+    it("should return false because messenger isn't registered", async function () {
       const { messengerRegistry, mockMessenger } = fixture;
 
       let isRegisteredMessenger = await messengerRegistry.registeredMessengers(

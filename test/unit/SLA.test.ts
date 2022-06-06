@@ -1,4 +1,4 @@
-const hre = require('hardhat');
+import { ethers, waffle, deployments, getNamedAccounts } from 'hardhat';
 import {
   ERC20PresetMinterPauser,
   ERC20PresetMinterPauser__factory,
@@ -8,12 +8,10 @@ import {
   StakeRegistry,
   Details,
 } from '../../typechain';
-const { ethers, waffle, deployments, getNamedAccounts } = hre;
 import {
   CONTRACT_NAMES,
   DEPLOYMENT_TAGS,
   PERIOD_TYPE,
-  SENetworkNames,
   SENetworkNamesBytes32,
   SENetworks,
   SLO_TYPE,
@@ -41,7 +39,6 @@ const baseSLAConfig = {
 const mintAmount = '1000000';
 
 const setup = deployments.createFixture(async () => {
-  const { deployments } = hre;
   const { deployer, notDeployer } = await getNamedAccounts();
   await deployments.fixture(DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE);
   const dslaToken: ERC20PresetMinterPauser = await ethers.getContract(
