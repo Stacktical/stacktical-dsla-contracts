@@ -1,7 +1,6 @@
-const hre = require('hardhat');
-const { ethers, deployments, getNamedAccounts } = hre;
+import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import { expect } from '../chai-setup';
-import { BytesLike } from 'ethers';
+import { BytesLike, ethers as Ethers } from 'ethers';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS, SENetworkNamesBytes32, SENetworks, PERIOD_TYPE, SLO_TYPE } from '../../constants';
 import { deployMockContract } from 'ethereum-waffle';
 import { toWei } from 'web3-utils';
@@ -42,7 +41,6 @@ const baseSLAConfig = {
 const mintAmount = '1000000';
 
 const setup = deployments.createFixture(async () => {
-	const { deployments } = hre;
 	await deployments.fixture(DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE);
 	const slaRegistry: SLARegistry = await ethers.getContract(
 		CONTRACT_NAMES.SLARegistry
@@ -115,6 +113,61 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 		notDeployer = (await getNamedAccounts()).notDeployer;
 		fixture = await setup();
 	});
+	describe('Constructor', function () {
+		it('should be able to deploy SLARegistry with proper addresses of other contracts', async () => {
+			const { slaRegistry, sloRegistry, periodRegistry } = fixture;
+			const { deploy } = deployments;
+			await expect(
+				deploy(CONTRACT_NAMES.SLARegistry, {
+					from: deployer,
+					log: true,
+					args: [
+						Ethers.constants.AddressZero,
+						Ethers.constants.AddressZero,
+						Ethers.constants.AddressZero,
+						Ethers.constants.AddressZero,
+						false,
+					],
+				})).to.be.revertedWith('invalid sloRegistry address');
+			await expect(
+				deploy(CONTRACT_NAMES.SLARegistry, {
+					from: deployer,
+					log: true,
+					args: [
+						sloRegistry.address,
+						Ethers.constants.AddressZero,
+						Ethers.constants.AddressZero,
+						Ethers.constants.AddressZero,
+						false,
+					],
+				})).to.be.revertedWith('invalid periodRegistry address');
+			await expect(
+				deploy(CONTRACT_NAMES.SLARegistry, {
+					from: deployer,
+					log: true,
+					args: [
+						sloRegistry.address,
+						periodRegistry.address,
+						Ethers.constants.AddressZero,
+						Ethers.constants.AddressZero,
+						false,
+					],
+				})).to.be.revertedWith('invalid messengerRegistry address');
+			const messengerRegistryAddr = await slaRegistry.messengerRegistry();
+			await expect(
+				deploy(CONTRACT_NAMES.SLARegistry, {
+					from: deployer,
+					log: true,
+					args: [
+						sloRegistry.address,
+						periodRegistry.address,
+						messengerRegistryAddr,
+						Ethers.constants.AddressZero,
+						false,
+					],
+				})).to.be.revertedWith('invalid stakeRegistry address');
+		})
+	})
 	it("should be able to create sla by anyone", async () => {
 		const { slaRegistry } = fixture;
 		const stakeRegistry: StakeRegistry = await ethers.getContract(
@@ -148,18 +201,48 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 			baseSLAConfig.leverage
 		)).to.emit(slaRegistry, "SLACreated");
 	})
-	it("should be able to request sli", async () => {
-		const { slaRegistry } = fixture;
-		const signer = await ethers.getSigner(deployer);
-		await deploySLA(baseSLAConfig);
-		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-		const sla = await SLA__factory.connect(slaAddress, signer);
-		const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
-		await expect(slaRegistry.requestSLI(
-			Number(nextVerifiablePeriod),
-			slaAddress,
-			false
-		)).to.emit(slaRegistry, "SLIRequested");
+	describe('Request SLI', function () {
+		it('should rever requesting sli if SLA address is not registered', async () => {
+			const { slaRegistry } = fixture;
+			await expect(slaRegistry.requestSLI(
+				0,
+				Ethers.constants.AddressZero,
+				false
+			)).to.be.revertedWith('This SLA is not valid.');
+		})
+		it("should revert if period id is not the next verifiable period id", async () => {
+			const { slaRegistry } = fixture;
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			await expect(slaRegistry.requestSLI(
+				1,
+				slaAddress,
+				false
+			)).to.be.revertedWith('not nextVerifiablePeriod');
+		})
+		it("should revert if period id is not allowed period", async () => {
+			const { slaRegistry } = fixture;
+			await deploySLA({ ...baseSLAConfig, initialPeriodId: 100, finalPeriodId: 100 });
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			// await expect(slaRegistry.requestSLI(
+			// 	100000,
+			// 	slaAddress,
+			// 	false
+			// )).to.be.revertedWith('not nextVerifiablePeriod');
+		})
+		it("should be able to request sli", async () => {
+			const { slaRegistry } = fixture;
+			const signer = await ethers.getSigner(deployer);
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sla = await SLA__factory.connect(slaAddress, signer);
+			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			await expect(slaRegistry.requestSLI(
+				Number(nextVerifiablePeriod),
+				slaAddress,
+				false
+			)).to.emit(slaRegistry, "SLIRequested");
+		})
 	})
 	it("should able to register new messenger", async () => {
 		// TODO: Can't test registerMessenger function cause we use mock contracts for both IMessenger and IMessageRegistry

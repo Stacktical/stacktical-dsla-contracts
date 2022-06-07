@@ -189,14 +189,22 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, slaAddress)).to.be.true;
 		expect(await stakeRegistry.slaWasStakedByUser(deployer, deployer)).to.be.false;
 	})
-	it("should create dTokens when staking tokens on sla", async () => {
-		const { stakeRegistry, slaRegistry, dslaToken } = fixture;
-		await deploySLA(baseSLAConfig);
-		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-		const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
+	describe('Creating DToken', function () {
+		it("should allow creating dTokens only for registered SLA", async () => {
+			const { stakeRegistry } = fixture;
+			await expect(
+				stakeRegistry.connect(owner).createDToken('Test', 'TEST', 18)
+			).to.be.revertedWith('Only for registered SLAs')
+		})
+		it("should create dTokens when staking tokens on sla", async () => {
+			const { stakeRegistry, slaRegistry, dslaToken } = fixture;
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
 
-		await expect(sla.addAllowedTokens(dslaToken.address))
-			.to.emit(stakeRegistry, "DTokenCreated");
+			await expect(sla.addAllowedTokens(dslaToken.address))
+				.to.emit(stakeRegistry, "DTokenCreated");
+		})
 	})
 	it("should create dTokens with same decimals as registered token", async () => {
 		const { slaRegistry, dslaToken } = fixture;
@@ -315,9 +323,17 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 			// TODO: cover later
 		});
 	})
-	it("should return locked value when returning from slaRegistry", async () => {
-		// TODO: can't cover this function since we use mock contract for messenger
-	});
+	describe('Return locked value', () => {
+		it('should allow returnLockedValue only for SLARegistry', async () => {
+			const { slaRegistry, stakeRegistry } = fixture;
+			await expect(
+				stakeRegistry.connect(owner).returnLockedValue(Ethers.constants.AddressZero)
+			).to.be.revertedWith('Can only be called by SLARegistry')
+		})
+		it("should return locked value when returning from slaRegistry", async () => {
+			// TODO: can't cover this function since we use mock contract for messenger
+		})
+	})
 	describe('Utils', function () {
 		it("should allow only owner to set staking parameters", async () => {
 			const { stakeRegistry } = fixture;

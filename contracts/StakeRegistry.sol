@@ -138,6 +138,15 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         uint256 amount
     );
 
+    /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
+    modifier onlySLARegistry() {
+        require(
+            msg.sender == address(slaRegistry),
+            'Can only be called by SLARegistry'
+        );
+        _;
+    }
+
     /**
      * @notice Constructor
      * @param _dslaTokenAddress 1. DSLA Token
@@ -157,15 +166,6 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         );
         _DSLATokenAddress = _dslaTokenAddress;
         allowedTokens.push(_dslaTokenAddress);
-    }
-
-    /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
-    modifier onlySLARegistry() {
-        require(
-            msg.sender == address(slaRegistry),
-            'Can only be called by SLARegistry'
-        );
-        _;
     }
 
     /**

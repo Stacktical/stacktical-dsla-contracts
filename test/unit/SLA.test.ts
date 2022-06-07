@@ -7,6 +7,7 @@ import {
   SLARegistry,
   StakeRegistry,
   Details,
+  PeriodRegistry,
 } from '../../typechain';
 import {
   CONTRACT_NAMES,
@@ -20,6 +21,10 @@ const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
 import { BigNumber, ethers as Ethers } from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { MockContract } from 'ethereum-waffle';
+import { evm_increaseTime } from '../helper';
+const moment = require('moment');
 
 enum POSITION {
   OK,
@@ -92,6 +97,7 @@ const setup = deployments.createFixture(async () => {
     sla,
     dslaToken,
     details,
+    mockMessenger,
   };
 });
 
@@ -100,18 +106,35 @@ type Fixture = {
   sla: SLA;
   dslaToken: ERC20PresetMinterPauser;
   details: Details;
+  mockMessenger: MockContract;
 };
 
 describe(CONTRACT_NAMES.SLA, function () {
   let fixture: Fixture;
   let deployer: string;
   let notDeployer: string;
-  beforeEach(async function () {
+  let owner: SignerWithAddress;
+  let user: SignerWithAddress;
+  before(async function () {
     deployer = (await getNamedAccounts()).deployer;
     notDeployer = (await getNamedAccounts()).notDeployer;
+    [owner, user,] = await ethers.getSigners();
+  })
+  beforeEach(async function () {
     fixture = await setup();
   });
+  describe('Register SLI', function () {
+    it('should allow SLI registration only for messenger of the SLA', async () => {
+      const { sla } = fixture;
+      await expect(sla.connect(owner).registerSLI(0, 0))
+        .to.be.revertedWith('not messenger');
 
+      // TODO: try again with messenger address signer
+      // const messegeSigner = await ethers.getSigner(mockMessenger.address);
+      // await expect(sla.connect(messegeSigner).registerSLI(10, 0))
+      //   .to.emit(sla, 'SLICreated');
+    })
+  })
   it('should revert creating SLA if owner or messenger address is invalid', async () => {
     const slaRegistry: SLARegistry = await ethers.getContract(
       CONTRACT_NAMES.SLARegistry
@@ -130,13 +153,37 @@ describe(CONTRACT_NAMES.SLA, function () {
     )).to.be.revertedWith('invalid messenger address');
   })
 
-  it('should not allow staking 0 amount', async () => {
-    const { sla, dslaToken } = fixture;
-    await expect(
-      sla.stakeTokens(0, dslaToken.address, POSITION.OK)
-    ).to.be.revertedWith('Stake must be greater than 0.');
-  });
+  describe('Stake Tokens', function () {
+    it('should not allow staking 0 amount', async () => {
+      const { sla, dslaToken } = fixture;
+      await expect(
+        sla.stakeTokens(0, dslaToken.address, POSITION.OK)
+      ).to.be.revertedWith('Stake must be greater than 0.');
+    });
+    it('should now allow staking when contract is finished', async () => {
+      const { sla, dslaToken } = fixture;
+      const PeriodRegistry: PeriodRegistry = await ethers.getContract(
+        CONTRACT_NAMES.PeriodRegistry
+      );
+      const periodStart = moment()
+        .utc(0)
+        .startOf('month')
+        .add(10, 'month')
+        .startOf('month')
+        .unix();
+      await PeriodRegistry.initializePeriod(
+        PERIOD_TYPE.DAILY,
+        [periodStart],
+        [periodStart + 1000]
+      );
+      await evm_increaseTime(periodStart + 1000)
 
+      // TODO: use MockMessenger to make it finished
+      // await expect(
+      //   sla.stakeTokens(0, dslaToken.address, POSITION.OK)
+      // ).to.be.revertedWith('This SLA has terminated.');
+    })
+  })
   it('should not let notDeployer withdraw tokens if the contract is not finished', async function () {
     const { sla, dslaToken, details } = fixture;
     await dslaToken.approve(sla.address, mintAmount);
