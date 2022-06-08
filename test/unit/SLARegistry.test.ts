@@ -5,6 +5,7 @@ import { CONTRACT_NAMES, DEPLOYMENT_TAGS, SENetworkNamesBytes32, SENetworks, PER
 import { toWei } from 'web3-utils';
 import {
 	ERC20PresetMinterPauser,
+	MessengerRegistry,
 	MockMessenger,
 	PeriodRegistry,
 	SLARegistry,
@@ -12,12 +13,14 @@ import {
 	SLORegistry,
 	StakeRegistry
 } from '../../typechain';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 type Fixture = {
 	sloRegistry: SLORegistry;
 	slaRegistry: SLARegistry;
 	stakeRegistry: StakeRegistry;
 	periodRegistry: PeriodRegistry;
+	messengerRegistry: MessengerRegistry;
 };
 interface SLAConfig {
 	sloValue: number,
@@ -54,13 +57,43 @@ const setup = deployments.createFixture(async () => {
 	const periodRegistry: PeriodRegistry = await ethers.getContract(
 		CONTRACT_NAMES.PeriodRegistry
 	);
+	const messengerRegistry: MessengerRegistry = await ethers.getContract(
+		CONTRACT_NAMES.MessengerRegistry
+	);
 	return {
 		sloRegistry,
 		slaRegistry,
 		stakeRegistry,
 		periodRegistry,
+		messengerRegistry
 	};
 });
+
+const deployMessenger = async (
+	deployer: string,
+	periodRegistry: string,
+	stakeRegistry: string
+) => {
+	// deploy mock messenger
+	const tx = await deployments.deploy(CONTRACT_NAMES.MockMessenger, {
+		from: deployer,
+		log: true,
+		args: [
+			ethers.constants.AddressZero,
+			ethers.constants.AddressZero,
+			1,
+			periodRegistry,
+			stakeRegistry,
+			SENetworkNamesBytes32[SENetworks.ONE],
+			'UPTIME.ok',
+			'UPTIME.ok',
+			'UPTIME.ko',
+			'UPTIME.ko',
+		]
+	})
+	const mockMessenger: MockMessenger = await ethers.getContractAt(CONTRACT_NAMES.MockMessenger, tx.address);
+	return mockMessenger;
+}
 
 const deploySLA = async (slaConfig: SLAConfig) => {
 	const slaRegistry: SLARegistry = await ethers.getContract(
@@ -82,23 +115,7 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 	await dslaToken.approve(stakeRegistry.address, toWei(mintAmount));
 
 	// deploy mock messenger
-	await deployments.deploy(CONTRACT_NAMES.MockMessenger, {
-		from: deployer,
-		log: true,
-		args: [
-			ethers.constants.AddressZero,
-			ethers.constants.AddressZero,
-			1,
-			periodRegistry.address,
-			stakeRegistry.address,
-			SENetworkNamesBytes32[SENetworks.ONE],
-			'UPTIME.ok',
-			'UPTIME.ok',
-			'UPTIME.ko',
-			'UPTIME.ko',
-		]
-	})
-	const mockMessenger: MockMessenger = await ethers.getContract(CONTRACT_NAMES.MockMessenger);
+	const mockMessenger = await deployMessenger(deployer, periodRegistry.address, stakeRegistry.address)
 	await slaRegistry.registerMessenger(mockMessenger.address, 'dummy link');
 
 	let tx = await slaRegistry.createSLA(
@@ -118,65 +135,63 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 
 describe(CONTRACT_NAMES.SLARegistry, function () {
 	let fixture: Fixture;
-	let deployer: string, notDeployer: string;
+	let owner: SignerWithAddress;
+	let user: SignerWithAddress;
+	before(async () => {
+		[owner, user,] = await ethers.getSigners();
+	})
 	beforeEach(async function () {
-		deployer = (await getNamedAccounts()).deployer;
-		notDeployer = (await getNamedAccounts()).notDeployer;
 		fixture = await setup();
 	});
-	describe('Constructor', function () {
+	describe('constructor', function () {
 		it('should be able to deploy SLARegistry with proper addresses of other contracts', async () => {
 			const { slaRegistry, sloRegistry, periodRegistry } = fixture;
 			const { deploy } = deployments;
-			await expect(
-				deploy(CONTRACT_NAMES.SLARegistry, {
-					from: deployer,
-					log: true,
-					args: [
-						ethers.constants.AddressZero,
-						ethers.constants.AddressZero,
-						ethers.constants.AddressZero,
-						ethers.constants.AddressZero,
-						false,
-					],
-				})).to.be.revertedWith('invalid sloRegistry address');
-			await expect(
-				deploy(CONTRACT_NAMES.SLARegistry, {
-					from: deployer,
-					log: true,
-					args: [
-						sloRegistry.address,
-						ethers.constants.AddressZero,
-						ethers.constants.AddressZero,
-						ethers.constants.AddressZero,
-						false,
-					],
-				})).to.be.revertedWith('invalid periodRegistry address');
-			await expect(
-				deploy(CONTRACT_NAMES.SLARegistry, {
-					from: deployer,
-					log: true,
-					args: [
-						sloRegistry.address,
-						periodRegistry.address,
-						ethers.constants.AddressZero,
-						ethers.constants.AddressZero,
-						false,
-					],
-				})).to.be.revertedWith('invalid messengerRegistry address');
+			await expect(deploy(CONTRACT_NAMES.SLARegistry, {
+				from: owner.address,
+				log: true,
+				args: [
+					ethers.constants.AddressZero,
+					ethers.constants.AddressZero,
+					ethers.constants.AddressZero,
+					ethers.constants.AddressZero,
+					false,
+				],
+			})).to.be.revertedWith('invalid sloRegistry address');
+			await expect(deploy(CONTRACT_NAMES.SLARegistry, {
+				from: owner.address,
+				log: true,
+				args: [
+					sloRegistry.address,
+					ethers.constants.AddressZero,
+					ethers.constants.AddressZero,
+					ethers.constants.AddressZero,
+					false,
+				],
+			})).to.be.revertedWith('invalid periodRegistry address');
+			await expect(deploy(CONTRACT_NAMES.SLARegistry, {
+				from: owner.address,
+				log: true,
+				args: [
+					sloRegistry.address,
+					periodRegistry.address,
+					ethers.constants.AddressZero,
+					ethers.constants.AddressZero,
+					false,
+				],
+			})).to.be.revertedWith('invalid messengerRegistry address');
 			const messengerRegistryAddr = await slaRegistry.messengerRegistry();
-			await expect(
-				deploy(CONTRACT_NAMES.SLARegistry, {
-					from: deployer,
-					log: true,
-					args: [
-						sloRegistry.address,
-						periodRegistry.address,
-						messengerRegistryAddr,
-						ethers.constants.AddressZero,
-						false,
-					],
-				})).to.be.revertedWith('invalid stakeRegistry address');
+			await expect(deploy(CONTRACT_NAMES.SLARegistry, {
+				from: owner.address,
+				log: true,
+				args: [
+					sloRegistry.address,
+					periodRegistry.address,
+					messengerRegistryAddr,
+					ethers.constants.AddressZero,
+					false,
+				],
+			})).to.be.revertedWith('invalid stakeRegistry address');
 		})
 	})
 	it("should be able to create sla by anyone", async () => {
@@ -223,7 +238,7 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 			baseSLAConfig.leverage
 		)).to.emit(slaRegistry, "SLACreated");
 	})
-	describe('Request SLI', function () {
+	describe('request sli', function () {
 		it('should rever requesting sli if SLA address is not registered', async () => {
 			const { slaRegistry } = fixture;
 			await expect(slaRegistry.requestSLI(
@@ -254,10 +269,9 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 		})
 		it("should be able to request sli", async () => {
 			const { slaRegistry } = fixture;
-			const signer = await ethers.getSigner(deployer);
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const sla = await SLA__factory.connect(slaAddress, signer);
+			const sla = await SLA__factory.connect(slaAddress, owner);
 			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
 			await expect(slaRegistry.requestSLI(
 				Number(nextVerifiablePeriod),
@@ -266,18 +280,24 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 			)).to.emit(slaRegistry, "SLIRequested");
 		})
 	})
-	it("should able to register new messenger", async () => {
-		// TODO: Can't test registerMessenger function cause we use mock contracts for both IMessenger and IMessageRegistry
+	describe('message registration', function () {
+		it("should able to register new messenger", async () => {
+			const { slaRegistry, periodRegistry, stakeRegistry, messengerRegistry } = fixture;
+
+			// deploy mock messenger
+			const mockMessenger = await deployMessenger(owner.address, periodRegistry.address, stakeRegistry.address)
+			await expect(slaRegistry.registerMessenger(mockMessenger.address, 'dummy link'))
+				.to.be.emit(messengerRegistry, 'MessengerRegistered');
+		})
 	})
 	it("should revert returning locked value when sla is not registered", async () => {
 		const { slaRegistry } = fixture;
-		await expect(slaRegistry.returnLockedValue(
-			deployer
-		)).to.be.revertedWith("This SLA is not valid.");
+		await expect(slaRegistry.returnLockedValue(owner.address))
+			.to.be.revertedWith("This SLA is not valid.");
 	})
 	it("should revert returning locked value when it is called from not-owner address", async () => {
 		const { slaRegistry } = fixture;
-		const signer = await ethers.getSigner(notDeployer);
+		const signer = await ethers.getSigner(user.address);
 
 		await deploySLA(baseSLAConfig);
 		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
@@ -296,12 +316,11 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 	})
 	it("should return locked value after sla contract has finished", async () => {
 		const { slaRegistry } = fixture;
-		const signer = await ethers.getSigner(deployer);
 
 		await deploySLA(baseSLAConfig);
 		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 
-		const sla = await SLA__factory.connect(slaAddress, signer);
+		const sla = await SLA__factory.connect(slaAddress, owner);
 		const lastPeriodId = await sla.finalPeriodId();
 		// TODO: Complete returnLockedValue - Can't cover this function at the moment cause we use mock messenger contract
 	})
@@ -323,7 +342,7 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 
 		expect(await slaRegistry.isRegisteredSLA(slaAddress)).to.be.true;
-		expect(await slaRegistry.isRegisteredSLA(deployer)).to.be.false;
+		expect(await slaRegistry.isRegisteredSLA(owner.address)).to.be.false;
 	})
 	it("should able to return all slas in array", async () => {
 		const { slaRegistry } = fixture;
@@ -336,7 +355,7 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 		const { slaRegistry } = fixture;
 		await deploySLA(baseSLAConfig);
 		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-		const slas = await slaRegistry.userSLAs(deployer);
+		const slas = await slaRegistry.userSLAs(owner.address);
 
 		expect(slas.length).to.be.equal(1);
 		expect(slas[0]).to.be.equal(slaAddress);

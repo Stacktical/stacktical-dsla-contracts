@@ -36,14 +36,8 @@ const baseSLAConfig = {
 };
 
 let activeWlSLAConfig = {
-  sloValue: 50 * 10 ** 3,
-  sloType: SLO_TYPE.GreaterThan,
+  ...baseSLAConfig,
   whitelisted: true,
-  periodType: PERIOD_TYPE.WEEKLY,
-  initialPeriodId: 0,
-  finalPeriodId: 10,
-  extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
-  leverage: 1,
 };
 
 const mintAmount = '1000000';

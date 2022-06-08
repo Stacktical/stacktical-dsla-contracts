@@ -19,7 +19,7 @@ import {
   SLO_TYPE,
 } from '../../constants';
 import { expect } from '../chai-setup';
-import { fromWei, toWei } from 'web3-utils';
+import { toWei } from 'web3-utils';
 import { BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { evm_increaseTime } from '../helper';
@@ -134,16 +134,9 @@ describe(CONTRACT_NAMES.SLA, function () {
   });
   describe('register SLI', function () {
     it('should allow SLI registration only for messenger of the SLA', async () => {
-      const { sla, mockMessenger, slaRegistry } = fixture;
+      const { sla } = fixture;
       await expect(sla.connect(owner).registerSLI(0, 0))
         .to.be.revertedWith('not messenger');
-
-      await slaRegistry.requestSLI(0, sla.address, false);
-      // TODO: try again with messenger address signer
-      // const messegeSigner = await ethers.getSigner(mockMessenger.address);
-      // await expect(sla.connect(messegeSigner).registerSLI(10, 0))
-      //   .to.emit(sla, 'SLICreated');
-
     })
   })
   describe('stake tokens', function () {
