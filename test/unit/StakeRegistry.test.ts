@@ -7,6 +7,7 @@ import { toWei } from 'web3-utils';
 import {
 	DToken,
 	ERC20PresetMinterPauser,
+	MockMessenger,
 	PeriodRegistry,
 	SLA,
 	SLARegistry,
@@ -84,6 +85,9 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 	const stakeRegistry: StakeRegistry = await ethers.getContract(
 		CONTRACT_NAMES.StakeRegistry
 	);
+	const periodRegistry: PeriodRegistry = await ethers.getContract(
+		CONTRACT_NAMES.PeriodRegistry
+	);
 	const dslaToken: ERC20PresetMinterPauser = await ethers.getContract(
 		CONTRACT_NAMES.DSLA
 	);
@@ -91,20 +95,26 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 	const { deployer } = await getNamedAccounts();
 	await dslaToken.mint(deployer, toWei(mintAmount));
 	await dslaToken.approve(stakeRegistry.address, toWei(mintAmount));
-	const iMessengerArtifact = await deployments.getArtifact(
-		CONTRACT_NAMES.IMessenger
-	);
-	const mockMessenger = await deployMockContract(
-		await ethers.getSigner(deployer),
-		iMessengerArtifact.abi
-	);
-	await mockMessenger.mock.lpName.returns('UPTIME.ok');
-	await mockMessenger.mock.spName.returns('UPTIME.ko');
-	await mockMessenger.mock.lpSymbolSlaId.returns('UPTIME.ok-0');
-	await mockMessenger.mock.spSymbolSlaId.returns('UPTIME.ko-0');
-	await mockMessenger.mock.requestSLI.returns();
-	await mockMessenger.mock.owner.returns(deployer);
-	await mockMessenger.mock.setSLARegistry.returns();
+
+	// deploy mock messenger
+	await deployments.deploy(CONTRACT_NAMES.MockMessenger, {
+		from: deployer,
+		log: true,
+		args: [
+			ethers.constants.AddressZero,
+			ethers.constants.AddressZero,
+			1,
+			periodRegistry.address,
+			stakeRegistry.address,
+			SENetworkNamesBytes32[SENetworks.ONE],
+			'UPTIME.ok',
+			'UPTIME.ok',
+			'UPTIME.ko',
+			'UPTIME.ko',
+		]
+	})
+	const mockMessenger: MockMessenger = await ethers.getContract(CONTRACT_NAMES.MockMessenger);
+	await slaRegistry.registerMessenger(mockMessenger.address, 'dummy link');
 
 	let tx = await slaRegistry.createSLA(
 		slaConfig.sloValue,
@@ -219,17 +229,31 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		expect(await duToken.decimals()).to.be.eq(dslaDecimal);
 	})
 	it("should lock dsla when creating sla on slaRegistry", async () => {
-		const { slaRegistry, stakeRegistry, dslaToken } = fixture;
+		const { slaRegistry, stakeRegistry, dslaToken, periodRegistry } = fixture;
 		await dslaToken.mint(deployer, toWei(mintAmount));
 		await dslaToken.mint(notDeployer, toWei(mintAmount));
 		await dslaToken.approve(stakeRegistry.address, toWei(mintAmount));
-		const iMessengerArtifact = await deployments.getArtifact(
-			CONTRACT_NAMES.IMessenger
-		);
-		const mockMessenger = await deployMockContract(
-			await ethers.getSigner(deployer),
-			iMessengerArtifact.abi
-		);
+
+		// deploy mock messenger
+		await deployments.deploy(CONTRACT_NAMES.MockMessenger, {
+			from: deployer,
+			log: true,
+			args: [
+				ethers.constants.AddressZero,
+				ethers.constants.AddressZero,
+				1,
+				periodRegistry.address,
+				stakeRegistry.address,
+				SENetworkNamesBytes32[SENetworks.ONE],
+				'UPTIME.ok',
+				'UPTIME.ok',
+				'UPTIME.ko',
+				'UPTIME.ko',
+			]
+		})
+		const mockMessenger: MockMessenger = await ethers.getContract(CONTRACT_NAMES.MockMessenger);
+		await slaRegistry.registerMessenger(mockMessenger.address, 'dummy link');
+
 		await expect(slaRegistry.createSLA(
 			baseSLAConfig.sloValue,
 			baseSLAConfig.sloType,

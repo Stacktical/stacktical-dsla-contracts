@@ -1,24 +1,21 @@
-const hre = require('hardhat');
+import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import {
   ERC20PresetMinterPauser,
-  ERC20PresetMinterPauser__factory,
   SLA,
-  SLA__factory,
   SLARegistry,
   StakeRegistry,
   Details,
+  PeriodRegistry,
+  MockMessenger,
 } from '../../typechain';
-const { ethers, waffle, deployments, getNamedAccounts } = hre;
 import {
   CONTRACT_NAMES,
   DEPLOYMENT_TAGS,
   PERIOD_TYPE,
-  SENetworkNames,
   SENetworkNamesBytes32,
   SENetworks,
   SLO_TYPE,
 } from '../../constants';
-const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
 
@@ -36,7 +33,6 @@ const baseSLAConfig = {
 const mintAmount = '1000000';
 
 const setup = deployments.createFixture(async () => {
-  const { deployments } = hre;
   const { deployer, notDeployer } = await getNamedAccounts();
   await deployments.fixture(DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE);
   const dslaToken: ERC20PresetMinterPauser = await ethers.getContract(
@@ -46,27 +42,37 @@ const setup = deployments.createFixture(async () => {
   const slaRegistry: SLARegistry = await ethers.getContract(
     CONTRACT_NAMES.SLARegistry
   );
-
-  const details: Details = await ethers.getContract(CONTRACT_NAMES.Details);
-
   const stakeRegistry: StakeRegistry = await ethers.getContract(
     CONTRACT_NAMES.StakeRegistry
   );
+  const periodRegistry: PeriodRegistry = await ethers.getContract(
+    CONTRACT_NAMES.PeriodRegistry
+  );
+
+  const details: Details = await ethers.getContract(CONTRACT_NAMES.Details);
+
   await dslaToken.mint(deployer, toWei(mintAmount));
   await dslaToken.mint(notDeployer, toWei(mintAmount));
   await dslaToken.approve(stakeRegistry.address, toWei(mintAmount));
-  const iMessengerArtifact = await deployments.getArtifact(
-    CONTRACT_NAMES.IMessenger
-  );
-  const mockMessenger = await deployMockContract(
-    await ethers.getSigner(deployer),
-    iMessengerArtifact.abi
-  );
-  await mockMessenger.mock.lpName.returns('UPTIME.ok');
-  await mockMessenger.mock.spName.returns('UPTIME.ko');
-  await mockMessenger.mock.lpSymbolSlaId.returns('UPTIME.ok-0');
-  await mockMessenger.mock.spSymbolSlaId.returns('UPTIME.ko-0');
-
+  // deploy mock messenger
+  await deployments.deploy(CONTRACT_NAMES.MockMessenger, {
+    from: deployer,
+    log: true,
+    args: [
+      ethers.constants.AddressZero,
+      ethers.constants.AddressZero,
+      1,
+      periodRegistry.address,
+      stakeRegistry.address,
+      SENetworkNamesBytes32[SENetworks.ONE],
+      'UPTIME.ok',
+      'UPTIME.ok',
+      'UPTIME.ko',
+      'UPTIME.ko',
+    ]
+  })
+  const mockMessenger: MockMessenger = await ethers.getContract(CONTRACT_NAMES.MockMessenger);
+  await slaRegistry.registerMessenger(mockMessenger.address, 'dummy link');
   let tx = await slaRegistry.createSLA(
     baseSLAConfig.sloValue,
     baseSLAConfig.sloType,
@@ -102,12 +108,8 @@ type Fixture = {
 
 describe(CONTRACT_NAMES.Details, function () {
   let fixture: Fixture;
-  let deployer: string;
-  let notDeployer: string;
 
   beforeEach(async function () {
-    deployer = (await getNamedAccounts()).deployer;
-    notDeployer = (await getNamedAccounts()).notDeployer;
     fixture = await setup();
   });
 

@@ -1,5 +1,5 @@
 import { DeployOptionsBase } from 'hardhat-deploy/dist/types';
-import { CONTRACT_NAMES, DEPLOYMENT_TAGS } from '../constants';
+import { CONTRACT_NAMES, DEPLOYMENT_TAGS, SENetworkNamesBytes32 } from '../constants';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { currentTimestamp, ONE_DAY } from '../test/helper';
 
@@ -33,16 +33,7 @@ module.exports = async ({
   await periodRegistry.mock.isValidPeriod.returns(true);
   await periodRegistry.mock.getPeriodStartAndEnd.returns(currentTimestamp, currentTimestamp + ONE_DAY);
 
-  const messengerRegistryArtifact = await deployments.getArtifact(
-    CONTRACT_NAMES.MessengerRegistry
-  );
-  const messengerRegistry = await deployMockContract(
-    await (ethers as any).getSigner(deployer),
-    messengerRegistryArtifact.abi
-  );
-  await messengerRegistry.mock.registeredMessengers.returns(true);
-  await messengerRegistry.mock.setSLARegistry.returns();
-
+  await deploy(CONTRACT_NAMES.MessengerRegistry, baseOptions);
   await deploy(CONTRACT_NAMES.SLORegistry, baseOptions);
   await deploy(CONTRACT_NAMES.DSLA, {
     ...baseOptions,
@@ -57,6 +48,7 @@ module.exports = async ({
   });
   const sloRegistry = await ethers.getContract(CONTRACT_NAMES.SLORegistry);
   const stakeRegistry = await ethers.getContract(CONTRACT_NAMES.StakeRegistry);
+  const messengerRegistry = await ethers.getContract(CONTRACT_NAMES.MessengerRegistry);
   const stringUtils = await ethers.getContract(CONTRACT_NAMES.StringUtils);
   const checkPastPeriods = false;
   await deploy(CONTRACT_NAMES.SLARegistry, {

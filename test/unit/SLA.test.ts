@@ -1,4 +1,4 @@
-import { ethers, waffle, deployments, getNamedAccounts } from 'hardhat';
+import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import {
   ERC20PresetMinterPauser,
   ERC20PresetMinterPauser__factory,
@@ -8,6 +8,7 @@ import {
   StakeRegistry,
   Details,
   PeriodRegistry,
+  MockMessenger,
 } from '../../typechain';
 import {
   CONTRACT_NAMES,
@@ -17,12 +18,10 @@ import {
   SENetworks,
   SLO_TYPE,
 } from '../../constants';
-const { deployMockContract } = waffle;
 import { expect } from '../chai-setup';
 import { fromWei, toWei } from 'web3-utils';
-import { BigNumber, ethers as Ethers } from 'ethers';
+import { BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { MockContract } from 'ethereum-waffle';
 import { evm_increaseTime } from '../helper';
 const moment = require('moment');
 
@@ -53,26 +52,36 @@ const setup = deployments.createFixture(async () => {
   const slaRegistry: SLARegistry = await ethers.getContract(
     CONTRACT_NAMES.SLARegistry
   );
-
   const details: Details = await ethers.getContract(CONTRACT_NAMES.Details);
-
   const stakeRegistry: StakeRegistry = await ethers.getContract(
     CONTRACT_NAMES.StakeRegistry
+  );
+  const periodRegistry: PeriodRegistry = await ethers.getContract(
+    CONTRACT_NAMES.PeriodRegistry
   );
   await dslaToken.mint(deployer, toWei(mintAmount));
   await dslaToken.mint(notDeployer, toWei(mintAmount));
   await dslaToken.approve(stakeRegistry.address, toWei(mintAmount));
-  const iMessengerArtifact = await deployments.getArtifact(
-    CONTRACT_NAMES.IMessenger
-  );
-  const mockMessenger = await deployMockContract(
-    await ethers.getSigner(deployer),
-    iMessengerArtifact.abi
-  );
-  await mockMessenger.mock.lpName.returns('UPTIME.ok');
-  await mockMessenger.mock.spName.returns('UPTIME.ko');
-  await mockMessenger.mock.lpSymbolSlaId.returns('UPTIME.ok-0');
-  await mockMessenger.mock.spSymbolSlaId.returns('UPTIME.ko-0');
+
+  // deploy mock messenger
+  await deployments.deploy(CONTRACT_NAMES.MockMessenger, {
+    from: deployer,
+    log: true,
+    args: [
+      ethers.constants.AddressZero,
+      ethers.constants.AddressZero,
+      1,
+      periodRegistry.address,
+      stakeRegistry.address,
+      SENetworkNamesBytes32[SENetworks.ONE],
+      'UPTIME.ok',
+      'UPTIME.ok',
+      'UPTIME.ko',
+      'UPTIME.ko',
+    ]
+  })
+  const mockMessenger: MockMessenger = await ethers.getContract(CONTRACT_NAMES.MockMessenger);
+  await slaRegistry.registerMessenger(mockMessenger.address, 'dummy link');
 
   let tx = await slaRegistry.createSLA(
     baseSLAConfig.sloValue,
@@ -106,7 +115,7 @@ type Fixture = {
   sla: SLA;
   dslaToken: ERC20PresetMinterPauser;
   details: Details;
-  mockMessenger: MockContract;
+  mockMessenger: MockMessenger;
 };
 
 describe(CONTRACT_NAMES.SLA, function () {
@@ -123,37 +132,21 @@ describe(CONTRACT_NAMES.SLA, function () {
   beforeEach(async function () {
     fixture = await setup();
   });
-  describe('Register SLI', function () {
+  describe('register SLI', function () {
     it('should allow SLI registration only for messenger of the SLA', async () => {
-      const { sla } = fixture;
+      const { sla, mockMessenger, slaRegistry } = fixture;
       await expect(sla.connect(owner).registerSLI(0, 0))
         .to.be.revertedWith('not messenger');
 
+      await slaRegistry.requestSLI(0, sla.address, false);
       // TODO: try again with messenger address signer
       // const messegeSigner = await ethers.getSigner(mockMessenger.address);
       // await expect(sla.connect(messegeSigner).registerSLI(10, 0))
       //   .to.emit(sla, 'SLICreated');
+
     })
   })
-  it('should revert creating SLA if owner or messenger address is invalid', async () => {
-    const slaRegistry: SLARegistry = await ethers.getContract(
-      CONTRACT_NAMES.SLARegistry
-    );
-    await expect(slaRegistry.createSLA(
-      baseSLAConfig.sloValue,
-      baseSLAConfig.sloType,
-      baseSLAConfig.whitelisted,
-      Ethers.constants.AddressZero,
-      baseSLAConfig.periodType,
-      baseSLAConfig.initialPeriodId,
-      baseSLAConfig.finalPeriodId,
-      'dummy-ipfs-hash',
-      baseSLAConfig.extraData,
-      baseSLAConfig.leverage
-    )).to.be.revertedWith('invalid messenger address');
-  })
-
-  describe('Stake Tokens', function () {
+  describe('stake tokens', function () {
     it('should not allow staking 0 amount', async () => {
       const { sla, dslaToken } = fixture;
       await expect(
