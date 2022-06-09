@@ -78,6 +78,32 @@ const setup = deployments.createFixture(async () => {
 	};
 });
 
+const deployMessenger = async (
+	deployer: string,
+	periodRegistry: string,
+	stakeRegistry: string
+) => {
+	// deploy mock messenger
+	const tx = await deployments.deploy(CONTRACT_NAMES.MockMessenger, {
+		from: deployer,
+		log: true,
+		args: [
+			ethers.constants.AddressZero,
+			ethers.constants.AddressZero,
+			1,
+			periodRegistry,
+			stakeRegistry,
+			SENetworkNamesBytes32[SENetworks.ONE],
+			'UPTIME.ok',
+			'UPTIME.ok',
+			'UPTIME.ko',
+			'UPTIME.ko',
+		]
+	})
+	const mockMessenger: MockMessenger = await ethers.getContractAt(CONTRACT_NAMES.MockMessenger, tx.address);
+	return mockMessenger;
+}
+
 const deploySLA = async (slaConfig: SLAConfig) => {
 	const slaRegistry: SLARegistry = await ethers.getContract(
 		CONTRACT_NAMES.SLARegistry
@@ -113,7 +139,7 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 			'UPTIME.ko',
 		]
 	})
-	const mockMessenger: MockMessenger = await ethers.getContract(CONTRACT_NAMES.MockMessenger);
+	const mockMessenger = await deployMessenger(deployer, periodRegistry.address, stakeRegistry.address)
 	await slaRegistry.registerMessenger(mockMessenger.address, 'dummy link');
 
 	let tx = await slaRegistry.createSLA(
@@ -133,56 +159,57 @@ const deploySLA = async (slaConfig: SLAConfig) => {
 
 describe(CONTRACT_NAMES.StakeRegistry, function () {
 	let fixture: Fixture;
-	let deployer: string, notDeployer: string;
 	let owner: SignerWithAddress;
+	let user: SignerWithAddress;
 	before(async () => {
-		[owner,] = await ethers.getSigners();
-		deployer = (await getNamedAccounts()).deployer;
-		notDeployer = (await getNamedAccounts()).notDeployer;
+		[owner, user] = await ethers.getSigners();
 	})
 	beforeEach(async function () {
 		fixture = await setup();
 	});
-	it("should register dsla token at constructor", async () => {
-		const { stakeRegistry } = fixture;
-		const dslaToken: ERC20PresetMinterPauser = await ethers.getContract(
-			CONTRACT_NAMES.DSLA
-		);
-		expect(await stakeRegistry.DSLATokenAddress()).to.be.equal(dslaToken.address);
-		expect(await stakeRegistry.allowedTokens(0)).to.be.equal(dslaToken.address);
+	describe('constructor', function () {
+		it("should register dsla token at constructor", async () => {
+			const { stakeRegistry } = fixture;
+			const dslaToken: ERC20PresetMinterPauser = await ethers.getContract(
+				CONTRACT_NAMES.DSLA
+			);
+			expect(await stakeRegistry.DSLATokenAddress()).to.be.equal(dslaToken.address);
+			expect(await stakeRegistry.allowedTokens(0)).to.be.equal(dslaToken.address);
+		})
+		it("should revert constructor if DSLA token address is invalid", async () => {
+			const { deploy } = deployments
+			await expect(deploy(CONTRACT_NAMES.StakeRegistry, {
+				from: owner.address,
+				log: true,
+				args: [Ethers.constants.AddressZero],
+			})).to.be.revertedWith('invalid DSLA token address');
+		})
+		it("should be able to set slaRegistry address once at first", async () => {
+			const { stakeRegistry, slaRegistry } = fixture;
+			const slaRegistryOnStake = await stakeRegistry.slaRegistry();
+			expect(slaRegistryOnStake).to.be.eq(slaRegistry.address);
+			await expect(stakeRegistry.setSLARegistry()).to.be.revertedWith(
+				'SLARegistry address has already been set'
+			);
+		})
 	})
-	it("should revert constructor if DSLA token address is invalid", async () => {
-		const { deploy } = deployments
-		await expect(deploy(CONTRACT_NAMES.StakeRegistry, {
-			from: deployer,
-			log: true,
-			args: [Ethers.constants.AddressZero],
-		})).to.be.revertedWith('invalid DSLA token address');
-	})
-	it("should be able to set slaRegistry address once at first", async () => {
-		const { stakeRegistry, slaRegistry } = fixture;
-		const slaRegistryOnStake = await stakeRegistry.slaRegistry();
-		expect(slaRegistryOnStake).to.be.eq(slaRegistry.address);
-		await expect(stakeRegistry.setSLARegistry()).to.be.revertedWith(
-			'SLARegistry address has already been set'
-		);
-	})
-	it("should allow only owner to add allowed tokens", async () => {
-		const { stakeRegistry, dslaToken } = fixture;
-		const signer = await ethers.getSigner(notDeployer);
+	describe('token allowance', function () {
+		it("should allow only owner to add allowed tokens", async () => {
+			const { stakeRegistry, dslaToken } = fixture;
 
-		await expect(stakeRegistry.addAllowedTokens(dslaToken.address))
-			.to.be.revertedWith('This token has been allowed already.');
-		await stakeRegistry.addAllowedTokens(deployer);
-		expect(await stakeRegistry.allowedTokens(1)).to.be.eq(deployer);
+			await expect(stakeRegistry.addAllowedTokens(dslaToken.address))
+				.to.be.revertedWith('This token has been allowed already.');
+			await stakeRegistry.addAllowedTokens(owner.address);
+			expect(await stakeRegistry.allowedTokens(1)).to.be.eq(owner.address);
 
-		await expect(stakeRegistry.connect(signer).addAllowedTokens(dslaToken.address))
-			.to.be.revertedWith('Ownable: caller is not the owner');
-	})
-	it("should able to check if the token is added to allowed tokens", async () => {
-		const { stakeRegistry, dslaToken } = fixture;
-		expect(await stakeRegistry.isAllowedToken(dslaToken.address)).to.be.true;
-		expect(await stakeRegistry.isAllowedToken(deployer)).to.be.false;
+			await expect(stakeRegistry.connect(user).addAllowedTokens(dslaToken.address))
+				.to.be.revertedWith('Ownable: caller is not the owner');
+		})
+		it("should able to check if the token is added to allowed tokens", async () => {
+			const { stakeRegistry, dslaToken } = fixture;
+			expect(await stakeRegistry.isAllowedToken(dslaToken.address)).to.be.true;
+			expect(await stakeRegistry.isAllowedToken(owner.address)).to.be.false;
+		})
 	})
 	it("should allow registration of owners of staking only for registered slas", async () => {
 		const { stakeRegistry, slaRegistry, dslaToken } = fixture;
@@ -190,16 +217,16 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 		const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
 
-		await expect(stakeRegistry.registerStakedSla(deployer)).to.be.revertedWith(
+		await expect(stakeRegistry.registerStakedSla(owner.address)).to.be.revertedWith(
 			'Only for registered SLAs'
 		);
 		await sla.addAllowedTokens(dslaToken.address);
 		await dslaToken.approve(slaAddress, mintAmount);
 		await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
-		expect(await stakeRegistry.slaWasStakedByUser(deployer, slaAddress)).to.be.true;
-		expect(await stakeRegistry.slaWasStakedByUser(deployer, deployer)).to.be.false;
+		expect(await stakeRegistry.slaWasStakedByUser(owner.address, slaAddress)).to.be.true;
+		expect(await stakeRegistry.slaWasStakedByUser(owner.address, owner.address)).to.be.false;
 	})
-	describe('Creating DToken', function () {
+	describe('creating dToken', function () {
 		it("should allow creating dTokens only for registered SLA", async () => {
 			const { stakeRegistry } = fixture;
 			await expect(
@@ -230,28 +257,12 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 	})
 	it("should lock dsla when creating sla on slaRegistry", async () => {
 		const { slaRegistry, stakeRegistry, dslaToken, periodRegistry } = fixture;
-		await dslaToken.mint(deployer, toWei(mintAmount));
-		await dslaToken.mint(notDeployer, toWei(mintAmount));
+		await dslaToken.mint(owner.address, toWei(mintAmount));
+		await dslaToken.mint(user.address, toWei(mintAmount));
 		await dslaToken.approve(stakeRegistry.address, toWei(mintAmount));
 
 		// deploy mock messenger
-		await deployments.deploy(CONTRACT_NAMES.MockMessenger, {
-			from: deployer,
-			log: true,
-			args: [
-				ethers.constants.AddressZero,
-				ethers.constants.AddressZero,
-				1,
-				periodRegistry.address,
-				stakeRegistry.address,
-				SENetworkNamesBytes32[SENetworks.ONE],
-				'UPTIME.ok',
-				'UPTIME.ok',
-				'UPTIME.ko',
-				'UPTIME.ko',
-			]
-		})
-		const mockMessenger: MockMessenger = await ethers.getContract(CONTRACT_NAMES.MockMessenger);
+		const mockMessenger = await deployMessenger(owner.address, periodRegistry.address, stakeRegistry.address);
 		await slaRegistry.registerMessenger(mockMessenger.address, 'dummy link');
 
 		await expect(slaRegistry.createSLA(
@@ -270,7 +281,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 	describe('Rewards Distribution', function () {
 		it("should distribute verification rewards when requesting sli on slaRegistry", async () => {
 			const { slaRegistry, stakeRegistry } = fixture;
-			const signer = await ethers.getSigner(deployer);
+			const signer = await ethers.getSigner(owner.address);
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 			const sla = await SLA__factory.connect(slaAddress, signer);
@@ -280,6 +291,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 				slaAddress,
 				false
 			)).to.emit(stakeRegistry, "VerificationRewardDistributed");
+			// TODO: check balance
 		})
 		it('should allow distribution only for SLARegistry', async () => {
 			const { slaRegistry, stakeRegistry } = fixture;
@@ -295,7 +307,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		})
 		it("should revert when verfication rewards are already distrubuted", async () => {
 			const { slaRegistry, stakeRegistry } = fixture;
-			const signer = await ethers.getSigner(deployer);
+			const signer = await ethers.getSigner(owner.address);
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 			const sla = await SLA__factory.connect(slaAddress, signer);
@@ -313,24 +325,24 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		})
 		it("should recieve verfication rewards", async () => {
 			const { slaRegistry, dslaToken } = fixture;
-			const signer = await ethers.getSigner(deployer);
+			const signer = await ethers.getSigner(owner.address);
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 			const sla = await SLA__factory.connect(slaAddress, signer);
 			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
-			const dslaBalance = await dslaToken.balanceOf(deployer);
+			const dslaBalance = await dslaToken.balanceOf(owner.address);
 			await slaRegistry.requestSLI(
 				Number(nextVerifiablePeriod),
 				slaAddress,
 				false
 			)
 			// receive userReward + platformReward + messengerRewards since all txs made from deployer
-			expect(await dslaToken.balanceOf(deployer))
+			expect(await dslaToken.balanceOf(owner.address))
 				.to.be.eq(BigNumber.from(10).pow(18).mul(750).add(dslaBalance));
 		})
 		it("should verify period when distributing rewards", async () => {
 			const { slaRegistry, stakeRegistry } = fixture;
-			const signer = await ethers.getSigner(deployer);
+			const signer = await ethers.getSigner(owner.address);
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 			const sla = await SLA__factory.connect(slaAddress, signer);
@@ -356,6 +368,10 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		})
 		it("should return locked value when returning from slaRegistry", async () => {
 			// TODO: can't cover this function since we use mock contract for messenger
+			const { slaRegistry, stakeRegistry } = fixture;
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
 		})
 	})
 	describe('Utils', function () {

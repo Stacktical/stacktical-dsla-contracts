@@ -99,7 +99,7 @@ contract MockMessenger is IMessenger, ReentrancyGuard {
         bool,
         address _callerAddress
     ) public override onlySLARegistry nonReentrant {
-        bytes32 requestId = bytes32(block.timestamp);
+        bytes32 requestId = bytes32(_periodId);
         requestIdToSLIRequest[requestId] = SLIRequest({
             slaAddress: _slaAddress,
             periodId: _periodId
@@ -109,8 +109,14 @@ contract MockMessenger is IMessenger, ReentrancyGuard {
         emit SLIRequested(_callerAddress, _requestsCounter, requestId);
     }
 
-    function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponse)
+    function mockFulfillSLI(uint256 _periodId, uint256 _chainlinkResponse)
         external
+    {
+        fulfillSLI(bytes32(_periodId), _chainlinkResponse);
+    }
+
+    function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponse)
+        public
         override
         nonReentrant
     {
