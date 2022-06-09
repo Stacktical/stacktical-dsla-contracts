@@ -22,7 +22,7 @@ import { expect } from '../chai-setup';
 import { toWei } from 'web3-utils';
 import { BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { evm_increaseTime } from '../helper';
+import { currentTimestamp, evm_increaseTime, ONE_DAY } from '../helper';
 const moment = require('moment');
 
 enum POSITION {
@@ -34,9 +34,9 @@ const baseSLAConfig = {
   sloValue: 50 * 10 ** 3,
   sloType: SLO_TYPE.GreaterThan,
   whitelisted: false,
-  periodType: PERIOD_TYPE.WEEKLY,
+  periodType: PERIOD_TYPE.DAILY,
   initialPeriodId: 0,
-  finalPeriodId: 10,
+  finalPeriodId: 1,
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
   leverage: leverage,
 };
@@ -107,6 +107,7 @@ const setup = deployments.createFixture(async () => {
     dslaToken,
     details,
     mockMessenger,
+    periodRegistry,
   };
 });
 
@@ -116,6 +117,7 @@ type Fixture = {
   dslaToken: ERC20PresetMinterPauser;
   details: Details;
   mockMessenger: MockMessenger;
+  periodRegistry: PeriodRegistry;
 };
 
 describe(CONTRACT_NAMES.SLA, function () {
@@ -147,259 +149,292 @@ describe(CONTRACT_NAMES.SLA, function () {
       ).to.be.revertedWith('Stake must be greater than 0.');
     });
     it('should now allow staking when contract is finished', async () => {
-      const { sla, dslaToken } = fixture;
-      const PeriodRegistry: PeriodRegistry = await ethers.getContract(
-        CONTRACT_NAMES.PeriodRegistry
-      );
+      const { sla, dslaToken, mockMessenger, slaRegistry, periodRegistry } = fixture;
       const periodStart = moment()
         .utc(0)
         .startOf('month')
         .add(10, 'month')
         .startOf('month')
         .unix();
-      await PeriodRegistry.initializePeriod(
+      await periodRegistry.initializePeriod(
         PERIOD_TYPE.DAILY,
         [periodStart],
         [periodStart + 1000]
       );
       await evm_increaseTime(periodStart + 1000)
 
-      // TODO: use MockMessenger to make it finished
-      // await expect(
-      //   sla.stakeTokens(0, dslaToken.address, POSITION.OK)
-      // ).to.be.revertedWith('This SLA has terminated.');
+      // make contract finished
+      await slaRegistry.requestSLI(0, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(0, 100))
+        .to.be.emit(sla, 'SLICreated');
+
+      await slaRegistry.requestSLI(1, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(1, 100))
+        .to.be.emit(sla, 'SLICreated');
+
+      await evm_increaseTime(periodStart + 1000 + ONE_DAY);
+      expect(await sla.contractFinished()).to.be.true;
+
+      await expect(
+        sla.stakeTokens(0, dslaToken.address, POSITION.OK)
+      ).to.be.revertedWith('This SLA has terminated.');
     })
   })
-  it('should not let notDeployer withdraw tokens if the contract is not finished', async function () {
-    const { sla, dslaToken, details } = fixture;
-    await dslaToken.approve(sla.address, mintAmount);
-    await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
-    const notDeployerSLA = SLA__factory.connect(
-      sla.address,
-      await ethers.getSigner(notDeployer)
-    );
+  describe('withdraw', function () {
+    it('should not let notDeployer withdraw tokens if the contract is not finished', async function () {
+      const { sla, dslaToken, details } = fixture;
+      await dslaToken.approve(sla.address, mintAmount);
+      await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
+      const notDeployerSLA = SLA__factory.connect(
+        sla.address,
+        await ethers.getSigner(notDeployer)
+      );
 
-    const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
-      dslaToken.address,
-      await ethers.getSigner(notDeployer)
-    );
-    await notDeployerDSLA.approve(sla.address, mintAmount);
-    await notDeployerSLA.stakeTokens(
-      mintAmount,
-      dslaToken.address,
-      POSITION.OK
-    );
-    const duTokenAddress = await sla.duTokenRegistry(dslaToken.address);
-    const duToken: ERC20PresetMinterPauser = await ethers.getContractAt(
-      'ERC20PresetMinterPauser',
-      duTokenAddress,
-      await ethers.getSigner(notDeployer)
-    );
-    await duToken.approve(sla.address, mintAmount);
-
-    await expect(
-      notDeployerSLA.withdrawUserTokens(mintAmount, dslaToken.address)
-    ).to.be.reverted;
-    let totalStake = (
-      await details.getSLADetailsArrays(sla.address)
-    ).tokensStake[0].totalStake.toString();
-    expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
-  });
-
-  it('should not let the deployer withdraw provider tokens if the contract is not finished', async () => {
-    const { sla, dslaToken, details } = fixture;
-    await dslaToken.approve(sla.address, mintAmount);
-    await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
-    const deployerSLA = SLA__factory.connect(
-      sla.address,
-      await ethers.getSigner(deployer)
-    );
-    const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
-      dslaToken.address,
-      await ethers.getSigner(deployer)
-    );
-    await deployerDSLA.approve(sla.address, mintAmount);
-    await deployerSLA.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
-    const duTokenAddress = await sla.dpTokenRegistry(dslaToken.address);
-    const duToken: ERC20PresetMinterPauser = await ethers.getContractAt(
-      'ERC20PresetMinterPauser',
-      duTokenAddress,
-      await ethers.getSigner(deployer)
-    );
-    await duToken.approve(sla.address, mintAmount);
-
-    await expect(
-      deployerSLA.withdrawProviderTokens(mintAmount, dslaToken.address)
-    ).to.be.revertedWith('Provider lock-up until the next verification.');
-
-    let totalStake = (
-      await details.getSLADetailsArrays(sla.address)
-    ).tokensStake[0].totalStake.toString();
-    expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
-  });
-
-  it('should distribute rewards to sla owner and protocol owner when claiming tokens', async () => {
-    const { sla, dslaToken } = fixture;
-    let stakeAmount = 100000;
-    await dslaToken.approve(sla.address, stakeAmount);
-    await sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK);
-    await expect(
-      sla.withdrawProviderTokens(mintAmount, dslaToken.address)
-    ).to.be.revertedWith('Provider lock-up until the next verification.');
-    // TODO: Complete withdrawProviderTokens - Can't cover this function at the moment cause we use mock messenger contract
-  });
-
-  it('should check that a normal amount of token can be staked', async () => {
-    const { sla, dslaToken, details } = fixture;
-    await dslaToken.approve(sla.address, mintAmount);
-    let stakeAmount = 100000;
-    await expect(sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
-      .to.emit(sla, 'Stake')
-      .withArgs(
+      const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
         dslaToken.address,
-        await sla.nextVerifiablePeriod(),
-        deployer,
-        stakeAmount,
+        await ethers.getSigner(notDeployer)
+      );
+      await notDeployerDSLA.approve(sla.address, mintAmount);
+      await notDeployerSLA.stakeTokens(
+        mintAmount,
+        dslaToken.address,
         POSITION.OK
       );
-    let totalStake = (
-      await details.getSLADetailsArrays(sla.address)
-    ).tokensStake[0].totalStake.toString();
-    expect(totalStake).equals(stakeAmount.toString());
-  });
+      const duTokenAddress = await sla.duTokenRegistry(dslaToken.address);
+      const duToken: ERC20PresetMinterPauser = await ethers.getContractAt(
+        'ERC20PresetMinterPauser',
+        duTokenAddress,
+        await ethers.getSigner(notDeployer)
+      );
+      await duToken.approve(sla.address, mintAmount);
 
-  it('should check that a negative amount of token cant be staked', async () => {
-    const { sla, dslaToken, details } = fixture;
-    await dslaToken.approve(sla.address, mintAmount);
+      await expect(
+        notDeployerSLA.withdrawUserTokens(mintAmount, dslaToken.address)
+      ).to.be.reverted;
+      let totalStake = (
+        await details.getSLADetailsArrays(sla.address)
+      ).tokensStake[0].totalStake.toString();
+      expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
+    });
 
-    await expect(sla.stakeTokens(0, dslaToken.address, POSITION.OK)).to.be
-      .revertedWith('Stake must be greater than 0.');
-    let totalStake = (
-      await details.getSLADetailsArrays(sla.address)
-    ).tokensStake[0].totalStake.toString();
-    expect(totalStake).equals('0');
-  });
+    it('should not let the deployer withdraw provider tokens if the contract is not finished', async () => {
+      const { sla, dslaToken, details } = fixture;
+      await dslaToken.approve(sla.address, ethers.constants.MaxUint256);
+      await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
+      await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
+      const duTokenAddress = await sla.dpTokenRegistry(dslaToken.address);
+      const duToken: ERC20PresetMinterPauser = await ethers.getContractAt(
+        'ERC20PresetMinterPauser',
+        duTokenAddress,
+        await ethers.getSigner(deployer)
+      );
+      await duToken.approve(sla.address, mintAmount);
 
-  it('should revert if number is overflowing', async () => {
-    const { sla, dslaToken, details } = fixture;
-    await dslaToken.approve(sla.address, mintAmount);
-    const bigNumber = BigNumber.from(10).pow(32);
-    await expect(sla.stakeTokens(bigNumber, dslaToken.address, POSITION.OK))
-      .to.be.reverted;
+      await expect(
+        sla.withdrawProviderTokens(mintAmount, dslaToken.address)
+      ).to.be.revertedWith('Provider lock-up until the next verification.');
 
-    let totalStake = (
-      await details.getSLADetailsArrays(sla.address)
-    ).tokensStake[0].totalStake.toString();
-    expect(totalStake).equals('0');
-  });
+      let totalStake = (
+        await details.getSLADetailsArrays(sla.address)
+      ).tokensStake[0].totalStake.toString();
+      expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
+    });
 
-  it('checks that allowed period is returning true if period is allowed', async () => {
-    const { sla } = fixture;
-    let isAllowedPeriod = await sla.isAllowedPeriod(0);
-    expect(isAllowedPeriod).to.be.true;
-  });
+    it('should distribute rewards to sla owner and protocol owner when claiming tokens', async () => {
+      const { sla, dslaToken, mockMessenger, slaRegistry, periodRegistry } = fixture;
+      let stakeAmount = 100000;
+      await dslaToken.approve(sla.address, ethers.constants.MaxUint256);
+      await sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK);
 
-  it('checks that allowed period is returning false if period is not allowed', async () => {
-    const { sla } = fixture;
-    let isAllowedPeriod = await sla.isAllowedPeriod(11);
-    expect(isAllowedPeriod).to.be.false;
-  });
+      // can't withdraw if the contract is not finished
+      await expect(
+        sla.withdrawProviderTokens(mintAmount, dslaToken.address)
+      ).to.be.revertedWith('Provider lock-up until the next verification.');
 
-  it('checks that the contract is not finished', async () => {
-    const { sla } = fixture;
-    let isContractFinished = await sla.contractFinished();
-    expect(isContractFinished).to.be.false;
-  });
+      const periodStart = moment()
+        .utc(0)
+        .startOf('month')
+        .add(10, 'month')
+        .startOf('month')
+        .unix();
+      await periodRegistry.initializePeriod(
+        PERIOD_TYPE.DAILY,
+        [periodStart],
+        [periodStart + 1000]
+      );
+      await evm_increaseTime(periodStart + 1000)
 
-  it('checks that the stakers length is 0 if there are no stakers', async () => {
-    const { sla } = fixture;
-    let stakersLength = await sla.getStakersLength();
-    expect(stakersLength).to.be.equal(0);
-  });
+      // make contract finished
+      await slaRegistry.requestSLI(0, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(0, 100))
+        .to.be.emit(sla, 'SLICreated');
 
-  it('checks that the stakers length is 1 if there are is 1 staker', async () => {
-    const { sla, dslaToken } = fixture;
-    await dslaToken.approve(sla.address, mintAmount);
-    let stakeAmount = 100000;
-    await sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK);
+      await slaRegistry.requestSLI(1, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(1, 100))
+        .to.be.emit(sla, 'SLICreated');
 
-    let stakersLength = await sla.getStakersLength();
-    expect(stakersLength).to.be.equal(1);
-  });
+      await evm_increaseTime(periodStart + 1000 + ONE_DAY);
+      expect(await sla.contractFinished()).to.be.true;
 
-  it('checks that the stakers length is 2 if there are are 2 stakers for short and long positions', async () => {
-    const { sla, dslaToken } = fixture;
-    let amount = 10000;
-    await dslaToken.approve(sla.address, amount);
+      // maybe approve dp token
+      // await sla.withdrawProviderTokens(stakeAmount, dslaToken.address)
+      // TODO: Complete withdrawProviderTokens - Can't cover this function at the moment cause we use mock messenger contract
+    });
+  })
 
-    // user long stake
-    const notDeployerSLA = SLA__factory.connect(
-      sla.address,
-      await ethers.getSigner(notDeployer)
-    );
+  describe('stake', function () {
+    it('should check that a normal amount of token can be staked', async () => {
+      const { sla, dslaToken, details } = fixture;
+      await dslaToken.approve(sla.address, mintAmount);
+      let stakeAmount = 100000;
+      await expect(sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
+        .to.emit(sla, 'Stake')
+        .withArgs(
+          dslaToken.address,
+          await sla.nextVerifiablePeriod(),
+          deployer,
+          stakeAmount,
+          POSITION.OK
+        );
+      let totalStake = (
+        await details.getSLADetailsArrays(sla.address)
+      ).tokensStake[0].totalStake.toString();
+      expect(totalStake).equals(stakeAmount.toString());
+    });
 
-    const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
-      dslaToken.address,
-      await ethers.getSigner(notDeployer)
-    );
+    it('should check that a negative amount of token cant be staked', async () => {
+      const { sla, dslaToken, details } = fixture;
+      await dslaToken.approve(sla.address, mintAmount);
 
-    await notDeployerDSLA.approve(sla.address, amount * leverage);
-    await notDeployerSLA.stakeTokens(
-      amount * leverage,
-      dslaToken.address,
-      POSITION.OK
-    );
+      await expect(sla.stakeTokens(0, dslaToken.address, POSITION.OK)).to.be
+        .revertedWith('Stake must be greater than 0.');
+      let totalStake = (
+        await details.getSLADetailsArrays(sla.address)
+      ).tokensStake[0].totalStake.toString();
+      expect(totalStake).equals('0');
+    });
 
-    // provider long stake
-    const deployerSLA = SLA__factory.connect(
-      sla.address,
-      await ethers.getSigner(deployer)
-    );
-    const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
-      dslaToken.address,
-      await ethers.getSigner(deployer)
-    );
+    it('should revert if number is overflowing', async () => {
+      const { sla, dslaToken, details } = fixture;
+      await dslaToken.approve(sla.address, mintAmount);
+      const bigNumber = BigNumber.from(10).pow(32);
+      await expect(sla.stakeTokens(bigNumber, dslaToken.address, POSITION.OK))
+        .to.be.reverted;
 
-    await deployerDSLA.approve(sla.address, amount);
-    await deployerSLA.stakeTokens(amount, dslaToken.address, POSITION.KO);
+      let totalStake = (
+        await details.getSLADetailsArrays(sla.address)
+      ).tokensStake[0].totalStake.toString();
+      expect(totalStake).equals('0');
+    });
 
-    // check stakers length
-    let stakersLength = await sla.getStakersLength();
-    expect(stakersLength).to.be.equal(2);
-  });
+    it('checks that allowed period is returning true if period is allowed', async () => {
+      const { sla } = fixture;
+      let isAllowedPeriod = await sla.isAllowedPeriod(0);
+      expect(isAllowedPeriod).to.be.true;
+    });
 
-  it('should revert because the short position is larger than the long position', async () => {
-    const { sla, dslaToken } = fixture;
-    let amount = 10000;
-    await dslaToken.approve(sla.address, amount);
+    it('checks that allowed period is returning false if period is not allowed', async () => {
+      const { sla } = fixture;
+      let isAllowedPeriod = await sla.isAllowedPeriod(11);
+      expect(isAllowedPeriod).to.be.false;
+    });
 
-    // user long stake
-    const notDeployerSLA = SLA__factory.connect(
-      sla.address,
-      await ethers.getSigner(notDeployer)
-    );
+    it('checks that the contract is not finished', async () => {
+      const { sla } = fixture;
+      let isContractFinished = await sla.contractFinished();
+      expect(isContractFinished).to.be.false;
+    });
 
-    const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
-      dslaToken.address,
-      await ethers.getSigner(notDeployer)
-    );
+    it('checks that the stakers length is 0 if there are no stakers', async () => {
+      const { sla } = fixture;
+      let stakersLength = await sla.getStakersLength();
+      expect(stakersLength).to.be.equal(0);
+    });
 
-    await notDeployerDSLA.approve(sla.address, amount);
-    await notDeployerSLA.stakeTokens(amount, dslaToken.address, POSITION.OK);
+    it('checks that the stakers length is 1 if there are is 1 staker', async () => {
+      const { sla, dslaToken } = fixture;
+      await dslaToken.approve(sla.address, mintAmount);
+      let stakeAmount = 100000;
+      await sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK);
 
-    // provider long stake
-    const deployerSLA = SLA__factory.connect(
-      sla.address,
-      await ethers.getSigner(deployer)
-    );
-    const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
-      dslaToken.address,
-      await ethers.getSigner(deployer)
-    );
+      let stakersLength = await sla.getStakersLength();
+      expect(stakersLength).to.be.equal(1);
+    });
 
-    await deployerDSLA.approve(sla.address, amount);
-    await expect(
-      deployerSLA.stakeTokens(amount, dslaToken.address, POSITION.KO)
-    ).to.be.reverted;
-  });
+    it('checks that the stakers length is 2 if there are are 2 stakers for short and long positions', async () => {
+      const { sla, dslaToken } = fixture;
+      let amount = 10000;
+      await dslaToken.approve(sla.address, amount);
+
+      // user long stake
+      const notDeployerSLA = SLA__factory.connect(
+        sla.address,
+        await ethers.getSigner(notDeployer)
+      );
+
+      const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+        dslaToken.address,
+        await ethers.getSigner(notDeployer)
+      );
+
+      await notDeployerDSLA.approve(sla.address, amount * leverage);
+      await notDeployerSLA.stakeTokens(
+        amount * leverage,
+        dslaToken.address,
+        POSITION.OK
+      );
+
+      // provider long stake
+      const deployerSLA = SLA__factory.connect(
+        sla.address,
+        await ethers.getSigner(deployer)
+      );
+      const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
+        dslaToken.address,
+        await ethers.getSigner(deployer)
+      );
+
+      await deployerDSLA.approve(sla.address, amount);
+      await deployerSLA.stakeTokens(amount, dslaToken.address, POSITION.KO);
+
+      // check stakers length
+      let stakersLength = await sla.getStakersLength();
+      expect(stakersLength).to.be.equal(2);
+    });
+
+    it('should revert because the short position is larger than the long position', async () => {
+      const { sla, dslaToken } = fixture;
+      let amount = 10000;
+      await dslaToken.approve(sla.address, amount);
+
+      // user long stake
+      const notDeployerSLA = SLA__factory.connect(
+        sla.address,
+        await ethers.getSigner(notDeployer)
+      );
+
+      const notDeployerDSLA = ERC20PresetMinterPauser__factory.connect(
+        dslaToken.address,
+        await ethers.getSigner(notDeployer)
+      );
+
+      await notDeployerDSLA.approve(sla.address, amount);
+      await notDeployerSLA.stakeTokens(amount, dslaToken.address, POSITION.OK);
+
+      // provider long stake
+      const deployerSLA = SLA__factory.connect(
+        sla.address,
+        await ethers.getSigner(deployer)
+      );
+      const deployerDSLA = ERC20PresetMinterPauser__factory.connect(
+        dslaToken.address,
+        await ethers.getSigner(deployer)
+      );
+
+      await deployerDSLA.approve(sla.address, amount);
+      await expect(
+        deployerSLA.stakeTokens(amount, dslaToken.address, POSITION.KO)
+      ).to.be.reverted;
+    });
+  })
 });

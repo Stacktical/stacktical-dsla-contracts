@@ -375,8 +375,6 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 				finalPeriodId: 1
 			})
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const lockedValue = await stakeRegistry.slaLockedValue(slaAddress)
-			console.log(lockedValue, lockedValue.lockedValue)
 
 			// request sli and fulfill sli
 			const sla = await SLA__factory.connect(slaAddress, owner);
