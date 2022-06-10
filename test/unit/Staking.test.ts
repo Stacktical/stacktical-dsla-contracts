@@ -377,100 +377,100 @@ describe(CONTRACT_NAMES.Staking, function () {
 
     });
 
-    // it('should perform staking for contract owner even if whitelist is activated', async () => {
-    //   // Contract Owner is added by default in whitelist, it's not needed to add it after contract creation
-    //   const { sla_wl, dslaToken, details } = fixture;
+    it('should perform staking for contract owner even if whitelist is activated', async () => {
+      // Contract Owner is added by default in whitelist, it's not needed to add it after contract creation
+      const { sla_wl, dslaToken, details } = fixture;
 
-    //   await sla_wl.addAllowedTokens(dslaToken.address);
-    //   await dslaToken.approve(sla_wl.address, mintAmount);
-    //   let stakeAmount = 100000;
+      await sla_wl.addAllowedTokens(dslaToken.address);
+      await dslaToken.approve(sla_wl.address, mintAmount);
+      let stakeAmount = 100000;
 
-    //   await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
-    //     .to.emit(sla_wl, 'Stake')
-    //     .withArgs(
-    //       dslaToken.address,
-    //       await sla_wl.nextVerifiablePeriod(),
-    //       owner.address,
-    //       stakeAmount,
-    //       POSITION.OK
-    //     );
-    //   let detailsarrs = (
-    //     await details.getSLADetailsArrays(sla_wl.address)
-    //   )
+      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
+        .to.emit(sla_wl, 'Stake')
+        .withArgs(
+          dslaToken.address,
+          await sla_wl.nextVerifiablePeriod(),
+          owner.address,
+          stakeAmount,
+          POSITION.OK
+        );
+      let detailsarrs = (
+        await details.getSLADetailsArrays(sla_wl.address)
+      )
 
-    //   let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
-    //   expect(totalStake).equals(stakeAmount.toString());
-    // });
+      let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+      expect(totalStake).equals(stakeAmount.toString());
+    });
 
 
-    // it('should prevent staking for not whitelisted user if whitelist is activated', async () => {
-    //   const { sla_wl, dslaToken } = fixture;
-    //   let stakeAmount = 100000;
-    //   await dslaToken.approve(sla_wl.address, stakeAmount);
+    it('should prevent staking for not whitelisted user if whitelist is activated', async () => {
+      const { sla_wl, dslaToken } = fixture;
+      let stakeAmount = 100000;
+      await dslaToken.approve(sla_wl.address, stakeAmount);
 
-    //   // user long stake
-    //   await dslaToken.connect(user).approve(sla_wl.address, stakeAmount);
-    //   await sla_wl.addAllowedTokens(dslaToken.address);
-    //   await expect(sla_wl.connect(user).stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
-    //     .to.be.revertedWith('not whitelisted');
-    // });
+      // user long stake
+      await dslaToken.connect(user).approve(sla_wl.address, stakeAmount);
+      await sla_wl.addAllowedTokens(dslaToken.address);
+      await expect(sla_wl.connect(user).stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
+        .to.be.revertedWith('not whitelisted');
+    });
 
-    // it('should perform staking for whitelisted user if whitelist is activated', async () => {
-    //   const { sla_wl, dslaToken, details } = fixture;
-    //   let stakeAmount = 100000;
-    //   await dslaToken.approve(sla_wl.address, stakeAmount);
+    it('should perform staking for whitelisted user if whitelist is activated', async () => {
+      const { sla_wl, dslaToken, details } = fixture;
+      let stakeAmount = 100000;
+      await dslaToken.approve(sla_wl.address, stakeAmount);
 
-    //   // user long stake
-    //   await dslaToken.connect(user).approve(sla_wl.address, stakeAmount);
-    //   await sla_wl.addAllowedTokens(dslaToken.address);
-    //   await sla_wl.addUsersToWhitelist([user.address])
+      // user long stake
+      await dslaToken.connect(user).approve(sla_wl.address, stakeAmount);
+      await sla_wl.addAllowedTokens(dslaToken.address);
+      await sla_wl.addUsersToWhitelist([user.address])
 
-    //   await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
-    //     .to.emit(sla_wl, 'Stake')
-    //     .withArgs(
-    //       dslaToken.address,
-    //       await sla_wl.nextVerifiablePeriod(),
-    //       owner.address,
-    //       stakeAmount,
-    //       POSITION.OK
-    //     );
-    //   let detailsarrs = (
-    //     await details.getSLADetailsArrays(sla_wl.address)
-    //   )
+      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
+        .to.emit(sla_wl, 'Stake')
+        .withArgs(
+          dslaToken.address,
+          await sla_wl.nextVerifiablePeriod(),
+          owner.address,
+          stakeAmount,
+          POSITION.OK
+        );
+      let detailsarrs = (
+        await details.getSLADetailsArrays(sla_wl.address)
+      )
 
-    //   let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
-    //   expect(totalStake).equals(stakeAmount.toString());
-    // });
+      let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+      expect(totalStake).equals(stakeAmount.toString());
+    });
 
-    // it('should perform staking for whitelisted user then deny staking after removal from whitelist if it is activated', async () => {
-    //   const { sla_wl, dslaToken, details } = fixture;
-    //   let stakeAmount = 100000;
-    //   await dslaToken.approve(sla_wl.address, stakeAmount);
+    it('should perform staking for whitelisted user then deny staking after removal from whitelist if it is activated', async () => {
+      const { sla_wl, dslaToken, details } = fixture;
+      let stakeAmount = 100000;
+      await dslaToken.approve(sla_wl.address, stakeAmount);
 
-    //   // user long stake
-    //   await dslaToken.connect(user).approve(sla_wl.address, stakeAmount);
-    //   await sla_wl.addAllowedTokens(dslaToken.address);
-    //   await sla_wl.addUsersToWhitelist([user.address])
+      // user long stake
+      await dslaToken.connect(user).approve(sla_wl.address, stakeAmount);
+      await sla_wl.addAllowedTokens(dslaToken.address);
+      await sla_wl.addUsersToWhitelist([user.address])
 
-    //   await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
-    //     .to.emit(sla_wl, 'Stake')
-    //     .withArgs(
-    //       dslaToken.address,
-    //       await sla_wl.nextVerifiablePeriod(),
-    //       owner.address,
-    //       stakeAmount,
-    //       POSITION.OK
-    //     );
-    //   let detailsarrs = (
-    //     await details.getSLADetailsArrays(sla_wl.address)
-    //   )
+      await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
+        .to.emit(sla_wl, 'Stake')
+        .withArgs(
+          dslaToken.address,
+          await sla_wl.nextVerifiablePeriod(),
+          owner.address,
+          stakeAmount,
+          POSITION.OK
+        );
+      let detailsarrs = (
+        await details.getSLADetailsArrays(sla_wl.address)
+      )
 
-    //   let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
-    //   expect(totalStake).equals(stakeAmount.toString());
+      let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
+      expect(totalStake).equals(stakeAmount.toString());
 
-    //   await sla_wl.removeUsersFromWhitelist([user.address])
-    //   await expect(sla_wl.connect(user).stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
-    //     .to.be.revertedWith('not whitelisted');
-    // });
+      await sla_wl.removeUsersFromWhitelist([user.address])
+      await expect(sla_wl.connect(user).stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
+        .to.be.revertedWith('not whitelisted');
+    });
   });
 });

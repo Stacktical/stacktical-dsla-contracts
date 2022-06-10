@@ -4,12 +4,12 @@ pragma solidity 0.8.9;
 import '@chainlink/contracts/src/v0.8/ChainlinkClient.sol';
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
+import '@openzeppelin/contracts/utils/Strings.sol';
 
 import '../interfaces/IMessenger.sol';
 import '../SLA.sol';
 import '../PeriodRegistry.sol';
 import '../StakeRegistry.sol';
-import '../libraries/StringUtils.sol';
 
 contract MockMessenger is IMessenger, ReentrancyGuard {
     using SafeERC20 for ERC20;
@@ -178,10 +178,7 @@ contract MockMessenger is IMessenger, ReentrancyGuard {
         override
         returns (string memory)
     {
-        return
-            string(
-                abi.encodePacked(lpSymbol, '-', StringUtils.uintToStr(slaId))
-            );
+        return string(abi.encodePacked(lpSymbol, '-', Strings.toString(slaId)));
     }
 
     function spSymbolSlaId(uint128 slaId)
@@ -190,9 +187,6 @@ contract MockMessenger is IMessenger, ReentrancyGuard {
         override
         returns (string memory)
     {
-        return
-            string(
-                abi.encodePacked(spSymbol, '-', StringUtils.uintToStr(slaId))
-            );
+        return string(abi.encodePacked(spSymbol, '-', Strings.toString(slaId)));
     }
 }
