@@ -16,6 +16,7 @@ import {
 } from '../../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { currentTimestamp, evm_increaseTime, ONE_DAY } from '../helper';
+import { MockContract } from 'ethereum-waffle';
 
 type Fixture = {
 	sloRegistry: SLORegistry;
@@ -209,6 +210,35 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 		})
 	})
 	describe('create sla', function () {
+		it('should revert if initial or final period id is invalid', async () => {
+			const { slaRegistry, stakeRegistry } = fixture;
+			const dslaToken: ERC20PresetMinterPauser = await ethers.getContract(
+				CONTRACT_NAMES.DSLA
+			);
+			const { deployer, notDeployer } = await getNamedAccounts();
+
+			// deploy mock messenger
+			const mockMessenger = await deployMessenger(deployer)
+			await slaRegistry.registerMessenger(mockMessenger.address, 'dummy link');
+
+			// Approve dsla tokens to lock on stake registry
+			await dslaToken.mint(deployer, mintAmount);
+			await dslaToken.mint(notDeployer, mintAmount);
+			await dslaToken.approve(stakeRegistry.address, ethers.constants.MaxUint256);
+
+			await expect(slaRegistry.createSLA(
+				baseSLAConfig.sloValue,
+				baseSLAConfig.sloType,
+				baseSLAConfig.whitelisted,
+				mockMessenger.address,
+				baseSLAConfig.periodType,
+				100, // initial period id
+				10, // final period id,
+				'dummy-ipfs-hash',
+				baseSLAConfig.extraData,
+				baseSLAConfig.leverage
+			)).to.be.revertedWith('invalid final/initial');
+		})
 		it("should be able to create sla by anyone", async () => {
 			const { slaRegistry, stakeRegistry, periodRegistry } = fixture;
 			const dslaToken: ERC20PresetMinterPauser = await ethers.getContract(
@@ -287,18 +317,6 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 			await expect(slaRegistry.requestSLI(
 				1,
-				slaAddress,
-				false
-			)).to.be.revertedWith('not nextVerifiablePeriod');
-		})
-		it("should revert if period id is not allowed period", async () => {
-			const { slaRegistry } = fixture;
-			await deploySLA({ ...baseSLAConfig });
-			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
-			const finalPeriodId = await sla.finalPeriodId();
-			await expect(slaRegistry.requestSLI(
-				finalPeriodId,
 				slaAddress,
 				false
 			)).to.be.revertedWith('not nextVerifiablePeriod');

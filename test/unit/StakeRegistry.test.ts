@@ -291,7 +291,6 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 				slaAddress,
 				false
 			)).to.emit(stakeRegistry, "VerificationRewardDistributed");
-			// TODO: check balance
 		})
 		it('should allow distribution only for SLARegistry', async () => {
 			const { slaRegistry, stakeRegistry } = fixture;
@@ -365,13 +364,6 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 			await expect(
 				stakeRegistry.connect(owner).returnLockedValue(Ethers.constants.AddressZero)
 			).to.be.revertedWith('Can only be called by SLARegistry')
-		})
-		it("should return locked value when returning from slaRegistry", async () => {
-			// TODO: can't cover this function since we use mock contract for messenger
-			const { slaRegistry, stakeRegistry } = fixture;
-			await deploySLA(baseSLAConfig);
-			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const sla: SLA = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress);
 		})
 	})
 	describe('Utils', function () {

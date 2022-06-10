@@ -129,6 +129,63 @@ describe(CONTRACT_NAMES.SLA, function () {
       await expect(sla.connect(owner).registerSLI(0, 0))
         .to.be.revertedWith('not messenger');
     })
+    it('should revert sli registration if period is not the next verifiable period', async () => {
+      const { sla, mockMessenger, slaRegistry, periodRegistry } = fixture;
+      const periodStart = moment()
+        .utc(0)
+        .startOf('month')
+        .add(10, 'month')
+        .startOf('month')
+        .unix();
+      await periodRegistry.initializePeriod(
+        PERIOD_TYPE.DAILY,
+        [periodStart],
+        [periodStart + 1000]
+      );
+      await evm_increaseTime(periodStart + 1000)
+
+      // make contract finished
+      await slaRegistry.requestSLI(0, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(0, 100))
+        .to.be.emit(sla, 'SLICreated')
+        .to.be.emit(sla, 'UserCompensationGenerated');
+
+      await slaRegistry.requestSLI(1, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(0, 100)).to.be.revertedWith('invalid period id')
+      await expect(mockMessenger.mockFulfillSLI(1, 100000))
+        .to.be.emit(sla, 'SLICreated')
+        .to.be.emit(sla, 'ProviderRewardGenerated');
+
+      await expect(slaRegistry.requestSLI(2, sla.address, true))
+        .to.be.revertedWith('invalid period');
+
+    })
+    it('should allow requesting sli from sla registry', async () => {
+      const { sla, mockMessenger, slaRegistry, periodRegistry } = fixture;
+      const periodStart = moment()
+        .utc(0)
+        .startOf('month')
+        .add(10, 'month')
+        .startOf('month')
+        .unix();
+      await periodRegistry.initializePeriod(
+        PERIOD_TYPE.DAILY,
+        [periodStart],
+        [periodStart + 1000]
+      );
+      await evm_increaseTime(periodStart + 1000)
+
+      // make contract finished
+      await slaRegistry.requestSLI(0, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(0, 100))
+        .to.be.emit(sla, 'SLICreated')
+        .to.be.emit(sla, 'UserCompensationGenerated');
+
+      await slaRegistry.requestSLI(1, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(1, 100000))
+        .to.be.emit(sla, 'SLICreated')
+        .to.be.emit(sla, 'ProviderRewardGenerated');
+    })
   })
   describe('stake tokens', function () {
     it('should not allow staking 0 amount', async () => {
@@ -158,7 +215,7 @@ describe(CONTRACT_NAMES.SLA, function () {
         .to.be.emit(sla, 'SLICreated');
 
       await slaRegistry.requestSLI(1, sla.address, true);
-      await expect(mockMessenger.mockFulfillSLI(1, 100))
+      await expect(mockMessenger.mockFulfillSLI(1, 100000))
         .to.be.emit(sla, 'SLICreated');
 
       await evm_increaseTime(periodStart + 1000 + ONE_DAY);
@@ -178,9 +235,14 @@ describe(CONTRACT_NAMES.SLA, function () {
       let amount = 10000;
 
       // user long stake
-      await dslaToken.connect(user).approve(sla.address, amount * leverage);
+      await dslaToken.connect(user).approve(sla.address, ethers.constants.MaxUint256);
       await sla.connect(user).stakeTokens(
         amount * leverage,
+        dslaToken.address,
+        POSITION.OK
+      );
+      await sla.connect(user).stakeTokens(
+        amount,
         dslaToken.address,
         POSITION.OK
       );
@@ -205,7 +267,7 @@ describe(CONTRACT_NAMES.SLA, function () {
       let totalStake = (
         await details.getSLADetailsArrays(sla.address)
       ).tokensStake[0].totalStake.toString();
-      expect(totalStake).equals((amount * 11).toString());
+      expect(totalStake).equals((amount * 12).toString());
     });
 
     it('should distribute rewards to sla and protocol owner when claiming user tokens', async () => {

@@ -140,6 +140,7 @@ const setup = deployments.createFixture(async () => {
 
   return {
     slaRegistry,
+    stakeRegistry,
     sla,
     sla_wl,
     dslaToken,
@@ -150,6 +151,7 @@ const setup = deployments.createFixture(async () => {
 
 type Fixture = {
   slaRegistry: SLARegistry;
+  stakeRegistry: StakeRegistry
   sla: SLA;
   sla_wl: SLA;
   dslaToken: ERC20PresetMinterPauser;
@@ -350,6 +352,26 @@ describe(CONTRACT_NAMES.Staking, function () {
       const { sla } = fixture;
       await expect(sla.addAllowedTokens(ethers.constants.AddressZero))
         .to.be.revertedWith('This token is not allowed.');
+    })
+
+    it('should revert if it exceeds max token length in StakeRegistry', async () => {
+      const { sla, stakeRegistry } = fixture;
+      const { deploy } = deployments
+      const token0 = await deploy(CONTRACT_NAMES.DSLA, {
+        from: owner.address,
+        contract: 'ERC20PresetMinterPauser',
+        args: ['token0', 'token0'],
+      });
+      const token1 = await deploy(CONTRACT_NAMES.DSLA, {
+        from: owner.address,
+        contract: 'ERC20PresetMinterPauser',
+        args: ['token1', 'token1'],
+      });
+      await stakeRegistry.addAllowedTokens(token0.address);
+      await stakeRegistry.addAllowedTokens(token1.address);
+      await sla.addAllowedTokens(token0.address);
+      await expect(sla.addAllowedTokens(token1.address))
+        .to.be.revertedWith('max token length');
     })
   })
   describe("whitelist", function () {
