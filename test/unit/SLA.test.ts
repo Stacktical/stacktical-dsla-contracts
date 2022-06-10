@@ -7,6 +7,7 @@ import {
   Details,
   PeriodRegistry,
   MockMessenger,
+  ERC20,
 } from '../../typechain';
 import {
   CONTRACT_NAMES,
@@ -174,13 +175,21 @@ describe(CONTRACT_NAMES.SLA, function () {
   describe('withdraw', function () {
     it('should not let user withdraw tokens if the contract is not finished', async function () {
       const { sla, dslaToken, details } = fixture;
-      await dslaToken.approve(sla.address, mintAmount);
-      await sla.stakeTokens(mintAmount, dslaToken.address, POSITION.OK);
-      await dslaToken.connect(user).approve(sla.address, mintAmount);
+      let amount = 10000;
+
+      // user long stake
+      await dslaToken.connect(user).approve(sla.address, amount * leverage);
       await sla.connect(user).stakeTokens(
-        mintAmount,
+        amount * leverage,
         dslaToken.address,
         POSITION.OK
+      );
+
+      await dslaToken.approve(sla.address, amount);
+      await sla.stakeTokens(
+        amount,
+        dslaToken.address,
+        POSITION.KO
       );
       const duTokenAddress = await sla.duTokenRegistry(dslaToken.address);
       const duToken: ERC20PresetMinterPauser = await ethers.getContractAt(
@@ -188,16 +197,86 @@ describe(CONTRACT_NAMES.SLA, function () {
         duTokenAddress,
         user
       );
-      await duToken.approve(sla.address, mintAmount);
+      await duToken.approve(sla.address, amount);
 
       await expect(
-        sla.connect(user).withdrawUserTokens(mintAmount, dslaToken.address)
-      ).to.be.reverted;
+        sla.connect(user).withdrawUserTokens(amount, dslaToken.address)
+      ).to.be.revertedWith('User lock-up until the next verification.');
       let totalStake = (
         await details.getSLADetailsArrays(sla.address)
       ).tokensStake[0].totalStake.toString();
-      expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
+      expect(totalStake).equals((amount * 11).toString());
     });
+
+    it('should distribute rewards to sla and protocol owner when claiming user tokens', async () => {
+      const { sla, dslaToken, periodRegistry, slaRegistry, mockMessenger, stakeRegistry } = fixture;
+      let amount = 10000;
+
+      // user long stake
+      await dslaToken.connect(user).approve(sla.address, amount * leverage);
+      await sla.connect(user).stakeTokens(
+        amount * leverage,
+        dslaToken.address,
+        POSITION.OK
+      );
+
+      await dslaToken.connect(owner).approve(sla.address, amount);
+      await sla.connect(owner).stakeTokens(
+        amount,
+        dslaToken.address,
+        POSITION.KO
+      );
+
+      // make contract finished
+      const periodStart = moment()
+        .utc(0)
+        .startOf('month')
+        .add(10, 'month')
+        .startOf('month')
+        .unix();
+      await periodRegistry.initializePeriod(
+        PERIOD_TYPE.DAILY,
+        [periodStart],
+        [periodStart + 1000]
+      );
+      await evm_increaseTime(periodStart + 1000)
+
+      await slaRegistry.requestSLI(0, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(0, 100))
+        .to.be.emit(sla, 'SLICreated');
+
+      await slaRegistry.requestSLI(1, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(1, 100))
+        .to.be.emit(sla, 'SLICreated');
+
+      await evm_increaseTime(periodStart + 1000 + ONE_DAY);
+      expect(await sla.contractFinished()).to.be.true;
+
+      // approve duToken
+      const duTokenAddress = await sla.duTokenRegistry(dslaToken.address);
+      const duToken: ERC20 = await ethers.getContractAt(CONTRACT_NAMES.ERC20, duTokenAddress);
+      await duToken.approve(sla.address, ethers.constants.MaxUint256);
+
+      // withdraw user tokens
+      const beforeDslaBalance = await dslaToken.balanceOf(owner.address);
+      await stakeRegistry.connect(owner).transferOwnership(user1.address);
+      await sla.connect(owner).transferOwnership(user.address);
+      await expect(sla.connect(owner).withdrawUserTokens(amount, dslaToken.address))
+        .to.emit(sla, 'UserWithdraw');
+
+      // 0.3 % should be distributed to sla owner
+      expect(await dslaToken.balanceOf(user.address))
+        .to.be.equal(BigNumber.from(amount).mul(30).div(10000).add(toWei(mintAmount)).sub(amount * 10))
+      // 0.15% should be distributed to protocol (stakeRegistry)
+      expect(await dslaToken.balanceOf(user1.address))
+        .to.be.equal(BigNumber.from(amount).mul(15).div(10000))
+      // you should receive 99.55% tokens
+      const afterDslaBalance = await dslaToken.balanceOf(owner.address);
+      expect(afterDslaBalance.sub(beforeDslaBalance))
+        .to.be.equal(BigNumber.from(amount).mul(9955).div(10000))
+
+      await stakeRegistry.connect(user1).transferOwnership(owner.address);
+    })
 
     it('should not let the deployer withdraw provider tokens if the contract is not finished', async () => {
       const { sla, dslaToken, details } = fixture;
@@ -222,7 +301,7 @@ describe(CONTRACT_NAMES.SLA, function () {
       expect(totalStake).equals((parseInt(mintAmount) * 2).toString());
     });
 
-    it('should distribute rewards to sla owner and protocol owner when claiming tokens', async () => {
+    it('should distribute rewards to sla owner and protocol owner when claiming provider tokens', async () => {
       const { sla, dslaToken, mockMessenger, slaRegistry, periodRegistry, stakeRegistry } = fixture;
       let stakeAmount = 100000;
       await dslaToken.approve(sla.address, ethers.constants.MaxUint256);
@@ -258,7 +337,7 @@ describe(CONTRACT_NAMES.SLA, function () {
       await evm_increaseTime(periodStart + 1000 + ONE_DAY);
       expect(await sla.contractFinished()).to.be.true;
 
-      // maybe approve dp token
+      // approve dp token
       const beforeDslaBalance = await dslaToken.balanceOf(owner.address);
       const dpTokenAddr = await sla.dpTokenRegistry(dslaToken.address);
       const dpToken = await ethers.getContractAt(CONTRACT_NAMES.ERC20, dpTokenAddr);
