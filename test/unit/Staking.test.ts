@@ -445,7 +445,7 @@ describe(CONTRACT_NAMES.Staking, function () {
       // user long stake
       await dslaToken.connect(user).approve(sla_wl.address, stakeAmount);
       await sla_wl.addAllowedTokens(dslaToken.address);
-      await sla_wl.addUsersToWhitelist([user.address])
+      await sla_wl.addUsersToWhitelist([user.address, user.address])
 
       await expect(sla_wl.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
         .to.emit(sla_wl, 'Stake')
@@ -490,7 +490,7 @@ describe(CONTRACT_NAMES.Staking, function () {
       let totalStake = detailsarrs.tokensStake[0].totalStake.toString();
       expect(totalStake).equals(stakeAmount.toString());
 
-      await sla_wl.removeUsersFromWhitelist([user.address])
+      await sla_wl.removeUsersFromWhitelist([user.address, user.address])
       await expect(sla_wl.connect(user).stakeTokens(stakeAmount, dslaToken.address, POSITION.OK))
         .to.be.revertedWith('not whitelisted');
     });

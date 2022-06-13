@@ -96,10 +96,9 @@ contract SLORegistry {
             return _value <= sloValue;
         } else if (sloType == SLOType.GreaterThan) {
             return _value > sloValue;
-        } else if (sloType == SLOType.GreaterOrEqualTo) {
-            return _value >= sloValue;
         } else {
-            return false;
+            // sloType == SLOType.GreaterOrEqualTo
+            return _value >= sloValue;
         }
     }
 
@@ -142,10 +141,9 @@ contract SLORegistry {
             return deviation;
         } else if (sloType == SLOType.GreaterThan) {
             return deviation;
-        } else if (sloType == SLOType.GreaterOrEqualTo) {
-            return deviation;
         } else {
-            return 0;
+            // sloType == SLOType.GreaterOrEqualTo
+            return deviation;
         }
     }
 }
