@@ -223,19 +223,10 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
      * @dev only SLA owner can call this function for only registered SLAs
      * @param _sla address of SLA
      */
-    function returnLockedValue(SLA _sla) public {
+    function returnLockedValue(SLA _sla) external {
         require(isRegisteredSLA(address(_sla)), 'This SLA is not valid.');
         require(msg.sender == _sla.owner(), 'Only the SLA owner can do this.');
-        uint256 finalPeriodId = _sla.finalPeriodId();
-        (, uint256 endOfLastValidPeriod) = IPeriodRegistry(_periodRegistry)
-            .getPeriodStartAndEnd(_sla.periodType(), finalPeriodId);
-
-        (, , SLA.Status lastPeriodStatus) = _sla.periodSLIs(finalPeriodId);
-        require(
-            (block.timestamp >= endOfLastValidPeriod &&
-                lastPeriodStatus != SLA.Status.NotVerified),
-            'This SLA has not terminated.'
-        );
+        require(_sla.contractFinished(), 'This SLA has not terminated.');
         emit ReturnLockedValue(address(_sla), msg.sender);
         IStakeRegistry(_stakeRegistry).returnLockedValue(address(_sla));
     }

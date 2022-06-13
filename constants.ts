@@ -27,6 +27,7 @@ export enum CONTRACT_NAMES {
   ERC20 = 'ERC20',
   Details = 'Details',
   IMessenger = 'IMessenger',
+  MockMessenger = 'MockMessenger',
   LinkToken = 'LinkToken',
   MessengerRegistry = 'MessengerRegistry',
   Oracle = 'Oracle',

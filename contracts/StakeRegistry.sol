@@ -15,7 +15,7 @@ import './interfaces/IStakeRegistry.sol';
  * @dev StakeRegistry is a contract to register the staking activity of the platform, along
  with controlling certain admin privileged parameters
  */
-contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
+contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
 
     struct LockedValue {
@@ -138,6 +138,15 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         uint256 amount
     );
 
+    /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
+    modifier onlySLARegistry() {
+        require(
+            msg.sender == address(slaRegistry),
+            'Can only be called by SLARegistry'
+        );
+        _;
+    }
+
     /**
      * @notice Constructor
      * @param _dslaTokenAddress 1. DSLA Token
@@ -157,15 +166,6 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
         );
         _DSLATokenAddress = _dslaTokenAddress;
         allowedTokens.push(_dslaTokenAddress);
-    }
-
-    /// @dev Throws if called by any address other than the SLARegistry contract or Chainlink Oracle.
-    modifier onlySLARegistry() {
-        require(
-            msg.sender == address(slaRegistry),
-            'Can only be called by SLARegistry'
-        );
-        _;
     }
 
     /**
@@ -468,5 +468,14 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard {
      */
     function DSLATokenAddress() external view override returns (address) {
         return _DSLATokenAddress;
+    }
+
+    function owner()
+        public
+        view
+        override(IStakeRegistry, Ownable)
+        returns (address)
+    {
+        return super.owner();
     }
 }

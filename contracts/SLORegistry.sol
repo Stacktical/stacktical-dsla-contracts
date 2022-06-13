@@ -88,29 +88,19 @@ contract SLORegistry {
 
         if (sloType == SLOType.EqualTo) {
             return _value == sloValue;
-        }
-
-        if (sloType == SLOType.NotEqualTo) {
+        } else if (sloType == SLOType.NotEqualTo) {
             return _value != sloValue;
-        }
-
-        if (sloType == SLOType.SmallerThan) {
+        } else if (sloType == SLOType.SmallerThan) {
             return _value < sloValue;
-        }
-
-        if (sloType == SLOType.SmallerOrEqualTo) {
+        } else if (sloType == SLOType.SmallerOrEqualTo) {
             return _value <= sloValue;
-        }
-
-        if (sloType == SLOType.GreaterThan) {
+        } else if (sloType == SLOType.GreaterThan) {
             return _value > sloValue;
-        }
-
-        if (sloType == SLOType.GreaterOrEqualTo) {
+        } else if (sloType == SLOType.GreaterOrEqualTo) {
             return _value >= sloValue;
+        } else {
+            return false;
         }
-
-        revert("isRespected wasn't executed properly");
     }
 
     /**
@@ -140,33 +130,22 @@ contract SLORegistry {
         if (deviation > deviationCapRate) {
             deviation = deviationCapRate;
         }
-
         if (sloType == SLOType.EqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
             return deviationCapRate;
-        }
-
-        if (sloType == SLOType.NotEqualTo) {
+        } else if (sloType == SLOType.NotEqualTo) {
             // Fixed deviation for this comparison, the reward percentage is the cap
             return deviationCapRate;
-        }
-
-        if (sloType == SLOType.SmallerThan) {
+        } else if (sloType == SLOType.SmallerThan) {
             return deviation;
-        }
-
-        if (sloType == SLOType.SmallerOrEqualTo) {
+        } else if (sloType == SLOType.SmallerOrEqualTo) {
             return deviation;
-        }
-
-        if (sloType == SLOType.GreaterThan) {
+        } else if (sloType == SLOType.GreaterThan) {
             return deviation;
-        }
-
-        if (sloType == SLOType.GreaterOrEqualTo) {
+        } else if (sloType == SLOType.GreaterOrEqualTo) {
             return deviation;
+        } else {
+            return 0;
         }
-
-        revert("getDeviation wasn't executed properly");
     }
 }
