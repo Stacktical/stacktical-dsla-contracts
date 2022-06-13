@@ -348,6 +348,19 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 				false
 			)).to.be.revertedWith('not nextVerifiablePeriod');
 		})
+		it("should revert if current period is not finished yet", async () => {
+			const { slaRegistry } = fixture;
+			await deploySLA(baseSLAConfig);
+			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+			const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner);
+
+			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			await expect(slaRegistry.requestSLI(
+				Number(nextVerifiablePeriod),
+				slaAddress,
+				false
+			)).to.be.revertedWith('period unfinished');
+		})
 		it("should be able to request sli", async () => {
 			const { slaRegistry } = fixture;
 			await deploySLA(baseSLAConfig);
@@ -362,6 +375,27 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 				false
 			)).to.emit(slaRegistry, "SLIRequested");
 		})
+		// it("should revert duplicated SLI request for same period id", async () => {
+		// 	const { slaRegistry } = fixture;
+		// 	const mockMessenger = await deploySLA(baseSLAConfig);
+		// 	const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
+		// 	const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner);
+
+		// 	await evm_increaseTime(periodStart + 1000)
+		// 	const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+		// 	await expect(slaRegistry.requestSLI(
+		// 		Number(nextVerifiablePeriod),
+		// 		slaAddress,
+		// 		false
+		// 	)).to.emit(slaRegistry, "SLIRequested");
+		// 	await expect(mockMessenger.mockFulfillSLI(nextVerifiablePeriod, 100))
+		// 		.to.be.emit(sla, 'SLICreated');
+		// 	await expect(slaRegistry.requestSLI(
+		// 		Number(nextVerifiablePeriod),
+		// 		slaAddress,
+		// 		false
+		// 	)).to.be.revertedWith('This SLA has already been verified.')
+		// })
 	})
 	describe('message registration', function () {
 		it("should able to register new messenger", async () => {
