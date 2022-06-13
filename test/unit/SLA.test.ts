@@ -21,7 +21,7 @@ import { expect } from '../chai-setup';
 import { toWei } from 'web3-utils';
 import { BigNumber } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { currentTimestamp, evm_increaseTime, ONE_DAY } from '../helper';
+import { evm_increaseTime, ONE_DAY } from '../helper';
 const moment = require('moment');
 
 enum POSITION {
@@ -137,7 +137,7 @@ describe(CONTRACT_NAMES.SLA, function () {
         .add(10, 'month')
         .startOf('month')
         .unix();
-      await periodRegistry.initializePeriod(
+      await periodRegistry.addPeriodsToPeriodType(
         PERIOD_TYPE.DAILY,
         [periodStart],
         [periodStart + 1000]
@@ -168,7 +168,7 @@ describe(CONTRACT_NAMES.SLA, function () {
         .add(10, 'month')
         .startOf('month')
         .unix();
-      await periodRegistry.initializePeriod(
+      await periodRegistry.addPeriodsToPeriodType(
         PERIOD_TYPE.DAILY,
         [periodStart],
         [periodStart + 1000]
@@ -202,7 +202,7 @@ describe(CONTRACT_NAMES.SLA, function () {
         .add(10, 'month')
         .startOf('month')
         .unix();
-      await periodRegistry.initializePeriod(
+      await periodRegistry.addPeriodsToPeriodType(
         PERIOD_TYPE.DAILY,
         [periodStart],
         [periodStart + 1000]
@@ -296,7 +296,7 @@ describe(CONTRACT_NAMES.SLA, function () {
         .add(10, 'month')
         .startOf('month')
         .unix();
-      await periodRegistry.initializePeriod(
+      await periodRegistry.addPeriodsToPeriodType(
         PERIOD_TYPE.DAILY,
         [periodStart],
         [periodStart + 1000]
@@ -381,7 +381,7 @@ describe(CONTRACT_NAMES.SLA, function () {
         .add(10, 'month')
         .startOf('month')
         .unix();
-      await periodRegistry.initializePeriod(
+      await periodRegistry.addPeriodsToPeriodType(
         PERIOD_TYPE.DAILY,
         [periodStart],
         [periodStart + 1000]

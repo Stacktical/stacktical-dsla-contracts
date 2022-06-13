@@ -2,7 +2,6 @@ import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import { expect } from '../chai-setup';
 import { BigNumber, BytesLike, ethers as Ethers } from 'ethers';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS, SENetworkNamesBytes32, SENetworks, PERIOD_TYPE, SLO_TYPE } from '../../constants';
-import { deployMockContract } from 'ethereum-waffle';
 import { toWei } from 'web3-utils';
 import {
 	DToken,
@@ -16,6 +15,8 @@ import {
 	StakeRegistry
 } from '../../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { evm_increaseTime } from '../helper';
+const moment = require('moment');
 
 type Fixture = {
 	sloRegistry: SLORegistry;
@@ -43,11 +44,17 @@ const baseSLAConfig = {
 	whitelisted: false,
 	periodType: PERIOD_TYPE.WEEKLY,
 	initialPeriodId: 0,
-	finalPeriodId: 10,
+	finalPeriodId: 1,
 	extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
 	leverage: 10,
 };
 const mintAmount = '1000000';
+const periodStart = moment()
+	.utc(0)
+	.startOf('month')
+	.add(10, 'month')
+	.startOf('month')
+	.unix();
 
 const setup = deployments.createFixture(async () => {
 	const { deployer, notDeployer } = await getNamedAccounts();
@@ -281,11 +288,11 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 	describe('Rewards Distribution', function () {
 		it("should distribute verification rewards when requesting sli on slaRegistry", async () => {
 			const { slaRegistry, stakeRegistry } = fixture;
-			const signer = await ethers.getSigner(owner.address);
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const sla = await SLA__factory.connect(slaAddress, signer);
+			const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner)
 			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			await evm_increaseTime(periodStart + 1000)
 			await expect(slaRegistry.requestSLI(
 				Number(nextVerifiablePeriod),
 				slaAddress,
@@ -296,7 +303,7 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 			const { slaRegistry, stakeRegistry } = fixture;
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const sla = await SLA__factory.connect(slaAddress, owner);
+			const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner)
 			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
 			await expect(stakeRegistry.connect(owner).distributeVerificationRewards(
 				slaAddress,
@@ -306,11 +313,11 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		})
 		it("should revert when verfication rewards are already distrubuted", async () => {
 			const { slaRegistry, stakeRegistry } = fixture;
-			const signer = await ethers.getSigner(owner.address);
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const sla = await SLA__factory.connect(slaAddress, signer);
+			const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner)
 			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			await evm_increaseTime(periodStart + 1000)
 			await expect(slaRegistry.requestSLI(
 				Number(nextVerifiablePeriod),
 				slaAddress,
@@ -324,12 +331,12 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		})
 		it("should recieve verfication rewards", async () => {
 			const { slaRegistry, dslaToken } = fixture;
-			const signer = await ethers.getSigner(owner.address);
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const sla = await SLA__factory.connect(slaAddress, signer);
+			const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner)
 			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
 			const dslaBalance = await dslaToken.balanceOf(owner.address);
+			await evm_increaseTime(periodStart + 1000)
 			await slaRegistry.requestSLI(
 				Number(nextVerifiablePeriod),
 				slaAddress,
@@ -341,11 +348,11 @@ describe(CONTRACT_NAMES.StakeRegistry, function () {
 		})
 		it("should verify period when distributing rewards", async () => {
 			const { slaRegistry, stakeRegistry } = fixture;
-			const signer = await ethers.getSigner(owner.address);
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const sla = await SLA__factory.connect(slaAddress, signer);
+			const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner)
 			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
+			await evm_increaseTime(periodStart + 1000)
 			await slaRegistry.requestSLI(
 				Number(nextVerifiablePeriod),
 				slaAddress,

@@ -17,7 +17,7 @@ import {
   SLO_TYPE,
 } from '../../constants';
 import { expect } from '../chai-setup';
-import { fromWei, toWei } from 'web3-utils';
+import { toWei } from 'web3-utils';
 
 const baseSLAConfig = {
   sloValue: 50 * 10 ** 3,
@@ -25,7 +25,7 @@ const baseSLAConfig = {
   whitelisted: false,
   periodType: PERIOD_TYPE.WEEKLY,
   initialPeriodId: 0,
-  finalPeriodId: 10,
+  finalPeriodId: 1,
   extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
   leverage: 1,
 };
@@ -54,6 +54,7 @@ const setup = deployments.createFixture(async () => {
   await dslaToken.mint(deployer, toWei(mintAmount));
   await dslaToken.mint(notDeployer, toWei(mintAmount));
   await dslaToken.approve(stakeRegistry.address, toWei(mintAmount));
+
   // deploy mock messenger
   await deployments.deploy(CONTRACT_NAMES.MockMessenger, {
     from: deployer,

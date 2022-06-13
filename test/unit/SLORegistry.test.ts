@@ -36,7 +36,7 @@ const baseSLAConfig = {
 	whitelisted: false,
 	periodType: PERIOD_TYPE.WEEKLY,
 	initialPeriodId: 0,
-	finalPeriodId: 10,
+	finalPeriodId: 1,
 	extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
 	leverage: 10,
 };

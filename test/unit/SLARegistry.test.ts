@@ -1,22 +1,19 @@
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import { expect } from '../chai-setup';
-import { BigNumber, BytesLike, utils } from 'ethers';
+import { BytesLike, utils } from 'ethers';
 import { CONTRACT_NAMES, DEPLOYMENT_TAGS, SENetworkNamesBytes32, SENetworks, PERIOD_TYPE, SLO_TYPE } from '../../constants';
-import { toWei } from 'web3-utils';
 import {
 	ERC20PresetMinterPauser,
 	MessengerRegistry,
 	MockMessenger,
 	PeriodRegistry,
-	SLA,
 	SLARegistry,
-	SLA__factory,
 	SLORegistry,
 	StakeRegistry
 } from '../../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { currentTimestamp, evm_increaseTime, ONE_DAY } from '../helper';
-import { MockContract } from 'ethereum-waffle';
+const moment = require('moment');
 
 type Fixture = {
 	sloRegistry: SLORegistry;
@@ -42,11 +39,17 @@ const baseSLAConfig: SLAConfig = {
 	whitelisted: false,
 	periodType: PERIOD_TYPE.WEEKLY,
 	initialPeriodId: 0,
-	finalPeriodId: 10,
+	finalPeriodId: 1,
 	extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
 	leverage: 10,
 };
 const mintAmount = utils.parseEther('1000000');
+const periodStart = moment()
+	.utc(0)
+	.startOf('month')
+	.add(10, 'month')
+	.startOf('month')
+	.unix();
 
 const setup = deployments.createFixture(async () => {
 	await deployments.fixture(DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE);
@@ -237,6 +240,30 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 				'dummy-ipfs-hash',
 				baseSLAConfig.extraData,
 				baseSLAConfig.leverage
+			)).to.be.revertedWith('first id invalid');
+			await expect(slaRegistry.createSLA(
+				baseSLAConfig.sloValue,
+				baseSLAConfig.sloType,
+				baseSLAConfig.whitelisted,
+				mockMessenger.address,
+				baseSLAConfig.periodType,
+				0, // initial period id
+				100, // final period id,
+				'dummy-ipfs-hash',
+				baseSLAConfig.extraData,
+				baseSLAConfig.leverage
+			)).to.be.revertedWith('final id invalid');
+			await expect(slaRegistry.createSLA(
+				baseSLAConfig.sloValue,
+				baseSLAConfig.sloType,
+				baseSLAConfig.whitelisted,
+				mockMessenger.address,
+				baseSLAConfig.periodType,
+				1, // initial period id
+				0, // final period id,
+				'dummy-ipfs-hash',
+				baseSLAConfig.extraData,
+				baseSLAConfig.leverage
 			)).to.be.revertedWith('invalid final/initial');
 		})
 		it("should be able to create sla by anyone", async () => {
@@ -325,7 +352,9 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 			const { slaRegistry } = fixture;
 			await deploySLA(baseSLAConfig);
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-			const sla = await SLA__factory.connect(slaAddress, owner);
+			const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner);
+
+			await evm_increaseTime(periodStart + 1000)
 			const nextVerifiablePeriod = await sla.nextVerifiablePeriod();
 			await expect(slaRegistry.requestSLI(
 				Number(nextVerifiablePeriod),
@@ -372,9 +401,9 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 				...baseSLAConfig, finalPeriodId: 0
 			});
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
-
-			const sla = await SLA__factory.connect(slaAddress, owner);
+			const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner);
 			const lastPeriodId = await sla.finalPeriodId();
+			await evm_increaseTime(periodStart + 1000)
 			await slaRegistry.requestSLI(lastPeriodId, slaAddress, true);
 			await expect(mockMessenger.mockFulfillSLI(lastPeriodId, 100))
 				.to.be.emit(sla, 'SLICreated');
@@ -385,7 +414,7 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 				.to.be.revertedWith('locked value is empty')
 		})
 		it("should return locked value after sla contract has finished", async () => {
-			const { slaRegistry, stakeRegistry, dslaToken } = fixture;
+			const { slaRegistry } = fixture;
 
 			// deploy messenger and create sla
 			const mockMessenger = await deploySLA({
@@ -395,7 +424,8 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
 			const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
 
 			// request sli and fulfill sli
-			const sla = await SLA__factory.connect(slaAddress, owner);
+			await evm_increaseTime(periodStart + 1000)
+			const sla = await ethers.getContractAt(CONTRACT_NAMES.SLA, slaAddress, owner);
 			await slaRegistry.requestSLI(0, slaAddress, true);
 			await expect(mockMessenger.mockFulfillSLI(0, 100))
 				.to.be.emit(sla, 'SLICreated');
