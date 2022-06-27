@@ -2,13 +2,13 @@
 pragma solidity 0.8.9;
 
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessenger.sol';
-import './interfaces/IERC20Query.sol';
 import './dToken.sol';
 
 /**
@@ -229,7 +229,7 @@ contract Staking is Ownable, ReentrancyGuard {
         string memory dpTokenSymbol = IMessenger(messengerAddress)
             .lpSymbolSlaId(slaID);
 
-        uint8 decimals = IERC20Query(_tokenAddress).decimals();
+        uint8 decimals = IERC20Metadata(_tokenAddress).decimals();
 
         dToken duToken = dToken(
             _stakeRegistry.createDToken(duTokenName, duTokenSymbol, decimals)

@@ -1,13 +1,13 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity 0.8.9;
 
 interface IMetaverseFactory {
     /// @dev this nft type presents token id
     enum SkillType {
         Champion,
-        UserScroll,
-        Shield,
+        Pen,
         Sword,
+        Shield,
         HoveringPool,
         LookingGlass
     }

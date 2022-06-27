@@ -262,7 +262,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
             userStakedSlas[_owner][msg.sender] = true;
             metaverseFactory.mintSkillNFT(
                 _owner,
-                IMetaverseFactory.SkillType.UserScroll
+                IMetaverseFactory.SkillType.Pen
             );
         }
         return true;
@@ -316,6 +316,11 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
         _lockedValue.dslaMessengerReward = _dslaMessengerReward;
         _lockedValue.dslaUserReward = _dslaUserReward;
         _lockedValue.dslaBurnedByVerification = _dslaBurnedByVerification;
+
+        metaverseFactory.mintSkillNFT(
+            _slaOwner,
+            IMetaverseFactory.SkillType.Sword
+        );
         emit ValueLocked(_sla, _slaOwner, lockedValue);
     }
 
