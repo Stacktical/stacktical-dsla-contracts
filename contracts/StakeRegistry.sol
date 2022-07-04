@@ -319,7 +319,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
 
         metaverseFactory.mintSkillNFT(
             _slaOwner,
-            IMetaverseFactory.SkillType.Sword
+            IMetaverseFactory.SkillType.Knife
         );
         emit ValueLocked(_sla, _slaOwner, lockedValue);
     }
