@@ -9,7 +9,7 @@ import './dToken.sol';
 import './interfaces/IMessenger.sol';
 import './interfaces/ISLARegistry.sol';
 import './interfaces/IStakeRegistry.sol';
-import './interfaces/IMetaverseFactory.sol';
+import './interfaces/IMetaverseActivityRegistry.sol';
 
 /**
  * @title StakeRegistry
@@ -32,7 +32,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
 
     address private _DSLATokenAddress;
     ISLARegistry public slaRegistry;
-    IMetaverseFactory public metaverseFactory;
+    IMetaverseActivityRegistry public metaverseRegistry;
 
     //______ onlyOwner modifiable parameters ______
 
@@ -185,16 +185,16 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
     }
 
     /**
-     * @dev sets the MetaverseFactory contract address and can only be called once
+     * @dev sets the MetaverseActivityRegistry contract address and can be called only once
      */
-    function setMetaverseFactory(address factory) external override {
+    function setMetaverseActivityRegistry(address registry) external {
         // Only able to trigger this function once
         require(
-            address(metaverseFactory) == address(0),
+            address(metaverseRegistry) == address(0),
             'MetaverseFactory address has already been set'
         );
 
-        metaverseFactory = IMetaverseFactory(factory);
+        metaverseRegistry = IMetaverseActivityRegistry(registry);
     }
 
     /**
@@ -260,9 +260,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
         );
         if (!slaWasStakedByUser(_owner, msg.sender)) {
             userStakedSlas[_owner][msg.sender] = true;
-            metaverseFactory.mintSkillNFT(
+            metaverseRegistry.registerActivity(
                 _owner,
-                IMetaverseFactory.SkillType.Pen
+                IMetaverseActivityRegistry.SkillType.Pen
             );
         }
         return true;
@@ -317,9 +317,9 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
         _lockedValue.dslaUserReward = _dslaUserReward;
         _lockedValue.dslaBurnedByVerification = _dslaBurnedByVerification;
 
-        metaverseFactory.mintSkillNFT(
+        metaverseRegistry.registerActivity(
             _slaOwner,
-            IMetaverseFactory.SkillType.Knife
+            IMetaverseActivityRegistry.SkillType.Knife
         );
         emit ValueLocked(_sla, _slaOwner, lockedValue);
     }

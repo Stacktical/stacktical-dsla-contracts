@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.9;
 
-interface IMetaverseFactory {
+interface IMetaverseActivityRegistry {
     /**
      * @dev this nft type presents token id
      * @param Pen       User Premium Deposited NFT (Maybe minted if User has deposited a premium to a SLA)
@@ -23,5 +23,5 @@ interface IMetaverseFactory {
         Bunker
     }
 
-    function mintSkillNFT(address account, SkillType tokenId) external;
+    function registerActivity(address user, SkillType activityType) external;
 }
