@@ -15,9 +15,21 @@ abstract contract IMessenger is Ownable {
     }
 
     /**
+     * @dev event emitted when created a new chainlink request
+     * @param caller 1. Requester's address
+     * @param requestsCounter 2. total count of requests
+     * @param requestId 3. id of the Chainlink request
+     */
+    event SLIRequested(
+        address indexed caller,
+        uint256 requestsCounter,
+        bytes32 requestId
+    );
+
+    /**
      * @dev event emitted when having a response from Chainlink with the SLI
      * @param slaAddress 1. SLA address to store the SLI
-     * @param periodId 2. id of the Chainlink request
+     * @param periodId 2. period id
      * @param requestId 3. id of the Chainlink request
      * @param chainlinkResponse 4. response from Chainlink
      */
@@ -27,6 +39,14 @@ abstract contract IMessenger is Ownable {
         bytes32 indexed requestId,
         bytes32 chainlinkResponse
     );
+
+    /**
+     * @dev event emitted when updating Chainlink Job ID
+     * @param owner 1. Oracle Owner
+     * @param jobId 2. Updated job id
+     * @param fee 3. Chainlink request fee
+     */
+    event JobIdModified(address indexed owner, bytes32 jobId, uint256 fee);
 
     /**
      * @dev sets the SLARegistry contract address and can only be called once
@@ -40,7 +60,6 @@ abstract contract IMessenger is Ownable {
      * @param _slaAddress 2. address of the receiver SLA
      * @param _slaAddress 2. if approval by owner or msg.sender
      */
-
     function requestSLI(
         uint256 _periodId,
         address _slaAddress,
@@ -52,11 +71,9 @@ abstract contract IMessenger is Ownable {
      * @dev callback function for the Chainlink SLI request which stores
      * the SLI in the SLA contract
      * @param _requestId the ID of the ChainLink request
-     * @param _chainlinkResponseUint256 response object from Chainlink Oracles
+     * @param answer response object from Chainlink Oracles
      */
-    function fulfillSLI(bytes32 _requestId, uint256 _chainlinkResponseUint256)
-        external
-        virtual;
+    function fulfillSLI(bytes32 _requestId, uint256 answer) external virtual;
 
     /**
      * @dev gets the interfaces precision

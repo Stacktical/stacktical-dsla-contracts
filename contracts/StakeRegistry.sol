@@ -457,6 +457,7 @@ contract StakeRegistry is IStakeRegistry, ReentrancyGuard, Ownable {
     function periodIsVerified(address _sla, uint256 _periodId)
         external
         view
+        override
         returns (bool)
     {
         return slaLockedValue[_sla].verifiedPeriods[_periodId];

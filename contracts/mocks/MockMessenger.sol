@@ -60,14 +60,6 @@ contract MockMessenger is IMessenger, ReentrancyGuard {
         spSymbol = _spSymbol;
     }
 
-    event JobIdModified(address indexed owner, bytes32 jobId, uint256 fee);
-
-    event SLIRequested(
-        address indexed caller,
-        uint256 requestsCounter,
-        bytes32 requestId
-    );
-
     modifier onlySLARegistry() {
         if (!retry) {
             require(

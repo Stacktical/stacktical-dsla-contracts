@@ -31,6 +31,11 @@ interface IStakeRegistry {
 
     function isAllowedToken(address tokenAddress_) external view returns (bool);
 
+    function periodIsVerified(address _sla, uint256 _periodId)
+        external
+        view
+        returns (bool);
+
     function returnLockedValue(address sla_) external;
 
     function distributeVerificationRewards(
