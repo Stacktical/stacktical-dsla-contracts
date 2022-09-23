@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-pragma solidity 0.8.9;
+pragma solidity ^0.8.9;
 
 library StringUtils {
     function addressToString(address _address)
@@ -69,5 +69,53 @@ library StringUtils {
             value /= 10;
         }
         return string(buffer);
+    }
+
+    function stringFloatToUnit(bytes memory value)
+        internal
+        pure
+        returns (uint256 result)
+    {
+        uint256 i;
+        uint256 counterBeforeDot;
+        uint256 counterAfterDot;
+        result = 0;
+        uint256 totNum = value.length;
+        totNum--;
+        bool hasDot = false;
+
+        for (i = 0; i < value.length; i++) {
+            uint8 c = uint8(value[i]);
+
+            if (c >= 48 && c <= 57) {
+                result = result * 10 + (c - 48);
+                counterBeforeDot++;
+                totNum--;
+            }
+
+            if (c == 46) {
+                hasDot = true;
+                break;
+            }
+        }
+
+        if (hasDot) {
+            for (uint256 j = 0; j < 18; j++) {
+                uint8 m = uint8(value[counterBeforeDot + 1 + j]);
+                if (m >= 48 && m <= 57) {
+                    result = result * 10 + (m - 48);
+                    counterAfterDot++;
+                    totNum--;
+                }
+
+                if (totNum == 0) {
+                    break;
+                }
+            }
+        }
+        if (counterAfterDot <= 18) {
+            uint256 addNum = 18 - counterAfterDot;
+            result = result * 10**addNum;
+        }
     }
 }
