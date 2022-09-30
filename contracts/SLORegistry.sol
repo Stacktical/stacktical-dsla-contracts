@@ -1,8 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
-
-import '@openzeppelin/contracts/math/SafeMath.sol';
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity 0.8.9;
 
 /**
  * @title SLORegistry
@@ -10,9 +7,6 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
  * objectives and querying those service level objectives
  */
 contract SLORegistry {
-    using SafeMath for uint256;
-    using SafeMath for int256;
-
     enum SLOType {
         EqualTo,
         NotEqualTo,
@@ -23,20 +17,22 @@ contract SLORegistry {
     }
 
     struct SLO {
-        uint256 sloValue;
+        // half storage slot
+        uint120 sloValue;
         SLOType sloType;
     }
-    /**
-     * @dev SLO Registered event
-     * @param sla 1. -
-     * @param sloValue 2. -
-     * @param sloType 3. -
-     */
+
+    /// @dev SLO Registered event
     event SLORegistered(address indexed sla, uint256 sloValue, SLOType sloType);
 
+    /// @notice maximum cap of deviation percent = 25%, base 10000
+    uint16 private constant deviationCapRate = 2500;
+    /// @notice address of SLARegistry contract
     address private slaRegistry;
+    /// @dev sla address => SLO mapping
     mapping(address => SLO) public registeredSLO;
 
+    /// @dev Modifier ensuring that certain function can only be called by SLARegistry
     modifier onlySLARegistry() {
         require(
             msg.sender == slaRegistry,
@@ -45,6 +41,10 @@ contract SLORegistry {
         _;
     }
 
+    /**
+     * @notice function to set SLARegistry address
+     * @dev this function can be called only once
+     */
     function setSLARegistry() public {
         // Only able to trigger this function once
         require(
@@ -55,13 +55,14 @@ contract SLORegistry {
     }
 
     /**
-     * @dev public function for creating service level objectives
+     * @notice public function for creating service level objectives
+     * @dev only SLARegistry can call this function
      * @param _sloValue 1. -
      * @param _sloType 2. -
      * @param _slaAddress 3. -
      */
     function registerSLO(
-        uint256 _sloValue,
+        uint120 _sloValue,
         SLOType _sloType,
         address _slaAddress
     ) public onlySLARegistry {
@@ -78,7 +79,7 @@ contract SLORegistry {
      * @return boolean with the SLO honoured state
      */
     function isRespected(uint256 _value, address _slaAddress)
-        public
+        external
         view
         returns (bool)
     {
@@ -87,85 +88,62 @@ contract SLORegistry {
 
         if (sloType == SLOType.EqualTo) {
             return _value == sloValue;
-        }
-
-        if (sloType == SLOType.NotEqualTo) {
+        } else if (sloType == SLOType.NotEqualTo) {
             return _value != sloValue;
-        }
-
-        if (sloType == SLOType.SmallerThan) {
+        } else if (sloType == SLOType.SmallerThan) {
             return _value < sloValue;
-        }
-
-        if (sloType == SLOType.SmallerOrEqualTo) {
+        } else if (sloType == SLOType.SmallerOrEqualTo) {
             return _value <= sloValue;
-        }
-
-        if (sloType == SLOType.GreaterThan) {
+        } else if (sloType == SLOType.GreaterThan) {
             return _value > sloValue;
-        }
-
-        if (sloType == SLOType.GreaterOrEqualTo) {
+        } else {
+            // sloType == SLOType.GreaterOrEqualTo
             return _value >= sloValue;
         }
-
-        revert("isRespected wasn't executed properly");
     }
 
     /**
      * @dev external view function to get the percentage difference between SLI and SLO
      * @param _sli The SLI value to check against the SLO
      * @param _slaAddress The SLO value to check against the SLI
-     * @param _precision The precision for the calculation
-     * @return uint256 with the deviation value for the selected sli and sla
+     * @return uint256 with the deviation value for the selected sli and sla, base 10000
      */
-    function getDeviation(
-        uint256 _sli,
-        address _slaAddress,
-        uint256 _precision
-    ) public view returns (uint256) {
+    function getDeviation(uint256 _sli, address _slaAddress)
+        external
+        view
+        returns (uint256)
+    {
         SLOType sloType = registeredSLO[_slaAddress].sloType;
         uint256 sloValue = registeredSLO[_slaAddress].sloValue;
 
         // Ensures a positive deviation for greater / small comparisons
         // The deviation is the percentage difference between SLI and SLO
-        uint256 deviation = (
-            _sli >= sloValue ? _sli.sub(sloValue) : sloValue.sub(_sli)
-        ).mul(_precision).div(_sli.add(sloValue).div(2));
+        //                          | sloValue - sli |
+        // formula =>  deviation = -------------------- %
+        //                          (sli + sloValue) / 2
+        uint256 deviation = ((
+            _sli >= sloValue ? _sli - sloValue : sloValue - _sli
+        ) * 20000) / (_sli + sloValue);
 
         // Enforces a deviation capped at 25%
-        if (deviation > _precision.mul(25).div(100)) {
-            deviation = _precision.mul(25).div(100);
+        if (deviation > deviationCapRate) {
+            deviation = deviationCapRate;
         }
-
         if (sloType == SLOType.EqualTo) {
-            // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = _precision.mul(1).div(100);
+            // Fixed deviation for this comparison, the reward percentage is the cap
+            return deviationCapRate;
+        } else if (sloType == SLOType.NotEqualTo) {
+            // Fixed deviation for this comparison, the reward percentage is the cap
+            return deviationCapRate;
+        } else if (sloType == SLOType.SmallerThan) {
+            return deviation;
+        } else if (sloType == SLOType.SmallerOrEqualTo) {
+            return deviation;
+        } else if (sloType == SLOType.GreaterThan) {
+            return deviation;
+        } else {
+            // sloType == SLOType.GreaterOrEqualTo
             return deviation;
         }
-
-        if (sloType == SLOType.NotEqualTo) {
-            // Fixed deviation for this comparison, the reward percentage fully driven by verification period
-            deviation = _precision.mul(1).div(100);
-            return deviation;
-        }
-
-        if (sloType == SLOType.SmallerThan) {
-            return deviation;
-        }
-
-        if (sloType == SLOType.SmallerOrEqualTo) {
-            return deviation;
-        }
-
-        if (sloType == SLOType.GreaterThan) {
-            return deviation;
-        }
-
-        if (sloType == SLOType.GreaterOrEqualTo) {
-            return deviation;
-        }
-
-        revert("getDeviation wasn't executed properly");
     }
 }

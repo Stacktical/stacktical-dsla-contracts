@@ -1,21 +1,19 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-import '@openzeppelin/contracts/access/Ownable.sol';
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity 0.8.9;
 
-abstract contract IStakeRegistry is Ownable {
-    function registerStakedSla(address _owner) external virtual returns (bool);
+interface IStakeRegistry {
+    function registerStakedSla(address _owner) external returns (bool);
 
-    function setSLARegistry() external virtual;
+    function setSLARegistry() external;
 
     function lockDSLAValue(
         address slaOwner_,
         address sla_,
         uint256 periodIdsLength_
-    ) external virtual;
+    ) external;
 
     function getStakingParameters()
         external
-        virtual
         view
         returns (
             uint256 DSLAburnRate,
@@ -29,20 +27,28 @@ abstract contract IStakeRegistry is Ownable {
             bool burnDSLA
         );
 
-    function DSLATokenAddress() external virtual view returns (address);
+    function DSLATokenAddress() external view returns (address);
 
-    function isAllowedToken(address tokenAddress_) external virtual view returns (bool);
+    function isAllowedToken(address tokenAddress_) external view returns (bool);
 
-    function returnLockedValue(address sla_) external virtual;
+    function periodIsVerified(address _sla, uint256 _periodId)
+        external
+        view
+        returns (bool);
+
+    function returnLockedValue(address sla_) external;
 
     function distributeVerificationRewards(
         address _sla,
         address _verificationRewardReceiver,
         uint256 _periodId
-    ) external virtual;
+    ) external;
 
-    function createDToken(string calldata _name, string calldata _symbol, uint8 decimals)
-        external
-        virtual
-        returns (address);
+    function createDToken(
+        string calldata _name,
+        string calldata _symbol,
+        uint8 decimals
+    ) external returns (address);
+
+    function owner() external view returns (address);
 }

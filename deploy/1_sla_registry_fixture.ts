@@ -1,7 +1,8 @@
 import { DeployOptionsBase } from 'hardhat-deploy/dist/types';
-import { CONTRACT_NAMES, DEPLOYMENT_TAGS } from '../constants';
+import { CONTRACT_NAMES, DEPLOYMENT_TAGS, PERIOD_TYPE, SENetworkNamesBytes32 } from '../constants';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { currentTimestamp, ONE_DAY } from '../test/helper';
+const moment = require('moment');
 
 module.exports = async ({
   getNamedAccounts,
@@ -21,28 +22,7 @@ module.exports = async ({
   await deploy(CONTRACT_NAMES.StringUtils, baseOptions);
 
   await deploy(CONTRACT_NAMES.PeriodRegistry, baseOptions);
-  const periodRegistryArtifact = await deployments.getArtifact(
-    CONTRACT_NAMES.PeriodRegistry
-  );
-  const periodRegistry = await deployMockContract(
-    await (ethers as any).getSigner(deployer),
-    periodRegistryArtifact.abi
-  );
-  await periodRegistry.mock.isInitializedPeriod.returns(true);
-  await periodRegistry.mock.periodIsFinished.returns(true);
-  await periodRegistry.mock.isValidPeriod.returns(true);
-  await periodRegistry.mock.getPeriodStartAndEnd.returns(currentTimestamp, currentTimestamp + ONE_DAY);
-
-  const messengerRegistryArtifact = await deployments.getArtifact(
-    CONTRACT_NAMES.MessengerRegistry
-  );
-  const messengerRegistry = await deployMockContract(
-    await (ethers as any).getSigner(deployer),
-    messengerRegistryArtifact.abi
-  );
-  await messengerRegistry.mock.registeredMessengers.returns(true);
-  await messengerRegistry.mock.setSLARegistry.returns();
-
+  await deploy(CONTRACT_NAMES.MessengerRegistry, baseOptions);
   await deploy(CONTRACT_NAMES.SLORegistry, baseOptions);
   await deploy(CONTRACT_NAMES.DSLA, {
     ...baseOptions,
@@ -57,6 +37,8 @@ module.exports = async ({
   });
   const sloRegistry = await ethers.getContract(CONTRACT_NAMES.SLORegistry);
   const stakeRegistry = await ethers.getContract(CONTRACT_NAMES.StakeRegistry);
+  const messengerRegistry = await ethers.getContract(CONTRACT_NAMES.MessengerRegistry);
+  const periodRegistry = await ethers.getContract(CONTRACT_NAMES.PeriodRegistry);
   const stringUtils = await ethers.getContract(CONTRACT_NAMES.StringUtils);
   const checkPastPeriods = false;
   await deploy(CONTRACT_NAMES.SLARegistry, {
@@ -75,6 +57,33 @@ module.exports = async ({
   await deploy(CONTRACT_NAMES.Details, {
     ...baseOptions
   });
+
+  const periodStart = moment()
+    .utc(0)
+    .startOf('month')
+    .add(10, 'month')
+    .startOf('month')
+    .unix();
+  await periodRegistry.initializePeriod(
+    PERIOD_TYPE.DAILY,
+    [periodStart],
+    [periodStart + 1000]
+  );
+  await periodRegistry.addPeriodsToPeriodType(
+    PERIOD_TYPE.DAILY,
+    [periodStart + 1001],
+    [periodStart + 2000]
+  );
+  await periodRegistry.initializePeriod(
+    PERIOD_TYPE.WEEKLY,
+    [periodStart],
+    [periodStart + 1000]
+  );
+  await periodRegistry.addPeriodsToPeriodType(
+    PERIOD_TYPE.WEEKLY,
+    [periodStart + 1001],
+    [periodStart + 2000]
+  );
 };
 
 module.exports.tags = [DEPLOYMENT_TAGS.SLA_REGISTRY_FIXTURE];

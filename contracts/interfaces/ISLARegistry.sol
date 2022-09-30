@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity 0.8.9;
 
 interface ISLARegistry {
     function sloRegistry() external view returns (address);

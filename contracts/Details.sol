@@ -1,27 +1,28 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity 0.8.9;
 
 import './SLA.sol';
 import './SLORegistry.sol';
-import './Staking.sol';
 import './interfaces/IStakeRegistry.sol';
 import './interfaces/IPeriodRegistry.sol';
 import './interfaces/IMessengerRegistry.sol';
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import './dToken.sol';
 
 /**
  * @title Details
- * @dev Details is a contract to fetch details of contracts with a single RPC endpoint
+ * @notice Details is a contract to fetch details of contracts with a single RPC endpoint
+ * @dev this contract only provides interfaces to the protocol, no write functions
  */
 contract Details {
+    /// @notice A struct to represent staking information of token
     struct TokenStake {
         address tokenAddress;
         uint256 totalStake;
         uint256 usersPool;
-        uint256 providerPool;
+        uint256 providersPool;
     }
 
+    /// @notice A struct to represent dToken information
     struct DtokenDetails {
         address tokenAddress;
         uint256 totalSupply;
@@ -34,10 +35,11 @@ contract Details {
 
     /**
      * @dev external view function that returns all dynamic agreement information
-     * @return stakersCount 2. amount of stakers
-     * @return nextVerifiablePeriod 3. amount of stakers
+     * @param _slaAddress Address of SLA
+     * @return stakersCount 1. amount of stakers
+     * @return nextVerifiablePeriod 2. next verifiable period id
+     * @return leverage 3. leverage
      */
-
     function getSLADynamicDetails(address _slaAddress)
         external
         view
@@ -53,6 +55,22 @@ contract Details {
         leverage = sla.leverage();
     }
 
+    /**
+     * @dev external view function that returns all details of a SLA
+     * @param _slaAddress Address of SLA
+     * @param _sloRegistry Address of SLORegistry
+     * @return slaOwner owner of sla
+     * @return messengerAddress messenger address
+     * @return sloValue slo value
+     * @return creationBlockNumber blocknumber of sla creation
+     * @return slaId id of sla
+     * @return initialPeriodId starting period id
+     * @return finalPeriodId ending period id
+     * @return whiteListed is whitelisted
+     * @return periodType period type
+     * @return sloType slo type
+     * @return ipfsHash ipfshash
+     */
     function getSLAStaticDetails(address _slaAddress, SLORegistry _sloRegistry)
         external
         view
@@ -83,6 +101,12 @@ contract Details {
         finalPeriodId = sla.finalPeriodId();
     }
 
+    /**
+     * @notice external view function that returns slis and staking information for all periods
+     * @param _slaAddress Address of SLA
+     * @return periodSLIs array of slis for all periods
+     * @return tokensStake array of tokenstake for all periods
+     */
     function getSLADetailsArrays(address _slaAddress)
         external
         view
@@ -99,7 +123,7 @@ contract Details {
         for (uint256 index = 0; index < periodIdsLength; index++) {
             uint256 periodId = initialPeriodId + index;
             (uint256 timestamp, uint256 sli, SLA.Status status) = sla
-            .periodSLIs(periodId);
+                .periodSLIs(periodId);
             periodSLIs[index] = SLA.PeriodSLI({
                 status: status,
                 sli: sli,
@@ -112,14 +136,21 @@ contract Details {
             address tokenAddress = sla.allowedTokens(index);
             tokensStake[index] = TokenStake({
                 tokenAddress: tokenAddress,
-                totalStake: sla.usersPool(sla.allowedTokens(index)) +
-                    sla.providerPool(sla.allowedTokens(index)),
-                usersPool: sla.usersPool(sla.allowedTokens(index)),
-                providerPool: sla.providerPool(sla.allowedTokens(index))
+                totalStake: sla.usersPool(tokenAddress) +
+                    sla.providersPool(tokenAddress),
+                usersPool: sla.usersPool(tokenAddress),
+                providersPool: sla.providersPool(tokenAddress)
             });
         }
     }
 
+    /**
+     * @notice external view function that returns all dToken details of SLA
+     * @param _slaAddress Address of SLA
+     * @param _owner user address
+     * @return dpTokens array of provider tokens
+     * @return duTokens array of user tokens
+     */
     function getDTokensDetails(address _slaAddress, address _owner)
         public
         view
@@ -135,32 +166,28 @@ contract Details {
         duTokens = new DtokenDetails[](allowedTokensLength);
         for (uint256 index = 0; index < allowedTokensLength; index++) {
             address tokenAddress = sla.allowedTokens(index);
-            address dpTokenAddress = address(sla.dpTokenRegistry(tokenAddress));
+            dToken dpToken = dToken(sla.dpTokenRegistry(tokenAddress));
             dpTokens[index] = DtokenDetails({
-                dTokenAddress: dpTokenAddress,
+                dTokenAddress: address(dpToken),
                 tokenAddress: tokenAddress,
-                totalSupply: ERC20(dpTokenAddress).totalSupply(),
-                dTokenSymbol: ERC20(dpTokenAddress).symbol(),
-                dTokenName: ERC20(dpTokenAddress).name(),
-                balance: fromOwner
-                    ? ERC20(dpTokenAddress).balanceOf(_owner)
-                    : 0,
+                totalSupply: dpToken.totalSupply(),
+                dTokenSymbol: dpToken.symbol(),
+                dTokenName: dpToken.name(),
+                balance: fromOwner ? dpToken.balanceOf(_owner) : 0,
                 allowance: fromOwner
-                    ? ERC20(dpTokenAddress).allowance(_owner, _slaAddress)
+                    ? dpToken.allowance(_owner, _slaAddress)
                     : 0
             });
-            address duTokenAddress = address(sla.duTokenRegistry(tokenAddress));
+            dToken duToken = dToken(sla.duTokenRegistry(tokenAddress));
             duTokens[index] = DtokenDetails({
-                dTokenAddress: duTokenAddress,
+                dTokenAddress: address(duToken),
                 tokenAddress: tokenAddress,
-                totalSupply: ERC20(duTokenAddress).totalSupply(),
-                dTokenSymbol: ERC20(duTokenAddress).symbol(),
-                dTokenName: ERC20(duTokenAddress).name(),
-                balance: fromOwner
-                    ? ERC20(duTokenAddress).balanceOf(_owner)
-                    : 0,
+                totalSupply: duToken.totalSupply(),
+                dTokenSymbol: duToken.symbol(),
+                dTokenName: duToken.name(),
+                balance: fromOwner ? duToken.balanceOf(_owner) : 0,
                 allowance: fromOwner
-                    ? ERC20(duTokenAddress).allowance(_owner, _slaAddress)
+                    ? duToken.allowance(_owner, _slaAddress)
                     : 0
             });
         }

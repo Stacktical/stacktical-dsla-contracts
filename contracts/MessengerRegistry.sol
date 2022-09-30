@@ -1,18 +1,15 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.6.6;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity 0.8.9;
 
 import './interfaces/IMessenger.sol';
 import './interfaces/IMessengerRegistry.sol';
-import '@openzeppelin/contracts/math/SafeMath.sol';
 
 /**
  * @title MessengerRegistry
- * @dev MessengerRegistry is a contract to register openly distributed Messengers
+ * @notice MessengerRegistry is a contract to register openly distributed Messengers
  */
 contract MessengerRegistry is IMessengerRegistry {
-    using SafeMath for uint256;
-
+    /// @notice struct to store the definition of Messenger
     struct Messenger {
         address ownerAddress;
         address messengerAddress;
@@ -23,14 +20,16 @@ contract MessengerRegistry is IMessengerRegistry {
         uint256 id;
     }
 
+    /// @notice messengers
     Messenger[] private _messengers;
-    /// @dev (messengerAddress=>bool) to check if the Messenger was
+    /// @notice (messengerAddress=>bool) to check if the Messenger was registered
     mapping(address => bool) private _registeredMessengers;
-    /// @dev (userAddress=>messengerAddress[]) to register the messengers of an owner
+    /// @notice (userAddress=>messengerAddress[]) to register the messengers of an owner
     mapping(address => uint256[]) private _ownerMessengers;
-
+    /// @notice SLARegistry address
     address private _slaRegistry;
 
+    /// @notice an event that is emitted when SLARegistry registers a new messenger
     event MessengerRegistered(
         address indexed ownerAddress,
         address indexed messengerAddress,
@@ -39,6 +38,7 @@ contract MessengerRegistry is IMessengerRegistry {
         uint256 id
     );
 
+    /// @notice an event that is emitted when Messenger owner modifies the messenger
     event MessengerModified(
         address indexed ownerAddress,
         address indexed messengerAddress,
@@ -48,11 +48,10 @@ contract MessengerRegistry is IMessengerRegistry {
     );
 
     /**
-     * @dev sets the SLARegistry contract address and can only be called
-     * once
+     * @notice function to set SLARegistry address
+     * @dev this function can be called only once
      */
     function setSLARegistry() external override {
-        // Only able to trigger this function once
         require(
             address(_slaRegistry) == address(0),
             'SLARegistry address has already been set'
@@ -62,7 +61,11 @@ contract MessengerRegistry is IMessengerRegistry {
     }
 
     /**
-     * @dev function to register a new Messenger
+     * @notice function to register a new Messenger
+     * @dev only SLARegistry can call this function
+     * @param callerAddress_ messenger owner address
+     * @param messengerAddress_ messenger address
+     * @param specificationUrl_ specification url of messenger
      */
     function registerMessenger(
         address callerAddress_,
@@ -73,6 +76,7 @@ contract MessengerRegistry is IMessengerRegistry {
             msg.sender == _slaRegistry,
             'Should only be called using the SLARegistry contract'
         );
+        require(messengerAddress_ != address(0x0), 'invalid messenger address');
         require(
             !_registeredMessengers[messengerAddress_],
             'messenger already registered'
@@ -92,7 +96,7 @@ contract MessengerRegistry is IMessengerRegistry {
         _ownerMessengers[messengerOwner].push(id);
 
         require(
-            precision.mod(100) == 0 && precision != 0,
+            precision % 100 == 0 && precision != 0,
             'invalid messenger precision, cannot register messanger'
         );
 
@@ -118,7 +122,9 @@ contract MessengerRegistry is IMessengerRegistry {
     }
 
     /**
-     * @dev function to modifyMessenger a Messenger
+     * @notice function to modify messenger
+     * @dev only messenger owner can call this function
+     * @param _specificationUrl new specification url to update
      */
     function modifyMessenger(
         string calldata _specificationUrl,
@@ -140,15 +146,24 @@ contract MessengerRegistry is IMessengerRegistry {
         );
     }
 
-    function getMessengers() external view returns (Messenger[] memory) {
-        Messenger[] memory returnMessengers = new Messenger[](
-            _messengers.length
-        );
-        for (uint256 index = 0; index < _messengers.length; index++) {
+    /**
+     * @notice external view function that returns registered messengers
+     * @return array of Messenger struct
+     */
+    function getMessengers(uint256 skip, uint256 num)
+        external
+        view
+        returns (Messenger[] memory)
+    {
+        if (skip >= _messengers.length) num = 0;
+        if (skip + num > _messengers.length) num = _messengers.length - skip;
+        Messenger[] memory returnMessengers = new Messenger[](num);
+
+        for (uint256 index = skip; index < skip + num; index++) {
             IMessenger messenger = IMessenger(
                 _messengers[index].messengerAddress
             );
-            returnMessengers[index] = Messenger({
+            returnMessengers[index - skip] = Messenger({
                 ownerAddress: _messengers[index].ownerAddress,
                 messengerAddress: _messengers[index].messengerAddress,
                 specificationUrl: _messengers[index].specificationUrl,
@@ -161,10 +176,19 @@ contract MessengerRegistry is IMessengerRegistry {
         return returnMessengers;
     }
 
+    /**
+     * @notice external view function that returns the number of registered messengers
+     * @return number of registered messengers
+     */
     function getMessengersLength() external view returns (uint256) {
         return _messengers.length;
     }
 
+    /**
+     * @notice external view function that returns the registration state by address
+     * @param messengerAddress_ messenger address to check
+     * @return bool registered or not
+     */
     function registeredMessengers(address messengerAddress_)
         external
         view
