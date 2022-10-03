@@ -1,0 +1,343 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sloRegistry_",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "periodRegistry_",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "messengerRegistry_",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "stakeRegistry_",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "checkPastPeriod_",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sla",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      }
+    ],
+    "name": "ReturnLockedValue",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "contract SLA",
+        "name": "sla",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "SLACreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "periodId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sla",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      }
+    ],
+    "name": "SLIRequested",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "SLAs",
+    "outputs": [
+      {
+        "internalType": "contract SLA",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "allSLAs",
+    "outputs": [
+      {
+        "internalType": "contract SLA[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "checkPastPeriod",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint120",
+        "name": "sloValue_",
+        "type": "uint120"
+      },
+      {
+        "internalType": "enum SLORegistry.SLOType",
+        "name": "sloType_",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "whitelisted_",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "messengerAddress_",
+        "type": "address"
+      },
+      {
+        "internalType": "enum IPeriodRegistry.PeriodType",
+        "name": "periodType_",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint128",
+        "name": "initialPeriodId_",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "finalPeriodId_",
+        "type": "uint128"
+      },
+      {
+        "internalType": "string",
+        "name": "ipfsHash_",
+        "type": "string"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "extraData_",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint64",
+        "name": "leverage_",
+        "type": "uint64"
+      }
+    ],
+    "name": "createSLA",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_slaAddress",
+        "type": "address"
+      }
+    ],
+    "name": "isRegisteredSLA",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "messengerRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "periodRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_messengerAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_specificationUrl",
+        "type": "string"
+      }
+    ],
+    "name": "registerMessenger",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_periodId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "contract SLA",
+        "name": "_sla",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_ownerApproval",
+        "type": "bool"
+      }
+    ],
+    "name": "requestSLI",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract SLA",
+        "name": "_sla",
+        "type": "address"
+      }
+    ],
+    "name": "returnLockedValue",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sloRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stakeRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "userSLAs",
+    "outputs": [
+      {
+        "internalType": "contract SLA[]",
+        "name": "SLAList",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
