@@ -33,7 +33,8 @@ contract SLA is Staking {
     uint128 public immutable finalPeriodId;
     IPeriodRegistry.PeriodType public immutable periodType;
     /// @dev extra data for customized workflows
-    bytes32[] public extraData;
+    bytes32[] public severity;
+    bytes32[] public penalty;
 
     uint256 public nextVerifiablePeriod;
 
@@ -85,7 +86,8 @@ contract SLA is Staking {
         uint128 _finalPeriodId,
         uint128 _slaID,
         string memory _ipfsHash,
-        bytes32[] memory _extraData,
+        bytes32[] memory _severity,
+        bytes32[] memory _penalty,
         uint64 _leverage
     )
         Staking(
@@ -105,7 +107,8 @@ contract SLA is Staking {
         initialPeriodId = _initialPeriodId;
         finalPeriodId = _finalPeriodId;
         periodType = _periodType;
-        extraData = _extraData;
+        severity = _severity;
+        penalty = _penalty;
         nextVerifiablePeriod = _initialPeriodId;
     }
 
@@ -125,7 +128,12 @@ contract SLA is Staking {
         periodSLI.sli = _sli;
         periodSLI.timestamp = block.timestamp;
 
-        uint256 deviation = _sloRegistry.getDeviation(_sli, address(this));
+        uint256 deviation = _sloRegistry.getDeviation(
+            _sli,
+            address(this),
+            severity,
+            penalty
+        );
 
         if (_sloRegistry.isRespected(_sli, address(this))) {
             periodSLI.status = Status.Respected;
