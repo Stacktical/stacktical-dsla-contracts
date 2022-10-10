@@ -111,8 +111,8 @@ contract SLORegistry {
     function getDeviation(
         uint256 _sli,
         address _slaAddress,
-        bytes32[] memory severity,
-        bytes32[] memory penalty
+        uint256[] memory severity,
+        uint256[] memory penalty
     ) external view returns (uint256) {
         SLOType sloType = registeredSLO[_slaAddress].sloType;
         uint256 sloValue = registeredSLO[_slaAddress].sloValue;
@@ -120,8 +120,8 @@ contract SLORegistry {
         uint256 deviation = 0;
 
         for (uint256 i = 0; i < severity.length; i++) {
-            if (_sli >= uint256(severity[i])) {
-                deviation = uint256(penalty[i]);
+            if (_sli >= severity[i]) {
+                deviation = penalty[i];
             }
         }
 

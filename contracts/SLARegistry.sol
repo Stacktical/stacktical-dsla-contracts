@@ -106,8 +106,8 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         uint128 initialPeriodId_,
         uint128 finalPeriodId_,
         string memory ipfsHash_,
-        bytes32[] memory severity_,
-        bytes32[] memory penalty_,
+        uint256[] memory severity_,
+        uint256[] memory penalty_,
         uint64 leverage_
     ) public nonReentrant {
         require(
@@ -144,6 +144,10 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
                 messengerAddress_
             ),
             'invalid messenger'
+        );
+        require(
+            severity_.length == penalty_.length,
+            'severity and penalty length should match'
         );
 
         SLA sla = new SLA(

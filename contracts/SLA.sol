@@ -33,8 +33,8 @@ contract SLA is Staking {
     uint128 public immutable finalPeriodId;
     IPeriodRegistry.PeriodType public immutable periodType;
     /// @dev extra data for customized workflows
-    bytes32[] public severity;
-    bytes32[] public penalty;
+    uint256[] public severity;
+    uint256[] public penalty;
 
     uint256 public nextVerifiablePeriod;
 
@@ -86,8 +86,8 @@ contract SLA is Staking {
         uint128 _finalPeriodId,
         uint128 _slaID,
         string memory _ipfsHash,
-        bytes32[] memory _severity,
-        bytes32[] memory _penalty,
+        uint256[] memory _severity,
+        uint256[] memory _penalty,
         uint64 _leverage
     )
         Staking(
