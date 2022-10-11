@@ -36,7 +36,8 @@ const baseSLAConfig = {
   periodType: PERIOD_TYPE.DAILY,
   initialPeriodId: 0,
   finalPeriodId: 1,
-  extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
+  severity: [],
+  penalty: [],
   leverage: leverage,
 };
 const mintAmount = '1000000';
@@ -82,7 +83,8 @@ const setup = deployments.createFixture(async () => {
     baseSLAConfig.initialPeriodId,
     baseSLAConfig.finalPeriodId,
     'dummy-ipfs-hash',
-    baseSLAConfig.extraData,
+    baseSLAConfig.severity,
+    baseSLAConfig.penalty,
     baseSLAConfig.leverage
   );
 

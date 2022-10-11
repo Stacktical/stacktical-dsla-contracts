@@ -26,7 +26,8 @@ const baseSLAConfig = {
   periodType: PERIOD_TYPE.WEEKLY,
   initialPeriodId: 0,
   finalPeriodId: 1,
-  extraData: [SENetworkNamesBytes32[SENetworks.ONE]],
+  severity: [],
+  penalty: [],
   leverage: 1,
 };
 
@@ -83,7 +84,8 @@ const setup = deployments.createFixture(async () => {
     baseSLAConfig.initialPeriodId,
     baseSLAConfig.finalPeriodId,
     'dummy-ipfs-hash',
-    baseSLAConfig.extraData,
+    baseSLAConfig.severity,
+    baseSLAConfig.penalty,
     baseSLAConfig.leverage
   );
 
