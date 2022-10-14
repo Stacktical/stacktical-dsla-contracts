@@ -93,7 +93,8 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
      * @param initialPeriodId_ starting period id
      * @param finalPeriodId_ ending period id
      * @param ipfsHash_ ipfshash
-     * @param extraData_ extradata
+     * @param severity_ severity
+     * @param penalty_ penalty per severity level
      * @param leverage_ leverage
      */
     function createSLA(
@@ -105,7 +106,8 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
         uint128 initialPeriodId_,
         uint128 finalPeriodId_,
         string memory ipfsHash_,
-        bytes32[] memory extraData_,
+        uint256[] memory severity_,
+        uint256[] memory penalty_,
         uint64 leverage_
     ) public nonReentrant {
         require(
@@ -143,6 +145,10 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
             ),
             'invalid messenger'
         );
+        require(
+            severity_.length == penalty_.length,
+            'severity and penalty length should match'
+        );
 
         SLA sla = new SLA(
             msg.sender,
@@ -153,7 +159,8 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
             finalPeriodId_,
             uint128(SLAs.length),
             ipfsHash_,
-            extraData_,
+            severity_,
+            penalty_,
             leverage_
         );
 
