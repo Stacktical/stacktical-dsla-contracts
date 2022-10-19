@@ -5,9 +5,6 @@ import 'solidity-coverage';
 import 'hardhat-abi-exporter';
 import 'hardhat-contract-sizer';
 import 'hardhat-deploy';
-import 'hardhat-docgen'
-import '@hardhat-docgen/core'
-import '@hardhat-docgen/markdown'
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -43,10 +40,11 @@ module.exports = {
     runOnCompile: true,
     strict: false,
   },
-  docgen: {
-    path: './docs',
+  abiExporter: {
+    path: "./abi",
+    runOnCompile: true,
     clear: true,
-    runOnCompile: false,
-    except: ['/test/*', '/mock/*', '/hardhat-proxy/*'],
+    flat: true,
+    spacing: 2,
   },
 };
