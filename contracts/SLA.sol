@@ -36,6 +36,7 @@ contract SLA is Staking {
     uint256[] public severity;
     uint256[] public penalty;
 
+    bool public terminateContract = false;
     uint256 public nextVerifiablePeriod;
 
     /// @dev periodId=>PeriodSLI mapping
@@ -154,7 +155,7 @@ contract SLA is Staking {
     }
 
     /**
-     * @notice Public view function to check if the contract is terminated
+     * @notice Public view function to check if the contract is finished
      * @dev finish condition = should pass last verified period and final period should not be verified.
      * @return Bool whether finished or not
      */
@@ -163,8 +164,9 @@ contract SLA is Staking {
             periodType,
             finalPeriodId
         );
-        return (block.timestamp >= endOfLastValidPeriod &&
-            periodSLIs[finalPeriodId].status != Status.NotVerified);
+        return ((block.timestamp >= endOfLastValidPeriod &&
+            periodSLIs[finalPeriodId].status != Status.NotVerified) ||
+            terminateContract);
     }
 
     /**
@@ -178,7 +180,7 @@ contract SLA is Staking {
         address _tokenAddress,
         Position _position
     ) external {
-        require(!contractFinished(), 'This SLA has terminated.');
+        require(!contractFinished(), 'This SLA has finished.');
 
         require(_amount > 0, 'Stake must be greater than 0.');
 
@@ -211,6 +213,7 @@ contract SLA is Staking {
             nextVerifiablePeriod,
             contractFinished()
         );
+
         emit ProviderWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
@@ -233,11 +236,23 @@ contract SLA is Staking {
             nextVerifiablePeriod,
             contractFinished()
         );
+
         emit UserWithdraw(
             _tokenAddress,
             nextVerifiablePeriod,
             msg.sender,
             _amount
         );
+    }
+
+    function toggleTermination() external onlyOwner {
+        (, uint256 endOfLastValidPeriod) = _periodRegistry.getPeriodStartAndEnd(
+            periodType,
+            finalPeriodId
+        );
+
+        require(block.timestamp >= endOfLastValidPeriod, 'This SLA has not finished.');
+
+        terminateContract = !terminateContract;
     }
 }
