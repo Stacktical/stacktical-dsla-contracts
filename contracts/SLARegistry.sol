@@ -233,7 +233,7 @@ contract SLARegistry is ISLARegistry, ReentrancyGuard {
     function returnLockedValue(SLA _sla) external {
         require(isRegisteredSLA(address(_sla)), 'This SLA is not valid.');
         require(msg.sender == _sla.owner(), 'Only the SLA owner can do this.');
-        require(_sla.contractFinished(), 'This SLA has not terminated.');
+        require(_sla.contractFinished(), 'This SLA has not finished.');
         emit ReturnLockedValue(address(_sla), msg.sender);
         IStakeRegistry(_stakeRegistry).returnLockedValue(address(_sla));
     }

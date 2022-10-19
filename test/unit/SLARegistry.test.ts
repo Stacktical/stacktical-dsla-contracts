@@ -478,7 +478,7 @@ describe(CONTRACT_NAMES.SLARegistry, function () {
       const slaAddress = (await slaRegistry.allSLAs()).slice(-1)[0];
       await expect(
         slaRegistry.returnLockedValue(slaAddress)
-      ).to.be.revertedWith('This SLA has not terminated.');
+      ).to.be.revertedWith('This SLA has not finished.');
     });
     it('should revert if no locked tokens', async () => {
       const { slaRegistry } = fixture;

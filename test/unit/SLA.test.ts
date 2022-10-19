@@ -225,7 +225,7 @@ describe(CONTRACT_NAMES.SLA, function () {
 
       await expect(
         sla.stakeTokens(0, dslaToken.address, POSITION.OK)
-      ).to.be.revertedWith('This SLA has terminated.');
+      ).to.be.revertedWith('This SLA has finished.');
     })
     it('should receive dp/du tokens when you stake tokens', async () => {
       // TODO:
