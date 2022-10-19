@@ -69,6 +69,9 @@ contract SLA is Staking {
         uint256 amount
     );
 
+    /// @notice An event that is emitted when toggles termination
+    event ToggleTermination(bool termination);
+
     /// @dev Modifier ensuring that certain function can only be called by Messenger
     modifier onlyMessenger() {
         require(msg.sender == messengerAddress, 'not messenger');
@@ -251,8 +254,13 @@ contract SLA is Staking {
             finalPeriodId
         );
 
-        require(block.timestamp >= endOfLastValidPeriod, 'This SLA has not finished.');
+        require(
+            block.timestamp >= endOfLastValidPeriod,
+            'This SLA has not finished.'
+        );
 
         terminateContract = !terminateContract;
+
+        emit ToggleTermination(terminateContract);
     }
 }

@@ -122,9 +122,11 @@ describe(CONTRACT_NAMES.SLA, function () {
   before(async function () {
     [owner, user, user1] = await ethers.getSigners();
   })
+
   beforeEach(async function () {
     fixture = await setup();
   });
+
   describe('register SLI', function () {
     it('should allow SLI registration only for messenger of the SLA', async () => {
       const { sla } = fixture;
@@ -231,6 +233,7 @@ describe(CONTRACT_NAMES.SLA, function () {
       // TODO:
     })
   })
+
   describe('withdraw', function () {
     it('should not let user withdraw tokens if the contract is not finished', async function () {
       const { sla, dslaToken, details } = fixture;
@@ -251,7 +254,12 @@ describe(CONTRACT_NAMES.SLA, function () {
 
       await dslaToken.approve(sla.address, amount);
       await sla.stakeTokens(
-        amount,
+        amount / 2,
+        dslaToken.address,
+        POSITION.KO
+      );
+      await sla.stakeTokens(
+        amount / 2,
         dslaToken.address,
         POSITION.KO
       );
@@ -440,10 +448,11 @@ describe(CONTRACT_NAMES.SLA, function () {
           stakeAmount,
           POSITION.OK
         );
+      await sla.stakeTokens(stakeAmount, dslaToken.address, POSITION.OK)
       let totalStake = (
         await details.getSLADetailsArrays(sla.address)
       ).tokensStake[0].totalStake.toString();
-      expect(totalStake).equals(stakeAmount.toString());
+      expect(totalStake).equals((stakeAmount * 2).toString());
     });
 
     it('should check that a negative amount of token cant be staked', async () => {
@@ -542,5 +551,49 @@ describe(CONTRACT_NAMES.SLA, function () {
         sla.connect(owner).stakeTokens(amount, dslaToken.address, POSITION.KO)
       ).to.be.reverted;
     });
+  })
+
+  describe('Toggle Termination', function () {
+    it("should revert termination toggle when SLA is not finished",async () => {
+      const { sla } = fixture;
+      await expect(
+        sla.toggleTermination()
+      ).to.be.revertedWith("This SLA has not finished.");
+    })
+    it("should allow termination toggle of SLA only for SLA owner", async () => {
+      const { sla, mockMessenger, slaRegistry, periodRegistry } = fixture;
+      const periodStart = moment()
+        .utc(0)
+        .startOf('month')
+        .add(10, 'month')
+        .startOf('month')
+        .unix();
+      await periodRegistry.addPeriodsToPeriodType(
+        PERIOD_TYPE.DAILY,
+        [periodStart],
+        [periodStart + 1000]
+      );
+      await evm_increaseTime(periodStart + 1000)
+
+      // make contract finished
+      await slaRegistry.requestSLI(0, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(0, 100))
+        .to.be.emit(sla, 'SLICreated');
+
+      await slaRegistry.requestSLI(1, sla.address, true);
+      await expect(mockMessenger.mockFulfillSLI(1, 100000))
+        .to.be.emit(sla, 'SLICreated');
+
+      await evm_increaseTime(periodStart + 1000 + ONE_DAY);
+      expect(await sla.contractFinished()).to.be.true;
+
+      await expect(
+        sla.connect(user1).toggleTermination()
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+
+      await expect(
+        sla.toggleTermination()
+      ).to.be.emit(sla, "ToggleTermination").withArgs(true);
+    })
   })
 });
